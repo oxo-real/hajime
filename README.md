@@ -1,9 +1,11 @@
 ```
-           _ _ 
-  ___ __ _| (_)
- / __/ _` | | |
-| (_| (_| | | |
- \___\__,_|_|_|
+ _            _ _                
+| |__   __ _ (_|_)_ __ ___   ___ 
+| '_ \ / _` || | | '_ ` _ \ / _ \
+| | | | (_| || | | | | | | |  __/
+|_| |_|\__,_|/ |_|_| |_| |_|\___|
+           |__/ 
+
  _ _|_ _ ._    _  _  
 (_\/|_(_)|_)\/(_|(/_ 
   /      |  /  _|    
@@ -12,39 +14,39 @@
 a seven part installation series
 (c) 2019 cytopyge
 
-## cali
+## hajime
 
 ### 1  Base
 The 'base' script creates a Globally Unique Identifiers (GUID) partition table (GPT) and Unified Extensible Firmware Interface (UEFI) system partition with systemd boot to bootstrap the user space for bleeding edge (BLE) and long term support (LTS) arch linux kernel. BOOT (ro) can be a separate partition / device. Logical volume manager (LVM) is fully encrypted with Linux Unified Key Setup (LUKS2) and contains separate volumes partitions for ROOT, HOME, VAR, USR (ro) and SWAP.
 
 ### 2  Conf
-The 'conf' script configures settings for time, network, mirrorlists, bootloader entries for bleeding edge and long term support kernels, ramdisk and creates an user environment.
+The 'conf' script configures settings for time, network, mirrorlists, bootloader entries for bleeding edge and long term support kernels, ramdisk and creates an user environment. After 'conf' the system is able to boot independently.
 
 ### 3  Post
-The third script creates 'post install' modifications to the package manager, updates the entire operating system, creates a mountpoint environment and installs an alternative AUR manager (yay) alongside pacman. After 'post' an fully fledged Arch installation is running on the system.
+The third script prepares the system 'post install' for the installation of a desktop environment. Modifications are made to the package manager, the entire operating system is updated, a mountpoint environment is beig created and an alternative AUR manager 'yay' is installed alongside the native 'pacman'. After 'post' an fully fledged Arch installation is running on the system.
 
 ### 4  Rice
-'cali rice' prepares the system for a display manager running under Wayland, with wlroots as a modular compositor library. The script will setup the Sway tiling window manager, but it can easily be modifed to be setup for old fashioned X11 based managers.
+'hajime rice' prepares the system for a display manager running under Wayland, with wlroots as a modular compositor library. The script will setup the Sway tiling window manager, but it can easily be modifed to be setup for X11 based managers, when preferred.
 
 ### 5  Doti
-'doti' installs a personal configuration dotfiles and tools like: z shell, vim, bitwarden, veracrypt.
+'doti' installs personal configuration dotfiles and tools like: z shell, vim, bitwarden, veracrypt.
 
 ### 6  Apps
 Installs a variety of tools, among others for: video, text, file management, network management, internet, system monitoring, virtual environments.
 
-### 7  Logr
-'logr' recovers personal local git repositorie. Adviced to tweak to personal preference.
+### 7  Gitu
+'gitu' brings the personal local git repository up-to-date. Adviced to tweak to personal preference.
 
 
 ## Take off instructions
-when using these cali scripts:
-be sure to get your latest Arch Linux image via: https://www.archlinux.org/download/
-after booting archiso live environment manually install git, clone cali by executing:
+when using these 'hajime' scripts:
+be sure to get your latest Arch Linux image via: https://www.archlinux.org/download/,
+then boot archiso live environment, install git and clone 'hajime':
 
 ```
-pacman -Sy git
-git clone https://gitlab.com/cytopyge/cali
-./cali/base.sh
+pacman -Sy --noconfirm git
+git clone https://gitlab.com/cytopyge/hajime
+./hajime/base.sh
 ```
 
 from here follow the in script instructions.
