@@ -246,7 +246,7 @@ sed -i '/\/usr/s/rw,/ro,/' /mnt/etc/fstab
 # preparing /mnt environment
 echo
 echo 'installing git and hajime to new environment'
-arch-chroot /mnt pacman -Sy git --noconfirm
+arch-chroot /mnt pacman -Sy --noconfirm git
 arch-chroot /mnt git clone https://gitlab.com/cytopyge/hajime
 echo
 
