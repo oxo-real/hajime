@@ -69,7 +69,7 @@ yay -S --noconfirm qrencode
 
 #[TODO] 
 # image viewer
-yay -S --noconfirm feh imv-git
+yay -S --noconfirm feh imv
 
 # image editor
 yay -S --noconfirm imagemagick
