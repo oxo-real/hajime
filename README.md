@@ -33,12 +33,12 @@ The third script prepares the system 'post install' for the installation of a de
 Installs a variety of tools, among others for: video, text, file management, network management, internet, system monitoring, virtual environments.
 
 ### 7  Gitu
-'gitu' brings the personal local git repository up-to-date. Adviced to tweak to personal preference.
+'Gitu' brings the personal local git repository up-to-date. Adviced to tweak the script to personal preference.
 
 ## Take off instructions
-when using these 'hajime' scripts:
-be sure to get your latest Arch Linux image via: https://www.archlinux.org/download/,
-then boot archiso live environment, install git and clone 'hajime':
+When using these 'hajime' scripts:
+Be sure to get your latest Arch Linux image via: https://www.archlinux.org/download/.
+Then boot into the ArchISO live system environment, install git and clone 'hajime':
 
 ```
 pacman -Sy --noconfirm git
@@ -46,7 +46,7 @@ git clone https://gitlab.com/cytopyge/hajime
 ./hajime/1base.sh
 ```
 
-From here follow check the in-script 'settings', run the scripts one by one and follow the in script instructions.
+From here follow check the 'settings' paragraphs in the beginning of the scripts. Then run the scripts one by one and follow the in-script instructions.
 
 ---
 ---
