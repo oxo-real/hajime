@@ -82,7 +82,11 @@ git clone -q https://gitlab.com/cytopyge/bwsession ~/git/code/bwsession
 
 
 # encryption
-yay -S --noconfirm veracrypt openvpn
+yay -S --noconfirm veracrypt
+
+# vpn 
+yay -S --noconfirm openvpn wireguard-tools
+
 
 # zsh shell config
 
