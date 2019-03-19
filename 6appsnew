@@ -21,70 +21,82 @@
 ## 
 #
 
+
+# terminal text tools
+terminal_text_tools="figlet qrencode"
+#terminal_text_tools=""
+
+# terminal file browser
+terminal_file_browser="nnn ranger vifm"
+#terminal_file_browser=""
+
+# file tools
+file_tools="srm rsync gdisk"
+#file_tools=""
+
+# network tools
+network_tools="wireshark-cli wireshark-qt mtr"
+#network_tools=""
+
+## mozilla firefox
+internet_tools="firefox-developer-edition w3m qutebrowser"
+
+# download utilities
+download_utilities="aria2"
+#download_utilities=""
+# system monitoring
+
+system_monitoring="glances ccze"
+#system_monitoring=""
+
+# virtual machines
+virtual_machines="virtualbox virtualbox-host-modules-arch"
+#virtual_machines=""
+
+# image viewers
+image_viewers="feh imv"
+#image_viewers=""
+
+# image editor
+image_editors="imagemagick"
+#image_editor=""
+
+# pdf viewer
+pdf_viewers="mupdf zathura-pdf-mupdf"
+#pdf_viewers=""
+
+# video tools
+video_tools="youtube-dl mpv youtube-viewer"
+#video_tools=""
+
+#[TODO]
+# photo editing
+#photo_editing=""
+#photo_editing=""
+
+#[TODO]
+# photo management
+#photo_management=""
+#photo_management=""
+
+# office-tools
+#office_tools="libreoffice-fresh libreoffice-fresh-nl"
+office_tools=""
+
+# mozilla firefox settings
+function mozilla_firefox {
+	[ -d ~/Downloads ] && rm -rf ~/Downloads
+	[ -d ~/.mozilla ] && rm -rf ~/.mozilla
+	git clone https://gitlab.com/cytopyge/ffxd_init ~/.mozilla
+	cd ~/.mozilla
+	git checkout -f addons
+	cd ~
+}
+
 # make rw
 sudo mount -o remount,rw  /usr
 
-yay -Syu --noconfirm \
-
-# video tools \
-youtube-dl mpv youtube-viewer \
-
-# terminal text tools \
-figlet \
-
-# terminal file browser \
-nnn ranger vifm \
-
-# file tools \
-srm rsync gdisk \
-
-# network tools \
-wireshark-cli wireshark-qt mtr \
-
-# download utility \
-aria2 \
-
-# internet tools \
-
-## mozilla firefox \
-firefox-developer-edition \
-[ -d ~/Downloads ] && rm -rf ~/Downloads \
-[ -d ~/.mozilla ] && rm -rf ~/.mozilla \
-git clone https://gitlab.com/cytopyge/ffxd_init ~/.mozilla \
-cd ~/.mozilla \
-git checkout -f addons \
-cd ~ \
-
-## w3m web browser \
-## also for ranger w3m image preview method \
-#[TODO] \
-w3m \
-
-# system monitoring \
-glances ccze \
-
-# virtual machines \
-virtualbox virtualbox-host-modules-arch \
-
-# qrcode \
-qrencode \
-
-#[TODO] \
-# image viewer \
-feh imv \
-
-# image editor \
-imagemagick \
-
-# pdf viewer \
-mupdf zathura-pdf-mupdf \
-
-#[TODO] \
-# photo editing \
-# yay -S --noconfirm \ 
-
-# libre-office \
-# yay -S --noconfirm libreoffice-fresh libreoffice-fresh-nl
+yay -Syu --noconfirm $terminal_text_tools $terminal_file_browser $file_tools $network_tools $internet_tools $ download_utilities $system_monitoring $virtual_machines $image_viewers $image_editors $pdf_viewers $video_tools $photo_editing $photo_management $office_tools
 
 # make ro
 sudo mount -o remount,ro  /usr
