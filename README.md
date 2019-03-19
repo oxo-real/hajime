@@ -9,6 +9,8 @@
  _ _|_ _ ._    _  _  
 (_\/|_(_)|_)\/(_|(/_ 
   /      |  /  _|    
+
+README.md
 ```
 # hajime
 ## a seven part arch linux installation series
