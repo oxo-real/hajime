@@ -22,6 +22,11 @@
 #
 
 
+# base_settings
+timezone=	"Europe/Amsterdam"
+arch_mirrorlist="https://www.archlinux.org/mirrorlist/?country=NL&protocol=http&protocol=https&ip_version=4"
+
+
 # clear screen
 clear
 echo
@@ -53,8 +58,7 @@ setfont ter-v32n
 timedatectl set-ntp true
 
 ## timezone
-timedatectl set-timezone Europe/Amsterdam
-
+timedatectl set-timezone $timezone
 ## verify
 timedatectl status
 echo
@@ -219,7 +223,7 @@ fi
 
 
 # update mirrorlist
-wget -O mirrorlist_nl 'https://www.archlinux.org/mirrorlist/?country=NL&protocol=http&protocol=https&ip_version=4'
+wget -O mirrorlist_nl $arch_mirrorlist
 sed -i 's/^.//' mirrorlist_nl
 
 

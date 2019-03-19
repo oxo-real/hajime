@@ -121,10 +121,6 @@ yay -S --noconfirm ttf-inconsolata
 #yay -S --noconfirm ttf-linux-libertine
 
 
-# adjust console font for HiDPI displays
-sudo echo 'FONT=Lat2-Terminus16' >> /etc/vconsole.conf
-
-
 # number one text editor
 ## vim
 #yay -S --noconfirm vim

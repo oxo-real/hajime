@@ -26,12 +26,8 @@
 sudo mount -o remount,rw  /usr
 
 
-####### ###### #### ### ## # FOR DEVELOPMENT PURPOSES # ## ### #### ##### ######
-## update hajime
-#sudo rm -rf hajime
-#sudo dhcpcd enp0s3
-#git clone https://gitlab.com/cytopyge/hajime
-####### ###### #### ### ## # FOR DEVELOPMENT PURPOSES # ## ### #### ##### ######
+# doti settings
+#[TODO] ?
 
 
 # dotfiles
@@ -83,6 +79,7 @@ git clone -q https://gitlab.com/cytopyge/bwsession ~/git/code/bwsession
 
 # encryption
 yay -S --noconfirm veracrypt
+
 
 # vpn 
 yay -S --noconfirm openvpn wireguard-tools

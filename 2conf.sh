@@ -22,6 +22,14 @@
 #
 
 
+# conf settings
+locale_conf=	"LANG=en_US.UTF-8"
+vconsole_conf=	"FONT=ter-v32n"
+mirror_country= "Netherlands"
+mirror_amout=	"5"
+username=	"user"
+
+
 # time settings
 ## set time zone
 ln -sf /usr/share/zoneinfo/Europe/Amsterdam /etc/localtime
@@ -32,7 +40,7 @@ hwclock --systohc
 # locale settings
 sed -i "/^#en_US.UTF-8 UTF-8/c\en_US.UTF-8 UTF-8" /etc/locale.gen
 locale-gen
-echo 'LANG=en_US.UTF-8' > /etc/locale.conf
+echo $locale_conf > /etc/locale.conf
 
 
 # network configuration
@@ -49,7 +57,7 @@ echo '127.0.1.1     "$hostname".localdomain     "$hostname"' >> /etc/hosts
 
 
 # set console font permanent via sd-vconsole
-echo 'FONT=ter-v32n' > /etc/vconsole.conf
+echo $vconsole_conf > /etc/vconsole.conf
 
 
 # set root password
@@ -58,19 +66,19 @@ passwd
 
 
 # update repositories and install core applications
-pacman -Syu --noconfirm linux-headers linux-lts linux-lts-headers reflector wpa_supplicant wireless_tools openssh wl-clipboard vim
+pacman -Syu --noconfirm linux-headers linux-lts linux-lts-headers reflector wpa_supplicant wireless_tools openssh wl-clipboard neovim
 
 
 # configuring the mirrorlist
 
 ## update mirrorlist
-https://www.archlinux.org/mirrorlist/all/
+#https://www.archlinux.org/mirrorlist/all/
 
 ## backup old mirrorlist
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/`date "+%Y%m%d%H%M%S"`_mirrorlist.backup
 
 ## select fastest five
-sudo reflector --verbose --country 'Netherlands' -l 5 --sort rate --save /etc/pacman.d/mirrorlist
+sudo reflector --verbose --country $mirror_country -l $mirror_amount --sort rate --save /etc/pacman.d/mirrorlist
 
 
 # installing the EFI boot manager
@@ -99,6 +107,7 @@ echo 'title Arch Linux BLE' > /boot/loader/entries/arch.conf
 echo 'linux /vmlinuz-linux' >> /boot/loader/entries/arch.conf
 echo 'initrd /initramfs-linux.img' >> /boot/loader/entries/arch.conf
 [ ! -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> /boot/loader/entries/arch.conf
+
 ## if lv_swap exists
 [ -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` rw resume=UUID=`blkid | grep lv_swap | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> /boot/loader/entries/arch.conf
 
@@ -107,6 +116,7 @@ echo 'title Arch Linux LTS' > /boot/loader/entries/arch-lts.conf
 echo 'linux /vmlinuz-linux-lts' >> /boot/loader/entries/arch-lts.conf
 echo 'initrd /initramfs-linux-lts.img' >> /boot/loader/entries/arch-lts.conf
 [ ! -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> /boot/loader/entries/arch-lts.conf
+
 ## if lv_swap exists
 [ -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` rw resume=UUID=`blkid | grep lv_swap | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> /boot/loader/entries/arch-lts.conf
 
@@ -123,8 +133,6 @@ mkinitcpio -p linux-lts
 # add user
 
 ## add $username
-echo 'enter username? '
-read username
 useradd -m -g wheel $username
 
 ## add $username to video group for brightness control
