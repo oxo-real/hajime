@@ -35,7 +35,6 @@ Installs a variety of tools, among others for: video, text, file management, net
 ### 7  Gitu
 'gitu' brings the personal local git repository up-to-date. Adviced to tweak to personal preference.
 
-
 ## Take off instructions
 when using these 'hajime' scripts:
 be sure to get your latest Arch Linux image via: https://www.archlinux.org/download/,
@@ -44,10 +43,10 @@ then boot archiso live environment, install git and clone 'hajime':
 ```
 pacman -Sy --noconfirm git
 git clone https://gitlab.com/cytopyge/hajime
-./hajime/base.sh
+./hajime/1base.sh
 ```
 
-from here follow the in script instructions.
+From here follow check the in-script 'settings', run the scripts one by one and follow the in script instructions.
 
 ---
 ---
