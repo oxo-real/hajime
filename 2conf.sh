@@ -147,13 +147,14 @@ useradd -m -g wheel $username
 usermod -a -G video $username
 
 ## set $username password
+echo $username
 passwd $username
 
 ## priviledge escalation for wheel group
 sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /etc/sudoers
 
 
-# move /hajime to ~
+# move /hajime to $user home
 cp -r /hajime /home/$username	
 sudo rm -rf /hajime
 
