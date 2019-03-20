@@ -22,17 +22,24 @@
 #
 
 
-# user customizable variables 
-locale_conf=	"LANG=en_US.UTF-8"
-vconsole_conf=	"FONT=ter-v32n"
-mirror_country= "Netherlands"
-mirror_amout=	"5"
-username=	"user"
-
+# user customizable variables
+time_zone=		"Europe/Amsterdam"
+locale_conf=		"LANG=en_US.UTF-8"
+vconsole_conf=		"FONT=ter-v32n"
+mirror_country= 	"Netherlands"
+mirror_amount=		"5"
+username=		"user"
+## core applications
+linux_kernel=		"linux-headers"
+linux_lts_kernel=	"linux-lts linux-lts-headers"
+command_line_editor=	"neovim"
+install_helpers=	"reflector wl-clipboard"
+wireless=		"wpa_supplicant wireless_tools"
+secure_connections=	"openssh"
 
 # time settings
 ## set time zone
-ln -sf /usr/share/zoneinfo/Europe/Amsterdam /etc/localtime
+ln -sf /usr/share/zoneinfo/$time_zone /etc/localtime
 ## set hwclock
 hwclock --systohc
 
@@ -65,20 +72,21 @@ whoami
 passwd
 
 
-# update repositories and install core applications
-pacman -Syu --noconfirm linux-headers linux-lts linux-lts-headers reflector wpa_supplicant wireless_tools openssh wl-clipboard neovim
+# install helpers
+pacman -S --noconfirm $install_helpers
 
 
 # configuring the mirrorlist
 
-## update mirrorlist
-#https://www.archlinux.org/mirrorlist/all/
-
 ## backup old mirrorlist
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/`date "+%Y%m%d%H%M%S"`_mirrorlist.backup
 
-## select fastest five
-sudo reflector --verbose --country $mirror_country -l $mirror_amount --sort rate --save /etc/pacman.d/mirrorlist
+## select fastest mirrors
+reflector --verbose --country $mirror_country -l $mirror_amount --sort rate --save /etc/pacman.d/mirrorlist
+
+
+# update repositories and install core applications
+pacman -Syu --noconfirm $linux_kernel $linux_lts_kernel $command_line_editor $wireless $secure_connections
 
 
 # installing the EFI boot manager

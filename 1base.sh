@@ -23,9 +23,12 @@
 
 
 # user customizable variables
+terminus_font=	"terminus-font"
 timezone=	"Europe/Amsterdam"
 arch_mirrorlist="https://www.archlinux.org/mirrorlist/?country=NL&protocol=http&protocol=https&ip_version=4"
-
+mirror_country=	"Netherlands"
+mirror_amount=	"5"
+install_helpers=	"reflector"
 
 # clear screen
 clear
@@ -43,10 +46,11 @@ echo
 
 
 # legible console font
+## especially useful for hiDPI screens
 
 ## install terminus font
-pacman -Sy --noconfirm terminus-font
-pacman -Ql terminus-font
+pacman -Sy --noconfirm $terminus_font
+pacman -Ql $terminus_font
 
 ## set console font temporarily
 setfont ter-v32n
@@ -221,10 +225,17 @@ if [[ $swap_bool == "Y" || $swap_bool == "y" ]]; then
 	swapon /dev/mapper/vg0-lv_swap
 fi
 
+# install helpers
+pacman -S --noconfirm $install_helpers
 
-# update mirrorlist
-wget -O mirrorlist_nl $arch_mirrorlist
-sed -i 's/^.//' mirrorlist_nl
+
+# configuring the mirrorlist
+
+## backup old mirrorlist
+cp /etc/pacman.d/mirrorlist /etc/pacman.d/`date "+%Y%m%d%H%M%S"`_mirrorlist_backup
+
+## select fastest mirrors
+reflector --verbose --country $mirror_country -l $mirror_amount --sort rate --save /etc/pacman.d/mirrorlist
 
 
 # install base & base-devel package group
