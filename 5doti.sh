@@ -69,20 +69,9 @@ sudo mount -o remount,rw  /usr
 #yay -Syu --noconfirm urxvt-resize-font-git
 
 
-# install bitwarden-cli config
-yay -S --noconfirm bitwarden-cli
-
 ## clone bwsession (padding & bwul)
 [ -d ~/git/code/bwsession ] || mkdir -p ~/git/code
 git clone -q https://gitlab.com/cytopyge/bwsession ~/git/code/bwsession
-
-
-# encryption
-yay -S --noconfirm veracrypt
-
-
-# vpn 
-yay -S --noconfirm openvpn wireguard-tools
 
 
 # zsh shell config
@@ -91,16 +80,11 @@ yay -S --noconfirm openvpn wireguard-tools
 ## re-login for changes to take effect
 sudo usermod -s `whereis zsh | awk '{print $2}'` $(whoami)
 
-## ZSH completions
-yay -S --noconfirm zsh-completions
-
-##ZSH syntax highlighting
-yay -S --noconfirm zsh-syntax-highlighting
-
 ## change shell
 sudo chsh -s /bin/zsh
 
 
+## shell decoration
 ## base16
 git clone https://github.com/chriskempson/base16-shell.git ~/.config/base16-shell
 base16_irblack

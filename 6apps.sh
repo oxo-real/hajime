@@ -21,70 +21,103 @@
 ## 
 #
 
-# make rw
-sudo mount -o remount,rw  /usr
-
-# video tools
-yay -Syu --noconfirm youtube-dl mpv youtube-viewer
 
 # terminal text tools
-yay -S --noconfirm figlet
+terminal_text_tools="figlet qrencode"
+#terminal_text_tools=""
+
 
 # terminal file browser
-yay -S --noconfirm nnn ranger vifm
+terminal_file_browser="nnn ranger vifm"
+#terminal_file_browser=""
+
 
 # file tools
-yay -S --noconfirm srm rsync gdisk
+file_tools="srm rsync gdisk"
+#file_tools=""
+
 
 # network tools
-yay -S --noconfirm wireshark-cli wireshark-qt mtr
+network_tools="wireshark-cli wireshark-qt mtr"
+#network_tools=""
 
-# download utility
-yay -S --noconfirm aria2
 
 # internet tools
+internet_tools="firefox-developer-edition w3m qutebrowser"
+#internet_tools=""
 
-## mozilla firefox
-yay -S --noconfirm firefox-developer-edition
-[ -d ~/Downloads ] && rm -rf ~/Downloads
-[ -d ~/.mozilla ] && rm -rf ~/.mozilla
-git clone https://gitlab.com/cytopyge/ffxd_init ~/.mozilla
-cd ~/.mozilla
-git checkout -f addons
-cd ~
 
-## w3m web browser
-## also for ranger w3m image preview method
-#[TODO]
-yay -S --noconfirm w3m
+# download utilities
+download_utilities="aria2"
+#download_utilities=""
+
 
 # system monitoring
-yay -S --noconfirm glances ccze
+system_monitoring="glances ccze"
+#system_monitoring=""
+
 
 # virtual machines
-yay -S --noconfirm virtualbox virtualbox-host-modules-arch
+virtual_machines="virtualbox virtualbox-host-modules-arch"
+#virtual_machines=""
 
-# qrcode
-yay -S --noconfirm qrencode
 
-#[TODO] 
-# image viewer
-yay -S --noconfirm feh imv
+# image viewers
+image_viewers="feh imv"
+#image_viewers=""
+
 
 # image editor
-yay -S --noconfirm imagemagick
+image_editors="imagemagick"
+#image_editor=""
+
 
 # pdf viewer
-yay -S --noconfirm mupdf zathura-pdf-mupdf
+pdf_viewers="mupdf zathura-pdf-mupdf"
+#pdf_viewers=""
 
-#[TODO]
+
+# video tools
+video_tools="youtube-dl mpv youtube-viewer"
+#video_tools=""
+
+
 # photo editing
-# yay -S --noconfirm 
+#[TODO]
+#photo_editing=""
+#photo_editing=""
 
-# libre-office
-# yay -S --noconfirm libreoffice-fresh libreoffice-fresh-nl
 
-# make ro
+# photo management
+#[TODO]
+#photo_management=""
+#photo_management=""
+
+
+# office-tools
+#office_tools="libreoffice-fresh libreoffice-fresh-nl"
+office_tools=""
+
+
+# make /usr rw
+sudo mount -o remount,rw  /usr
+
+
+# install app packages
+yay -Sy $terminal_text_tools $terminal_file_browser $file_tools $network_tools $internet_tools $download_utilities $system_monitoring $virtual_machines $image_viewers $image_editors $pdf_viewers $video_tools $photo_editing $photo_management $office_tools
+
+
+# mozilla firefox settings
+function mozilla_firefox {
+	[ -d ~/Downloads ] && rm -rf ~/Downloads
+	[ -d ~/.mozilla ] && rm -rf ~/.mozilla
+	git clone https://gitlab.com/cytopyge/ffxd_init ~/.mozilla
+	cd ~/.mozilla
+	git checkout -f addons
+	cd ~
+}
+
+# make /usr ro
 sudo mount -o remount,ro  /usr
 
 clear

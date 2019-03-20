@@ -22,12 +22,23 @@
 #
 
 
+# user customizable variables
+wayland="wlroots-git"
+dwm="sway-git swaylock-git i3blocks"
+shell="zsh"
+shell_additions="zsh-completions zsh-syntax-highlighting"
+terminal="termite-nocsd"
+terminal_additions="rofi"
+password_security="bitwarden-cli"
+encryption="veracypt"
+secure_connections="wireguard-tools openvpn"
+fonts="terminus-font ttf-inconsolata"
+display="brightnessctl"
+audio="alsa-utils"
+
+
 # set /usr writeable
 sudo mount -o remount,rw  /usr
-
-
-# Wayland
-yay -Syu --noconfirm wlroots-git
 
 
 # X11
@@ -54,27 +65,19 @@ yay -Syu --noconfirm wlroots-git
 ## yay -S xf86-video-intel
 
 
-## applications ##
-
-
-# linux core
-## lsof
-yay -S --noconfirm lsof
-
-
 # shell of choice: ZSH
-yay -S --noconfirm zsh
+#yay -S --noconfirm zsh
 
 
-# tiling window manager
-yay -S --noconfirm sway-git swaylock-git i3blocks 
+# desktop window manager
+#yay -S --noconfirm sway-git swaylock-git i3blocks 
 
 
 # terminal emulator of choice
 
 ## wayland native termite alternative
 ## no client side decorations
-yay -S --noconfirm termite-nocsd
+#yay -S --noconfirm termite-nocsd
 
 ## under X11
 # get .Xresources from archive
@@ -84,26 +87,22 @@ yay -S --noconfirm termite-nocsd
 # essential terminal tools
 
 ## rofi
-yay -S --noconfirm rofi
-
-## fzf
-git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-~/.fzf/install
+#yay -S --noconfirm rofi
 
 
 # display brightness control
-yay -S --noconfirm brightnessctl
+#yay -S --noconfirm brightnessctl
 
 
 # sound
-yay -S --noconfirm alsa-utils #pulse-audio
+#yay -S --noconfirm alsa-utils #pulse-audio
 
 
 # fonts
 
 ## monospace
 ## terminus-font
-yay -S --noconfirm terminus-font
+#yay -S --noconfirm terminus-font
 ### Xresources: 'URxvt.font: xft:xos4 Terminus:size=12'
 ## install terminus-font
 #yay -Ql terminus-font
@@ -112,7 +111,7 @@ yay -S --noconfirm terminus-font
 
 ## ttf/otf fonts
 ## inconsolata
-yay -S --noconfirm ttf-inconsolata 
+#yay -S --noconfirm ttf-inconsolata 
 ## Xresources: 'URxvt.font: xft:Inconsolata:size=12'
 #yay -S --noconfirm terminus-font-ttf
 ## Xresources: 'URxvt.font: xft:Terminus (TTF):size=12:style=Medium'
@@ -121,13 +120,12 @@ yay -S --noconfirm ttf-inconsolata
 #yay -S --noconfirm ttf-linux-libertine
 
 
-# number one text editor
-## vim
-#yay -S --noconfirm vim
-## neovim
-## has i.e. better clipboard functionality
-yay -S --noconfirm neovim
+yay -Sy $wayland $dwm $shell $shell_additions $terminal $terminal_additions $password_security $encryption $secure_connections $fonts $display $audio
 
+
+# fzf
+git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+~/.fzf/install
 
 # reset /usr read-only
 sudo mount -o remount,ro  /usr

@@ -40,7 +40,7 @@ Installs a variety of tools, among others for: video, text, file management, net
 ## Take off instructions
 When using these 'hajime' scripts:
 Be sure to get your latest Arch Linux image via: https://www.archlinux.org/download/.
-Then boot into the ArchISO live system environment, install git and clone 'hajime':
+Then boot into the ArchISO live system environment, install git, clone 'hajime', check the user customizable variables sections and start the first script:
 
 ```
 pacman -Sy --noconfirm git
@@ -48,7 +48,7 @@ git clone https://gitlab.com/cytopyge/hajime
 ./hajime/1base.sh
 ```
 
-From here follow check the 'settings' paragraphs in the beginning of the scripts. Then run the scripts one by one and follow the in-script instructions.
+From here run the scripts one-by-one and follow the in-script instructions.
 
 ---
 ---

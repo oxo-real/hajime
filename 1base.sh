@@ -22,7 +22,7 @@
 #
 
 
-# base_settings
+# user customizable variables
 timezone=	"Europe/Amsterdam"
 arch_mirrorlist="https://www.archlinux.org/mirrorlist/?country=NL&protocol=http&protocol=https&ip_version=4"
 

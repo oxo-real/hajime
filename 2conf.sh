@@ -22,7 +22,7 @@
 #
 
 
-# conf settings
+# user customizable variables 
 locale_conf=	"LANG=en_US.UTF-8"
 vconsole_conf=	"FONT=ter-v32n"
 mirror_country= "Netherlands"

@@ -22,6 +22,11 @@
 #
 
 
+# user customizable variables
+base_additions="lsof pacman-contrib"
+bloat_ware="nano"
+
+
 # dhcp connect
 ip a
 echo
@@ -85,7 +90,7 @@ sudo mount -o remount,rw  /usr
 sudo mount -o remount,rw  /boot
 
 
-# update package repository
+# update and sync package repository, upgrade system
 
 ## -S, --sync		(synchronize packages)
 ## -y, --refresh	(download fresh package databases from the server)
@@ -93,7 +98,7 @@ sudo mount -o remount,rw  /boot
 sudo pacman -Syu --noconfirm
 
 
-# create mountpoints
+# create mountpoint docking bays
 sudo mkdir -p /dock/1
 sudo mkdir -p /dock/2
 sudo mkdir -p /dock/3
@@ -118,12 +123,11 @@ sudo rm -rf ~/tmp
 
 
 # install pacman tools
-yay -S --noconfirm pacman-contrib
+yay -S --noconfirm $base_additions
 
 
-# nano in base is a core glitch ...
-yay -R --noconfirm nano
-echo 'nano is bloat, removed'
+# remove system bloat
+yay -R --noconfirm $bloat_ware
 
 
 # set /usr and /boot read-only
