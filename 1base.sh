@@ -23,12 +23,13 @@
 
 
 # user customizable variables
-terminus_font=	"terminus-font"
-timezone=	"Europe/Amsterdam"
+terminus_font="terminus-font"
+timezone="Europe/Amsterdam"
 arch_mirrorlist="https://www.archlinux.org/mirrorlist/?country=NL&protocol=http&protocol=https&ip_version=4"
-mirror_country=	"Netherlands"
-mirror_amount=	"5"
-install_helpers=	"reflector"
+mirror_country="Netherlands"
+mirror_amount="5"
+install_helpers="reflector"
+
 
 # clear screen
 clear

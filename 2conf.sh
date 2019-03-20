@@ -23,19 +23,19 @@
 
 
 # user customizable variables
-time_zone=		"Europe/Amsterdam"
-locale_conf=		"LANG=en_US.UTF-8"
-vconsole_conf=		"FONT=ter-v32n"
-mirror_country= 	"Netherlands"
-mirror_amount=		"5"
-username=		"user"
+time_zone="Europe/Amsterdam"
+locale_conf="LANG=en_US.UTF-8"
+vconsole_conf="FONT=ter-v32n"
+mirror_country="Netherlands"
+mirror_amount="5"
+username="user"
 ## core applications
-linux_kernel=		"linux-headers"
-linux_lts_kernel=	"linux-lts linux-lts-headers"
-command_line_editor=	"neovim"
-install_helpers=	"reflector wl-clipboard"
-wireless=		"wpa_supplicant wireless_tools"
-secure_connections=	"openssh"
+linux_kernel="linux-headers"
+linux_lts_kernel="linux-lts linux-lts-headers"
+command_line_editor="neovim"
+install_helpers="reflector wl-clipboard"
+wireless="wpa_supplicant wireless_tools"
+secure_connections="openssh"
 
 # time settings
 ## set time zone
