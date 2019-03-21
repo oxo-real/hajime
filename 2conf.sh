@@ -37,6 +37,7 @@ install_helpers="reflector wl-clipboard"
 wireless="wpa_supplicant wireless_tools"
 secure_connections="openssh"
 
+
 # time settings
 ## set time zone
 ln -sf /usr/share/zoneinfo/$time_zone /etc/localtime
