@@ -23,22 +23,31 @@
 
 
 # user customizable variables
-wayland="wlroots-git"
-dwm="sway-git swaylock-git i3blocks"
+wayland=""
+wayland_git="wlroots-git"
+dwm="i3blocks"
+dwm_git="sway-git swaylock-git"
 shell="zsh"
 shell_additions="zsh-completions zsh-syntax-highlighting"
-terminal="termite-nocsd"
+terminal=""
+terminal_git="termite-nocsd"
 terminal_additions="rofi"
-password_security="bitwarden-cli"
+password_security=""
+password_security_git="bitwarden-cli"
 encryption="veracrypt"
 secure_connections="wireguard-tools openvpn"
 fonts="terminus-font ttf-inconsolata"
-display="brightnessctl"
+display=""
+display_git="brightnessctl"
 audio="alsa-utils"
 
 
 # set /usr writeable
 sudo mount -o remount,rw  /usr
+
+
+yay -Sy $wayland $dwm $shell $shell_additions $terminal $terminal_additions $password_security $encryption $secure_connections $fonts $display $audio
+yay -Sy $wayland_git $dwm_git $shell_git $shell_additions_git $terminal_git $terminal_additions_git $password_security_git $encryption_git $secure_connections_git $fonts_git $display_git $audio_git
 
 
 # X11
@@ -118,9 +127,6 @@ sudo mount -o remount,rw  /usr
 
 ## other ttf/otf font options
 #yay -S --noconfirm ttf-linux-libertine
-
-
-yay -Sy $wayland $dwm $shell $shell_additions $terminal $terminal_additions $password_security $encryption $secure_connections $fonts $display $audio
 
 
 # fzf
