@@ -99,14 +99,6 @@ video_tools="youtube-dl mpv youtube-viewer"
 office_tools=""
 
 
-# make /usr rw
-sudo mount -o remount,rw  /usr
-
-
-# install app packages
-yay -Sy $terminal_text_tools $terminal_file_browser $file_tools $network_tools $internet_tools $download_utilities $system_monitoring $virtual_machines $image_viewers $image_editors $pdf_viewers $video_tools $photo_editing $photo_management $office_tools
-
-
 # mozilla firefox settings
 function mozilla_firefox {
 	[ -d ~/Downloads ] && rm -rf ~/Downloads
@@ -116,6 +108,18 @@ function mozilla_firefox {
 	git checkout -f addons
 	cd ~
 }
+
+# make /usr rw
+sudo mount -o remount,rw  /usr
+
+
+# install app packages
+yay -Sy $terminal_text_tools $terminal_file_browser $file_tools $network_tools $internet_tools $download_utilities $system_monitoring $virtual_machines $image_viewers $image_editors $pdf_viewers $video_tools $photo_editing $photo_management $office_tools
+
+
+# function calls
+mozilla_firefox
+
 
 # make /usr ro
 sudo mount -o remount,ro  /usr
