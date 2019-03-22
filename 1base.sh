@@ -24,6 +24,7 @@
 
 # user customizable variables
 terminus_font="terminus-font"
+console_font="ter-v20n"
 timezone="Europe/Amsterdam"
 arch_mirrorlist="https://www.archlinux.org/mirrorlist/?country=NL&protocol=http&protocol=https&ip_version=4"
 mirror_country="Netherlands"
@@ -54,7 +55,7 @@ pacman -Sy --noconfirm $terminus_font
 pacman -Ql $terminus_font
 
 ## set console font temporarily
-setfont ter-v32n
+setfont $console_font
 
 
 # time synchronization
@@ -96,7 +97,7 @@ gdisk "$boot_dev"
 clear
 
 ## lsblk for human
-lsblk -o size,name,label,mountpoint
+lsblk --tree -o name,size,label,path,mountpoint
 echo
 
 ## create lvm partition
@@ -123,7 +124,7 @@ clear
 
 ## dialog
 ## lsblk for human
-lsblk -o size,name,label,mountpoint
+lsblk --tree -o name,size,label,path,mountpoint
 echo
 echo -n 'enter full path of the BOOT partition (/dev/sdXn) '
 read boot_part
@@ -133,7 +134,7 @@ read lvm_part
 echo
 echo 'cryptsetup is about to start'
 echo 'within the encrypted lvm volumegroup the logical volumes'
-echo 'ROOT, HOME, VAR, USR & SWAP are being created'
+echo 'ROOT, HOME, VAR & USR are being created'
 echo
 echo -n 'ROOT partition size (GB)? '
 read root_size
