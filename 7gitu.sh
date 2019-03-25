@@ -1,24 +1,24 @@
 #!/bin/bash
 #
 ##
-###  _            _ _                        _ _         
-### | |__   __ _ (_|_)_ __ ___   ___    __ _(_) |_ _   _ 
+###  _            _ _                        _ _
+### | |__   __ _ (_|_)_ __ ___   ___    __ _(_) |_ _   _
 ### | '_ \ / _` || | | '_ ` _ \ / _ \  / _` | | __| | | |
 ### | | | | (_| || | | | | | | |  __/ | (_| | | |_| |_| |
 ### |_| |_|\__,_|/ |_|_| |_| |_|\___|  \__, |_|\__|\__,_|7
-###            |__/                    |___/             
+###            |__/                    |___/
 ###
-###  _ _|_ _ ._    _  _  
-### (_\/|_(_)|_)\/(_|(/_ 
-###   /      |  /  _|                      
+###  _ _|_ _ ._    _  _
+### (_\/|_(_)|_)\/(_|(/_
+###   /      |  /  _|
 ###
-### hajime_logr
+### hajime_gitu
 ### cytopyge arch linux installation 'update git repository'
 ### addendum to a five part installation series
 ###
 ### (c) 2019 cytopyge
 ###
-## 
+##
 #
 
 
@@ -75,7 +75,7 @@ bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | s
 
 git clone https://gitlab.com/cytopyge/wfa
 
-### snapshot 
+### snapshot
 bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
 
 git clone https://gitlab.com/cytopyge/snapshot
