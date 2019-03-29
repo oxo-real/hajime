@@ -31,7 +31,7 @@ clear
 wayland=""
 wayland_git="wlroots-git"
 dwm="i3blocks"
-dwm_git="sway-git swaylock-git"
+dwm_git="sway-git swaylock-git slurp-git grim-git jq-git"
 shell="zsh"
 shell_additions="zsh-completions zsh-syntax-highlighting"
 terminal=""
