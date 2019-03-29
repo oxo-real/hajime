@@ -1,16 +1,16 @@
 #!/bin/bash
 #
 ##
-###  _            _ _                      _       _   _ 
+###  _            _ _                      _       _   _
 ### | |__   __ _ (_|_)_ __ ___   ___    __| | ___ | |_(_)
 ### | '_ \ / _` || | | '_ ` _ \ / _ \  / _` |/ _ \| __| |
 ### | | | | (_| || | | | | | | |  __/ | (_| | (_) | |_| |
 ### |_| |_|\__,_|/ |_|_| |_| |_|\___|  \__,_|\___/ \__|_|5
-###            |__/                                      
+###            |__/
 ###
-###  _ _|_ _ ._    _  _  
-### (_\/|_(_)|_)\/(_|(/_ 
-###   /      |  /  _|                                               
+###  _ _|_ _ ._    _  _
+### (_\/|_(_)|_)\/(_|(/_
+###   /      |  /  _|
 ###
 ### hajime_doti
 ### cytopyge arch linux installation 'dotfiles installation and configuration'
@@ -20,6 +20,9 @@
 ###
 ##
 #
+
+
+clear
 
 
 # make /usr read-write
@@ -110,5 +113,5 @@ sudo mount -o remount,ro  /usr
 ## administration
 sudo touch ~/hajime/5doti.done
 
-clear
+
 echo 'sh hajime/6apps.sh'

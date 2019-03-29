@@ -1,16 +1,16 @@
 #!/bin/bash
 #
 ##
-###  _            _ _                       _          
-### | |__   __ _ (_|_)_ __ ___   ___   _ __(_) ___ ___ 
+###  _            _ _                       _
+### | |__   __ _ (_|_)_ __ ___   ___   _ __(_) ___ ___
 ### | '_ \ / _` || | | '_ ` _ \ / _ \ | '__| |/ __/ _ \
 ### | | | | (_| || | | | | | | |  __/ | |  | | (_|  __/
 ### |_| |_|\__,_|/ |_|_| |_| |_|\___| |_|  |_|\___\___|4
-###            |__/                                    
+###            |__/
 ###
-###  _ _|_ _ ._    _  _  
-### (_\/|_(_)|_)\/(_|(/_ 
-###   /      |  /  _|                     
+###  _ _|_ _ ._    _  _
+### (_\/|_(_)|_)\/(_|(/_
+###   /      |  /  _|
 ###
 ### hajime_rice
 ### cytopyge arch linux installation 'rice'
@@ -22,7 +22,12 @@
 #
 
 
+clear
+
+
 # user customizable variables
+## application categories
+## 'git' packages that need compiling are separated because of an error occuring in yay when combined
 wayland=""
 wayland_git="wlroots-git"
 dwm="i3blocks"
@@ -55,7 +60,7 @@ yay -Sy $wayland_git $dwm_git $shell_git $shell_additions_git $terminal_git $ter
 # https://wiki.archlinux.org/index.php/Libinput#Via_xinput
 # xorg-xrdb for loading .Xresources
 # xorg-xinput to alter libinput settings (mouse, keyboard)
-#yay -S --noconfirm xorg-xrdb xorg-xinput xorg-xinit xterm #xorg 
+#yay -S --noconfirm xorg-xrdb xorg-xinput xorg-xinit xterm #xorg
 
 
 # video drivers (X11)
@@ -79,7 +84,7 @@ yay -Sy $wayland_git $dwm_git $shell_git $shell_additions_git $terminal_git $ter
 
 
 # desktop window manager
-#yay -S --noconfirm sway-git swaylock-git i3blocks 
+#yay -S --noconfirm sway-git swaylock-git i3blocks
 
 
 # terminal emulator of choice
@@ -120,7 +125,7 @@ yay -Sy $wayland_git $dwm_git $shell_git $shell_additions_git $terminal_git $ter
 
 ## ttf/otf fonts
 ## inconsolata
-#yay -S --noconfirm ttf-inconsolata 
+#yay -S --noconfirm ttf-inconsolata
 ## Xresources: 'URxvt.font: xft:Inconsolata:size=12'
 #yay -S --noconfirm terminus-font-ttf
 ## Xresources: 'URxvt.font: xft:Terminus (TTF):size=12:style=Medium'

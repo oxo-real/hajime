@@ -22,6 +22,9 @@
 #
 
 
+clear
+
+
 # prepare git environment
 [ -d ~/git ] || mkdir ~/git
 cd ~/git
@@ -86,6 +89,6 @@ cd ~
 sudo chown -R cytopyge:wheel *
 
 
-clear
+
 echo 'finished installation'
 echo 'please reboot'
