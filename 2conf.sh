@@ -1,16 +1,16 @@
 #!/bin/bash
 #
 ##
-###  _            _ _                                   __ 
+###  _            _ _                                   __
 ### | |__   __ _ (_|_)_ __ ___   ___    ___ ___  _ __  / _|
-### | '_ \ / _` || | | '_ ` _ \ / _ \  / __/ _ \| '_ \| |_ 
+### | '_ \ / _` || | | '_ ` _ \ / _ \  / __/ _ \| '_ \| |_
 ### | | | | (_| || | | | | | | |  __/ | (_| (_) | | | |  _|
 ### |_| |_|\__,_|/ |_|_| |_| |_|\___|  \___\___/|_| |_|_|  2
-###            |__/                                        
+###            |__/
 ###
-###  _ _|_ _ ._    _  _  
-### (_\/|_(_)|_)\/(_|(/_ 
-###   /      |  /  _|                     
+###  _ _|_ _ ._    _  _
+### (_\/|_(_)|_)\/(_|(/_
+###   /      |  /  _|
 ###
 ### hajime_conf
 ### cytopyge arch linux installation 'configuration'
@@ -20,6 +20,9 @@
 ###
 ##
 #
+
+
+clear
 
 
 # user customizable variables
@@ -156,11 +159,11 @@ sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /etc/sudoers
 
 
 # move /hajime to $user home
-cp -r /hajime /home/$username	
+cp -r /hajime /home/$username
 sudo rm -rf /hajime
 
 
-# exit arch-chroot environment 
+# exit arch-chroot environment
 
 ## return go archiso environment
 echo 'manually:'
