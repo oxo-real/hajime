@@ -1,16 +1,16 @@
 #!/bin/bash
 #
 ##
-###  _            _ _                  _                    
-### | |__   __ _ (_|_)_ __ ___   ___  | |__   __ _ ___  ___ 
+###  _            _ _                  _
+### | |__   __ _ (_|_)_ __ ___   ___  | |__   __ _ ___  ___
 ### | '_ \ / _` || | | '_ ` _ \ / _ \ | '_ \ / _` / __|/ _ \
 ### | | | | (_| || | | | | | | |  __/ | |_) | (_| \__ \  __/
 ### |_| |_|\__,_|/ |_|_| |_| |_|\___| |_.__/ \__,_|___/\___|1
 ###            |__/
 ###
-###  _ _|_ _ ._    _  _  
-### (_\/|_(_)|_)\/(_|(/_ 
-###   /      |  /  _|                     
+###  _ _|_ _ ._    _  _
+### (_\/|_(_)|_)\/(_|(/_
+###   /      |  /  _|
 ###
 ### hajime_base
 ### cytopyge arch linux installation 'base'
@@ -74,7 +74,7 @@ clear
 # device partitioning
 
 ## lsblk for human
-lsblk -o size,name,label,mountpoint
+lsblk --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
 echo
 
 ## create boot partition
@@ -97,7 +97,7 @@ gdisk "$boot_dev"
 clear
 
 ## lsblk for human
-lsblk --tree -o name,size,label,path,mountpoint
+lsblk --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
 echo
 
 ## create lvm partition
@@ -206,7 +206,7 @@ mkfs.ext4 -L HOME /dev/mapper/vg0-lv_home
 mkfs.ext4 -L USR /dev/mapper/vg0-lv_usr
 mkfs.ext4 -L VAR /dev/mapper/vg0-lv_var
 
-## create mountpoints 
+## create mountpoints
 mount /dev/mapper/vg0-lv_root /mnt
 mkdir /mnt/boot
 mkdir /mnt/home
