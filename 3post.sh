@@ -104,8 +104,13 @@ sudo mkdir -p /dock/2
 sudo mkdir -p /dock/3
 sudo mkdir -p /dock/4
 
-# create directories
+# create user_ directories
+mkdir -p ~/backup_
+mkdir -p ~/data_
 mkdir -p ~/download_
+mkdir -p ~/keys_
+mkdir -p ~/media_
+mkdir -p ~/settings_
 mkdir -p ~/test_
 mkdir -p ~/todo_
 
