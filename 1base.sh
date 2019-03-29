@@ -124,7 +124,8 @@ clear
 
 ## dialog
 ## lsblk for human
-lsblk --tree -o name,size,label,path,mountpoint
+lsblk --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
+echo
 echo
 echo -n 'enter full path of the BOOT partition (/dev/sdXn) '
 read boot_part
