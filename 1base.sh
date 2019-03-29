@@ -271,8 +271,10 @@ echo
 
 # user advice
 echo 'changing root'
+echo
 echo 'to continue execute manually:'
 echo 'sh hajime/2conf.sh'
+echo
 
 
 # finishing
