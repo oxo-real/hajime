@@ -128,4 +128,4 @@ mozilla_firefox
 sudo mount -o remount,ro  /usr
 
 
-echo 'sh hajime/7logr.sh'
+echo 'sh hajime/7gitu.sh'

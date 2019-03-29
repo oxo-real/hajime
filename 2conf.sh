@@ -165,14 +165,13 @@ sudo rm -rf /hajime
 
 # exit arch-chroot environment
 
-## return go archiso environment
-echo 'manually:'
+## return to archiso environment
+echo
 echo 'exit'
-echo 'umount -R /mnt'
-echo 'Remove boot medium'
 
 
 # reboot advice
+echo 'umount -R /mnt'
 echo 'reboot'
 echo 'sh hajime/3post.sh'
 

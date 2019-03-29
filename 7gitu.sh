@@ -43,7 +43,7 @@ git clone https://gitlab.com/cytopyge/notes
 cd ~/git/code
 
 ### wfkill
-git clone https://gitlab.com/cytopyge/wfkill
+git clone https://gitlab.com/cytopyge/wlkill
 
 ### bwsession
 git clone https://gitlab.com/cytopyge/bwsession
