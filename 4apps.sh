@@ -26,33 +26,140 @@ clear
 
 
 # user customizable variables
-## application categories
+
+
+## core applications
 ## 'git' packages that need compiling are separated because of an error occuring in yay when combined
 wayland=""
 wayland_git="wlroots-git"
+
 dwm="i3blocks"
 dwm_git="sway-git swaylock-git slurp-git grim-git jq-git"
+
 shell="zsh"
+shell_git=""
+
 shell_additions="zsh-completions zsh-syntax-highlighting"
+shell_additions_git=""
+
 terminal=""
 terminal_git="termite-nocsd"
+
 terminal_additions="rofi"
+terminal_additions_git=""
+
 password_security=""
 password_security_git="bitwarden-cli"
+
 encryption="veracrypt"
+encryption_git=""
+
 secure_connections="wireguard-tools openvpn"
+secure_connections_git=""
+
 fonts="terminus-font ttf-inconsolata"
+fonts_git=""
+
 display=""
 display_git="brightnessctl"
+
 audio="alsa-utils"
+audio_git=""
+
+
+# additional tools
+
+terminal_text_tools="figlet qrencode"
+
+terminal_file_browser="nnn ranger vifm"
+
+file_tools="srm rsync gdisk"
+
+network_tools="wireshark-cli wireshark-qt mtr"
+
+internet_tools="firefox-developer-edition w3m qutebrowser"
+
+download_utilities="aria2"
+
+system_monitoring="glances ccze"
+
+virtual_machines="virtualbox virtualbox-host-modules-arch"
+
+image_viewers="feh imv"
+
+image_editors="imagemagick"
+
+pdf_viewers="mupdf zathura-pdf-mupdf"
+
+video_tools="youtube-dl mpv youtube-viewer"
+
+#[TODO]
+photo_editing=""
+
+#[TODO]
+photo_management=""
+
+office_tools=""
+#office_tools="libreoffice-fresh libreoffice-fresh-nl"
 
 
 # set /usr writeable
 sudo mount -o remount,rw  /usr
 
 
-yay -Sy $wayland $dwm $shell $shell_additions $terminal $terminal_additions $password_security $encryption $secure_connections $fonts $display $audio
-yay -Sy $wayland_git $dwm_git $shell_git $shell_additions_git $terminal_git $terminal_additions_git $password_security_git $encryption_git $secure_connections_git $fonts_git $display_git $audio_git
+# install core applications
+yay -Sy --noconfirm \
+	$wayland \
+	$dwm \
+	$shell \
+	$shell_additions \
+	$terminal \
+	$terminal_additions \
+	$password_security \
+	$encryption \
+	$secure_connections \
+	$fonts \
+	$display \
+	$audio
+
+## fzf
+git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+~/.fzf/install
+
+
+#install core applications git
+yay -Sy --noconfirm \
+	$wayland_git \
+	$dwm_git \
+	$shell_git \
+	$shell_additions_git \
+	$terminal_git \
+	$terminal_additions_git \
+	$password_security_git \
+	$encryption_git \
+	$secure_connections_git \
+	$fonts_git \
+	$display_git \
+	$audio_git
+
+
+#install additional tools
+yay -Sy --noconfirm \
+	$terminal_text_tools \
+	$terminal_file_browser \
+	$file_tools \
+	$network_tools \
+	$internet_tools \
+	$download_utilities \
+	$system_monitoring \
+	$virtual_machines \
+	$image_viewers \
+	$image_editors \
+	$pdf_viewers \
+	$video_tools \
+	$photo_editing \
+	$photo_management \
+	$office_tools
 
 
 # X11
@@ -133,10 +240,6 @@ yay -Sy $wayland_git $dwm_git $shell_git $shell_additions_git $terminal_git $ter
 ## other ttf/otf font options
 #yay -S --noconfirm ttf-linux-libertine
 
-
-# fzf
-git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-~/.fzf/install
 
 # reset /usr read-only
 sudo mount -o remount,ro  /usr

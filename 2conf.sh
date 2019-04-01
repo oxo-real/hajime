@@ -37,7 +37,7 @@ linux_kernel="linux-headers"
 linux_lts_kernel="linux-lts linux-lts-headers"
 command_line_editor="neovim"
 install_helpers="reflector wl-clipboard"
-wireless="wpa_supplicant wireless_tools"
+wireless="wpa_supplicant wireless_tools iw"
 secure_connections="openssh"
 
 

@@ -105,6 +105,17 @@ git config --global user.email "$(whoami)@protonmail.com"
 git config --global user.name "$(whoami)"
 
 
+# mozilla firefox settings
+function mozilla_firefox {
+	[ -d ~/Downloads ] && rm -rf ~/Downloads
+	[ -d ~/.mozilla ] && rm -rf ~/.mozilla
+	git clone https://gitlab.com/cytopyge/ffxd_init ~/.mozilla
+	cd ~/.mozilla
+	git checkout -f addons
+	cd ~
+}
+
+
 # finishing
 
 ## make /usr read-only
