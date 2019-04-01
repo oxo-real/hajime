@@ -147,7 +147,7 @@ echo -n 'USR partition size (GB)?  '
 read usr_size
 echo -n 'create SWAP partition (y/N)? '
 read swap_bool
-swap_size = 0
+swap_size=0
 if [[ $swap_bool == "Y" || $swap_bool == "y" ]]; then
 	echo -n 'SWAP partition size (GB)? '
 	read swap_size
