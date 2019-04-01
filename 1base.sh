@@ -141,9 +141,9 @@ echo -n 'ROOT partition size (GB)? '
 read root_size
 echo -n 'HOME partition size (GB)? '
 read home_size
-echo -n 'VAR partition size (GB)? '
+echo -n 'VAR partition size (GB)?  '
 read var_size
-echo -n 'USR partition size (GB)? '
+echo -n 'USR partition size (GB)?  '
 read usr_size
 echo -n 'create SWAP partition (y/N)? '
 read swap_bool
