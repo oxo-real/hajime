@@ -89,12 +89,12 @@ sudo chsh -s /bin/zsh
 
 ## shell decoration
 ## base16
-git clone https://github.com/chriskempson/base16-shell.git ~/.config/base16-shell
-base16_irblack
+git clone -q https://github.com/chriskempson/base16-shell.git ~/.config/base16-shell
+#[TODO]base16_irblack
 
 
 # vim vundle
-git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+git clone -q https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 
 ## install plugins defined in ~/.dot/.vimrc
 vim +PluginInstall +qall
@@ -109,7 +109,7 @@ git config --global user.name "$(whoami)"
 function mozilla_firefox {
 	[ -d ~/Downloads ] && rm -rf ~/Downloads
 	[ -d ~/.mozilla ] && rm -rf ~/.mozilla
-	git clone https://gitlab.com/cytopyge/ffxd_init ~/.mozilla
+	git clone -q https://gitlab.com/cytopyge/ffxd_init ~/.mozilla
 	cd ~/.mozilla
 	git checkout -f addons
 	cd ~

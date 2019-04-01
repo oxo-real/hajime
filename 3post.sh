@@ -34,41 +34,7 @@ echo -n 'enter interface number '
 read interface_number
 interface=$(ip a | grep ^'$interface_number' | awk '{print $2}' | sed 's/://')
 sudo dhcpcd $interface
-
-
-# statusbar (just for fun)
-#echo -ne '==========   (0%)\r'
-#sleep 0.`echo $((1 + RANDOM % 10))`
-#sleep 0.`echo $((1 + RANDOM % 10))`
-#echo -ne '>=========  (10%)\r'
-#sleep 0.`echo $((1 + RANDOM % 10))`
-#sleep 0.`echo $((1 + RANDOM % 10))`
-#echo -ne '>>========  (20%)\r'
-#sleep 0.`echo $((1 + RANDOM % 10))`
-#sleep 0.`echo $((1 + RANDOM % 10))`
-#echo -ne '>>>=======  (30%)\r'
-#sleep 0.`echo $((1 + RANDOM % 10))`
-#sleep 0.`echo $((1 + RANDOM % 10))`
-#echo -ne '>>>>======  (40%)\r'
-#sleep 0.`echo $((1 + RANDOM % 10))`
-#sleep 0.`echo $((1 + RANDOM % 10))`
-#echo -ne '>>>>>=====  (50%)\r'
-#sleep 0.`echo $((1 + RANDOM % 10))`
-#sleep 0.`echo $((1 + RANDOM % 10))`
-#echo -ne '>>>>>>====  (60%)\r'
-#sleep 0.`echo $((1 + RANDOM % 10))`
-#sleep 0.`echo $((1 + RANDOM % 10))`
-#echo -ne '>>>>>>>===  (70%)\r'
-#sleep 0.`echo $((1 + RANDOM % 10))`
-#sleep 0.`echo $((1 + RANDOM % 10))`
-#echo -ne '>>>>>>>>==  (80%)\r'
-#sleep 0.`echo $((1 + RANDOM % 10))`
-#sleep 0.`echo $((1 + RANDOM % 10))`
-#echo -ne '>>>>>>>>>=  (90%)\r'
-#sleep 0.`echo $((1 + RANDOM % 10))`
-#sleep 0.`echo $((1 + RANDOM % 10))`
-#echo -ne '>>>>>>>>>> (100%)\r'
-#echo -ne '\n'
+sleep 5
 echo "'$interface' connected"
 ping -c 1 9.9.9.9
 
