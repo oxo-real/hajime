@@ -1,19 +1,19 @@
 #!/bin/bash
 #
 ##
-###  _            _ _                      _       _   _
-### | |__   __ _ (_|_)_ __ ___   ___    __| | ___ | |_(_)
-### | '_ \ / _` || | | '_ ` _ \ / _ \  / _` |/ _ \| __| |
-### | | | | (_| || | | | | | | |  __/ | (_| | (_) | |_| |
-### |_| |_|\__,_|/ |_|_| |_| |_|\___|  \__,_|\___/ \__|_|5
+###  _            _ _                      _ _        __
+### | |__   __ _ (_|_)_ __ ___   ___    __| | |_ ___ / _|
+### | '_ \ / _` || | | '_ ` _ \ / _ \  / _` | __/ __| |_
+### | | | | (_| || | | | | | | |  __/ | (_| | || (__|  _|
+### |_| |_|\__,_|/ |_|_| |_| |_|\___|  \__,_|\__\___|_| 5
 ###            |__/
 ###
 ###  _ _|_ _ ._    _  _
 ### (_\/|_(_)|_)\/(_|(/_
 ###   /      |  /  _|
 ###
-### hajime_doti
-### cytopyge arch linux installation 'dotfiles installation and configuration'
+### hajime_dtcf
+### cytopyge arch linux installation 'dotfiles configuration'
 ### fifth and final part of a series
 ###
 ### (c) 2019 cytopyge
@@ -40,15 +40,12 @@ rm -rf ~/.dot
 
 ## clone cytopyge dotfiles
 [ -d ~/.dot ] || mkdir -p ~/.dot
-git clone -q https://gitlab.com/cytopyge/dotfiles ~/.dot
+git clone https://gitlab.com/cytopyge/dotfiles ~/.dot
 
-
-# sourcing dotfiles
-
-## zsh shell
+## sourcing zsh shell
 echo 'source ~/.dot/.zshrc' > ~/.zshrc
 
-## vi improved
+## sourcing vi improved
 echo 'source ~/.dot/.vimrc' > ~/.vimrc
 
 
@@ -72,11 +69,6 @@ sudo mount -o remount,rw  /usr
 #yay -Syu --noconfirm urxvt-resize-font-git
 
 
-## clone bwsession (padding & bwul)
-[ -d ~/git/code/bwsession ] || mkdir -p ~/git/code
-git clone -q https://gitlab.com/cytopyge/bwsession ~/git/code/bwsession
-
-
 # zsh shell config
 
 ## set zsh as default shell for current user
@@ -86,18 +78,23 @@ sudo usermod -s `whereis zsh | awk '{print $2}'` $(whoami)
 ## change shell
 sudo chsh -s /bin/zsh
 
-
 ## shell decoration
 ## base16
-git clone -q https://github.com/chriskempson/base16-shell.git ~/.config/base16-shell
-#[TODO]base16_irblack
+git clone https://github.com/chriskempson/base16-shell.git ~/.config/base16-shell
+cd ~
+base16_irblack
 
 
-# vim vundle
-git clone -q https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+# vim
+
+## vim alias
+alias vim=nvim
+
+## vim vundle
+git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 
 ## install plugins defined in ~/.dot/.vimrc
-vim +PluginInstall +qall
+nvim +PluginInstall +qall
 
 
 # global git configuration
@@ -109,11 +106,85 @@ git config --global user.name "$(whoami)"
 function mozilla_firefox {
 	[ -d ~/Downloads ] && rm -rf ~/Downloads
 	[ -d ~/.mozilla ] && rm -rf ~/.mozilla
-	git clone -q https://gitlab.com/cytopyge/ffxd_init ~/.mozilla
+	git clone https://gitlab.com/cytopyge/ffxd_init ~/.mozilla
+	## activate addons branch
 	cd ~/.mozilla
 	git checkout -f addons
 	cd ~
 }
+
+
+# prepare cytopyge git environment
+[ -d ~/git ] || mkdir ~/git
+cd ~/git
+
+
+# recover public git repositories
+
+## hajime
+git clone https://gitlab.com/cytopyge/hajime
+
+## notes
+git clone https://gitlab.com/cytopyge/notes
+
+## prepare system core code environment
+[ -d ~/git/code ] || mkdir ~/git/code
+cd ~/git/code
+
+### wlkill
+git clone https://gitlab.com/cytopyge/wlkill
+
+### ethkill
+git clone https://gitlab.com/cytopyge/ethkill
+
+### bwsession
+git clone https://gitlab.com/cytopyge/bwsession
+
+### linup
+git clone https://gitlab.com/cytopyge/linup
+
+
+# recover private git repositories
+while true; do
+	read -p "recover cytopyge private git repositories? (y/n) " private
+    case $private in
+        [Yy]* ) sh ~/git/code/bwsession/bwul; break;;
+        [Nn]* ) exit;;
+	* ) echo "(y/n)?";;
+    esac
+done
+
+
+#[TODO] wl-paste from bash script seems not to open vault properly
+
+## tried:
+## wl-paste
+## `echo wl-paste`
+wl-paste -n
+
+### hashr
+bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
+
+git clone https://gitlab.com/cytopyge/hashr
+
+### wfa
+bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
+
+git clone https://gitlab.com/cytopyge/wfa
+
+### snapshot
+bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
+
+git clone https://gitlab.com/cytopyge/snapshot
+
+
+# make all files in '~' owned by current user
+cd ~
+sudo chown -R $(whoami):wheel *
+
+
+echo 'finished installation'
+echo 'please reboot'
 
 
 # finishing
@@ -122,7 +193,4 @@ function mozilla_firefox {
 sudo mount -o remount,ro  /usr
 
 ## administration
-sudo touch ~/hajime/5doti.done
-
-
-echo 'sh hajime/6apps.sh'
+sudo touch ~/hajime/5dtcf.done

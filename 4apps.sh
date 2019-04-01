@@ -1,20 +1,21 @@
 #!/bin/bash
 #
 ##
-###  _            _ _                       _
-### | |__   __ _ (_|_)_ __ ___   ___   _ __(_) ___ ___
-### | '_ \ / _` || | | '_ ` _ \ / _ \ | '__| |/ __/ _ \
-### | | | | (_| || | | | | | | |  __/ | |  | | (_|  __/
-### |_| |_|\__,_|/ |_|_| |_| |_|\___| |_|  |_|\___\___|4
-###            |__/
+###
+###  _            _ _
+### | |__   __ _ (_|_)_ __ ___   ___    __ _ _ __  _ __  ___
+### | '_ \ / _` || | | '_ ` _ \ / _ \  / _` | '_ \| '_ \/ __|
+### | | | | (_| || | | | | | | |  __/ | (_| | |_) | |_) \__ \
+### |_| |_|\__,_|/ |_|_| |_| |_|\___|  \__,_| .__/| .__/|___/4
+###            |__/                         |_|   |_|
 ###
 ###  _ _|_ _ ._    _  _
 ### (_\/|_(_)|_)\/(_|(/_
 ###   /      |  /  _|
 ###
-### hajime_rice
-### cytopyge arch linux installation 'rice'
-### fourth part of a series
+### hajime_apps
+### cytopyge arch linux installation 'apps'
+### fourth part of an intriguing series
 ###
 ### (c) 2019 cytopyge
 ###
@@ -246,8 +247,8 @@ sudo mount -o remount,ro  /usr
 
 
 # execute dotfiles install script
-echo 'sh hajime/5doti.sh'
+echo 'sh hajime/5dtcf.sh'
 
 
 # finishing
-sudo touch hajime/4rice.done
+sudo touch hajime/4apps.done

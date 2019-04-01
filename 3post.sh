@@ -108,7 +108,7 @@ sudo mount -o remount,ro  /boot
 
 # human info
 echo
-echo 'sh hajime/4rice.sh'
+echo 'sh hajime/4apps.sh'
 
 # finishing
 sudo touch hajime/3post.done
