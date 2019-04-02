@@ -41,7 +41,7 @@ shell_additions="zsh-completions zsh-syntax-highlighting"
 
 terminal="termite-nocsd"
 
-terminal_additions="rofi"
+terminal_additions="rofi fzf-git"
 
 password_security="bitwarden-cli"
 
@@ -112,8 +112,8 @@ yay -Sy --noconfirm \
 	$audio
 
 ## fzf
-git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-~/.fzf/install
+#git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+#~/.fzf/install
 
 
 #install additional tools
