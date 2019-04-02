@@ -31,41 +31,29 @@ clear
 
 ## core applications
 ## 'git' packages that need compiling are separated because of an error occuring in yay when combined
-wayland=""
-wayland_git="wlroots-git"
+wayland="wlroots-git"
 
-dwm="i3blocks"
-dwm_git="sway-git swaylock-git slurp-git grim-git jq-git"
+dwm="i3blocks sway-git swaylock-git slurp-git grim-git jq-git"
 
 shell="zsh"
-shell_git=""
 
 shell_additions="zsh-completions zsh-syntax-highlighting"
-shell_additions_git=""
 
-terminal=""
-terminal_git="termite-nocsd"
+terminal="termite-nocsd"
 
 terminal_additions="rofi"
-terminal_additions_git=""
 
-password_security=""
-password_security_git="bitwarden-cli"
+password_security="bitwarden-cli"
 
 encryption="veracrypt"
-encryption_git=""
 
 secure_connections="wireguard-tools openvpn"
-secure_connections_git=""
 
 fonts="terminus-font ttf-inconsolata"
-fonts_git=""
 
-display=""
-display_git="brightnessctl"
+display="brightnessctl"
 
 audio="alsa-utils"
-audio_git=""
 
 
 # additional tools
@@ -126,22 +114,6 @@ yay -Sy --noconfirm \
 ## fzf
 git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
 ~/.fzf/install
-
-
-#install core applications git
-yay -Sy --noconfirm \
-	$wayland_git \
-	$dwm_git \
-	$shell_git \
-	$shell_additions_git \
-	$terminal_git \
-	$terminal_additions_git \
-	$password_security_git \
-	$encryption_git \
-	$secure_connections_git \
-	$fonts_git \
-	$display_git \
-	$audio_git
 
 
 #install additional tools
