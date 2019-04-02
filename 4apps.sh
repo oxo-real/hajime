@@ -64,7 +64,7 @@ terminal_file_browser="nnn ranger vifm"
 
 file_tools="srm rsync gdisk"
 
-network_tools="wireshark-cli wireshark-qt mtr"
+network_tools="wireshark-cli wireshark-qt mtr iftop"
 
 internet_tools="firefox-developer-edition w3m qutebrowser"
 
