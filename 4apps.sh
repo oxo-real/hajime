@@ -135,6 +135,10 @@ yay -Sy --noconfirm \
 	$office_tools
 
 
+#[TODO] jq termite-nocsd bitwarden-cli brightnessctl gdisk
+yay -Sy --noconfirm jq termite-nocsd bitwarden-cli brightnessctl gdisk
+
+
 # X11
 # https://wiki.archlinux.org/index.php/Libinput#Configuration
 # https://wiki.archlinux.org/index.php/Libinput#Via_xinput

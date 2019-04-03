@@ -48,8 +48,7 @@ echo 'source ~/.dot/.zshrc' > ~/.zshrc
 ## sourcing vi improved
 echo 'source ~/.dot/.vimrc' > ~/.vimrc
 
-
-# restore dotfiles symlinks
+## restore dotfiles symlinks
 sh ~/.dot/symlinks/restore
 
 
@@ -95,6 +94,7 @@ git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 
 ## install plugins defined in ~/.dot/.vimrc
 nvim +PluginInstall +qall
+clear
 
 
 # global git configuration
@@ -112,6 +112,8 @@ function mozilla_firefox {
 	git checkout -f addons
 	cd ~
 }
+
+mozilla_firefox
 
 
 # prepare cytopyge git environment
