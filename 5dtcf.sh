@@ -141,7 +141,7 @@ git clone https://gitlab.com/cytopyge/ethkill
 git clone https://gitlab.com/cytopyge/bwsession
 
 ### linup
-git clone https://gitlab.com/cytopyge/linup
+git clone https://gitlab.com/cytopyge/updater
 
 
 # recover private git repositories
