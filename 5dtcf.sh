@@ -35,7 +35,7 @@ sudo mount -o remount,rw  /usr
 
 # dotfiles
 
-## removing existing ~/.dot
+## remove existing ~/.dot
 rm -rf ~/.dot
 
 ## clone cytopyge dotfiles
@@ -148,34 +148,40 @@ git clone https://gitlab.com/cytopyge/linup
 while true; do
 	read -p "recover cytopyge private git repositories? (y/n) " private
     case $private in
-        [Yy]* ) sh ~/git/code/bwsession/bwul; break;;
-        [Nn]* ) exit;;
+        [Yy]* ) recover_cytopyge_private_git; break;;
+        [Nn]* ) break;;
 	* ) echo "(y/n)?";;
     esac
 done
 
 
-#[TODO] wl-paste from bash script seems not to open vault properly
+recover_cytopyge_private_git () {
 
-## tried:
-## wl-paste
-## `echo wl-paste`
-wl-paste -n
+	sh ~/git/code/bwsession/bwul
 
-### hashr
-bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
+	#[TODO] wl-paste from bash script seems not to open vault properly
 
-git clone https://gitlab.com/cytopyge/hashr
+	## tried:
+	## wl-paste
+	## `echo wl-paste`
+	wl-paste -n
 
-### wfa
-bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
+	### hashr
+	bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
 
-git clone https://gitlab.com/cytopyge/wfa
+	git clone https://gitlab.com/cytopyge/hashr
 
-### snapshot
-bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
+	### wfa
+	bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
 
-git clone https://gitlab.com/cytopyge/snapshot
+	git clone https://gitlab.com/cytopyge/wfa
+
+	### snapshot
+	bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
+
+	git clone https://gitlab.com/cytopyge/snapshot
+
+}
 
 
 # make all files in '~' owned by current user
