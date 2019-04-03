@@ -1,19 +1,19 @@
 ```
- _            _ _                
-| |__   __ _ (_|_)_ __ ___   ___ 
+ _            _ _
+| |__   __ _ (_|_)_ __ ___   ___
 | '_ \ / _` || | | '_ ` _ \ / _ \
 | | | | (_| || | | | | | | |  __/
 |_| |_|\__,_|/ |_|_| |_| |_|\___|
-           |__/ 
+           |__/
 
- _ _|_ _ ._    _  _  
-(_\/|_(_)|_)\/(_|(/_ 
-  /      |  /  _|    
+ _ _|_ _ ._    _  _
+(_\/|_(_)|_)\/(_|(/_
+  /      |  /  _|
 
 README.md
 ```
 # hajime
-## a seven part arch linux installation series
+## a five part arch linux installation series
 (c) 2019 cytopyge
 
 ### 1  Base
@@ -25,35 +25,30 @@ The 'conf' script configures settings for time, network, mirrorlists, bootloader
 ### 3  Post
 The third script prepares the system 'post install' for the installation of a desktop environment. Modifications are made to the package manager, the entire operating system is updated, a mountpoint environment is beig created and an alternative AUR manager 'yay' is installed alongside the native 'pacman'. After 'post' an fully fledged Arch installation is running on the system.
 
-### 4  Rice
-'hajime rice' prepares the system for a display manager running under Wayland, with wlroots as a modular compositor library. The script will setup the Sway tiling window manager, but it can easily be modifed to be setup for X11 based managers, when preferred.
+### 4  Apps
+'hajime apps' prepares the system for a display manager running under Wayland, with wlroots as a modular compositor library. The script will setup the Sway tiling window manager, but it can easily be modifed to be setup for X11 based managers, when preferred. It also installs a variety of tools, among others for: video, text, file management, network management, internet, system monitoring, virtual environments.
 
-### 5  Doti
-'doti' installs personal configuration dotfiles and tools like: z shell, vim, bitwarden, veracrypt.
+### 5  Dtcg
+'dtcg' installs the dotfile configuration, which contains settings for the apps and window manager to run smoothly.
 
-### 6  Apps
-Installs a variety of tools, among others for: video, text, file management, network management, internet, system monitoring, virtual environments.
-
-### 7  Gitu
-'Gitu' brings the personal local git repository up-to-date. Adviced to tweak the script to personal preference.
 
 ## Take off instructions
-When using these 'hajime' scripts:
-Be sure to get your latest Arch Linux image via: https://www.archlinux.org/download/.
-Then boot into the ArchISO live system environment, install git, clone 'hajime', check the user customizable variables sections and start the first script:
+When using the 'hajime' scripts:
+Be sure to first get your latest Arch Linux install image via: https://www.archlinux.org/download/.
+Boot into the ArchISO live system environment, install git, clone 'hajime' and check the user customizable variables sections before executing the first script:
 
 ```
-pacman -Sy --noconfirm git
+pacman -Sy git
 git clone https://gitlab.com/cytopyge/hajime
 ./hajime/1base.sh
 ```
 
-From here run the scripts one-by-one and follow the in-script instructions.
+From here run the scripts in numerical order and follow the in-script instructions. Have fun!
 
 ---
 ---
 
-# resources
+# resource reference
 
 ## general installation guide
 https://wiki.archlinux.org/index.php/installation_guide
