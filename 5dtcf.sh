@@ -29,10 +29,6 @@ clear
 sudo mount -o remount,rw  /usr
 
 
-# doti settings
-#[TODO] ?
-
-
 # dotfiles
 
 ## remove existing ~/.dot
@@ -51,9 +47,13 @@ echo 'source ~/.dot/.vimrc' > ~/.vimrc
 ## restore dotfiles symlinks
 sh ~/.dot/symlinks/restore
 
-
-# restore resets /usr to ro
+## restore resets /usr to ro
 sudo mount -o remount,rw  /usr
+
+## prepare wallpaper file
+[ -d ~/media_/images/wallpaper ] || mkdir -p ~/media_/images/wallpaper/active
+touch ~/media_images/wallpaper/active
+## to be replaced with preferred image
 
 
 # X11 config
