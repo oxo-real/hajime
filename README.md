@@ -10,7 +10,6 @@
 (_\/|_(_)|_)\/(_|(/_
   /      |  /  _|
 
-README.md
 ```
 # hajime
 ## a five part arch linux installation series
@@ -80,7 +79,19 @@ https://freedesktop.org/wiki/Software/systemd
 
 ## Wayland
 https://wayland.freedesktop.org
+https://github.com/swaywm/wlroots
 
 ## Sway
-https://github.com/swaywm/wlroots
 https://swaywm.org/
+
+## rice inspirations
+```
+https://github.com/budlabs
+https://github.com/lukesmithxyz
+https://github.com/kaihendry
+https://github.com/gotbletu
+https://github.com/tpope
+https://github.com/christoomey
+https://github.com/r00k
+```
+many thanks for sharing!
