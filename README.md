@@ -92,6 +92,7 @@ https://swaywm.org/
 * https://github.com/tpope
 * https://github.com/christoomey
 * https://github.com/r00k
+
 many thanks for sharing!
 
 ## more inspirational
