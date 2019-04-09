@@ -85,7 +85,6 @@ https://github.com/swaywm/wlroots
 https://swaywm.org/
 
 ## rice inspirations
-```
 https://github.com/budlabs
 https://github.com/lukesmithxyz
 https://github.com/kaihendry
@@ -93,5 +92,8 @@ https://github.com/gotbletu
 https://github.com/tpope
 https://github.com/christoomey
 https://github.com/r00k
-```
 many thanks for sharing!
+
+## more inspirational
+https://www.fsf.org/
+http://www.gnu.org/
