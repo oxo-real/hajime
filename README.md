@@ -71,29 +71,29 @@ https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system
 https://gitlab.com/cryptsetup/LUKS2-docs
 
 ## LVM
-https://wiki.archlinux.org/index.php/LVM
-https://wiki.archlinux.org/index.php/Resizing_LVM-on-LUKS
+* https://wiki.archlinux.org/index.php/LVM
+* https://wiki.archlinux.org/index.php/Resizing_LVM-on-LUKS
 
 ## systemd
 https://freedesktop.org/wiki/Software/systemd
 
 ## Wayland
-https://wayland.freedesktop.org
-https://github.com/swaywm/wlroots
+* https://wayland.freedesktop.org
+* https://github.com/swaywm/wlroots
 
 ## Sway
 https://swaywm.org/
 
 ## rice inspirations
-https://github.com/budlabs
-https://github.com/lukesmithxyz
-https://github.com/kaihendry
-https://github.com/gotbletu
-https://github.com/tpope
-https://github.com/christoomey
-https://github.com/r00k
+* https://github.com/budlabs
+* https://github.com/lukesmithxyz
+* https://github.com/kaihendry
+* https://github.com/gotbletu
+* https://github.com/tpope
+* https://github.com/christoomey
+* https://github.com/r00k
 many thanks for sharing!
 
 ## more inspirational
-https://www.fsf.org/
-http://www.gnu.org/
+* https://www.fsf.org/
+* http://www.gnu.org/
