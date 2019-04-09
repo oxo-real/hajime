@@ -44,6 +44,9 @@ echo 'source ~/.dot/.zshrc' > ~/.zshrc
 ## sourcing vi improved
 echo 'source ~/.dot/.vimrc' > ~/.vimrc
 
+## sourcing tmux config
+echo 'source ~/.dot/.tmuxrc' > ~/.tmux.conf
+
 ## restore dotfiles symlinks
 sh ~/.dot/symlinks/restore
 

@@ -39,7 +39,7 @@ shell="zsh"
 
 shell_additions="zsh-completions zsh-syntax-highlighting"
 
-terminal="termite-nocsd"
+terminal="termite-nocsd tmux"
 
 terminal_additions="rofi"
 
@@ -60,13 +60,15 @@ audio="alsa-utils"
 
 terminal_text_tools="figlet qrencode"
 
-terminal_file_browser="nnn ranger vifm"
+terminal_file_browser="nnn vifm"
 
 file_tools="srm rsync gdisk"
 
 network_tools="wireshark-cli wireshark-qt mtr iftop"
 
 internet_tools="firefox-developer-edition w3m qutebrowser"
+
+feeds="newsboat"
 
 download_utilities="aria2"
 
@@ -123,6 +125,7 @@ yay -Sy --noconfirm \
 	$file_tools \
 	$network_tools \
 	$internet_tools \
+	$feeds \
 	$download_utilities \
 	$system_monitoring \
 	$virtual_machines \
