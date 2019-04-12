@@ -33,7 +33,7 @@ The third script prepares the system 'post install' for the installation of a de
 
 ## Take off instructions
 When using the 'hajime' scripts:
-Be sure to first get your latest Arch Linux install image via: https://www.archlinux.org/download/.
+Be sure to first get your latest Arch Linux install image with isolatest (https://gitlab.com/cytopyge/isolatest) or manually via: https://www.archlinux.org/download/.
 Boot into the ArchISO live system environment, install git, clone 'hajime' and check the user customizable variables sections before executing the first script:
 
 ```
