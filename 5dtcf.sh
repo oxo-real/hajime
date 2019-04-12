@@ -145,8 +145,11 @@ git clone https://gitlab.com/cytopyge/ethkill
 ### bwsession
 git clone https://gitlab.com/cytopyge/bwsession
 
-### linup
+### updater
 git clone https://gitlab.com/cytopyge/updater
+
+### isolatest
+git clone https://gitlab.com/cytopyge/isolatest
 
 
 # recover private git repositories
