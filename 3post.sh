@@ -33,8 +33,7 @@ echo
 echo -n 'enter interface number '
 read interface_number
 interface=$(ip a | grep ^'$interface_number' | awk '{print $2}' | sed 's/://')
-sudo dhcpcd $interface
-sleep 5
+sudo dhcpcd -w $interface
 if [[ ! -z $interface ]] ; then
 	echo "'$interface' connected"
 else
