@@ -96,7 +96,7 @@ alias vim=nvim
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 
 ## install plugins defined in ~/.dot/.vimrc
-nvim +PluginInstall +qall
+vim +PluginInstall +qall
 clear
 
 

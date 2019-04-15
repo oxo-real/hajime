@@ -35,7 +35,10 @@ read interface_number
 interface=$(ip a | grep ^'$interface_number' | awk '{print $2}' | sed 's/://')
 sudo dhcpcd $interface
 sleep 5
-echo "'$interface' connected"
+if [ ! -z $interface ] ; then
+	echo "'$interface' connected"
+else
+	exit
 ping -c 1 9.9.9.9
 
 
@@ -98,7 +101,7 @@ yay -S --noconfirm $base_additions
 
 
 # remove system bloat
-yay -R --noconfirm $bloat_ware
+yay -Rns --noconfirm $bloat_ware
 
 
 # set /usr and /boot read-only
