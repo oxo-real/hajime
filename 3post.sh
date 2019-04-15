@@ -35,10 +35,13 @@ read interface_number
 interface=$(ip a | grep ^'$interface_number' | awk '{print $2}' | sed 's/://')
 sudo dhcpcd $interface
 sleep 5
-if [ ! -z $interface ] ; then
+if [[ ! -z $interface ]] ; then
 	echo "'$interface' connected"
 else
+	printf "$interface not able to obtain lease\n"
+	printf "exiting\n"
 	exit
+fi
 ping -c 1 9.9.9.9
 
 
