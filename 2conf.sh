@@ -59,12 +59,12 @@ echo $locale_conf > /etc/locale.conf
 ## create the hostname file
 echo -n 'Enter hostname? '
 read hostname
-echo "$hostname" > /etc/hostname
+printf "$hostname" > /etc/hostname
 
 ## add matching entries to hosts file
-echo '127.0.0.1    localhost.localdomain    localhost' >> /etc/hosts
-echo '::1    localhost.localdomain    localhost' >> /etc/hosts
-echo '127.0.1.1     "$hostname".localdomain     "$hostname"' >> /etc/hosts
+printf "127.0.0.1	localhost.localdomain	localhost" >> /etc/hosts
+printf "::1		localhost.localdomain	localhost" >> /etc/hosts
+printf "127.0.1.1	$hostname.localdomain	$hostname" >> /etc/hosts
 
 
 # set console font permanent via sd-vconsole
