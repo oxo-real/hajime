@@ -33,7 +33,7 @@ clear
 ## 'git' packages that need compiling are separated because of an error occuring in yay when combined
 wayland="wlroots-git"
 
-dwm="i3blocks sway-git swaylock-git slurp-git grim-git jq-git"
+dwm="sway-git swaylock-git i3blocks xtitle-git slurp-git grim-git jq-git"
 
 shell="zsh"
 
