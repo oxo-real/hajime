@@ -70,6 +70,8 @@ internet_tools="firefox-developer-edition w3m qutebrowser urlscan"
 
 feeds="newsboat"
 
+email="neomutt msmtp isync notmuch abook"
+
 download_utilities="aria2"
 
 system_monitoring="glances ccze"
@@ -126,6 +128,7 @@ yay -Sy --noconfirm \
 	$network_tools \
 	$internet_tools \
 	$feeds \
+	$email \
 	$download_utilities \
 	$system_monitoring \
 	$virtual_machines \
