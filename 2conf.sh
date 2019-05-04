@@ -32,6 +32,8 @@ vconsole_conf="FONT=ter-v32n"
 mirror_country="Netherlands"
 mirror_amount="5"
 username="user"
+bootloader_timeout="2"
+bootloader_editor="0"
 ## core applications
 linux_kernel="linux-headers"
 linux_lts_kernel="linux-lts linux-lts-headers"
@@ -100,8 +102,8 @@ bootctl install
 
 ## boot loader configuration
 echo 'default arch' > /boot/loader/loader.conf
-echo 'timeout 3' >> /boot/loader/loader.conf
-echo 'editor 0' >> /boot/loader/loader.conf
+printf "timeout $bootloader_timeout" >> /boot/loader/loader.conf
+printf "editor $bootloader_editor" >> /boot/loader/loader.conf
 echo 'console-mode max' >> /boot/loader/loader.conf
 
 
@@ -114,8 +116,8 @@ sed -i "/^HOOKS/c\HOOKS=(base systemd autodetect keyboard sd-vconsole modconf bl
 
 # adding boot loader entries
 
-## bleeding edge kernel (BLE)
-echo 'title Arch Linux BLE' > /boot/loader/entries/arch.conf
+## bleeding edge kernel
+echo 'title arch' > /boot/loader/entries/arch.conf
 echo 'linux /vmlinuz-linux' >> /boot/loader/entries/arch.conf
 echo 'initrd /initramfs-linux.img' >> /boot/loader/entries/arch.conf
 [ ! -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> /boot/loader/entries/arch.conf
@@ -124,7 +126,7 @@ echo 'initrd /initramfs-linux.img' >> /boot/loader/entries/arch.conf
 [ -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` rw resume=UUID=`blkid | grep lv_swap | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> /boot/loader/entries/arch.conf
 
 ## long term support kernel (LTS)
-echo 'title Arch Linux LTS' > /boot/loader/entries/arch-lts.conf
+echo 'title arch-lts' > /boot/loader/entries/arch-lts.conf
 echo 'linux /vmlinuz-linux-lts' >> /boot/loader/entries/arch-lts.conf
 echo 'initrd /initramfs-linux-lts.img' >> /boot/loader/entries/arch-lts.conf
 [ ! -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> /boot/loader/entries/arch-lts.conf

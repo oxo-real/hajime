@@ -70,7 +70,11 @@ internet_tools="firefox-developer-edition w3m qutebrowser urlscan"
 
 feeds="newsboat"
 
-email="neomutt msmtp isync notmuch abook"
+email="neomutt msmtp isync notmuch"
+
+contact_management="abook"
+
+time_management="calcurse"
 
 download_utilities="aria2"
 
@@ -129,6 +133,8 @@ yay -Sy --noconfirm \
 	$internet_tools \
 	$feeds \
 	$email \
+	$contact_management \
+	$time_management \
 	$download_utilities \
 	$system_monitoring \
 	$virtual_machines \

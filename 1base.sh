@@ -135,16 +135,17 @@ read lvm_part
 echo
 echo 'cryptsetup is about to start'
 echo 'within the encrypted lvm volumegroup the logical volumes'
-echo 'ROOT, HOME, VAR & USR are being created'
+echo 'ROOT, HOME, USR & VAR are being created'
+printf "01501005"
 echo
 echo -n 'ROOT partition size (GB)? '
 read root_size
 echo -n 'HOME partition size (GB)? '
 read home_size
-echo -n 'VAR partition size (GB)?  '
-read var_size
 echo -n 'USR partition size (GB)?  '
 read usr_size
+echo -n 'VAR partition size (GB)?  '
+read var_size
 echo -n 'create SWAP partition (y/N)? '
 read swap_bool
 swap_size=0
