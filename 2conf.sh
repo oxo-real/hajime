@@ -57,33 +57,39 @@ locale-gen
 echo $locale_conf > /etc/locale.conf
 
 
+# vconsole settings
+echo $vconsole_conf > /etc/vconsole.conf
+
+
 # network configuration
 
 ## set hostname
 
 function set_hostname() {
 
-read -p "change hostname '$hostname'? (y/N) " -n 1 -r
+	read -p "change hostname '$hostname'? (y/N) " -n 1 -r
 
-if [[ $REPLY =~ ^[Yy]$ ]] ; then
-	echo
-	printf "enter hostname: "
-	read hostname
-	echo
-	printf "hostname '$hostname' entered, correct? (Y/n) \n"
-	read hostname_correct
+	if [[ $REPLY =~ ^[Yy]$ ]] ; then
+		echo
+		printf "enter hostname: "
+		read hostname
+		echo
+		printf "hostname '$hostname' entered, correct? (Y/n) \n"
+		read hostname_correct
 
-		if [[ $REPLY =~ ^[Nn]$ ]] ; then
-			echo
-			set_hostname
-		else
-			printf "using '$hostname' as hostname\n"
-		fi
-else
-	printf "using '$hostname' as hostname\n"
-fi
+			if [[ $REPLY =~ ^[Nn]$ ]] ; then
+				echo
+				set_hostname
+			else
+				printf "using '$hostname' as hostname\n"
+			fi
+	else
+		printf "using '$hostname' as hostname\n"
+	fi
 
 }
+
+set_hostname
 
 ## create hostname file
 printf "$hostname" > /etc/hostname
@@ -171,27 +177,29 @@ mkinitcpio -p linux-lts
 
 function set_username() {
 
-read -p "change username '$username'? (y/N) " -n 1 -r
+	read -p "change username '$username'? (y/N) " -n 1 -r
 
-if [[ $REPLY =~ ^[Yy]$ ]] ; then
-	echo
-	printf "enter username: "
-	read username
-	echo
-	printf "username '$username' entered, correct? (Y/n) \n"
-	read username_correct
+	if [[ $REPLY =~ ^[Yy]$ ]] ; then
+		echo
+		printf "enter username: "
+		read username
+		echo
+		printf "username '$username' entered, correct? (Y/n) \n"
+		read username_correct
 
-		if [[ $REPLY =~ ^[Nn]$ ]] ; then
-			echo
-			set_username
-		else
-			printf "using '$username' as username\n"
-		fi
-else
-	printf "using '$username' as username\n"
-fi
+			if [[ $REPLY =~ ^[Nn]$ ]] ; then
+				echo
+				set_username
+			else
+				printf "using '$username' as username\n"
+			fi
+	else
+		printf "using '$username' as username\n"
+	fi
 
 }
+
+set_username
 
 ## add $username
 useradd -m -g wheel $username
