@@ -157,9 +157,8 @@ read -p "recover cytopyge private git repositories? (y/N) " -n 1 -r
 
 if [[ $REPLY =~ ^[Yy]$ ]] ; then
 	recover_cytopyge_private_git
-	break
 else
-	break
+	finishing_up
 fi
 
 recover_cytopyge_private_git () {
@@ -188,10 +187,16 @@ recover_cytopyge_private_git () {
 
 	git clone https://gitlab.com/cytopyge/snapshot
 
+	finishing_up
+
 }
 
 
-# make all files in '~' owned by current user
+finishing_up () {
+
+# finishing
+
+## make all files in '~' owned by current user
 cd ~
 sudo chown -R $(whoami):wheel *
 
@@ -200,10 +205,10 @@ echo 'finished installation'
 echo 'please reboot'
 
 
-# finishing
-
 ## make /usr read-only
 sudo mount -o remount,ro  /usr
 
 ## administration
 sudo touch ~/hajime/5dtcf.done
+
+}
