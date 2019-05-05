@@ -153,15 +153,14 @@ git clone https://gitlab.com/cytopyge/isolatest
 
 
 # recover private git repositories
-while true; do
-	read -p "recover cytopyge private git repositories? (y/n) " private
-    case $private in
-        [Yy]* ) recover_cytopyge_private_git; break;;
-        [Nn]* ) break;;
-	* ) echo "(y/n)?";;
-    esac
-done
+read -p "recover cytopyge private git repositories? (y/N) " -n 1 -r
 
+if [[ $REPLY =~ ^[Yy]$ ]] ; then
+	recover_cytopyge_private_git
+	break
+else
+	break
+fi
 
 recover_cytopyge_private_git () {
 
