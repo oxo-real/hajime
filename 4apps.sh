@@ -32,7 +32,7 @@ clear
 
 wayland="wlroots-git"
 
-dwm="sway-git swaylock-git i3blocks xtitle-git slurp-git grim-git jq-git"
+dwm="sway-git swaylock-git i3blocks slurp-git grim-git jq-git"
 
 shell="zsh"
 
@@ -98,6 +98,8 @@ video_tools="youtube-dl mpv youtube-viewer"
 #office_tools=""
 #office_tools="libreoffice-fresh libreoffice-fresh-nl"
 
+weather="wttr"
+
 
 # set /usr writeable
 sudo mount -o remount,rw  /usr
@@ -143,7 +145,8 @@ yay -Sy --noconfirm \
 	$video_tools \
 	$photo_editing \
 	$photo_management \
-	$office_tools
+	$office_tools \
+	$weather
 
 
 #[TODO] jq termite-nocsd bitwarden-cli brightnessctl gdisk
