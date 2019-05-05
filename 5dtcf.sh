@@ -106,7 +106,9 @@ git config --global user.name "$(whoami)"
 
 
 # mozilla firefox settings
-function mozilla_firefox {
+
+function mozilla_firefox() {
+
 	[ -d ~/Downloads ] && rm -rf ~/Downloads
 	[ -d ~/.mozilla ] && rm -rf ~/.mozilla
 	git clone https://gitlab.com/cytopyge/ffxd_init ~/.mozilla
@@ -114,7 +116,9 @@ function mozilla_firefox {
 	cd ~/.mozilla
 	git checkout -f addons
 	cd ~
+
 }
+
 
 mozilla_firefox
 
@@ -127,9 +131,11 @@ cd ~/git
 # recover public git repositories
 
 ## hajime
+clear
 git clone https://gitlab.com/cytopyge/hajime
 
 ## notes
+clear
 git clone https://gitlab.com/cytopyge/notes
 
 ## prepare system core code environment
@@ -137,31 +143,27 @@ git clone https://gitlab.com/cytopyge/notes
 cd ~/git/code
 
 ### wlkill
+clear
 git clone https://gitlab.com/cytopyge/wlkill
 
 ### ethkill
+clear
 git clone https://gitlab.com/cytopyge/ethkill
 
 ### bwsession
+clear
 git clone https://gitlab.com/cytopyge/bwsession
 
 ### updater
+clear
 git clone https://gitlab.com/cytopyge/updater
 
 ### isolatest
+clear
 git clone https://gitlab.com/cytopyge/isolatest
 
 
-# recover private git repositories
-read -p "recover cytopyge private git repositories? (y/N) " -n 1 -r
-
-if [[ $REPLY =~ ^[Yy]$ ]] ; then
-	recover_cytopyge_private_git
-else
-	finishing_up
-fi
-
-recover_cytopyge_private_git () {
+function recover_cytopyge_private_git() {
 
 	sh ~/git/code/bwsession/bwul
 
@@ -173,16 +175,19 @@ recover_cytopyge_private_git () {
 	wl-paste -n
 
 	### hashr
+	clear
 	bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
 
 	git clone https://gitlab.com/cytopyge/hashr
 
 	### wfa
+	clear
 	bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
 
 	git clone https://gitlab.com/cytopyge/wfa
 
 	### snapshot
+	clear
 	bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
 
 	git clone https://gitlab.com/cytopyge/snapshot
@@ -192,23 +197,41 @@ recover_cytopyge_private_git () {
 }
 
 
-finishing_up () {
+function finishing_up() {
 
-# finishing
+	# finishing
 
-## make all files in '~' owned by current user
-cd ~
-sudo chown -R $(whoami):wheel *
+	## make all files in '~' owned by current user
+	cd ~
+	sudo chown -R $(whoami):wheel *
+
+	## make /usr read-only
+	sudo mount -o remount,ro  /usr
+
+	## administration
+	sudo touch ~/hajime/5dtcf.done
 
 
-echo 'finished installation'
-echo 'please reboot'
+	clear
+	echo 'finished installation'
+	read -p "sudo reboot? (y/N) " -n 1 -r
 
-
-## make /usr read-only
-sudo mount -o remount,ro  /usr
-
-## administration
-sudo touch ~/hajime/5dtcf.done
+	if [[ $REPLY =~ ^[yY]$ ]] ; then
+		sudo reboot
+	else
+		exit
+	fi
 
 }
+
+
+# recover private git repositories
+clear
+read -p "recover cytopyge private git repositories? (y/N) " -n 1 -r
+echo
+
+if [[ $REPLY =~ ^[Yy]$ ]] ; then
+	recover_cytopyge_private_git
+else
+	finishing_up
+fi

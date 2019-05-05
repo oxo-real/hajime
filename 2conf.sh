@@ -31,6 +31,7 @@ locale_conf="LANG=en_US.UTF-8"
 vconsole_conf="FONT=ter-v32n"
 mirror_country="Netherlands"
 mirror_amount="5"
+hostname="host"
 username="user"
 bootloader_timeout="2"
 bootloader_editor="0"
@@ -58,19 +59,39 @@ echo $locale_conf > /etc/locale.conf
 
 # network configuration
 
-## create the hostname file
-echo -n 'Enter hostname? '
-read hostname
+## set hostname
+
+function set_hostname() {
+
+read -p "change hostname '$hostname'? (y/N) " -n 1 -r
+
+if [[ $REPLY =~ ^[Yy]$ ]] ; then
+	echo
+	printf "enter hostname: "
+	read hostname
+	echo
+	printf "hostname '$hostname' entered, correct? (Y/n) \n"
+	read hostname_correct
+
+		if [[ $REPLY =~ ^[Nn]$ ]] ; then
+			echo
+			set_hostname
+		else
+			printf "using '$hostname' as hostname\n"
+		fi
+else
+	printf "using '$hostname' as hostname\n"
+fi
+
+}
+
+## create hostname file
 printf "$hostname" > /etc/hostname
 
 ## add matching entries to hosts file
 printf "127.0.0.1	localhost.localdomain	localhost" >> /etc/hosts
 printf "::1		localhost.localdomain	localhost" >> /etc/hosts
 printf "127.0.1.1	$hostname.localdomain	$hostname" >> /etc/hosts
-
-
-# set console font permanent via sd-vconsole
-echo $vconsole_conf > /etc/vconsole.conf
 
 
 # set root password
@@ -146,10 +167,36 @@ mkinitcpio -p linux-lts
 
 # add user
 
+## set username
+
+function set_username() {
+
+read -p "change username '$username'? (y/N) " -n 1 -r
+
+if [[ $REPLY =~ ^[Yy]$ ]] ; then
+	echo
+	printf "enter username: "
+	read username
+	echo
+	printf "username '$username' entered, correct? (Y/n) \n"
+	read username_correct
+
+		if [[ $REPLY =~ ^[Nn]$ ]] ; then
+			echo
+			set_username
+		else
+			printf "using '$username' as username\n"
+		fi
+else
+	printf "using '$username' as username\n"
+fi
+
+}
+
 ## add $username
 useradd -m -g wheel $username
 
-## add $username to video group for brightness control
+## add $username to video group (for brightnessctl)
 usermod -a -G video $username
 
 ## set $username password
