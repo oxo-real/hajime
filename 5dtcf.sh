@@ -142,14 +142,6 @@ git clone https://gitlab.com/cytopyge/notes
 [ -d ~/git/code ] || mkdir ~/git/code
 cd ~/git/code
 
-### wlkill
-clear
-git clone https://gitlab.com/cytopyge/wlkill
-
-### ethkill
-clear
-git clone https://gitlab.com/cytopyge/ethkill
-
 ### bwsession
 clear
 git clone https://gitlab.com/cytopyge/bwsession
@@ -173,6 +165,12 @@ function recover_cytopyge_private_git() {
 	## wl-paste
 	## `echo wl-paste`
 	wl-paste -n
+
+	### netkill
+	clear
+	bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
+
+	git clone https://gitlab.com/cytopyge/netkill
 
 	### hashr
 	clear

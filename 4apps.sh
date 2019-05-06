@@ -75,7 +75,7 @@ contact_management="abook"
 
 time_management="calcurse"
 
-download_utilities="aria2 transmission"
+download_utilities="aria2 transmission-cli transmission-remote-cli-git"
 
 system_monitoring="glances ccze"
 
