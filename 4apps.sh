@@ -60,7 +60,7 @@ audio="alsa-utils"
 
 terminal_text_tools="figlet qrencode"
 
-terminal_file_browser="nnn vifm"
+terminal_file_browser="nnn vifm lf"
 
 file_tools="srm rsync gdisk"
 
