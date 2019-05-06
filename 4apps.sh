@@ -28,12 +28,11 @@ clear
 
 # user customizable variables
 
-
 ## core applications
-## 'git' packages that need compiling are separated because of an error occuring in yay when combined
+
 wayland="wlroots-git"
 
-dwm="sway-git swaylock-git i3blocks xtitle-git slurp-git grim-git jq-git"
+dwm="sway-git swaylock-git i3blocks slurp-git grim-git jq-git"
 
 shell="zsh"
 
@@ -66,17 +65,17 @@ file_tools="srm rsync gdisk"
 
 network_tools="wireshark-cli wireshark-qt mtr iftop"
 
-internet_tools="firefox-developer-edition w3m qutebrowser urlscan"
+internet_tools="firefox-developer-edition qutebrowser urlscan"
 
 feeds="newsboat"
 
-email="neomutt msmtp isync notmuch"
+email="neomutt msmtp isync notmuch protonmail-bridge"
 
 contact_management="abook"
 
 time_management="calcurse"
 
-download_utilities="aria2"
+download_utilities="aria2 transmission-cli transmission-remote-cli-git"
 
 system_monitoring="glances ccze"
 
@@ -91,13 +90,15 @@ pdf_viewers="mupdf zathura-pdf-mupdf"
 video_tools="youtube-dl mpv youtube-viewer"
 
 #[TODO]
-photo_editing=""
+#photo_editing=""
 
 #[TODO]
-photo_management=""
+#photo_management=""
 
-office_tools=""
+#office_tools=""
 #office_tools="libreoffice-fresh libreoffice-fresh-nl"
+
+weather="wttr metar"
 
 
 # set /usr writeable
@@ -144,7 +145,8 @@ yay -Sy --noconfirm \
 	$video_tools \
 	$photo_editing \
 	$photo_management \
-	$office_tools
+	$office_tools \
+	$weather
 
 
 #[TODO] jq termite-nocsd bitwarden-cli brightnessctl gdisk
