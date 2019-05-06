@@ -98,7 +98,7 @@ video_tools="youtube-dl mpv youtube-viewer"
 #office_tools=""
 #office_tools="libreoffice-fresh libreoffice-fresh-nl"
 
-weather="wttr"
+weather="wttr metar"
 
 
 # set /usr writeable
