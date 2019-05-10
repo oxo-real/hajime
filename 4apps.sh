@@ -42,7 +42,7 @@ terminal="termite-nocsd tmux"
 
 terminal_additions="rofi"
 
-password_security="bitwarden-cli"
+password_security="bitwarden-cli pass-wl-clipboard"
 
 encryption="veracrypt"
 
