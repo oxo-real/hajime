@@ -74,7 +74,7 @@ function set_hostname() {
 		printf "enter hostname: "
 		read hostname
 		echo
-		printf "hostname '$hostname' entered, correct? (Y/n) \n"
+		printf "hostname '$hostname' entered, correct? (Y/n) "
 		read hostname_correct
 
 			if [[ $REPLY =~ ^[Nn]$ ]] ; then
@@ -184,7 +184,7 @@ function set_username() {
 		printf "enter username: "
 		read username
 		echo
-		printf "username '$username' entered, correct? (Y/n) \n"
+		printf "username '$username' entered, correct? (Y/n) "
 		read username_correct
 
 			if [[ $REPLY =~ ^[Nn]$ ]] ; then
