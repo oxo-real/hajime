@@ -79,7 +79,7 @@ function set_hostname() {
 
 			if [[ $REPLY =~ ^[Nn]$ ]] ; then
 				echo
-				set_hostname
+				return 0 && set_hostname
 			else
 				printf "using '$hostname' as hostname\n"
 			fi
@@ -189,7 +189,7 @@ function set_username() {
 
 			if [[ $REPLY =~ ^[Nn]$ ]] ; then
 				echo
-				set_username
+				return 0 && set_username
 			else
 				printf "using '$username' as username\n"
 			fi
