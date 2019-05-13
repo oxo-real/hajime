@@ -26,6 +26,7 @@
 terminus_font="terminus-font"
 console_font="ter-v20n"
 timezone="Europe/Amsterdam"
+sync_system_clock_over_ntp="true"
 arch_mirrorlist="https://www.archlinux.org/mirrorlist/?country=NL&protocol=http&protocol=https&ip_version=4"
 mirror_country="Netherlands"
 mirror_amount="5"
@@ -58,14 +59,16 @@ pacman -Ql $terminus_font
 setfont $console_font
 
 
-# time synchronization
+# hardware clock and system clock
 
 ## network time protocol
-timedatectl set-ntp true
+timedatectl set-ntp $sync_system_clock_over_ntp
 
 ## timezone
 timedatectl set-timezone $timezone
 ## verify
+date
+hwclock -rv
 timedatectl status
 echo
 clear
@@ -89,7 +92,7 @@ echo '<q>	exit gdisk'
 echo
 
 ## request boot device path
-echo -n 'enter full path of the boot device (/dev/sdX): '
+printf "enter full path of the boot device (/dev/sdX): "
 read boot_dev
 echo "partitioning "$boot_dev"..."
 echo
@@ -112,11 +115,11 @@ echo '<q>	exit gdisk'
 echo
 
 ## request lvm device path
-echo -n 'enter full path of the lvm device (/dev/sdY) '
-read lvm_part
-echo "partitioning "$lvm_part"..."
+printf "enter full path of the lvm device (/dev/sdY): "
+read lvm_dev
+echo "partitioning "$lvm_dev"..."
 echo
-gdisk "$lvm_part"
+gdisk "$lvm_dev"
 clear
 
 
@@ -127,59 +130,102 @@ clear
 lsblk --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
 echo
 echo
-echo -n 'enter full path of the BOOT partition (/dev/sdXn) '
-read boot_part
-echo
-echo -n 'enter full path of the LVM partition (/dev/sdYm) '
-read lvm_part
-echo
-echo 'cryptsetup is about to start'
-echo 'within the encrypted lvm volumegroup the logical volumes'
-echo 'ROOT, HOME, USR & VAR are being created'
-printf "01501005"
-echo
-echo -n 'ROOT partition size (GB)? '
-read root_size
-echo -n 'HOME partition size (GB)? '
-read home_size
-echo -n 'USR partition size (GB)?  '
-read usr_size
-echo -n 'VAR partition size (GB)?  '
-read var_size
-echo -n 'create SWAP partition (y/N)? '
-read swap_bool
-swap_size=0
-if [[ $swap_bool == "Y" || $swap_bool == "y" ]]; then
-	echo -n 'SWAP partition size (GB)? '
-	read swap_size
-fi
-total_size=$(echo $(( root_size + home_size + var_size + usr_size + swap_size )))
-echo
-df -h
-echo
-echo "lvm partition "$lvm_part" has to be at least $total_size GB"
-echo -n 'continue? (Y/n) '
-read lvm_continue
-if [[ $lvm_continue == "Y" || $lvm_continue == "y" || $lvm_continue = "" ]]; then
-        # default option
-	# lvm continue positive
-	echo 'encrypt partition and create lvm volumes'
-else
-	# lvm continue negative
-	echo 'really exit? (y/N) '
-	read lvm_continue_exit_confirm
 
-	if [[ $lvm_continue_exit_confirm == "N" || $lvm_continue_exit_confirm == "n" || $lvm_continue_exit_confirm = "" ]]; then
-		# default option
-        	# lvm exit confirmation negative
-		# [TODO] do nothing
-		:
-	else
-		# lvm exit confirmation positive
-		echo 'exiting ...'
-		#exit
+
+function set_boot_partition() {
+
+	read -p "enter BOOT partition number: $boot_dev" boot_part_no
+	boot_part=$boot_dev$boot_part_no
+	echo
+
+	printf "the full BOOT partition is: '$boot_part', correct? (y/N) "
+
+		if [[ $REPLY =~ ^[Yy]$ ]] ; then
+				printf "using '$boot_part' as BOOT partition\n"
+			else
+				echo
+				return 0 && set_boot_partition
+		fi
+	echo
+
+}
+
+
+function set_lvm_partition() {
+
+	read -p "enter LVM partition number: $lvm_dev" lvm_part_no
+	lvm_part=$lvm_dev$lvm_part_no
+	echo
+
+	printf "the full LVM partition is: '$lvm_part', correct? (y/N) "
+
+		if [[ $REPLY =~ ^[Yy]$ ]] ; then
+				printf "using '$lvm_part' as LVM partition\n"
+			else
+				echo
+				return 0 && set_lvm_partition
+		fi
+	echo
+
+}
+
+
+function set_partition_sizes() {
+
+	echo 'cryptsetup is about to start;'
+	echo 'within the encrypted LVM volumegroup the logical volumes'
+	echo 'ROOT, HOME, USR & VAR are being created'
+	printf "01501005"
+	echo
+	echo -n 'ROOT partition size (GB)? '
+	read root_size
+	echo -n 'HOME partition size (GB)? '
+	read home_size
+	echo -n 'USR partition size (GB)?  '
+	read usr_size
+	echo -n 'VAR partition size (GB)?  '
+	read var_size
+	echo -n 'create SWAP partition (y/N)? '
+	read swap_bool
+	swap_size=0
+	if [[ $swap_bool == "Y" || $swap_bool == "y" ]]; then
+		echo -n 'SWAP partition size (GB)? '
+		read swap_size
 	fi
-fi
+	total_size=$(echo $(( root_size + home_size + var_size + usr_size + swap_size )))
+	echo
+	df -h
+	echo
+	echo "lvm partition "$lvm_part" has to be at least $total_size GB"
+	echo -n 'continue? (Y/n) '
+	read lvm_continue
+	if [[ $lvm_continue == "Y" || $lvm_continue == "y" || $lvm_continue = "" ]]; then
+	        # default option
+		# lvm continue positive
+		echo 'encrypt partition and create lvm volumes'
+	else
+		# lvm continue negative
+		echo 'really exit? (y/N) '
+		read lvm_continue_exit_confirm
+
+		if [[ $lvm_continue_exit_confirm == "N" || $lvm_continue_exit_confirm == "n" || $lvm_continue_exit_confirm = "" ]]; then
+			# default option
+	        	# lvm exit confirmation negative
+			# [TODO] do nothing
+			:
+		else
+			# lvm exit confirmation positive
+			echo 'exiting ...'
+			#exit
+		fi
+	fi
+
+}
+
+
+set_boot_partition
+set_lvm_partition
+set_partition_sizes
 
 
 # cryptsetup on designated partition

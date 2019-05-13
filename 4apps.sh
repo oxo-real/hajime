@@ -150,7 +150,7 @@ yay -Sy --noconfirm \
 
 
 #[TODO] jq termite-nocsd bitwarden-cli brightnessctl gdisk
-yay -Sy --noconfirm jq termite-nocsd bitwarden-cli brightnessctl gdisk
+#yay -Sy --noconfirm jq termite-nocsd bitwarden-cli brightnessctl gdisk
 
 
 # X11
