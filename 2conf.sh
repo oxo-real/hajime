@@ -176,25 +176,22 @@ mkinitcpio -p linux-lts
 
 function set_username() {
 
-	read -p "change username '$username'? (y/N) " -n 1 -r
+	read -p "change username '$username'? (Y/n) " -n 1 -r
 
-	if [[ $REPLY =~ ^[Yy]$ ]] ; then
-		echo
-		printf "enter username: "
-		read username
-		echo
-		printf "username '$username' entered, correct? (Y/n) "
-		read username_correct
+	if [[ $REPLY =~ ^[Nn]$ ]] ; then
+		printf "using '$username' as username\n"
+	else
+		read -p "enter username: " username
+		read -p "username:	'$username', correct? (Y/n) " -n 1 -r
 
 			if [[ $REPLY =~ ^[Nn]$ ]] ; then
-				echo
-				return 0 && set_username
+				clear
+				set_username
 			else
 				printf "using '$username' as username\n"
 			fi
-	else
-		printf "using '$username' as username\n"
 	fi
+	echo
 
 }
 
