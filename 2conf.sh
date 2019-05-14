@@ -176,6 +176,7 @@ mkinitcpio -p linux-lts
 
 function set_username() {
 
+	clear
 	read -p "change username '$username'? (Y/n) " -n 1 -r
 
 	if [[ $REPLY =~ ^[Nn]$ ]] ; then
@@ -227,6 +228,7 @@ echo 'exit'
 echo 'umount -R /mnt'
 echo 'reboot'
 echo 'sh hajime/3post.sh'
+echo
 
 
 # finishing
