@@ -77,7 +77,7 @@ clear
 # device partitioning
 
 ## lsblk for human
-lsblk --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
+lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
 echo
 
 ## create boot partition
@@ -100,7 +100,7 @@ gdisk "$boot_dev"
 clear
 
 ## lsblk for human
-lsblk --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
+lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
 echo
 
 ## create lvm partition
@@ -127,7 +127,7 @@ clear
 
 ## dialog
 ## lsblk for human
-lsblk --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
+lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
 echo
 echo
 
