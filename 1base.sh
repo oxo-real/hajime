@@ -92,7 +92,7 @@ echo '<q>	exit gdisk'
 echo
 
 ## request boot device path
-printf "enter full path of the boot device (/dev/sdX): "
+printf "enter full path of the BOOT device (/dev/sdX): "
 read boot_dev
 echo "partitioning "$boot_dev"..."
 echo
@@ -115,7 +115,7 @@ echo '<q>	exit gdisk'
 echo
 
 ## request lvm device path
-printf "enter full path of the lvm device (/dev/sdY): "
+printf "enter full path of the LVM device (/dev/sdY): "
 read lvm_dev
 echo "partitioning "$lvm_dev"..."
 echo
