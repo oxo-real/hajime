@@ -74,7 +74,7 @@ echo
 clear
 
 
-# device partitioning
+function set_boot_device() {
 
 ## lsblk for human
 lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
@@ -92,12 +92,26 @@ echo '<q>	exit gdisk'
 echo
 
 ## request boot device path
-printf "enter full path of the BOOT device (/dev/sdX): "
-read boot_dev
-echo "partitioning "$boot_dev"..."
+read "enter full path of the BOOT device (/dev/sdX): " boot_dev
+echo
+
+read -p "BOOT device: '$boot_dev', correct? (y/N) " -n 1 -r
+
+		if [[ $REPLY =~ ^[Yy]$ ]] ; then
+			echo
+			printf "partitioning '$boot_dev' as BOOT device\n"
+		else
+			clear
+			set_boot_device
+		fi
+
 echo
 gdisk "$boot_dev"
 clear
+}
+
+
+function set_lvm_device() {
 
 ## lsblk for human
 lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
@@ -115,24 +129,33 @@ echo '<q>	exit gdisk'
 echo
 
 ## request lvm device path
-printf "enter full path of the LVM device (/dev/sdY): "
-read lvm_dev
-echo "partitioning "$lvm_dev"..."
+read "enter full path of the LVM device (/dev/sdY): " lvm_dev
+echo
+
+read -p "LVM device: '$lvm_dev', correct? (y/N) " -n 1 -r
+
+		if [[ $REPLY =~ ^[Yy]$ ]] ; then
+			echo
+			printf "partitioning '$lvm_dev' as LVM device\n"
+		else
+			clear
+			set_lvm_device
+		fi
+
 echo
 gdisk "$lvm_dev"
 clear
-
-
-# cryptsetup
-
-## dialog
-## lsblk for human
-lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
-echo
-echo
+}
 
 
 function set_boot_partition() {
+
+	## dialog
+	## lsblk for human
+	clear
+	lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
+	echo
+	echo
 
 	read -p "enter BOOT partition number: $boot_dev" boot_part_no
 	boot_part=$boot_dev$boot_part_no
@@ -144,15 +167,22 @@ function set_boot_partition() {
 			echo
 			printf "using '$boot_part' as BOOT partition\n"
 		else
-			clear
 			set_boot_partition
 		fi
+
 	echo
 
 }
 
 
 function set_lvm_partition() {
+
+	## dialog
+	## lsblk for human
+	clear
+	lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
+	echo
+	echo
 
 	read -p "enter LVM partition number: $lvm_dev" lvm_part_no
 	lvm_part=$lvm_dev$lvm_part_no
@@ -173,6 +203,8 @@ function set_lvm_partition() {
 
 
 function set_partition_sizes() {
+
+	# cryptsetup
 
 	echo 'cryptsetup is about to start;'
 	echo 'within the encrypted LVM volumegroup the logical volumes'
@@ -225,6 +257,8 @@ function set_partition_sizes() {
 }
 
 
+set_boot_device
+set_lvm_device
 set_boot_partition
 set_lvm_partition
 set_partition_sizes
