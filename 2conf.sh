@@ -59,6 +59,7 @@ echo $locale_conf > /etc/locale.conf
 
 # vconsole settings
 echo $vconsole_conf > /etc/vconsole.conf
+echo
 
 
 # network configuration
@@ -70,12 +71,8 @@ function set_hostname() {
 	read -p "change hostname '$hostname'? (y/N) " -n 1 -r
 
 	if [[ $REPLY =~ ^[Yy]$ ]] ; then
-		echo
-		printf "enter hostname: "
-		read hostname
-		echo
-		printf "hostname '$hostname' entered, correct? (Y/n) "
-		read hostname_correct
+		read -p "enter hostname: " hostname
+		read -p "hostname '$hostname' entered, correct? (Y/n) " -n 1 -r
 
 			if [[ $REPLY =~ ^[Nn]$ ]] ; then
 				echo
@@ -86,6 +83,7 @@ function set_hostname() {
 	else
 		printf "using '$hostname' as hostname\n"
 	fi
+	echo
 
 }
 

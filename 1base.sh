@@ -129,7 +129,7 @@ echo
 ## request lvm device path
 read -p "enter full path of the LVM device (/dev/sdY): " lvm_dev
 
-read -p "LVM device: '$lvm_dev', correct? (y/N) " -n 1 -r
+read -p "LVM device: '$lvm_dev', correct? (Y/n) " -n 1 -r
 
 		if [[ $REPLY =~ ^[Nn]$ ]] ; then
 			clear
