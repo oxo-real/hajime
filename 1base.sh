@@ -144,7 +144,8 @@ function set_boot_partition() {
 		printf "using '$boot_part' as BOOT partition\n"
 	else
 		echo
-		return 0 && set_boot_partition
+		return 0
+		set_boot_partition
 	fi
 	echo
 
