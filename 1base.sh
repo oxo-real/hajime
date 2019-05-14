@@ -92,7 +92,7 @@ echo '<q>	exit gdisk'
 echo
 
 ## request boot device path
-read "enter full path of the BOOT device (/dev/sdX): " boot_dev
+read -p "enter full path of the BOOT device (/dev/sdX): " boot_dev
 echo
 
 read -p "BOOT device: '$boot_dev', correct? (y/N) " -n 1 -r
@@ -107,7 +107,7 @@ read -p "BOOT device: '$boot_dev', correct? (y/N) " -n 1 -r
 
 echo
 gdisk "$boot_dev"
-clear
+clearH
 }
 
 
@@ -129,7 +129,7 @@ echo '<q>	exit gdisk'
 echo
 
 ## request lvm device path
-read "enter full path of the LVM device (/dev/sdY): " lvm_dev
+read -p "enter full path of the LVM device (/dev/sdY): " lvm_dev
 echo
 
 read -p "LVM device: '$lvm_dev', correct? (y/N) " -n 1 -r
