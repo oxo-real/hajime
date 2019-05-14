@@ -93,7 +93,6 @@ echo
 
 ## request boot device path
 read -p "enter full path of the BOOT device (/dev/sdX): " boot_dev
-echo
 
 read -p "BOOT device: '$boot_dev', correct? (Y/n) " -n 1 -r
 
@@ -101,7 +100,6 @@ read -p "BOOT device: '$boot_dev', correct? (Y/n) " -n 1 -r
 			clear
 			set_boot_device
 		else
-			echo
 			printf "partitioning '$boot_dev' as BOOT device\n"
 		fi
 
@@ -130,7 +128,6 @@ echo
 
 ## request lvm device path
 read -p "enter full path of the LVM device (/dev/sdY): " lvm_dev
-echo
 
 read -p "LVM device: '$lvm_dev', correct? (y/N) " -n 1 -r
 
@@ -138,7 +135,6 @@ read -p "LVM device: '$lvm_dev', correct? (y/N) " -n 1 -r
 			clear
 			set_lvm_device
 		else
-			echo
 			printf "partitioning '$lvm_dev' as LVM device\n"
 		fi
 
@@ -155,11 +151,9 @@ function set_boot_partition() {
 	clear
 	lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
 	echo
-	echo
 
 	read -p "enter BOOT partition number: $boot_dev" boot_part_no
 	boot_part=$boot_dev$boot_part_no
-	echo
 
 	read -p "the full BOOT partition is: '$boot_part', correct? (Y/n) " -n 1 -r
 
@@ -167,7 +161,6 @@ function set_boot_partition() {
 			clear
 			set_boot_partition
 		else
-			echo
 			printf "using '$boot_part' as BOOT partition\n"
 		fi
 
@@ -183,11 +176,9 @@ function set_lvm_partition() {
 	clear
 	lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
 	echo
-	echo
 
 	read -p "enter LVM partition number: $lvm_dev" lvm_part_no
 	lvm_part=$lvm_dev$lvm_part_no
-	echo
 
 	read -p "the full LVM partition is: '$lvm_part', correct? (Y/n) " -n 1 -r
 
@@ -195,7 +186,6 @@ function set_lvm_partition() {
 			clear
 			set_lvm_partition
 		else
-			echo
 			printf "using '$lvm_part' as LVM partition\n"
 		fi
 	echo
