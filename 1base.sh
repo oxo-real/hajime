@@ -95,19 +95,19 @@ echo
 read -p "enter full path of the BOOT device (/dev/sdX): " boot_dev
 echo
 
-read -p "BOOT device: '$boot_dev', correct? (y/N) " -n 1 -r
+read -p "BOOT device: '$boot_dev', correct? (Y/n) " -n 1 -r
 
-		if [[ $REPLY =~ ^[Yy]$ ]] ; then
-			echo
-			printf "partitioning '$boot_dev' as BOOT device\n"
-		else
+		if [[ $REPLY =~ ^[Nn]$ ]] ; then
 			clear
 			set_boot_device
+		else
+			echo
+			printf "partitioning '$boot_dev' as BOOT device\n"
 		fi
 
 echo
 gdisk "$boot_dev"
-clearH
+clear
 }
 
 
@@ -134,12 +134,12 @@ echo
 
 read -p "LVM device: '$lvm_dev', correct? (y/N) " -n 1 -r
 
-		if [[ $REPLY =~ ^[Yy]$ ]] ; then
-			echo
-			printf "partitioning '$lvm_dev' as LVM device\n"
-		else
+		if [[ $REPLY =~ ^[Nn]$ ]] ; then
 			clear
 			set_lvm_device
+		else
+			echo
+			printf "partitioning '$lvm_dev' as LVM device\n"
 		fi
 
 echo
@@ -161,13 +161,14 @@ function set_boot_partition() {
 	boot_part=$boot_dev$boot_part_no
 	echo
 
-	read -p "the full BOOT partition is: '$boot_part', correct? (y/N) " -n 1 -r
+	read -p "the full BOOT partition is: '$boot_part', correct? (Y/n) " -n 1 -r
 
-		if [[ $REPLY =~ ^[Yy]$ ]] ; then
+		if [[ $REPLY =~ ^[Nn]$ ]] ; then
+			clear
+			set_boot_partition
+		else
 			echo
 			printf "using '$boot_part' as BOOT partition\n"
-		else
-			set_boot_partition
 		fi
 
 	echo
@@ -188,14 +189,14 @@ function set_lvm_partition() {
 	lvm_part=$lvm_dev$lvm_part_no
 	echo
 
-	read -p "the full LVM partition is: '$lvm_part', correct? (y/N) " -n 1 -r
+	read -p "the full LVM partition is: '$lvm_part', correct? (Y/n) " -n 1 -r
 
-		if [[ $REPLY =~ ^[Yy]$ ]] ; then
-			echo
-			printf "using '$lvm_part' as LVM partition\n"
-		else
+		if [[ $REPLY =~ ^[Nn]$ ]] ; then
 			clear
 			set_lvm_partition
+		else
+			echo
+			printf "using '$lvm_part' as LVM partition\n"
 		fi
 	echo
 
