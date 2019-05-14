@@ -99,11 +99,12 @@ printf "127.0.1.1	$hostname.localdomain	$hostname" >> /etc/hosts
 
 
 # set root password
-printf "$(whoami)@$hostname"
+printf "$(whoami)@$hostname\n"
 passwd
 
 
 # install helpers
+clear
 pacman -S --noconfirm $install_helpers
 
 
@@ -206,7 +207,7 @@ useradd -m -g wheel $username
 usermod -a -G video $username
 
 ## set $username password
-printf "$username@$hostname"
+printf "$username@$hostname\n"
 passwd $username
 
 ## priviledge escalation for wheel group
