@@ -172,12 +172,12 @@ function finishing_up() {
 
 	clear
 	echo 'finished installation'
-	read -p "sudo reboot? (y/N) " -n 1 -r
+	read -p "sudo reboot? (Y/n) " -n 1 -r
 
-	if [[ $REPLY =~ ^[yY]$ ]] ; then
-		sudo reboot
-	else
+	if [[ $REPLY =~ ^[Nn]$ ]] ; then
 		exit
+	else
+		sudo reboot
 	fi
 
 }
