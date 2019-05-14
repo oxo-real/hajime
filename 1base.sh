@@ -141,10 +141,10 @@ function set_boot_partition() {
 	read -p "the full BOOT partition is: '$boot_part', correct? (y/N) " -n 1 -r
 
 		if [[ $REPLY =~ ^[Yy]$ ]] ; then
-				printf "using '$boot_part' as BOOT partition\n"
-			else
-				echo
-				return 0 && set_boot_partition
+			printf "using '$boot_part' as BOOT partition\n"
+		else
+			echo
+			return 0 && set_boot_partition
 		fi
 	echo
 
@@ -160,10 +160,10 @@ function set_lvm_partition() {
 	read -p "the full LVM partition is: '$lvm_part', correct? (y/N) " -n 1 -r
 
 		if [[ $REPLY =~ ^[Yy]$ ]] ; then
-				printf "using '$lvm_part' as LVM partition\n"
-			else
-				echo
-				return 0 && set_lvm_partition
+			printf "using '$lvm_part' as LVM partition\n"
+		else
+			echo
+			return 0 && set_lvm_partition
 		fi
 	echo
 
