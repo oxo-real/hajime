@@ -74,7 +74,7 @@ function set_hostname() {
 		printf "using '$hostname' as hostname\n"
 	else
 		read -p "enter hostname: " hostname
-		read -p "hostname:	 '$hostname', correct? (Y/n) " -n 1 -r
+		read -p "hostname:	'$hostname', correct? (Y/n) " -n 1 -r
 
 			if [[ $REPLY =~ ^[Nn]$ ]] ; then
 				clear
@@ -99,7 +99,7 @@ printf "127.0.1.1	$hostname.localdomain	$hostname" >> /etc/hosts
 
 
 # set root password
-whoami
+printf "$(whoami)@$hostname"
 passwd
 
 
@@ -206,7 +206,7 @@ useradd -m -g wheel $username
 usermod -a -G video $username
 
 ## set $username password
-echo $username
+printf "$username@$hostname"
 passwd $username
 
 ## priviledge escalation for wheel group
