@@ -32,7 +32,7 @@ clear
 
 wayland="wlroots-git"
 
-dwm="sway-git swaylock-git i3blocks slurp-git grim-git jq-git"
+dwm="sway-git swaylock-git i3blocks slurp-git grim-git"
 
 shell="zsh"
 
@@ -57,7 +57,7 @@ audio="alsa-utils"
 
 # additional tools
 
-terminal_text_tools="figlet qrencode"
+terminal_text_tools="figlet qrencode jq"
 
 terminal_file_browser="nnn vifm lf"
 
