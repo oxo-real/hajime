@@ -54,7 +54,7 @@ display="brightnessctl"
 
 audio="pulseaudio alsa-utils"
 
-bluetooth="bluez bluez-utils"
+bluetooth="bluez bluez-utils pulseaudio-bluetooth"
 
 
 # additional tools

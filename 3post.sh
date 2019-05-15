@@ -23,7 +23,7 @@
 
 
 # user customizable variables
-base_additions="lsof pacman-contrib"
+base_additions="lsof pacman-contrib mlocate"
 bloat_ware="nano"
 
 
