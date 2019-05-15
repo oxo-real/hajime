@@ -52,7 +52,9 @@ fonts="terminus-font ttf-inconsolata"
 
 display="brightnessctl"
 
-audio="alsa-utils"
+audio="pulseaudio alsa-utils"
+
+bluetooth="bluez bluez-utils"
 
 
 # additional tools
@@ -118,7 +120,8 @@ yay -Sy --noconfirm \
 	$secure_connections \
 	$fonts \
 	$display \
-	$audio
+	$audio \
+	$bluetooth
 
 
 # install additional tools
