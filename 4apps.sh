@@ -42,7 +42,7 @@ terminal="termite-nocsd tmux"
 
 terminal_additions="rofi"
 
-password_security="bitwarden-cli pass-wl-clipboard"
+password_security="pass-wl-clipboard" ##bitwarden-cli -> via npm (see 'loose ends' below)
 
 encryption="veracrypt"
 
@@ -120,12 +120,8 @@ yay -Sy --noconfirm \
 	$display \
 	$audio
 
-## fzf
-git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-~/.fzf/install
 
-
-#install additional tools
+# install additional tools
 yay -Sy --noconfirm \
 	$terminal_text_tools \
 	$terminal_file_browser \
@@ -149,6 +145,21 @@ yay -Sy --noconfirm \
 	$weather
 
 
+# loose ends
+
+## bitwarden cli
+### via npm
+### https://www.npmjs.com/package/@bitwarden/cli
+### as long as bitwarden-cli in AUR is out-of-date:
+### https://aur.archlinux.org/packages/bitwarden-cli/
+### see:
+### https://help.bitwarden.com/article/cli/#download--install
+npm install -g @bitwarden/cli
+### check for update with: bw update
+
+## fzf
+git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+~/.fzf/install
 #[TODO] jq termite-nocsd bitwarden-cli brightnessctl gdisk
 #yay -Sy --noconfirm jq termite-nocsd bitwarden-cli brightnessctl gdisk
 
