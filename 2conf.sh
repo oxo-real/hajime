@@ -182,8 +182,10 @@ function set_username() {
 	read -p "change username '$username'? (Y/n) " -n 1 -r
 
 	if [[ $REPLY =~ ^[Nn]$ ]] ; then
+		echo
 		printf "using '$username' as username\n"
 	else
+		echo
 		read -p "enter username: " username
 		read -p "username:	'$username', correct? (Y/n) " -n 1 -r
 
