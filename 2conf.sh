@@ -71,8 +71,10 @@ function set_hostname() {
 	read -p "change hostname '$hostname'? (Y/n) " -n 1 -r
 
 	if [[ $REPLY =~ ^[Nn]$ ]] ; then
+		echo
 		printf "using '$hostname' as hostname\n"
 	else
+		echo
 		read -p "enter hostname: " hostname
 		read -p "hostname:	'$hostname', correct? (Y/n) " -n 1 -r
 
