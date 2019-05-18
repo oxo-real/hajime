@@ -119,6 +119,13 @@ cp /etc/pacman.d/mirrorlist /etc/pacman.d/`date "+%Y%m%d%H%M%S"`_mirrorlist.back
 reflector --verbose --country $mirror_country -l $mirror_amount --sort rate --save /etc/pacman.d/mirrorlist
 
 
+#[TODO]
+# to be tested
+# setting an additional pacman hooks directory
+## for dash (see below)
+sed -i '/HookDir/c\HookDir = $HOME/.dot/code/pacman/hooks/' /etc/pacman.conf
+
+
 # update repositories and install core applications
 pacman -Syu --noconfirm $linux_kernel $linux_lts_kernel $command_line_editor $wireless $secure_connections
 
@@ -138,7 +145,7 @@ echo 'console-mode max' >> /boot/loader/loader.conf
 # configure mkinitcpio
 
 ## create an initial ramdisk environment (initramfs)
-## enable systemd HOOKS
+## enable systemd hooks
 sed -i "/^HOOKS/c\HOOKS=(base systemd autodetect keyboard sd-vconsole modconf block sd-encrypt sd-lvm2 filesystems fsck)" /etc/mkinitcpio.conf
 
 

@@ -23,7 +23,7 @@
 
 
 # user customizable variables
-base_additions="lsof pacman-contrib mlocate"
+base_additions="lsof pacman-contrib mlocate dash"
 bloat_ware="nano"
 
 
@@ -104,6 +104,14 @@ yay -S --noconfirm $base_additions
 
 # remove system bloat
 yay -Rns --noconfirm $bloat_ware
+
+
+# Debian Almquist shell (DASH) a POSIX-compliant implementation of /bin/sh
+## pacman hook is in: ~/.dot/code/pacman/hooks/relink_dash.hook
+
+## linking /bin/sh
+ln -sfT dash /usr/bin/sh
+
 
 
 # set /usr and /boot read-only
