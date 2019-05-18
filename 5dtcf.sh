@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 ##
 ###  _            _ _                      _ _        __
@@ -187,7 +187,7 @@ function recover_cytopyge_private_git() {
 
 	sh ~/git/code/bwsession/bwul
 
-	#[TODO] wl-paste from bash script seems not to open vault properly
+	#[TODO] wl-paste from sh script seems not to open vault properly
 
 	## tried:
 	## wl-paste
