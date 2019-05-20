@@ -62,6 +62,17 @@ echo $vconsole_conf > /etc/vconsole.conf
 echo
 
 
+reply() {
+
+	# first silently entered character goes directly to $reply
+	stty_0=$(stty -g)
+	stty raw -echo
+	reply=$(head -c 1)
+	stty $stty_0
+
+}
+
+
 # network configuration
 
 ## set hostname
@@ -69,19 +80,22 @@ echo
 set_hostname() {
 
 	clear
-	read -p "change hostname '$hostname'? (Y/n) " -n 1 -r
+	printf "change hostname '$hostname'? (Y/n) "
+	reply
 
-	if [[ $REPLY =~ ^[Nn]$ ]] ; then
+	if printf "$reply" | grep -iq "^n" ; then
 		echo
 		printf "using '$hostname' as hostname\n"
 	else
 		echo
-		read -p "enter hostname: " hostname
-		read -p "hostname:	'$hostname', correct? (Y/n) " -n 1 -r
+		read "enter hostname: " hostname
 
-			if [[ $REPLY =~ ^[Nn]$ ]] ; then
-				clear
-				set_hostname
+		printf "hostname:	'$hostname', correct? (Y/n) "
+		reply
+
+		if printf "$reply" | grep -iq "^n" ; then
+			clear
+			set_hostname
 			else
 				printf "using '$hostname' as hostname\n"
 			fi
