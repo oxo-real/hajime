@@ -110,7 +110,7 @@ yay -Rns --noconfirm $bloat_ware
 ## pacman hook is in: ~/.dot/code/pacman/hooks/relink_dash.hook
 
 ## linking /bin/sh
-ln -sfT dash /usr/bin/sh
+sudo ln -sfT dash /usr/bin/sh
 
 
 

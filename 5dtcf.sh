@@ -107,7 +107,7 @@ git config --global user.name "$(whoami)"
 
 # mozilla firefox settings
 
-function mozilla_firefox() {
+mozilla_firefox() {
 
 	[ -d ~/Downloads ] && rm -rf ~/Downloads
 	[ -d ~/.mozilla ] && rm -rf ~/.mozilla
@@ -155,7 +155,7 @@ clear
 git clone https://gitlab.com/cytopyge/isolatest
 
 
-function finishing_up() {
+finishing_up() {
 
 	# finishing
 
@@ -183,7 +183,7 @@ function finishing_up() {
 }
 
 
-function recover_cytopyge_private_git() {
+recover_cytopyge_private_git() {
 
 	sh ~/git/code/bwsession/bwul
 
