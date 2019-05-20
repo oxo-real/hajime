@@ -66,8 +66,9 @@ echo
 
 ## set hostname
 
-function set_hostname() {
+set_hostname() {
 
+	clear
 	read -p "change hostname '$hostname'? (Y/n) " -n 1 -r
 
 	if [[ $REPLY =~ ^[Nn]$ ]] ; then
@@ -103,6 +104,52 @@ printf "127.0.1.1	$hostname.localdomain	$hostname" >> /etc/hosts
 # set root password
 printf "$(whoami)@$hostname\n"
 passwd
+
+
+# add user
+
+## set username
+
+set_username() {
+
+	clear
+	read -p "change username '$username'? (Y/n) " -n 1 -r
+
+	if [[ $REPLY =~ ^[Nn]$ ]] ; then
+		echo
+		printf "using '$username' as username\n"
+	else
+		echo
+		read -p "enter username: " username
+		read -p "username:	'$username', correct? (Y/n) " -n 1 -r
+
+			if [[ $REPLY =~ ^[Nn]$ ]] ; then
+				clear
+				set_username
+			else
+				printf "using '$username' as username\n"
+			fi
+	fi
+	echo
+
+}
+
+set_username
+
+## add $username
+useradd -m -g wheel $username
+
+## add $username to video group (for brightnessctl)
+usermod -a -G video $username
+
+## set $username password
+printf "$username@$hostname\n"
+passwd $username
+
+## priviledge escalation for wheel group
+sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /etc/sudoers
+
+
 
 
 # install helpers
@@ -177,50 +224,6 @@ mkinitcpio -p linux
 
 ## for linux-lts preset
 mkinitcpio -p linux-lts
-
-
-# add user
-
-## set username
-
-function set_username() {
-
-	clear
-	read -p "change username '$username'? (Y/n) " -n 1 -r
-
-	if [[ $REPLY =~ ^[Nn]$ ]] ; then
-		echo
-		printf "using '$username' as username\n"
-	else
-		echo
-		read -p "enter username: " username
-		read -p "username:	'$username', correct? (Y/n) " -n 1 -r
-
-			if [[ $REPLY =~ ^[Nn]$ ]] ; then
-				clear
-				set_username
-			else
-				printf "using '$username' as username\n"
-			fi
-	fi
-	echo
-
-}
-
-set_username
-
-## add $username
-useradd -m -g wheel $username
-
-## add $username to video group (for brightnessctl)
-usermod -a -G video $username
-
-## set $username password
-printf "$username@$hostname\n"
-passwd $username
-
-## priviledge escalation for wheel group
-sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /etc/sudoers
 
 
 # move /hajime to $user home
