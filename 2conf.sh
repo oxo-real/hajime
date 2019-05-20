@@ -88,7 +88,7 @@ set_hostname() {
 		printf "using '$hostname' as hostname\n"
 	else
 		echo
-		read "enter hostname: " hostname
+		read -p "enter hostname: " hostname
 
 		printf "hostname:	'$hostname', correct? (Y/n) "
 		reply
