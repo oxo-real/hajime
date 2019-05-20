@@ -53,6 +53,9 @@ sudo systemctl start gdm.service
 
 # resource reference
 
+## video drivers for x11
+https://wiki.archlinux.org/index.php/Xorg#Driver_installation
+
 ## xfce
 https://wiki.archlinux.org/index.php/Xfce#Installation
 https://xfce.org
