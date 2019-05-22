@@ -36,6 +36,51 @@ install_helpers="reflector"
 # clear screen
 clear
 echo
+printf " Welcome to Hajime!\n"
+echo
+echo
+printf " CAUTION!\n"
+printf " These scripts will overwrite any existing data on target devices!\n"
+printf " By continuing you will testify that you know what you are doing.\n"
+echo
+printf " Be sure to have the most recent version of the arch installation image!\n"
+printf " Use cytopyge's 'isolatest' to get the most recent authentic iso image.\n"
+printf " You can download it via: http://gitlab.com/cytopyge/isolatest\n"
+printf " Or retrieve your installation image via: https://www/archlinux.org/download/\n"
+echo
+echo
+printf " Are you really sure to continue? (y/N) "
+
+
+reply() {
+
+        # first silently entered character goes directly to $reply
+        stty_0=$(stty -g)
+        stty raw -echo
+        reply=$(head -c 1)
+        stty $stty_0
+
+}
+
+
+reply
+
+
+if printf "$reply" | grep -iq "^y" ; then
+        sleep 1
+	echo
+	echo
+	printf " Safe journey!\n"
+	sleep 1
+	clear
+else
+        echo
+	echo
+        printf " Installation aborted by user!\n"
+        printf " Exiting Hajime\n"
+	echo
+        exit
+fi
 
 
 # network setup
@@ -74,7 +119,27 @@ echo
 clear
 
 
-function set_boot_device() {
+reply_single_hidden() {
+
+	stty_0=$(stty -g)
+	stty -echo
+	read reply
+	stty $stty_0
+
+}
+
+
+reply_plain() {
+
+	#stty_0=$(stty -g)
+	#stty -echo
+	read reply
+	#stty $stty_0
+
+}
+
+
+set_boot_device() {
 
 ## lsblk for human
 lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
@@ -92,24 +157,27 @@ echo '<q>	exit gdisk'
 echo
 
 ## request boot device path
-read -p "enter full path of the BOOT device (/dev/sdX): " boot_dev
+printf "enter full path of the BOOT device (/dev/sdX): "
+reply_plain
+boot_dev=$reply
 
-read -p "BOOT device: '$boot_dev', correct? (Y/n) " -n 1 -r
-
-		if [[ $REPLY =~ ^[Nn]$ ]] ; then
-			clear
-			set_boot_device
-		else
-			printf "partitioning '$boot_dev' as BOOT device\n"
-		fi
+printf "BOOT device: '$boot_dev', correct? (Y/n) "
+reply_single_hidden
+if printf "$reply" | grep -iq "^n" ; then
+	clear
+	set_boot_device
+else
+	printf "partitioning '$boot_dev' as BOOT device\n"
+fi
 
 echo
 gdisk "$boot_dev"
 clear
+
 }
+
 
-
-function set_lvm_device() {
+set_lvm_device() {
 
 ## lsblk for human
 lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
@@ -127,24 +195,27 @@ echo '<q>	exit gdisk'
 echo
 
 ## request lvm device path
-read -p "enter full path of the LVM device (/dev/sdY): " lvm_dev
+printf "enter full path of the LVM device (/dev/sdY): "
+reply_plain
+lvm_dev=$reply
 
-read -p "LVM device: '$lvm_dev', correct? (Y/n) " -n 1 -r
-
-		if [[ $REPLY =~ ^[Nn]$ ]] ; then
-			clear
-			set_lvm_device
-		else
-			printf "partitioning '$lvm_dev' as LVM device\n"
-		fi
+printf "LVM device: '$lvm_dev', correct? (Y/n) "
+reply_single_hidden
+if printf "$reply" | grep -iq "^n" ; then
+	clear
+	set_lvm_device
+else
+	printf "partitioning '$lvm_dev' as LVM device\n"
+fi
 
 echo
 gdisk "$lvm_dev"
 clear
+
 }
 
 
-function set_boot_partition() {
+set_boot_partition() {
 
 	## dialog
 	## lsblk for human
@@ -152,24 +223,27 @@ function set_boot_partition() {
 	lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
 	echo
 
-	read -p "enter BOOT partition number: $boot_dev" boot_part_no
+	printf"enter BOOT partition number: $boot_dev"
+	reply_plain
+	boot_part_no=$reply
 	boot_part=$boot_dev$boot_part_no
 
-	read -p "the full BOOT partition is: '$boot_part', correct? (Y/n) " -n 1 -r
+	printf "the full BOOT partition is: '$boot_part', correct? (Y/n) "
+	reply_single_hidden
 
-		if [[ $REPLY =~ ^[Nn]$ ]] ; then
-			clear
-			set_boot_partition
-		else
-			printf "using '$boot_part' as BOOT partition\n"
-		fi
+	if printf "$reply" | grep -iq "^n" ; then
+		clear
+		set_boot_partition
+	else
+		printf "using '$boot_part' as BOOT partition\n"
+	fi
 
 	echo
 
 }
 
 
-function set_lvm_partition() {
+set_lvm_partition() {
 
 	## dialog
 	## lsblk for human
@@ -177,31 +251,36 @@ function set_lvm_partition() {
 	lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
 	echo
 
-	read -p "enter LVM partition number: $lvm_dev" lvm_part_no
+	printf "enter LVM partition number: $lvm_dev"
+	reply_plain
+	lvm_part_no=$reply
 	lvm_part=$lvm_dev$lvm_part_no
 
-	read -p "the full LVM partition is: '$lvm_part', correct? (Y/n) " -n 1 -r
+	printf "the full LVM partition is: '$lvm_part', correct? (Y/n) "
+	reply_single_hidden
 
-		if [[ $REPLY =~ ^[Nn]$ ]] ; then
-			clear
-			set_lvm_partition
-		else
-			printf "using '$lvm_part' as LVM partition\n"
-		fi
+	if printf "$reply" | grep -iq "^n" ; then
+		clear
+		set_lvm_partition
+	else
+		printf "using '$lvm_part' as LVM partition\n"
+	fi
+
 	echo
 
 }
 
 
-function set_partition_sizes() {
+set_partition_sizes() {
 
 	# cryptsetup
 
-	echo 'cryptsetup is about to start;'
-	echo 'within the encrypted LVM volumegroup the logical volumes'
-	echo 'ROOT, HOME, USR & VAR are being created'
-	printf "01501005"
+	printf "cryptsetup is about to start\n"
+	printf "within the encrypted LVM volumegroup the logical volumes\n"
+	printf "ROOT, HOME, USR & VAR are being created\n"
+	printf "01501005\n"
 	echo
+
 	echo -n 'ROOT partition size (GB)? '
 	read root_size
 	echo -n 'HOME partition size (GB)? '
@@ -210,13 +289,18 @@ function set_partition_sizes() {
 	read usr_size
 	echo -n 'VAR partition size (GB)?  '
 	read var_size
-	echo -n 'create SWAP partition (y/N)? '
-	read swap_bool
+
+	printf "create SWAP partition (y/N)? \n"
+	reply_single_hidden
 	swap_size=0
-	if [[ $swap_bool == "Y" || $swap_bool == "y" ]]; then
-		echo -n 'SWAP partition size (GB)? '
-		read swap_size
+	if printf "$reply" | grep -iq "^y" ; then
+		printf "SWAP partition size (GB)? \n"
+		reply_plain
+		swap_size=$reply
+	else
+		clear
 	fi
+#>>>
 	total_size=$(echo $(( root_size + home_size + var_size + usr_size + swap_size )))
 	echo
 	df -h

@@ -97,6 +97,7 @@ set_hostname() {
 			clear
 			set_hostname
 			else
+				echo
 				printf "using '$hostname' as hostname\n"
 			fi
 	fi

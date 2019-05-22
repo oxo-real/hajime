@@ -83,6 +83,7 @@ mkdir -p ~/keys_
 mkdir -p ~/media_
 mkdir -p ~/settings_
 mkdir -p ~/test_
+mkdir -p ~/temp_
 mkdir -p ~/todo_
 
 # yay, a packagemanager written in go
@@ -121,7 +122,11 @@ sudo mount -o remount,ro  /boot
 
 # human info
 echo
-echo 'sh hajime/4apps.sh'
+printf "an independent Arch Linux OS came into being\n"
+printf "proceed with your personal configuration\n"
+printf "or continue with part 4 of this installation saga:\n"
+printf "sh hajime/4apps.sh\n"
+
 
 # finishing
 sudo touch hajime/3post.done
