@@ -161,6 +161,10 @@ printf "enter full path of the BOOT device (/dev/sdX): "
 reply_plain
 boot_dev=$reply
 
+echo
+printf "$(lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint | grep $boot_dev)\n"
+echo
+
 printf "BOOT device: '$boot_dev', correct? (Y/n) "
 reply_single_hidden
 if printf "$reply" | grep -iq "^n" ; then
@@ -199,6 +203,10 @@ printf "enter full path of the LVM device (/dev/sdY): "
 reply_plain
 lvm_dev=$reply
 
+echo
+printf "$(lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint | grep $lvm_dev)\n"
+echo
+
 printf "LVM device: '$lvm_dev', correct? (Y/n) "
 reply_single_hidden
 if printf "$reply" | grep -iq "^n" ; then
@@ -228,6 +236,10 @@ set_boot_partition() {
 	boot_part_no=$reply
 	boot_part=$boot_dev$boot_part_no
 
+	echo
+	printf "$(lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint | grep $boot_dev)\n"
+	echo
+
 	printf "the full BOOT partition is: '$boot_part', correct? (Y/n) "
 	reply_single_hidden
 
@@ -255,6 +267,10 @@ set_lvm_partition() {
 	reply_plain
 	lvm_part_no=$reply
 	lvm_part=$lvm_dev$lvm_part_no
+
+	echo
+	printf "$(lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint | grep $lvm_dev)\n"
+	echo
 
 	printf "the full LVM partition is: '$lvm_part', correct? (Y/n) "
 	reply_single_hidden
