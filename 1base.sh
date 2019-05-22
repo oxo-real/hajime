@@ -70,14 +70,16 @@ if printf "$reply" | grep -iq "^y" ; then
         sleep 1
 	echo
 	echo
-	printf " Safe journey!\n"
-	sleep 1
+	printf " Have a safe journey!\n"
+	sleep 2
 	clear
 else
         echo
 	echo
-        printf " Installation aborted by user!\n"
-        printf " Exiting Hajime\n"
+        printf " Hajime aborted by user!\n"
+        echo
+	sleep 1
+	printf " Bye!\n"
 	echo
         exit
 fi
@@ -161,16 +163,18 @@ if printf "$reply" | grep -iq "^n" ; then
 	clear
 	set_boot_device
 else
-	printf "partitioning '$boot_dev' as BOOT device\n"
+	echo
+	printf "configure '$boot_dev' as BOOT device\n"
 fi
 
 ## create boot partition
 ## info for human
-echo 'gdisk boot partition ef00 (EFI System)'
-echo '<o>	create new GUID partition table'
-echo '<n>	create new EFI System partition'
-echo '<w>	write changes to device'
-echo '<q>	exit gdisk'
+echo 'add a new ef00 (EFI System) partition'
+echo
+echo '<o>	create a new empty GUID partition table (GPT)'
+echo '<n>	add a new partition'
+echo '<w>	write table to disk and exit'
+echo '<q>	quit without saving changes'
 echo
 gdisk "$boot_dev"
 clear
@@ -200,16 +204,18 @@ if printf "$reply" | grep -iq "^n" ; then
 	clear
 	set_lvm_device
 else
-	printf "partitioning '$lvm_dev' as LVM device\n"
+	echo
+	printf "configure '$lvm_dev' as LVM device\n"
 fi
 
 ## create lvm partition
 ## info for human
-echo 'lvm partition 8e00 (Linux LVM)'
-echo '<o>	create new GUID partition table'
-echo '<n>	create new Logical Volume Manager (LVM) partition'
-echo '<w>	write changes to device'
-echo '<q>	exit gdisk'
+echo 'add a new 8e00 (Linux LVM) partition'
+echo
+echo '<o>	create a new empty GUID partition table (GPT)'
+echo '<n>	add a new partition'
+echo '<w>	write table to disk and exit'
+echo '<q>	quit without saving changes'
 echo
 gdisk "$lvm_dev"
 clear
