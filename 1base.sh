@@ -88,7 +88,6 @@ reply_single
 
 
 if printf "$reply" | grep -iq "^y" ; then
-        sleep 1
 	echo
 	echo
 	printf " Have a safe journey!\n"
@@ -295,16 +294,18 @@ set_lvm_partition() {
 set_partition_sizes() {
 
 	lvm_size_bytes=$(lsblk -o path,size -b | grep $lvm_part | awk '{print $2}')
-	printf "size of the encrypted LVM volumegroup '$lvm_part' is $lvm_size\n"
+	lvm_size_human=$(lsblk -o path,size | grep $lvm_part | awk '{print $2}')
+	lvm_size_calc=$($lvm_size_human | rev | cut -c 2- | rev )
+	printf "size of the encrypted LVM volumegroup '$lvm_part' is $lvm_size_human\n"
 	printf "logical volumes ROOT, HOME, USR & VAR are being created\n"
-	printf "01501005\n"
 	echo
 
 	#recommended sizes
-	root_size_bytes=$(0.05 \* $lvm_size_bytes)
-	usr_size_bytes=$(0.20 \* $lvm_size_bytes)
-	var_size_bytes=$(0.20 \* $lvm_size_bytes)
-	home_size_bytes=$(0.50 \* $lvm_size_bytes)
+	printf "01501005\n"
+	root_size=$(expr 0.05 \* $lvm_size_calc)
+	usr_size=$(expr 0.20 \* $lvm_size_calc)
+	var_size=$(expr 0.20 \* $lvm_size_calc)
+	home_size=$(expr 0.50 \* $lvm_size_calc)
 
 	printf "ROOT partition size (GB) [$root_size]? "
 	read root_size
