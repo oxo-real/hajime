@@ -52,18 +52,39 @@ echo
 printf " Are you really sure to continue? (y/N) "
 
 
-reply() {
+# define reply functions
 
-        # first silently entered character goes directly to $reply
+reply_plain() {
+
+	# entery must be confirmed explicitly (by pushing enter)
+	read reply
+
+}
+
+
+reply_single() {
+
+        # first entered character goes directly to $reply
         stty_0=$(stty -g)
-        stty raw -echo
+	stty raw #-echo
         reply=$(head -c 1)
         stty $stty_0
 
 }
 
 
-reply
+reply_single_hidden() {
+
+        # first entered character goes silently to $reply
+	stty_0=$(stty -g)
+	stty raw -echo
+        reply=$(head -c 1)
+	stty $stty_0
+
+}
+
+
+reply_single
 
 
 if printf "$reply" | grep -iq "^y" ; then
@@ -119,26 +140,6 @@ hwclock -rv
 timedatectl status
 echo
 clear
-
-
-reply_single_hidden() {
-
-	stty_0=$(stty -g)
-	stty -echo
-	read reply
-	stty $stty_0
-
-}
-
-
-reply_plain() {
-
-	#stty_0=$(stty -g)
-	#stty -echo
-	read reply
-	#stty $stty_0
-
-}
 
 
 set_boot_device() {
