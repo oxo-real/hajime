@@ -175,7 +175,7 @@ gdisk "$boot_dev"
 clear
 
 }
-
+
 
 set_lvm_device() {
 
