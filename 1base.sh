@@ -164,6 +164,7 @@ if printf "$reply" | grep -iq "^n" ; then
 	set_boot_device
 else
 	echo
+	echo
 	printf "configure '$boot_dev' as BOOT device\n"
 fi
 
@@ -205,6 +206,7 @@ if printf "$reply" | grep -iq "^n" ; then
 	set_lvm_device
 else
 	echo
+	echo
 	printf "configure '$lvm_dev' as LVM device\n"
 fi
 
@@ -231,7 +233,7 @@ set_boot_partition() {
 	lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
 	echo
 
-	printf"enter BOOT partition number: $boot_dev"
+	printf "enter BOOT partition number: $boot_dev"
 	reply_plain
 	boot_part_no=$reply
 	boot_part=$boot_dev$boot_part_no
