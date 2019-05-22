@@ -250,6 +250,7 @@ set_boot_partition() {
 		clear
 		set_boot_partition
 	else
+		echo
 		printf "using '$boot_part' as BOOT partition\n"
 	fi
 
@@ -282,6 +283,7 @@ set_lvm_partition() {
 		clear
 		set_lvm_partition
 	else
+		echo
 		printf "using '$lvm_part' as LVM partition\n"
 	fi
 
@@ -292,21 +294,25 @@ set_lvm_partition() {
 
 set_partition_sizes() {
 
-	# cryptsetup
-
-	printf "cryptsetup is about to start\n"
-	printf "within the encrypted LVM volumegroup the logical volumes\n"
-	printf "ROOT, HOME, USR & VAR are being created\n"
+	lvm_size_bytes=$(lsblk -o path,size -b | grep $lvm_part | awk '{print $2}')
+	printf "size of the encrypted LVM volumegroup '$lvm_part' is $lvm_size\n"
+	printf "logical volumes ROOT, HOME, USR & VAR are being created\n"
 	printf "01501005\n"
 	echo
 
-	echo -n 'ROOT partition size (GB)? '
+	#recommended sizes
+	root_size_bytes=$(0.05 \* $lvm_size_bytes)
+	usr_size_bytes=$(0.20 \* $lvm_size_bytes)
+	var_size_bytes=$(0.20 \* $lvm_size_bytes)
+	home_size_bytes=$(0.50 \* $lvm_size_bytes)
+
+	printf "ROOT partition size (GB) [$root_size]? "
 	read root_size
-	echo -n 'HOME partition size (GB)? '
+	printf "HOME partition size (GB) [$home_size]? "
 	read home_size
-	echo -n 'USR partition size (GB)?  '
+	printf "USR  partition size (GB) [$usr_size]? "
 	read usr_size
-	echo -n 'VAR partition size (GB)?  '
+	printf "VAR  partition size (GB) [$var_size]? "
 	read var_size
 
 	printf "create SWAP partition (y/N)? \n"
