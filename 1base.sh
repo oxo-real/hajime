@@ -145,16 +145,6 @@ set_boot_device() {
 lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
 echo
 
-## create boot partition
-## info for human
-echo 'boot partition ef00 (EFI System)'
-echo 'recommended size at least 256M'
-echo
-echo '<o>	create new GUID partition table'
-echo '<n>	create new EFI System partition'
-echo '<w>	write changes to device'
-echo '<q>	exit gdisk'
-echo
 
 ## request boot device path
 printf "enter full path of the BOOT device (/dev/sdX): "
@@ -174,6 +164,13 @@ else
 	printf "partitioning '$boot_dev' as BOOT device\n"
 fi
 
+## create boot partition
+## info for human
+echo 'gdisk boot partition ef00 (EFI System)'
+echo '<o>	create new GUID partition table'
+echo '<n>	create new EFI System partition'
+echo '<w>	write changes to device'
+echo '<q>	exit gdisk'
 echo
 gdisk "$boot_dev"
 clear
@@ -187,16 +184,6 @@ set_lvm_device() {
 lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
 echo
 
-## create lvm partition
-## info for human
-echo 'lvm partition 8e00 (Linux LVM)'
-echo 'recommended size at least 16G'
-echo
-echo '<o>	create new GUID partition table'
-echo '<n>	create new Logical Volume Manager (LVM) partition'
-echo '<w>	write changes to device'
-echo '<q>	exit gdisk'
-echo
 
 ## request lvm device path
 printf "enter full path of the LVM device (/dev/sdY): "
@@ -216,6 +203,13 @@ else
 	printf "partitioning '$lvm_dev' as LVM device\n"
 fi
 
+## create lvm partition
+## info for human
+echo 'lvm partition 8e00 (Linux LVM)'
+echo '<o>	create new GUID partition table'
+echo '<n>	create new Logical Volume Manager (LVM) partition'
+echo '<w>	write changes to device'
+echo '<q>	exit gdisk'
 echo
 gdisk "$lvm_dev"
 clear
