@@ -301,6 +301,7 @@ set_partition_sizes() {
 	echo
 
 	#recommended sizes
+	#[TODO] calculate using awk (posix cmpliant)
 	printf "01501005\n"
 	root_size=$(expr 0.05 \* $lvm_size_calc)
 	usr_size=$(expr 0.20 \* $lvm_size_calc)
@@ -326,7 +327,7 @@ set_partition_sizes() {
 	else
 		clear
 	fi
-#>>>
+
 	total_size=$(echo $(( root_size + home_size + var_size + usr_size + swap_size )))
 	echo
 	df -h
