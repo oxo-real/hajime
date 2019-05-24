@@ -386,29 +386,28 @@ set_partition_sizes() {
 
 	## total
 	total_size="`echo "$root_size + $home_size + $var_size + $usr_size + $swap_size" | bc`"
+	total_size_calc=$(printf "$total_size" | rev | cut -c 2- | rev )
 	echo
-	echo "lvm partition "$lvm_part" has to be at least $total_size GB"
-	echo -n 'continue? (Y/n) '
-	read lvm_continue
-	if [[ $lvm_continue == "Y" || $lvm_continue == "y" || $lvm_continue = "" ]]; then
-	        # default option
-		# lvm continue positive
-		echo 'encrypt partition and create lvm volumes'
-	else
-		# lvm continue negative
-		echo 'really exit? (y/N) '
-		read lvm_continue_exit_confirm
+	if [ $total_size_calc -gt $lvm_size_calc ]; then
+		printf "too much!\n"
+		set_partition_sizes
+	fi
 
-		if [[ $lvm_continue_exit_confirm == "N" || $lvm_continue_exit_confirm == "n" || $lvm_continue_exit_confirm = "" ]]; then
-			# default option
-	        	# lvm exit confirmation negative
-			# [TODO] do nothing
-			:
-		else
-			# lvm exit confirmation positive
-			echo 'exiting ...'
-			#exit
-		fi
+	echo -n 'continue? (Y/n) '
+	reply_single
+	if printf "$reply" | grep -iq "^n" ; then
+       		echo
+      	 	echo
+       		printf " Hajime aborted by user!\n"
+       		echo
+       		sleep 1
+       		printf " Bye!\n"
+       		echo
+       		exit
+	else
+		echo
+		printf "encrypt partition and create lvm volumes\n"
+		clear
 	fi
 
 }
