@@ -126,6 +126,10 @@ pacman -Ql $terminus_font
 setfont $console_font
 
 
+# for floating point arithmetic in this script
+pacman -S --noconfirm bc
+
+
 # hardware clock and system clock
 
 ## network time protocol
@@ -301,21 +305,50 @@ set_partition_sizes() {
 	echo
 
 	#recommended sizes
-	#[TODO] calculate using awk (posix cmpliant)
-	printf "01501005\n"
-	root_size=$(expr 0.05 \* $lvm_size_calc)
-	usr_size=$(expr 0.20 \* $lvm_size_calc)
-	var_size=$(expr 0.20 \* $lvm_size_calc)
-	home_size=$(expr 0.50 \* $lvm_size_calc)
+	#[TODO] calculate using awk (posix cmpliance without bc)
+	root_perc="0.05"
+	usr_perc="0.25"
+	var_perc="0.25"
+	home_perc="0.40"
 
-	printf "ROOT partition size (GB) [$root_size]? "
-	read root_size
-	printf "HOME partition size (GB) [$home_size]? "
-	read home_size
-	printf "USR  partition size (GB) [$usr_size]? "
-	read usr_size
-	printf "VAR  partition size (GB) [$var_size]? "
-	read var_size
+	printf "01501005\n"
+	root_size=`echo "$root_perc * $lvm_size_calc" | bc`
+	usr_size=`echo "$usr_perc * $lvm_size_calc" | bc`
+	var_size=`echo "$var_perc * $lvm_size_calc" | bc`
+	home_size=`echo "$home_perc * $lvm_size_calc" | bc`
+
+	printf "ROOT partition size [$root_size] (GB)? "
+	root_size="0"
+	reply_plain
+        root_size=$reply
+        if [ $root_size -eq "0" ]; then
+                root_size="`echo "$root_perc * $lvm_size_calc" | bc`"
+        fi
+
+	printf "HOME partition size [$home_size] (GB)? "
+	home_size="0"
+	reply_plain
+        home_size=$reply
+        if [ $home_size -eq "0" ]; then
+                home_size="`echo "$home_perc * $lvm_size_calc" | bc`"
+        fi
+
+	printf "USR  partition size [$usr_size] (GB)? "
+	usr_size="0"
+	reply_plain
+	usr_size=$reply
+        read usr_size
+        if [ $usr_size -eq "0" ]; then
+                usr_size="`echo "$usr_perc * $lvm_size_calc" | bc`"
+        fi
+
+	printf "VAR  partition size [$var_size] (GB)? "
+	var_size="0"
+	reply_plain
+	var_size=$reply
+        if [ $var_size -eq "0" ]; then
+                var_size="`echo "$var_perc * $lvm_size_calc" | bc`"
+        fi
 
 	printf "create SWAP partition (y/N)? \n"
 	reply_single_hidden
@@ -328,7 +361,7 @@ set_partition_sizes() {
 		clear
 	fi
 
-	total_size=$(echo $(( root_size + home_size + var_size + usr_size + swap_size )))
+	total_size="`echo "$root_size + $home_size + $var_size + $usr_size + $swap_size" | bc`"
 	echo
 	df -h
 	echo
