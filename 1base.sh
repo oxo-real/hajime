@@ -388,7 +388,7 @@ set_partition_sizes() {
 	total_size="`echo "$root_size + $home_size + $var_size + $usr_size + $swap_size" | bc`"
 	total_size_calc=$(printf "$total_size" | rev | cut -c 2- | rev )
 	echo
-	if [ $total_size_calc -gt $lvm_size_calc ]; then
+	if [ "$total_size_calc" -gt "$lvm_size_calc" ]; then
 		printf "too much!\n"
 		set_partition_sizes
 	fi
