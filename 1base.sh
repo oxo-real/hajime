@@ -90,7 +90,7 @@ if printf "$reply" | grep -iq "^y" ; then
 	echo
 	echo
 	echo
-	printf " Have a safe journey!\n"
+	printf " Have a safe journey! "
 	sleep 2
 	clear
 else
@@ -297,7 +297,7 @@ set_partition_sizes() {
 
 	lvm_size_bytes=$(lsblk -o path,size -b | grep $lvm_part | awk '{print $2}')
 	lvm_size_human=$(lsblk -o path,size | grep $lvm_part | awk '{print $2}')
-	lvm_size_calc=$(printf "$lvm_size_human" | rev | cut -c 2- | rev )
+	lvm_size_calc=$(lsblk -o path,size | grep $lvm_part | awk '{print $2+0}')
 	printf "size of the encrypted LVM volumegroup '$lvm_part' is $lvm_size_human\n"
 	printf "logical volumes ROOT, HOME, USR & VAR are being created\n"
 	echo
@@ -310,6 +310,7 @@ set_partition_sizes() {
 	## starting dialog
 	printf "create SWAP partition (y/N)? \n"
 	reply_single_hidden
+	swap_bool=$reply
 	if printf "$reply" | grep -iq "^y" ; then
 		printf "SWAP partition size (GB)? [$swap_size_recomm] "
 		reply_plain
@@ -321,7 +322,8 @@ set_partition_sizes() {
 		### remove decimals
 		swap_size="${swap_size_calc%%.*}"
 		### correct $lvm_size_calc
-		lvm_size_calc=`echo "$lvm_size_calc - $swap_size_calc" | bc`
+		lvm_size_calc=`echo "$lvm_size_calc - $swap_size" | bc`
+		#lvm_size_calc=`echo "$lvm_size_calc - $swap_size_calc" | bc`
 	else
 		echo
 		printf "no SWAP\n"
@@ -386,10 +388,10 @@ set_partition_sizes() {
 
 	## total
 	total_size="`echo "$root_size + $home_size + $var_size + $usr_size + $swap_size" | bc`"
-	total_size_calc=$(printf "$total_size" | rev | cut -c 2- | rev )
+	total_size_calc=$(printf $total_size | awk '{print $1+0}')
 	diff_total_lvm_calc="`echo "$total_size_calc - $lvm_size_calc" | bc`"
 	echo
-	if [ "$diff_total_lvm_calc" -lt 0 ]; then
+	if [ "$diff_total_lvm_calc" -gt 0 ]; then
 		printf "too much!\n"
 		set_partition_sizes
 	fi
@@ -461,7 +463,7 @@ mount /dev/mapper/vg0-lv_usr /mnt/usr
 mount /dev/mapper/vg0-lv_var /mnt/var
 
 
-## swap
+## create (optional) swap
 if [[ $swap_bool == "Y" || $swap_bool == "y" ]]; then
 	lvcreate -L "$swap_size"G vg0 -n lv_swap
 	mkswap -L SWAP /dev/mapper/vg0-lv_swap
