@@ -311,7 +311,7 @@ set_partition_sizes() {
 	printf "create SWAP partition (y/N)? \n"
 	reply_single_hidden
 	if printf "$reply" | grep -iq "^y" ; then
-		printf "SWAP partition size (GB)? [$swap_size_recomm] \n"
+		printf "SWAP partition size (GB)? [$swap_size_recomm] "
 		reply_plain
 		swap_size_calc=0 ###???? needed ???
 		swap_size_calc=$reply
@@ -321,7 +321,7 @@ set_partition_sizes() {
 		### remove decimals
 		swap_size="${swap_size_calc%%.*}"
 		### correct $lvm_size_calc
-		lvm_size_calc=$lvm_size_calc-$swap_size_calc
+		lvm_size_calc=`echo "$lvm_size_calc - $swap_size_calc" | bc`
 	else
 		echo
 		printf "no SWAP\n"
