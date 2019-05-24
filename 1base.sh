@@ -297,7 +297,7 @@ set_partition_sizes() {
 
 	lvm_size_bytes=$(lsblk -o path,size -b | grep $lvm_part | awk '{print $2}')
 	lvm_size_human=$(lsblk -o path,size | grep $lvm_part | awk '{print $2}')
-	lvm_size_calc=$($lvm_size_human | rev | cut -c 2- | rev )
+	lvm_size_calc=$(printf "$lvm_size_human" | rev | cut -c 2- | rev )
 	printf "size of the encrypted LVM volumegroup '$lvm_part' is $lvm_size_human\n"
 	printf "logical volumes ROOT, HOME, USR & VAR are being created\n"
 	echo
