@@ -48,7 +48,6 @@ printf " Use cytopyge's 'isolatest' to get the most recent authentic iso image.\
 printf " You can download it via: http://gitlab.com/cytopyge/isolatest\n"
 printf " Or retrieve your installation image via: https://www/archlinux.org/download/\n"
 echo
-echo
 printf " Are you really sure to continue? (y/N) "
 
 
@@ -88,6 +87,7 @@ reply_single
 
 
 if printf "$reply" | grep -iq "^y" ; then
+	echo
 	echo
 	echo
 	printf " Have a safe journey!\n"
@@ -387,8 +387,9 @@ set_partition_sizes() {
 	## total
 	total_size="`echo "$root_size + $home_size + $var_size + $usr_size + $swap_size" | bc`"
 	total_size_calc=$(printf "$total_size" | rev | cut -c 2- | rev )
+	diff_total_lvm_calc="`echo "$total_size_calc - $lvm_size_calc" | bc`"
 	echo
-	if [ "$total_size_calc" -gt "$lvm_size_calc" ]; then
+	if [ "$diff_total_lvm_calc" -lt 0 ]; then
 		printf "too much!\n"
 		set_partition_sizes
 	fi
