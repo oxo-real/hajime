@@ -83,6 +83,20 @@ reply_single_hidden() {
 }
 
 
+exit_hajime () {
+
+        echo
+	echo
+        printf " Hajime aborted by user!\n"
+        echo
+	sleep 1
+	printf " Bye!\n"
+	echo
+        exit
+
+}
+
+
 reply_single
 
 
@@ -94,14 +108,7 @@ if printf "$reply" | grep -iq "^y" ; then
 	sleep 2
 	clear
 else
-        echo
-	echo
-        printf " Hajime aborted by user!\n"
-        echo
-	sleep 1
-	printf " Bye!\n"
-	echo
-        exit
+	exit_hajime
 fi
 
 
@@ -399,14 +406,7 @@ set_partition_sizes() {
 	echo -n 'continue? (Y/n) '
 	reply_single
 	if printf "$reply" | grep -iq "^n" ; then
-       		echo
-      	 	echo
-       		printf " Hajime aborted by user!\n"
-       		echo
-       		sleep 1
-       		printf " Bye!\n"
-       		echo
-       		exit
+		exit_hajime
 	else
 		echo
 		printf "encrypt partition and create lvm volumes\n"
