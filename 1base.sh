@@ -248,7 +248,6 @@ set_boot_partition() {
 
 	printf "the full BOOT partition is: '$boot_part', correct? (Y/n) "
 	reply_single_hidden
-
 	if printf "$reply" | grep -iq "^n" ; then
 		clear
 		set_boot_partition
@@ -281,7 +280,6 @@ set_lvm_partition() {
 
 	printf "the full LVM partition is: '$lvm_part', correct? (Y/n) "
 	reply_single_hidden
-
 	if printf "$reply" | grep -iq "^n" ; then
 		clear
 		set_lvm_partition
@@ -304,66 +302,90 @@ set_partition_sizes() {
 	printf "logical volumes ROOT, HOME, USR & VAR are being created\n"
 	echo
 
-	#recommended sizes
-	#[TODO] calculate using awk (posix cmpliance without bc)
-	root_perc="0.05"
-	usr_perc="0.25"
-	var_perc="0.25"
-	home_perc="0.40"
+	## optional swap partition
 
-	printf "01501005\n"
-	root_size=`echo "$root_perc * $lvm_size_calc" | bc`
-	usr_size=`echo "$usr_perc * $lvm_size_calc" | bc`
-	var_size=`echo "$var_perc * $lvm_size_calc" | bc`
-	home_size=`echo "$home_perc * $lvm_size_calc" | bc`
+	## recommended SWAP size (GB)
+	swap_size_recomm=4.00
 
-	printf "ROOT partition size [$root_size] (GB)? "
-	root_size="0"
-	reply_plain
-        root_size=$reply
-        if [ $root_size -eq "0" ]; then
-                root_size="`echo "$root_perc * $lvm_size_calc" | bc`"
-        fi
-
-	printf "HOME partition size [$home_size] (GB)? "
-	home_size="0"
-	reply_plain
-        home_size=$reply
-        if [ $home_size -eq "0" ]; then
-                home_size="`echo "$home_perc * $lvm_size_calc" | bc`"
-        fi
-
-	printf "USR  partition size [$usr_size] (GB)? "
-	usr_size="0"
-	reply_plain
-	usr_size=$reply
-        read usr_size
-        if [ $usr_size -eq "0" ]; then
-                usr_size="`echo "$usr_perc * $lvm_size_calc" | bc`"
-        fi
-
-	printf "VAR  partition size [$var_size] (GB)? "
-	var_size="0"
-	reply_plain
-	var_size=$reply
-        if [ $var_size -eq "0" ]; then
-                var_size="`echo "$var_perc * $lvm_size_calc" | bc`"
-        fi
-
+	## starting dialog
 	printf "create SWAP partition (y/N)? \n"
 	reply_single_hidden
-	swap_size=0
 	if printf "$reply" | grep -iq "^y" ; then
-		printf "SWAP partition size (GB)? \n"
+		printf "SWAP partition size (GB)? [$swap_size_recomm] \n"
 		reply_plain
-		swap_size=$reply
+		swap_size_calc=0 ###???? needed ???
+		swap_size_calc=$reply
+	        if [ -z "$swap_size_calc" ]; then
+        	        swap_size_calc=$swap_size_recomm
+        	fi
+		### remove decimals
+		swap_size="${swap_size_calc%%.*}"
+		### correct $lvm_size_calc
+		lvm_size_calc=$lvm_size_calc-$swap_size_calc
 	else
-		clear
+		echo
+		printf "no SWAP\n"
 	fi
 
+
+	## recommended percentages of $lvm_size_calc
+	root_perc=0.05
+	home_perc=0.40
+	usr_perc=0.25
+	var_perc=0.25
+
+	root_size_calc=`echo "$root_perc * $lvm_size_calc" | bc`
+	home_size_calc=`echo "$home_perc * $lvm_size_calc" | bc`
+	usr_size_calc=`echo "$usr_perc * $lvm_size_calc" | bc`
+	var_size_calc=`echo "$var_perc * $lvm_size_calc" | bc`
+	###[TODO] calculate using awk (posix compliance without bc)
+
+	## ROOT partition
+	printf "ROOT partition size (GB)? [$root_size_calc] "
+	root_size_calc=0
+	reply_plain
+        root_size_calc=$reply
+        if [ -z "$root_size_calc" ]; then
+                root_size_calc="`echo "$root_perc * $lvm_size_calc" | bc`"
+        fi
+	### remove decimals
+	root_size="${root_size_calc%%.*}"
+
+	## HOME partition
+	printf "HOME partition size (GB)? [$home_size_calc] "
+	home_size_calc=0
+	reply_plain
+        home_size_calc=$reply
+        if [ -z "$home_size_calc" ]; then
+                home_size_calc="`echo "$home_perc * $lvm_size_calc" | bc`"
+        fi
+	### remove decimals
+	home_size="${home_size_calc%%.*}"
+
+	## USR  partition
+	printf "USR  partition size (GB)? [$usr_size_calc] "
+	usr_size_calc=0
+	reply_plain
+	usr_size_calc=$reply
+        if [ -z "$usr_size_calc" ]; then
+                usr_size_calc="`echo "$usr_perc * $lvm_size_calc" | bc`"
+        fi
+	### remove decimals
+	usr_size="${usr_size_calc%%.*}"
+
+	## VAR  partition
+	printf "VAR  partition size (GB)? [$var_size_calc] "
+	var_size_calc=0
+	reply_plain
+	var_size_calc=$reply
+        if [ -z "$var_size_calc" ]; then
+                var_size_calc="`echo "$var_perc * $lvm_size_calc" | bc`"
+        fi
+	### remove decimals
+	var_size="${var_size_calc%%.*}"
+
+	## total
 	total_size="`echo "$root_size + $home_size + $var_size + $usr_size + $swap_size" | bc`"
-	echo
-	df -h
 	echo
 	echo "lvm partition "$lvm_part" has to be at least $total_size GB"
 	echo -n 'continue? (Y/n) '
@@ -415,8 +437,8 @@ vgcreate vg0 /dev/mapper/cryptlvm
 ## create logical volumes
 lvcreate -L "$root_size"G vg0 -n lv_root
 lvcreate -L "$home_size"G vg0 -n lv_home
-lvcreate -L "$var_size"G vg0 -n lv_usr
 lvcreate -L "$usr_size"G vg0 -n lv_var
+lvcreate -L "$var_size"G vg0 -n lv_usr
 
 ## make filesystems
 mkfs.vfat -F 32 -n BOOT "$boot_part"
