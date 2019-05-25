@@ -189,7 +189,7 @@ sed -i '/HookDir/c\HookDir = $HOME/.dot/code/pacman/hooks/' /etc/pacman.conf
 
 
 # update repositories and install core applications
-pacman -Syu --noconfirm $linux_kernel $linux_lts_kernel $command_line_editor $wireless $secure_connections
+pacman -S --noconfirm $linux_kernel $linux_lts_kernel $command_line_editor $wireless $secure_connections
 
 
 # installing the EFI boot manager

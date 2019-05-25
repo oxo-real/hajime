@@ -33,24 +33,6 @@ mirror_amount="5"
 install_helpers="reflector"
 
 
-# clear screen
-clear
-echo
-printf " Welcome to Hajime!\n"
-echo
-echo
-printf " CAUTION!\n"
-printf " These scripts will overwrite any existing data on target devices!\n"
-printf " By continuing you will testify that you know what you are doing.\n"
-echo
-printf " Be sure to have the most recent version of the arch installation image!\n"
-printf " Use cytopyge's 'isolatest' to get the most recent authentic iso image.\n"
-printf " You can download it via: http://gitlab.com/cytopyge/isolatest\n"
-printf " Or retrieve your installation image via: https://www/archlinux.org/download/\n"
-echo
-printf " Are you really sure to continue? (y/N) "
-
-
 # define reply functions
 
 reply_plain() {
@@ -83,6 +65,7 @@ reply_single_hidden() {
 }
 
 
+# define exit function
 exit_hajime () {
 
         echo
@@ -97,141 +80,86 @@ exit_hajime () {
 }
 
 
-reply_single
-
-
-if printf "$reply" | grep -iq "^y" ; then
-	echo
-	echo
-	echo
-	printf " Have a safe journey! "
-	sleep 2
-	clear
-else
-	exit_hajime
-fi
-
-
-# network setup
-
-## get network interface
-i=$(ip -o -4 route show to default | awk '{print $5}')
-
-## connect to network interface
-dhcpcd $i
-echo
-
-
-# legible console font
-## especially useful for hiDPI screens
-
-## install terminus font
-pacman -Sy --noconfirm $terminus_font
-pacman -Ql $terminus_font
-
-## set console font temporarily
-setfont $console_font
-
-
-# for floating point arithmetic in this script
-pacman -S --noconfirm bc
-
-
-# hardware clock and system clock
-
-## network time protocol
-timedatectl set-ntp $sync_system_clock_over_ntp
-
-## timezone
-timedatectl set-timezone $timezone
-## verify
-date
-hwclock -rv
-timedatectl status
-echo
-clear
-
-
 set_boot_device() {
 
-## lsblk for human
-lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
-echo
+	## lsblk for human
+	lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
+	echo
 
 
-## request boot device path
-printf "enter full path of the BOOT device (/dev/sdX): "
-reply_plain
-boot_dev=$reply
+	## request boot device path
+	printf "enter full path of the BOOT device (/dev/sdX): "
+	reply_plain
+	boot_dev=$reply
 
-echo
-printf "$(lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint | grep $boot_dev)\n"
-echo
+	echo
+	printf "$(lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint | grep $boot_dev)\n"
+	echo
 
-printf "BOOT device: '$boot_dev', correct? (Y/n) "
-reply_single_hidden
-if printf "$reply" | grep -iq "^n" ; then
+	printf "BOOT device: '$boot_dev', correct? (Y/n) "
+	reply_single_hidden
+	if printf "$reply" | grep -iq "^n" ; then
+		clear
+		set_boot_device
+	else
+		echo
+		echo
+		printf "configure '$boot_dev' as BOOT device\n"
+	fi
+
+	## create boot partition
+	## info for human
+	echo 'add a new ef00 (EFI System) partition'
+	echo
+	echo '<o>	create a new empty GUID partition table (GPT)'
+	echo '<n>	add a new partition'
+	echo '<w>	write table to disk and exit'
+	echo '<q>	quit without saving changes'
+	echo
+	gdisk "$boot_dev"
 	clear
-	set_boot_device
-else
-	echo
-	echo
-	printf "configure '$boot_dev' as BOOT device\n"
-fi
-
-## create boot partition
-## info for human
-echo 'add a new ef00 (EFI System) partition'
-echo
-echo '<o>	create a new empty GUID partition table (GPT)'
-echo '<n>	add a new partition'
-echo '<w>	write table to disk and exit'
-echo '<q>	quit without saving changes'
-echo
-gdisk "$boot_dev"
-clear
 
 }
 
 
 set_lvm_device() {
 
-## lsblk for human
-lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
-echo
+	## lsblk for human
+	lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
+	echo
 
 
-## request lvm device path
-printf "enter full path of the LVM device (/dev/sdY): "
-reply_plain
-lvm_dev=$reply
+	## request lvm device path
+	printf "enter full path of the LVM device (/dev/sdY): "
+	reply_plain
+	lvm_dev=$reply
 
-echo
-printf "$(lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint | grep $lvm_dev)\n"
-echo
+	echo
+	printf "$(lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint | grep $lvm_dev)\n"
+	echo
 
-printf "LVM device: '$lvm_dev', correct? (Y/n) "
-reply_single_hidden
-if printf "$reply" | grep -iq "^n" ; then
+	printf "LVM device: '$lvm_dev', correct? (Y/n) "
+	reply_single_hidden
+	if printf "$reply" | grep -iq "^n" ; then
+		clear
+		set_lvm_device
+	else
+		echo
+		echo
+		printf "configure '$lvm_dev' as LVM device\n"
+	fi
+
+	## create lvm partition
+	## info for human
+	echo 'add a new 8e00 (Linux LVM) partition'
+	echo
+	echo '<o>	create a new empty GUID partition table (GPT)'
+	echo '<n>	add a new partition'
+	echo '<w>	write table to disk and exit'
+	echo '<q>	quit without saving changes'
+	echo
+	gdisk "$lvm_dev"
 	clear
-	set_lvm_device
-else
-	echo
-	echo
-	printf "configure '$lvm_dev' as LVM device\n"
-fi
-
-## create lvm partition
-## info for human
-echo 'add a new 8e00 (Linux LVM) partition'
-echo
-echo '<o>	create a new empty GUID partition table (GPT)'
-echo '<n>	add a new partition'
-echo '<w>	write table to disk and exit'
-echo '<q>	quit without saving changes'
-echo
-gdisk "$lvm_dev"
-clear
 
 }
 
@@ -333,7 +261,7 @@ set_partition_sizes() {
 		#lvm_size_calc=`echo "$lvm_size_calc - $swap_size_calc" | bc`
 	else
 		echo
-		printf "no SWAP\n"
+		printf "no SWAP partition will be created\n"
 	fi
 
 
@@ -416,6 +344,80 @@ set_partition_sizes() {
 }
 
 
+# clear screen
+clear
+echo
+printf " Welcome to Hajime!\n"
+echo
+echo
+printf " CAUTION!\n"
+printf " These scripts will overwrite any existing data on target devices!\n"
+printf " By continuing you will testify that you know what you are doing.\n"
+echo
+printf " Be sure to have the most recent version of the arch installation image!\n"
+printf " Use cytopyge's 'isolatest' to get the most recent authentic iso image.\n"
+printf " You can download it via: http://gitlab.com/cytopyge/isolatest\n"
+printf " Or retrieve your installation image via: https://www/archlinux.org/download/\n"
+echo
+printf " Are you really sure to continue? (y/N) "
+
+
+reply_single
+
+
+if printf "$reply" | grep -iq "^y" ; then
+	echo
+	echo
+	echo
+	printf " Have a safe journey! "
+	sleep 2
+	clear
+else
+	exit_hajime
+fi
+
+
+# network setup
+
+## get network interface
+i=$(ip -o -4 route show to default | awk '{print $5}')
+
+## connect to network interface
+dhcpcd $i
+echo
+
+
+# legible console font
+## especially useful for hiDPI screens
+
+## install terminus font
+pacman -Sy --noconfirm $terminus_font
+pacman -Ql $terminus_font
+
+## set console font temporarily
+setfont $console_font
+
+
+# for floating point arithmetic in this script
+pacman -S --noconfirm bc
+
+
+# hardware clock and system clock
+
+## network time protocol
+timedatectl set-ntp $sync_system_clock_over_ntp
+
+## timezone
+timedatectl set-timezone $timezone
+## verify
+date
+hwclock -rv
+timedatectl status
+echo
+clear
+
+
+# setting up partitions
 set_boot_device
 set_lvm_device
 set_boot_partition
@@ -463,7 +465,7 @@ mount /dev/mapper/vg0-lv_usr /mnt/usr
 mount /dev/mapper/vg0-lv_var /mnt/var
 
 
-## create (optional) swap
+## create (optional) swap partition
 if [[ $swap_bool == "Y" || $swap_bool == "y" ]]; then
 	lvcreate -L "$swap_size"G vg0 -n lv_swap
 	mkswap -L SWAP /dev/mapper/vg0-lv_swap
@@ -483,7 +485,7 @@ cp /etc/pacman.d/mirrorlist /etc/pacman.d/`date "+%Y%m%d%H%M%S"`_mirrorlist_back
 reflector --verbose --country $mirror_country -l $mirror_amount --sort rate --save /etc/pacman.d/mirrorlist
 
 
-# install base & base-devel package group
+# install base & base-devel package groups
 pacstrap -i /mnt base base-devel
 
 
