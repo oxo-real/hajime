@@ -31,6 +31,7 @@ bloat_ware="nano"
 
 reply() {
 
+
 	# first silently entered character goes directly to $reply
 	stty_0=$(stty -g)
 	stty raw -echo
@@ -41,6 +42,8 @@ reply() {
 
 
 dhcp_connect() {
+
+
 	# dhcp connect
 	ip a
 	echo
@@ -63,6 +66,7 @@ dhcp_connect() {
 
 set_read_write() {
 
+
 	# set /usr and /boot read-write
 	sudo mount -o remount,rw  /usr
 	sudo mount -o remount,rw  /boot
@@ -71,6 +75,7 @@ set_read_write() {
 
 
 modify_pacman_conf() {
+
 
 	# modify pacman.conf
 
@@ -87,6 +92,8 @@ modify_pacman_conf() {
 
 
 create_directories() {
+
+
 	# create mountpoint docking bays
 
 	sudo mkdir -p /dock/1
@@ -112,6 +119,7 @@ create_directories() {
 
 base_mutations() {
 
+
 	# yay, a packagemanager written in go
 	## build yay
 	mkdir -p ~/tmp/yay
@@ -122,6 +130,7 @@ base_mutations() {
 	makepkg -si
 	cd
 	sudo rm -rf ~/tmp
+
 
 	# add, remove and configure to the standard base packages
 
@@ -142,6 +151,7 @@ base_mutations() {
 
 system_update() {
 
+
 	# system update
 
 	## [[[git updater version as of 20190525_085600]]]
@@ -157,7 +167,7 @@ system_update() {
 	printf "%7s %s\n" "$(yay -Qe | wc -l)" "explicit"
 	printf "%7s %s\n" "$(yay -Qd | wc -l)" "dependend"
 	printf "\033[1m%7s %s\033[0m\n" "$(yay -Q | wc -l)" "total count"
-	# total count matches: -4 + $(ls -ila /var/lib/pacman/local | grep wc -l)
+	#total count matches: -4 + $(ls -ila /var/lib/pacman/local | grep wc -l)
 	printf "%7s %s\n" "$(yay -Qn | wc -l)" "native"
 	printf "%7s %s\n" "$(yay -Qm | wc -l)" "foreign"
 	echo
@@ -178,6 +188,7 @@ system_update() {
 	fi
 	echo
 
+
 	# update packages
 	printf "update (Syu)\n"
 	yay -Syu
@@ -186,12 +197,13 @@ system_update() {
 
 	# cleaning up
 	printf "cleanup (Rns Qtdq)\n"
-
 	yay -Rns $(yay -Qtdq) 2>/dev/null
 	printf "done\n"
+
 	printf "cleanup (c)\n"
 	yay -c
 	printf "done\n"
+
 	printf "cleanup (rv)\n"
 	paccache -rv
 	printf "done\n"
@@ -199,6 +211,7 @@ system_update() {
 
 
 	# show missing package files
+
 	## i3blocks is filtered out from results
 	printf "missing package files (Qk)\n"
 	yay -Qk | grep -v '0 m' || printf " no missing package files detected\n"
@@ -207,8 +220,8 @@ system_update() {
 
 	# updatedb
 	## in order to user locate (faster than find)
-	## requier  s mlocate
-	printf "update locate db\n"
+	## mlocate is required
+	printf "update locate database\n"
 	sudo updatedb
 	printf "done\n"
 
@@ -217,12 +230,15 @@ system_update() {
 
 set_read_only() {
 
+
 	# set /usr and /boot read-only
 	sudo mount -o remount,ro  /usr
 	sudo mount -o remount,ro  /boot
 
 }
 
+
+# execution
 
 dhcp_connect
 set_read_write
