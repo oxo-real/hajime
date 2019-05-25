@@ -119,15 +119,17 @@ create_directories() {
 
 base_mutations() {
 
+	# update package databases
+	sudo pacman -Syu
 
 	# yay, a packagemanager written in go
 	## build yay
-	mkdir -p ~/tmp/yay
-	git clone -q https://aur.archlinux.org/yay.git ~/tmp/yay
+	sudo mkdir -p ~/tmp/yay
+	sudo git clone -q https://aur.archlinux.org/yay.git ~/tmp/yay
 	cd ~/tmp/yay
 
 	## install yay
-	makepkg -si
+	sudo makepkg -si
 	cd
 	sudo rm -rf ~/tmp
 
