@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 ##
 ###  _            _ _                                  _
@@ -23,7 +23,7 @@
 
 
 # user customizable variables
-base_additions="lsof pacman-contrib mlocate dash"
+base_additions="lsof pacman-contrib mlocate" #dash
 bloat_ware="nano"
 
 
@@ -146,7 +146,7 @@ base_mutations() {
 	## pacman hook is in: ~/.dot/code/pacman/hooks/relink_dash.hook
 
 	## linking /bin/sh
-	sudo ln -sfT dash /usr/bin/sh
+	#>>>>>>>>>sudo ln -sfT dash /usr/bin/sh
 
 }
 

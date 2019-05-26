@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 ##
 ###  _            _ _                                   __
@@ -185,7 +185,7 @@ reflector --verbose --country $mirror_country -l $mirror_amount --sort rate --sa
 # to be tested
 # setting an additional pacman hooks directory
 ## for dash (see below)
-sed -i '/HookDir/c\HookDir = $HOME/.dot/code/pacman/hooks/' /etc/pacman.conf
+#sed -i '/HookDir/c\HookDir = $HOME/.dot/code/pacman/hooks/' /etc/pacman.conf
 
 
 # update repositories and install core applications
