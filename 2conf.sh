@@ -43,6 +43,7 @@ install_helpers="reflector wl-clipboard"
 wireless="wpa_supplicant wireless_tools iw"
 secure_connections="openssh"
 micro_code="intel-ucode" #amd-ucode
+system_security="arch-audit"
 
 
 # time settings
@@ -190,7 +191,7 @@ reflector --verbose --country $mirror_country -l $mirror_amount --sort rate --sa
 
 
 # update repositories and install core applications
-pacman -S --noconfirm $linux_kernel $linux_lts_kernel $command_line_editor $wireless $secure_connections $micro_code
+pacman -S --noconfirm $linux_kernel $linux_lts_kernel $command_line_editor $wireless $secure_connections $micro_code $system_security
 
 
 # installing the EFI boot manager
