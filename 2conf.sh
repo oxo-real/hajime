@@ -42,6 +42,7 @@ command_line_editor="neovim"
 install_helpers="reflector wl-clipboard"
 wireless="wpa_supplicant wireless_tools iw"
 secure_connections="openssh"
+micro_code="intel-ucode" #amd-ucode
 
 
 # time settings
@@ -189,7 +190,7 @@ reflector --verbose --country $mirror_country -l $mirror_amount --sort rate --sa
 
 
 # update repositories and install core applications
-pacman -S --noconfirm $linux_kernel $linux_lts_kernel $command_line_editor $wireless $secure_connections
+pacman -S --noconfirm $linux_kernel $linux_lts_kernel $command_line_editor $wireless $secure_connections $micro_code
 
 
 # installing the EFI boot manager
@@ -216,6 +217,7 @@ sed -i "/^HOOKS/c\HOOKS=(base systemd autodetect keyboard sd-vconsole modconf bl
 ## bleeding edge kernel
 echo 'title arch' > /boot/loader/entries/arch.conf
 echo 'linux /vmlinuz-linux' >> /boot/loader/entries/arch.conf
+echo 'initrd /intel-ucode.img' >> /boot/loader/entries/arch.conf
 echo 'initrd /initramfs-linux.img' >> /boot/loader/entries/arch.conf
 [ ! -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> /boot/loader/entries/arch.conf
 
@@ -225,6 +227,7 @@ echo 'initrd /initramfs-linux.img' >> /boot/loader/entries/arch.conf
 ## long term support kernel (LTS)
 echo 'title arch-lts' > /boot/loader/entries/arch-lts.conf
 echo 'linux /vmlinuz-linux-lts' >> /boot/loader/entries/arch-lts.conf
+echo 'initrd /intel-ucode.img' >> /boot/loader/entries/arch.conf
 echo 'initrd /initramfs-linux-lts.img' >> /boot/loader/entries/arch-lts.conf
 [ ! -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> /boot/loader/entries/arch-lts.conf
 

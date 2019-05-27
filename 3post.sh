@@ -120,7 +120,7 @@ create_directories() {
 base_mutations() {
 
 	# update package databases
-	#sudo pacman -Syu
+	sudo pacman -Syu
 
 	# yay, a packagemanager written in go
 	## build yay
