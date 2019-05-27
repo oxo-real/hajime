@@ -42,7 +42,7 @@ command_line_editor="neovim"
 install_helpers="reflector wl-clipboard"
 wireless="wpa_supplicant wireless_tools iw"
 secure_connections="openssh"
-micro_code="intel-ucode" #amd-ucode
+micro_code="$ucode cpuid"
 system_security="arch-audit"
 
 
@@ -190,6 +190,17 @@ reflector --verbose --country $mirror_country -l $mirror_amount --sort rate --sa
 #sed -i '/HookDir/c\HookDir = $HOME/.dot/code/pacman/hooks/' /etc/pacman.conf
 
 
+# check if cpu_name contains "Intel"
+cpu_name=$(lscpu | grep name)
+if [[ $cpu_name == *"Intel"*  ]]; then
+	cpu_type="intel"
+	ucode="intel-ucode iucode-tool"
+else
+	#[TODO] proper check?
+	cpu_type="amd"
+	ucode="amd-ucode"
+fi
+
 # update repositories and install core applications
 pacman -S --noconfirm $linux_kernel $linux_lts_kernel $command_line_editor $wireless $secure_connections $micro_code $system_security
 
@@ -218,21 +229,23 @@ sed -i "/^HOOKS/c\HOOKS=(base systemd autodetect keyboard sd-vconsole modconf bl
 ## bleeding edge kernel
 echo 'title arch' > /boot/loader/entries/arch.conf
 echo 'linux /vmlinuz-linux' >> /boot/loader/entries/arch.conf
+#[TODO] intel / amd check here
 echo 'initrd /intel-ucode.img' >> /boot/loader/entries/arch.conf
 echo 'initrd /initramfs-linux.img' >> /boot/loader/entries/arch.conf
+### if lv_swap does not exist
 [ ! -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> /boot/loader/entries/arch.conf
-
-## if lv_swap exists
+### if lv_swap does exists
 [ -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` rw resume=UUID=`blkid | grep lv_swap | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> /boot/loader/entries/arch.conf
 
 ## long term support kernel (LTS)
 echo 'title arch-lts' > /boot/loader/entries/arch-lts.conf
 echo 'linux /vmlinuz-linux-lts' >> /boot/loader/entries/arch-lts.conf
+#[TODO] intel / amd check here
 echo 'initrd /intel-ucode.img' >> /boot/loader/entries/arch.conf
 echo 'initrd /initramfs-linux-lts.img' >> /boot/loader/entries/arch-lts.conf
+### if lv_swap does not exist
 [ ! -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> /boot/loader/entries/arch-lts.conf
-
-## if lv_swap exists
+### if lv_swap does exist
 [ -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` rw resume=UUID=`blkid | grep lv_swap | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> /boot/loader/entries/arch-lts.conf
 
 
