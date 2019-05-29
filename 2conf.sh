@@ -42,7 +42,8 @@ command_line_editor="neovim"
 install_helpers="reflector wl-clipboard"
 wireless="wpa_supplicant wireless_tools iw"
 secure_connections="openssh"
-micro_code="$ucode cpuid"
+micro_code_intel="intel-ucode iucode-tool"
+micro_code_amd="amd-ucode"
 system_security="arch-audit"
 
 
@@ -190,19 +191,21 @@ reflector --verbose --country $mirror_country -l $mirror_amount --sort rate --sa
 #sed -i '/HookDir/c\HookDir = $HOME/.dot/code/pacman/hooks/' /etc/pacman.conf
 
 
+#[TODO]
 # check if cpu_name contains "Intel"
-cpu_name=$(lscpu | grep name)
-if [[ $cpu_name == *"Intel"*  ]]; then
-	cpu_type="intel"
-	ucode="intel-ucode iucode-tool"
-else
-	#[TODO] proper check?
-	cpu_type="amd"
-	ucode="amd-ucode"
-fi
+#cpu_name=$(lscpu | grep name)
+#if [[ $cpu_name == *"Intel"*  ]]; then
+#	cpu_type="intel"
+#	ucode="intel-ucode iucode-tool"
+#else
+#	#[TODO] proper check?
+#	cpu_type="amd"
+#	ucode="amd-ucode"
+#fi
+
 
 # update repositories and install core applications
-pacman -S --noconfirm $linux_kernel $linux_lts_kernel $command_line_editor $wireless $secure_connections $micro_code $system_security
+pacman -S --noconfirm $linux_kernel $linux_lts_kernel $command_line_editor $wireless $secure_connections $micro_code_intel $system_security
 
 
 # installing the EFI boot manager
