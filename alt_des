@@ -26,6 +26,7 @@ desktop environment (DE) is a bundle of programs which share a common GUI.
 
 
 # 1 xfce with lightdm
+#=====================
 
 ## desktop environment:	xfce
 ## display manager: 	lightdm
@@ -39,6 +40,7 @@ startxfce
 
 
 # 2 gnome with gdm
+#==================
 
 ## desktop environment:	gnome
 ## display manager:	gdm
