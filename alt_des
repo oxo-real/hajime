@@ -39,7 +39,21 @@ sudo systemctl start lightdm.service
 startxfce
 
 
-# 2 gnome with gdm
+# 2 lxde with lightdm
+#=====================
+
+## desktop environment:	lxde
+## display manager:	openbox
+
+yay -Sy xf86-video-nouveau xorg-server xorg-xinit lxde-common lxsession openbox
+
+## start lightdm.service or 'enable' for autostart after boot
+sudo systemctl start openbox.service
+
+startlxde
+
+
+# 3 gnome with gdm
 #==================
 
 ## desktop environment:	gnome
@@ -50,6 +64,22 @@ yay -Sy xf86-video-nouveau xorg-server xorg-xinit gdm gnome
 ## start gdm.service or 'enable' for autostart after boot
 sudo systemctl start gdm.service
 
+
+# 4 kde plasma
+#==============
+
+## desktop environment:	kde
+## display manager:	lightdm
+
+yay -Sy xf86-video-nouveau xorg-server xorg-xinit plasma-desktop plasma-wayland-session openbox
+
+optional: plasma or plasma-meta
+optional: kde-applications or kde-application-meta
+
+## start gdm.service or 'enable' for autostart after boot
+sudo systemctl start gdm.service
+
+startkde
 
 ---
 
