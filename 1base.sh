@@ -261,6 +261,7 @@ set_partition_sizes() {
 		#lvm_size_calc=`echo "$lvm_size_calc - $swap_size_calc" | bc`
 	else
 		echo
+		swap_size_calc=0
 		printf "no SWAP partition will be created\n"
 	fi
 
