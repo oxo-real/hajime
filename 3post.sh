@@ -282,9 +282,9 @@ conclusion() {
 	printf "sh hajime/4apps.sh\n"
 	echo
 	printf "press any key to continue...\n"
+	reply_single
 	clear
 	echo
-	reply_single
 	alsi
 
 }
