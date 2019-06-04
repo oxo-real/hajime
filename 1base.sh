@@ -24,7 +24,7 @@
 
 # user customizable variables
 terminus_font="terminus-font"
-console_font="ter-v20n"
+console_font="ter-v16n"
 timezone="Europe/Amsterdam"
 sync_system_clock_over_ntp="true"
 arch_mirrorlist="https://www.archlinux.org/mirrorlist/?country=NL&protocol=http&protocol=https&ip_version=4"
@@ -349,10 +349,11 @@ set_partition_sizes() {
 # clear screen
 clear
 echo
-printf " Welcome to Hajime!\n"
+printf " Irasshaimase!\n"
 echo
 echo
 printf " CAUTION!\n"
+printf " This is hajime.\n"
 printf " These scripts will overwrite any existing data on target devices!\n"
 printf " By continuing you will testify that you know what you are doing.\n"
 echo
@@ -371,7 +372,7 @@ if printf "$reply" | grep -iq "^y" ; then
 	echo
 	echo
 	echo
-	printf " Have a safe journey! "
+	printf " Kamaete ... Hajime! "
 	sleep 2
 	clear
 else
@@ -393,11 +394,11 @@ echo
 ## especially useful for hiDPI screens
 
 ## install terminus font
-pacman -Sy --noconfirm $terminus_font
-pacman -Ql $terminus_font
+#pacman -Sy --noconfirm $terminus_font
+#pacman -Ql $terminus_font
 
 ## set console font temporarily
-setfont $console_font
+#setfont $console_font
 
 
 # for floating point arithmetic in this script
