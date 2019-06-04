@@ -54,9 +54,11 @@ sh ~/.dot/symlinks/restore
 sudo mount -o remount,rw  /usr
 
 ## prepare wallpaper file
-[ -d ~/media_/images/wallpaper ] || mkdir -p ~/media_/images/wallpaper/active
-touch ~/media_images/wallpaper/active
+[ -d ~/media_/images/wallpaper ] || mkdir -p ~/media_/images/wallpaper
 ## to be replaced with preferred image
+(cd ~/media_/images/wallpaper && \
+	curl -O https://www.archlinux.org/static/logos/archlinux-logo-light-1200dpi.7ccd81fd52dc.png \
+	> ~/media_/images/wallpaper/active)
 
 
 # X11 config
@@ -81,7 +83,7 @@ sudo usermod -s `whereis zsh | awk '{print $2}'` $(whoami)
 sudo chsh -s /bin/zsh
 
 ## shell decoration
-## base16
+## base16-shell
 git clone https://github.com/chriskempson/base16-shell.git ~/.config/base16-shell
 cd ~
 base16_irblack
@@ -96,6 +98,8 @@ alias vim=nvim
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 
 ## install plugins defined in ~/.dot/.vimrc
+#[TODO] check for duplicity
+#[TODO] add base16-vim here?
 vim +PluginInstall +qall
 clear
 
@@ -186,13 +190,6 @@ finishing_up() {
 recover_cytopyge_private_git() {
 
 	sh ~/git/code/bwsession/bwul
-
-	#[TODO] wl-paste from sh script seems not to open vault properly
-
-	## tried:
-	## wl-paste
-	## `echo wl-paste`
-	wl-paste -n
 
 	### netkill
 	clear
