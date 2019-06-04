@@ -56,9 +56,10 @@ sudo mount -o remount,rw  /usr
 ## prepare wallpaper file
 [ -d ~/media_/images/wallpaper ] || mkdir -p ~/media_/images/wallpaper
 ## to be replaced with preferred image
-(cd ~/media_/images/wallpaper && \
-	curl -O https://www.archlinux.org/static/logos/archlinux-logo-light-1200dpi.7ccd81fd52dc.png \
-	> ~/media_/images/wallpaper/active)
+cd ~/media_/images/wallpaper
+curl -O https://www.archlinux.org/static/logos/archlinux-logo-light-1200dpi.7ccd81fd52dc.png
+mv archlinux-logo-light-1200dpi.7ccd81fd52dc.png active
+cd
 
 
 # X11 config
