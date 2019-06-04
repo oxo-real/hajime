@@ -23,7 +23,7 @@
 
 
 # user customizable variables
-base_additions="lsof pacman-contrib mlocate" #dash
+base_additions="lsof pacman-contrib mlocate alsi" #dash
 bloat_ware="nano"
 
 
@@ -119,8 +119,10 @@ create_directories() {
 
 base_mutations() {
 
+
 	# update package databases
 	sudo pacman -Syu
+
 
 	# yay, a packagemanager written in go
 	## build yay
@@ -142,11 +144,14 @@ base_mutations() {
 	## remove core system bloat
 	yay -Rns --noconfirm $bloat_ware
 
-	# Debian Almquist shell (DASH) a POSIX-compliant implementation of /bin/sh
+
+	# Debian Almquist shell (DASH)
+
+	## dsah is a POSIX-compliant implementation of /bin/sh
 	## pacman hook is in: ~/.dot/code/pacman/hooks/relink_dash.hook
 
 	## linking /bin/sh
-	#>>>>>>>>>sudo ln -sfT dash /usr/bin/sh
+	#sudo ln -sfT dash /usr/bin/sh
 
 }
 
@@ -192,30 +197,36 @@ system_update() {
 
 
 	# update packages
-	printf "update (Syu)\n"
+	clear
+	printf "package update (Syu)\n"
 	yay -Syu
 	echo
 
 
 	# cleaning up
-	printf "cleanup (Rns Qtdq)\n"
+	printf "package cleanup\n"
+	printf "yay\n"
+	printf "[Rns Qtdq]\n"
 	yay -Rns $(yay -Qtdq) 2>/dev/null
-	printf "done\n"
+	printf "> done\n"
 
-	printf "cleanup (c)\n"
+	printf "[c]\n"
 	yay -c
-	printf "done\n"
+	printf "> done\n"
 
-	printf "cleanup (rv)\n"
+	printf "paccache\n"
+	printf "[rv]\n"
 	paccache -rv
-	printf "done\n"
+	printf "> done\n"
 	echo
 
 
 	# show missing package files
 
 	## i3blocks is filtered out from results
-	printf "missing package files (Qk)\n"
+	printf "missing package files\n"
+	printf "yay\n"
+	printf "[Qk]\n"
 	yay -Qk | grep -v '0 m' || printf " no missing package files detected\n"
 	echo
 
@@ -240,6 +251,45 @@ set_read_only() {
 }
 
 
+reply_single() {
+
+        # first entered character goes directly to $reply
+        stty_0=$(stty -g)
+	stty raw #-echo
+        reply=$(head -c 1)
+        stty $stty_0
+
+}
+
+
+conclusion() {
+
+
+	# finishing
+	sudo touch hajime/3post.done
+
+
+	# human info
+	clear
+	echo
+	printf "congratulations, with your brand new Arch Linux OS!\n"
+	echo
+	printf "your terminal is ready to run"
+	printf "proceed with your own personal configuration,\n"
+	printf "use alternative desktop environments as shown in the repo\n"
+	printf "or continue with part 4 of this installation saga with:\n"
+	echo
+	printf "sh hajime/4apps.sh\n"
+	echo
+	printf "press any key to continue...\n"
+	clear
+	echo
+	reply_single
+	alsi
+
+}
+
+
 # execution
 
 dhcp_connect
@@ -249,16 +299,4 @@ create_directories
 base_mutations
 system_update
 set_read_only
-
-
-# human info
-echo
-printf "congratulations, with your brand new Arch Linux OS!\n"
-printf "proceed with your own personal configuration,\n"
-printf "use alternative desktop environments as shown in the repo\n"
-printf "or continue with part 4 of this installation saga:\n"
-printf "sh hajime/4apps.sh\n"
-
-
-# finishing
-sudo touch hajime/3post.done
+conclusion
