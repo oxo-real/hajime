@@ -476,6 +476,7 @@ if [[ $swap_bool == "Y" || $swap_bool == "y" ]]; then
 fi
 
 # install helpers
+clear
 pacman -S --noconfirm $install_helpers
 
 
@@ -509,7 +510,7 @@ sed -i '/\/usr/s/rw,/ro,/' /mnt/etc/fstab
 
 
 # preparing /mnt environment
-echo
+clear
 echo 'installing git and hajime to new environment'
 arch-chroot /mnt pacman -Sy --noconfirm git
 arch-chroot /mnt git clone https://gitlab.com/cytopyge/hajime
