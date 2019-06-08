@@ -250,7 +250,7 @@ set_partition_sizes() {
 	if printf "$reply" | grep -iq "^y" ; then
 		printf "SWAP partition size (GB)? [$swap_size_recomm] "
 		reply_plain
-		swap_size_calc=0 ###???? needed ???
+		swap_size_calc=0 #[TODO]###???? needed ???
 		swap_size_calc=$reply
 	        if [ -z "$swap_size_calc" ]; then
         	        swap_size_calc=$swap_size_recomm
@@ -258,7 +258,7 @@ set_partition_sizes() {
 		### remove decimals
 		swap_size="${swap_size_calc%%.*}"
 		### correct $lvm_size_calc
-		lvm_size_calc=`echo "$lvm_size_calc - $swap_size" | bc`
+		lvm_size_calc="`echo "$lvm_size_calc - $swap_size" | bc`"
 		#lvm_size_calc=`echo "$lvm_size_calc - $swap_size_calc" | bc`
 	else
 		swap_size=0
@@ -323,8 +323,8 @@ set_partition_sizes() {
 	var_size="${var_size_calc%%.*}"
 
 	## total
-	total_size="`echo "$root_size + $home_size + $var_size + $usr_size + $swap_size" | bc`"
-	total_size_calc=$(printf $total_size | awk '{print $1+0}')
+	total_size_calc="`echo "$root_size + $home_size + $var_size + $usr_size + $swap_size" | bc`"
+	#total_size_calc=$(printf $total_size | awk '{print $1+0}')
 	diff_total_lvm_calc="`echo "$total_size_calc - $lvm_size_calc" | bc`"
 	echo
 	#[TODO]
