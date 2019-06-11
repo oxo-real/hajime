@@ -272,16 +272,17 @@ conclusion() {
 	# human info
 	clear
 	echo
-	printf "congratulations, with your brand new Arch Linux OS!\n"
+	printf "congratulations, with your Arch Linux OS!\n"
 	echo
-	printf "your terminal is ready to run"
+	printf "your terminal is now ready to run\n"
+	echo
 	printf "proceed with your own personal configuration,\n"
-	printf "use alternative desktop environments as shown in the repo\n"
-	printf "or continue with part 4 of this installation saga with:\n"
+	printf "use an alternative desktop environments\n"
+	printf "or continue with this installation series by entering:\n"
 	echo
 	printf "sh hajime/4apps.sh\n"
 	echo
-	printf "press any key to continue...\n"
+	printf "press any key to continue... "
 	reply_single
 	clear
 	echo
