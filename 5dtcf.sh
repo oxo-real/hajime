@@ -106,6 +106,7 @@ clear
 
 
 # global git configuration
+## affects ~/.gitconfig
 git config --global user.email "$(whoami)@protonmail.com"
 git config --global user.name "$(whoami)"
 
@@ -190,7 +191,7 @@ finishing_up() {
 
 recover_cytopyge_private_git() {
 
-	sh ~/git/code/bwsession/bwul
+	sh ~/git/code/bwsession/bw_vault_unlock
 
 	### netkill
 	clear
