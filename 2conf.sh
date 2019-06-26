@@ -214,10 +214,10 @@ pacman -S --noconfirm $linux_kernel $linux_lts_kernel $command_line_editor $wire
 bootctl install
 
 ## boot loader configuration
-echo 'default arch' > /boot/loader/loader.conf
-printf "timeout $bootloader_timeout" >> /boot/loader/loader.conf
-printf "editor $bootloader_editor" >> /boot/loader/loader.conf
-echo 'console-mode max' >> /boot/loader/loader.conf
+printf "default arch\n" > /boot/loader/loader.conf
+printf "timeout $bootloader_timeout\n" >> /boot/loader/loader.conf
+printf "editor $bootloader_editor\n" >> /boot/loader/loader.conf
+printf "console-mode max" >> /boot/loader/loader.conf
 
 
 # configure mkinitcpio
