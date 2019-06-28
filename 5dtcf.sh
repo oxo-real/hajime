@@ -192,36 +192,37 @@ finishing_up() {
 recover_cytopyge_private_git() {
 
 	sh ~/git/code/bwsession/bw_vault_unlock
+	`wl-paste`
 
 	### netkill
 	clear
-	bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy
+	bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
 
-	git clone https://gitlab.com/cytopyge/netkill
+	git clone https://cytopyge@gitlab.com/cytopyge/netkill
 
 	### hashr
 	clear
-#	bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
+	bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
 
-	git clone https://gitlab.com/cytopyge/hashr
+	git clone https://cytopyge@gitlab.com/cytopyge/hashr
 
 	### wfa
 	clear
-#	bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
+	bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
 
-	git clone https://gitlab.com/cytopyge/wfa
+	git clone https://cytopyge@gitlab.com/cytopyge/wfa
 
 	### snapshot
 	clear
-#	bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
+	bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
 
-	git clone https://gitlab.com/cytopyge/snapshot
+	git clone https://cytopyge@gitlab.com/cytopyge/snapshot
 
 	### security
 	clear
 	bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
 
-	git clone https://gitlab.com/cytopyge/security
+	git clone https://cytopyge@gitlab.com/cytopyge/security
 
 	finishing_up
 
