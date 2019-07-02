@@ -59,7 +59,7 @@ bluetooth="bluez bluez-utils pulseaudio-bluetooth"
 
 # additional tools
 
-terminal_text_tools="figlet qrencode jq"
+terminal_text_tools="figlet qrencode jq xxd-standalone"
 
 terminal_file_browser="nnn vifm lf"
 
