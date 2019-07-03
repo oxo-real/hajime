@@ -205,9 +205,9 @@ system_update() {
 
 	# cleaning up
 	printf "package cleanup\n"
-	printf "yay\n"
-	printf "[Rns Qtdq]\n"
-	yay -Rns $(yay -Qtdq) 2>/dev/null
+	#printf "yay\n"
+	#printf "[Rns Qtdq]\n"
+	#yay -Rns $(yay -Qtdq) 2>/dev/null
 	printf "> done\n"
 
 	printf "[c]\n"
@@ -225,7 +225,7 @@ system_update() {
 
 	## i3blocks is filtered out from results
 	printf "missing package files\n"
-	printf "yay\n"
+	#printf "yay\n"
 	printf "[Qk]\n"
 	yay -Qk | grep -v '0 m' || printf " no missing package files detected\n"
 	echo
