@@ -114,9 +114,9 @@ set_hostname
 printf "$hostname" > /etc/hostname
 
 ## add matching entries to hosts file
-printf "127.0.0.1	localhost.localdomain	localhost" >> /etc/hosts
-printf "::1		localhost.localdomain	localhost" >> /etc/hosts
-printf "127.0.1.1	$hostname.localdomain	$hostname" >> /etc/hosts
+printf "127.0.0.1	localhost.localdomain	localhost\n" >> /etc/hosts
+printf "::1		localhost.localdomain	localhost\n" >> /etc/hosts
+printf "127.0.1.1	$hostname.localdomain	$hostname\n" >> /etc/hosts
 
 
 # set root password
