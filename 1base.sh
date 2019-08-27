@@ -373,7 +373,7 @@ if printf "$reply" | grep -iq "^y" ; then
 	echo
 	echo
 	printf " Kamaete ... Hajime! "
-	sleep 2
+	sleep 1
 	clear
 else
 	exit_hajime
@@ -391,6 +391,7 @@ echo
 
 
 # legible console font
+
 ## especially useful for hiDPI screens
 
 ## install terminus font
@@ -402,6 +403,7 @@ echo
 
 
 # for floating point arithmetic in this script
+
 pacman -S --noconfirm bc
 
 
@@ -409,7 +411,6 @@ pacman -S --noconfirm bc
 
 ## network time protocol
 timedatectl set-ntp $sync_system_clock_over_ntp
-
 ## timezone
 timedatectl set-timezone $timezone
 ## verify
@@ -421,6 +422,7 @@ clear
 
 
 # setting up partitions
+
 set_boot_device
 set_lvm_device
 set_boot_partition
