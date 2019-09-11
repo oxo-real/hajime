@@ -161,6 +161,16 @@ clear
 git clone https://gitlab.com/cytopyge/isolatest
 
 
+### netconn
+clear
+git clone https://gitlab.com/cytopyge/netconn
+
+
+### netkill
+clear
+git clone https://gitlab.com/cytopyge/netkill
+
+
 finishing_up() {
 
 	# finishing
@@ -193,12 +203,6 @@ recover_cytopyge_private_git() {
 
 	sh ~/git/code/bwsession/bw_vault_unlock
 	`wl-paste`
-
-	### netkill
-	clear
-	bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
-
-	git clone https://cytopyge@gitlab.com/cytopyge/netkill
 
 	### hashr
 	clear
