@@ -277,7 +277,7 @@ conclusion() {
 	printf "your terminal is now ready to run\n"
 	echo
 	printf "proceed with your own personal configuration,\n"
-	printf "use an alternative desktop environments\n"
+	printf "use an alternative desktop environment\n"
 	printf "or continue with this installation series by entering:\n"
 	echo
 	printf "sh hajime/4apps.sh\n"
