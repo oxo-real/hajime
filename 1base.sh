@@ -37,7 +37,7 @@ install_helpers="reflector"
 
 reply_plain() {
 
-	# entery must be confirmed explicitly (by pushing enter)
+	# entry must be confirmed explicitly (by pushing enter)
 	read reply
 
 }

@@ -61,7 +61,7 @@ bluetooth="bluez bluez-utils pulseaudio-bluetooth"
 
 terminal_text_tools="figlet qrencode jq xxd-standalone"
 
-terminal_file_browser="nnn vifm lf"
+terminal_file_browser="nnn vifm lf-git"
 
 file_tools="srm rsync gdisk"
 

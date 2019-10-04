@@ -139,6 +139,9 @@ cd ~/git
 ## hajime
 clear
 git clone https://gitlab.com/cytopyge/hajime
+### git/hajime becomes the git repo;
+### remove git repo from install directory
+rm -rf $HOME/hajime/.git
 
 ## notes
 clear
