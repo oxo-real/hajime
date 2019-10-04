@@ -102,17 +102,17 @@ create_directories() {
 	sudo mkdir -p /dock/4
 
 
-	# create user_ directories
+	# create _user directories
 
-	mkdir -p ~/backup_
-	mkdir -p ~/data_
-	mkdir -p ~/download_
-	mkdir -p ~/keys_
-	mkdir -p ~/media_
-	mkdir -p ~/settings_
-	mkdir -p ~/test_
-	mkdir -p ~/temp_
-	mkdir -p ~/todo_
+	mkdir -p ~/_backup
+	mkdir -p ~/_data
+	mkdir -p ~/_download
+	mkdir -p ~/_keys
+	mkdir -p ~/_media
+	mkdir -p ~/_settings
+	mkdir -p ~/_test
+	mkdir -p ~/_temp
+	mkdir -p ~/_todo
 
 }
 
