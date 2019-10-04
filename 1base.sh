@@ -327,7 +327,7 @@ set_partition_sizes() {
 	#total_size_calc=$(printf $total_size | awk '{print $1+0}')
 	diff_total_lvm_calc="`echo "$total_size_calc - $lvm_size_calc" | bc`"
 	echo
-	#[TODO]
+	#[TODO] repair error integer expresssion expected on condition no swap
 	if [ "$diff_total_lvm_calc" -gt 0 ]; then
 		printf "too much!\n"
 		set_partition_sizes
