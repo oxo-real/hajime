@@ -130,8 +130,8 @@ mozilla_firefox
 
 
 # prepare cytopyge git environment
-[ -d ~/git ] || mkdir ~/git
-cd ~/git
+[ -d ~/_git ] || mkdir ~/_git
+cd ~/_git
 
 
 # recover public git repositories
@@ -148,28 +148,26 @@ clear
 git clone https://gitlab.com/cytopyge/notes
 
 ## prepare system core code environment
-[ -d ~/git/code ] || mkdir ~/git/code
-cd ~/git/code
+[ -d ~/_git/code ] || mkdir ~/_git/code
+cd ~/_git/code
 
-### bwsession
+## bwsession
 clear
 git clone https://gitlab.com/cytopyge/bwsession
 
-### updater
+## updater
 clear
 git clone https://gitlab.com/cytopyge/updater
 
-### isolatest
+## isolatest
 clear
 git clone https://gitlab.com/cytopyge/isolatest
 
-
-### netconn
+## netconn
 clear
 git clone https://gitlab.com/cytopyge/netconn
 
-
-### netkill
+## netkill
 clear
 git clone https://gitlab.com/cytopyge/netkill
 
@@ -204,7 +202,7 @@ finishing_up() {
 
 recover_cytopyge_private_git() {
 
-	sh ~/git/code/bwsession/bw_vault_unlock
+	sh ~/_git/code/bwsession/bw_vault_unlock
 	`wl-paste`
 
 	### hashr
