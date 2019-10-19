@@ -24,7 +24,7 @@
 
 # user customizable variables
 base_additions="lsof pacman-contrib mlocate alsi" #dash
-bloat_ware="nano"
+#bloat_ware="nano"
 
 
 # functions
@@ -120,8 +120,8 @@ create_directories() {
 base_mutations() {
 
 
-	# update package databases
-	sudo pacman -Syu
+	# install base-devel package
+	sudo pacman -S base-devel
 
 
 	# yay, a packagemanager written in go

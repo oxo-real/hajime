@@ -35,11 +35,12 @@ hostname="host"
 username="user"
 bootloader_timeout="2"
 bootloader_editor="0"
-## core applications
-linux_kernel="linux-headers"
+## TODO del linux in $linux_kernel probably duplicate (already installed in 1base)
+linux_kernel="linux linux-headers"
 linux_lts_kernel="linux-lts linux-lts-headers"
+###TODO del if pacstrap in 1base works core_applications="sudo lvm2"
 command_line_editor="neovim"
-install_helpers="reflector wl-clipboard-git"
+install_helpers="reflector wl-clipboard-git binutils"
 wireless="wpa_supplicant wireless_tools iw"
 secure_connections="openssh"
 micro_code_intel="intel-ucode iucode-tool"
@@ -172,7 +173,7 @@ sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /etc/sudoers
 
 # install helpers
 clear
-pacman -S --noconfirm $install_helpers
+pacman -Sy --noconfirm $install_helpers
 
 
 # configuring the mirrorlist
@@ -205,7 +206,7 @@ reflector --verbose --country $mirror_country -l $mirror_amount --sort rate --sa
 
 
 # update repositories and install core applications
-pacman -S --noconfirm $linux_kernel $linux_lts_kernel $command_line_editor $wireless $secure_connections $micro_code_intel $system_security
+pacman -S --noconfirm $linux_kernel $linux_lts_kernel $core_applications $command_line_editor $wireless $secure_connections $micro_code_intel $system_security
 
 
 # installing the EFI boot manager
@@ -222,7 +223,13 @@ printf "console-mode max" >> /boot/loader/loader.conf
 
 # configure mkinitcpio
 
-## create an initial ramdisk environment (initramfs)
+# lvm2 in arch-chroot
+## source: wiki lvm > installing arch linux on lvm > configure mkinitcpio
+## when mkinitcpio is run in an arch-chroot then lvm2 must be installed inside
+#pacman -S --noconfirm lvm2 >> transferred to $core_applications
+
+
+# create an initial ramdisk environment (initramfs)
 ## enable systemd hooks
 sed -i "/^HOOKS/c\HOOKS=(base systemd autodetect keyboard sd-vconsole modconf block sd-encrypt sd-lvm2 filesystems fsck)" /etc/mkinitcpio.conf
 
@@ -263,6 +270,7 @@ mkinitcpio -p linux-lts
 
 # move /hajime to $user home
 cp -r /hajime /home/$username
+# TODO probably sudo has to be pacstrapped
 sudo rm -rf /hajime
 
 

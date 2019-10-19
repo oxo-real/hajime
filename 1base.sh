@@ -492,7 +492,8 @@ reflector --verbose --country $mirror_country -l $mirror_amount --sort rate --sa
 
 
 # install base & base-devel package groups
-pacstrap -i /mnt base base-devel
+### TODO bring to $pacstrap
+pacstrap -i /mnt base linux linux-firmware sudo dhcpcd lvm2 git binutils
 
 
 # generate fstab
@@ -512,9 +513,10 @@ sed -i '/\/usr/s/rw,/ro,/' /mnt/etc/fstab
 
 
 # preparing /mnt environment
+### TODO also a placeholder for essential packages
 clear
 echo 'installing git and hajime to new environment'
-arch-chroot /mnt pacman -Sy --noconfirm git
+###TODO del line if lvm2 and git in pacstrap works###arch-chroot /mnt pacman -Sy --noconfirm git lvm2
 arch-chroot /mnt git clone https://gitlab.com/cytopyge/hajime
 echo
 
