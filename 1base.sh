@@ -262,7 +262,7 @@ set_partition_sizes() {
 		#lvm_size_calc=`echo "$lvm_size_calc - $swap_size_calc" | bc`
 	else
 		swap_size=0
-		printf "no SWAP partition will be created\n"
+		printf "SWAP partition will NOT be created\n"
 	fi
 
 
@@ -326,10 +326,14 @@ set_partition_sizes() {
 	total_size_calc="`echo "$root_size + $home_size + $var_size + $usr_size + $swap_size" | bc`"
 	#total_size_calc=$(printf $total_size | awk '{print $1+0}')
 	diff_total_lvm_calc="`echo "$total_size_calc - $lvm_size_calc" | bc`"
+	diff_t="$(echo $diff_total_lvm_calc | awk -F . '{print $1}')"
 	echo
 	#[TODO] repair error integer expresssion expected on condition no swap
-	if [ "$diff_total_lvm_calc" -gt 0 ]; then
-		printf "too much!\n"
+	#remove float from diff_total_lvm_calc before passing it to if statement
+	#if [[ "$diff_total_lvm_calc" -gt 0 ]]; then
+	if [[ "$diff_t" -gt 0 ]]; then
+		printf "disk size is insufficient for allocated space\n"
+		printf "please shrink allocated space and try again\n"
 		set_partition_sizes
 	fi
 
