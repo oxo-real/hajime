@@ -36,7 +36,7 @@ username="user"
 bootloader_timeout="2"
 bootloader_editor="0"
 ## TODO del linux in $linux_kernel probably duplicate (already installed in 1base)
-linux_kernel="linux linux-headers"
+linux_kernel="linux-headers" #linux 1base
 linux_lts_kernel="linux-lts linux-lts-headers"
 ###TODO del if pacstrap in 1base works core_applications="sudo lvm2"
 command_line_editor="neovim"
