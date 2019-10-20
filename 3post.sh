@@ -25,7 +25,7 @@
 # user customizable variables
 ## base-devel packages retrieved with: yay -Qg | awk '{print $2}'
 base_devel="autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext grep groff gzip libtool m4 make pacman patch pkgconf sed sudo systemd texinfo util-linux which"
-base_additions="lsof pacman-contrib mlocate alsi" #dash
+base_additions="lsof pacman-contrib mlocate alsi wl-clipboard-git"  #dash
 #bloat_ware="nano" # seems to be no more bloatware in the core since kernel v536
 
 
