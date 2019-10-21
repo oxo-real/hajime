@@ -54,7 +54,7 @@ sh ~/.dot/symlinks/restore
 sudo mount -o remount,rw  /usr
 
 ## prepare wallpaper file
-[ -d ~/_media_/images/wallpaper ] || mkdir -p ~/_media_/images/wallpaper
+[ -d ~/_media/images/wallpaper ] || mkdir -p ~/_media_/images/wallpaper
 ## to be replaced with preferred image
 cd ~/_media_/images/wallpaper
 curl -O https://www.archlinux.org/static/logos/archlinux-logo-light-1200dpi.7ccd81fd52dc.png
