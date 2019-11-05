@@ -203,13 +203,20 @@ finishing_up() {
 recover_cytopyge_private_git() {
 
 	sh ~/_git/code/bwsession/bw_vault_unlock
-	`wl-paste`
+
+	#`wl-paste`
 
 	### hashr
 	clear
 	bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
 
 	git clone https://cytopyge@gitlab.com/cytopyge/hashr
+
+	### history
+	clear
+	bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
+
+	git clone https://cytopyge@gitlab.com/cytopyge/history
 
 	### wfa
 	clear
