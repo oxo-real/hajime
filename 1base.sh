@@ -250,7 +250,7 @@ set_partition_sizes() {
 	if printf "$reply" | grep -iq "^y" ; then
 		printf "SWAP partition size (GB)? [$swap_size_recomm] "
 		reply_plain
-		swap_size_calc=0 #[TODO]###???? needed ???
+		swap_size_calc=0 #[TODO] necesarry?
 		swap_size_calc=$reply
 	        if [ -z "$swap_size_calc" ]; then
         	        swap_size_calc=$swap_size_recomm
@@ -324,13 +324,10 @@ set_partition_sizes() {
 
 	## total
 	total_size_calc="`echo "$root_size + $home_size + $var_size + $usr_size + $swap_size" | bc`"
-	#total_size_calc=$(printf $total_size | awk '{print $1+0}')
 	diff_total_lvm_calc="`echo "$total_size_calc - $lvm_size_calc" | bc`"
 	diff_t="$(echo $diff_total_lvm_calc | awk -F . '{print $1}')"
 	echo
-	#[TODO] repair error integer expresssion expected on condition no swap
-	#remove float from diff_total_lvm_calc before passing it to if statement
-	#if [[ "$diff_total_lvm_calc" -gt 0 ]]; then
+
 	if [[ "$diff_t" -gt 0 ]]; then
 		printf "disk size is insufficient for allocated space\n"
 		printf "please shrink allocated space and try again\n"
@@ -517,10 +514,8 @@ sed -i '/\/usr/s/rw,/ro,/' /mnt/etc/fstab
 
 
 # preparing /mnt environment
-### TODO also a placeholder for essential packages
 clear
 echo 'installing git and hajime to new environment'
-###TODO del line if lvm2 and git in pacstrap works###arch-chroot /mnt pacman -Sy --noconfirm git lvm2
 arch-chroot /mnt git clone https://gitlab.com/cytopyge/hajime
 echo
 

@@ -184,13 +184,6 @@ reflector --verbose --country $mirror_country -l $mirror_amount --sort rate --sa
 
 
 #[TODO]
-# to be tested
-# setting an additional pacman hooks directory
-## for dash (see below)
-#sed -i '/HookDir/c\HookDir = $HOME/.dot/code/pacman/hooks/' /etc/pacman.conf
-
-
-#[TODO]
 # check if cpu_name contains "Intel"
 #cpu_name=$(lscpu | grep name)
 #if [[ $cpu_name == *"Intel"*  ]]; then
@@ -217,14 +210,6 @@ printf "default arch\n" > /boot/loader/loader.conf
 printf "timeout $bootloader_timeout\n" >> /boot/loader/loader.conf
 printf "editor $bootloader_editor\n" >> /boot/loader/loader.conf
 printf "console-mode max" >> /boot/loader/loader.conf
-
-
-# configure mkinitcpio
-
-# lvm2 in arch-chroot
-## source: wiki lvm > installing arch linux on lvm > configure mkinitcpio
-## when mkinitcpio is run in an arch-chroot then lvm2 must be installed inside
-#pacman -S --noconfirm lvm2 >> transferred to $core_applications
 
 
 # create an initial ramdisk environment (initramfs)
