@@ -59,7 +59,7 @@ bluetooth="bluez bluez-utils pulseaudio-bluetooth"
 
 # additional tools
 
-terminal_text_tools="figlet qrencode jq xxd-standalone"
+terminal_text_tools="emacs figlet qrencode jq xxd-standalone"
 
 terminal_file_browser="nnn vifm lf-git"
 
@@ -97,7 +97,8 @@ weather="wttr metar"
 #photo_editing="gimp"
 
 #[TODO]
-#photo_management="digikam"
+## which one prefers?
+#photo_management="digikam darktable"
 
 #office_tools="libreoffice-fresh libreoffice-fresh-nl"
 
@@ -153,6 +154,8 @@ yay -Sy --noconfirm \
 git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
 ~/.fzf/install
 
+## spacemacs (emacs evil)
+git clone https://github.com/syl20bnr/spacemacs ~/.emacs.d
 
 # reset /usr read-only
 sudo mount -o remount,ro  /usr
