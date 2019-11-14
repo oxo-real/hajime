@@ -156,6 +156,9 @@ git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
 
 ## spacemacs (emacs evil)
 git clone https://github.com/syl20bnr/spacemacs ~/.emacs.d
+cd ~/.emacs.d
+git checkout develop
+
 
 # reset /usr read-only
 sudo mount -o remount,ro  /usr
