@@ -169,4 +169,4 @@ echo 'sh hajime/5dtcf.sh'
 
 
 # finishing
-sudo touch hajime/4apps.done
+sudo touch ~/hajime/4apps.done
