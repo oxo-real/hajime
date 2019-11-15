@@ -167,10 +167,6 @@ git clone https://gitlab.com/cytopyge/isolatest
 clear
 git clone https://gitlab.com/cytopyge/netconn
 
-## netkill
-clear
-git clone https://gitlab.com/cytopyge/netkill
-
 
 finishing_up() {
 
