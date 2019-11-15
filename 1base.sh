@@ -279,6 +279,7 @@ set_partition_sizes() {
 	###[TODO] calculate using awk (posix compliance without bc)
 
 	## ROOT partition
+	echo
 	printf "ROOT partition size (GB)? [$root_size_calc] "
 	root_size_calc=0
 	reply_plain
