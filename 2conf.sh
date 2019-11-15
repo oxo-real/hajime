@@ -82,26 +82,37 @@ reply() {
 set_hostname() {
 
 	clear
-	printf "change hostname '$hostname'? (Y/n) "
+	printf "hostname: '$hostname'\n"
+	printf "correct? (y/N) "
 	reply
 
-	if printf "$reply" | grep -iq "^n" ; then
+	if printf "$reply" | grep -iq "^y" ; then
 		echo
 		printf "using '$hostname' as hostname\n"
+		printf "really sure? (Y/n) "
+		reply
+
+		if printf "$reply" | grep -iq "^n" ; then
+			clear
+			set_hostname
+		else
+				echo
+				printf "using '$hostname' as hostname\n"
+		fi
+
 	else
 		echo
 		read -p "enter hostname: " hostname
-
 		printf "hostname:	'$hostname', correct? (Y/n) "
 		reply
 
 		if printf "$reply" | grep -iq "^n" ; then
 			clear
 			set_hostname
-			else
+		else
 				echo
 				printf "using '$hostname' as hostname\n"
-			fi
+		fi
 	fi
 	echo
 
