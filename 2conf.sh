@@ -88,6 +88,7 @@ set_hostname() {
 
 	if printf "$reply" | grep -iq "^y" ; then
 
+		echo
 		printf "using '$hostname' as hostname\n"
 		printf "really sure? (Y/n) "
 		reply
@@ -104,6 +105,7 @@ set_hostname() {
 
 	else
 
+		echo
 		read -p "enter hostname: " hostname
 		printf "hostname:	'$hostname', correct? (Y/n) "
 		reply
@@ -146,20 +148,17 @@ passwd
 set_username() {
 
 	clear
-#	read -p "change username '$username'? (Y/n) " -n 1 -r
 	printf "username: '$username'\n"
 	printf "correct? (Y/n) "
 	reply
 
-#	if [[ $REPLY =~ ^[Nn]$ ]] ; then
 	if printf "$reply" | grep -iq "^n"; then
 
+		echo
 		read -p "enter username: " username
-#		read -p "username:	'$username', correct? (Y/n) " -n 1 -r
 		printf "username:	'$username', correct? (Y/n) "
 		reply
 
-#			if [[ $REPLY =~ ^[Nn]$ ]] ; then
 		if printf "$reply" | grep -iq "^n"; then
 
 			clear
@@ -171,8 +170,9 @@ set_username() {
 
 	else
 
-		read -p "enter username: " username
-		printf "username:	'$username', correct? (Y/n) "
+		echo
+		printf "using '$username' as username\n"
+		printf "really sure? (Y/n) "
 		reply
 
 		if printf "$reply" | grep -iq "^n"; then
