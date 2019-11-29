@@ -81,7 +81,7 @@ download_utilities="aria2 transmission-cli transmission-remote-cli-git"
 
 system_monitoring="glances ccze"
 
-virtual_machines="virtualbox virtualbox-host-modules-arch"
+virtual_machines="" #"virtualbox virtualbox-host-modules-arch"
 
 image_viewers="feh imv"
 
