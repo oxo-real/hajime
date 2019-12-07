@@ -205,7 +205,8 @@ passwd $username
 ## priviledge escalation for wheel group
 sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /etc/sudoers
 
-
+## keep environment variable with elevated priviledges
+sed -i 's/# Defaults env_keep += "HOME"/Defaults env_keep += "HOME"\nDefaults !always_set_home, !set_home' /etc/sudoers
 
 
 # install helpers
