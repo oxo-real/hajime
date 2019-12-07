@@ -27,6 +27,7 @@ terminus_font="terminus-font"
 console_font="ter-v16n"
 timezone="Europe/Amsterdam"
 sync_system_clock_over_ntp="true"
+rtc_local_timezone="0"
 arch_mirrorlist="https://www.archlinux.org/mirrorlist/?country=NL&protocol=http&protocol=https&ip_version=4"
 mirror_country="Netherlands"
 mirror_amount="5"
@@ -411,6 +412,8 @@ pacman -S --noconfirm bc
 
 # hardware clock and system clock
 
+## hardware clock (rtc) coordinated universal time (UTC)
+timedatectl set-local-rtc $rtc_local_timezone
 ## network time protocol
 timedatectl set-ntp $sync_system_clock_over_ntp
 ## timezone
