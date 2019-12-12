@@ -269,9 +269,9 @@ set_partition_sizes() {
 
 	## recommended percentages of $lvm_size_calc
 	root_perc=0.01
-	home_perc=0.44
-	usr_perc=0.29
-	var_perc=0.29
+	home_perc=0.40
+	usr_perc=0.25
+	var_perc=0.25
 
 	root_size_calc=`echo "$root_perc * $lvm_size_calc" | bc`
 	home_size_calc=`echo "$home_perc * $lvm_size_calc" | bc`
