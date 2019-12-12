@@ -52,7 +52,7 @@ For debug purposes it can be useful to review an logging of the installation pro
 Create a full debug log of the installation with:
 
 ```
-sh -xv hajime/1base.sh | tee hajime/1base.log
+sh hajime/1base.sh | tee hajime/1base.log
 ```
 
 After execution of the 1base.sh script is finished, copy the log file to the arch-chroot environment:
@@ -64,14 +64,14 @@ mv /hajime/1base.log /mnt/hajime/1base.log
 The log of the second script can be directly written in de arch-chroot environment:
 
 ```
-sh -xv hajime/2conf.sh | tee /mnt/hajime/2conf.log
+sh hajime/2conf.sh | tee /mnt/hajime/2conf.log
 ```
 
 From the third script the installation process is running inside the operating system environment,
 therefore logs can be written to the home folder of the current user:
 
 ```
-sh -xv hajime/3post.sh | tee $HOME/hajime/3post.log
+sh hajime/3post.sh | tee $HOME/hajime/3post.log
 ```
 
 # resource reference
