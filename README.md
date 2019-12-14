@@ -27,8 +27,8 @@ The third script prepares the system 'post install' for the installation of a de
 ### 4  Apps
 'hajime apps' prepares the system for a display manager running under Wayland, with wlroots as a modular compositor library. The script will setup the Sway tiling window manager, but it can easily be modifed to be setup for X11 based managers, when preferred. It also installs a variety of tools, among others for: video, text, file management, network management, internet, system monitoring, virtual environments.
 
-### 5  Dtcg
-'dtcg' installs the dotfile configuration, which contains settings for the apps and window manager to run smoothly.
+### 5  Dtcf
+'dtcf' installs the dotfile configuration, which contains settings for the apps and window manager to run smoothly.
 
 
 ## Take off instructions
@@ -48,7 +48,7 @@ From here run the scripts in numerical order and follow the in-script instructio
 ---
 
 ## install log
-For debug purposes it can be useful to review an logging of the installation process.
+For debug purposes it can be useful to be able to review an logging of the installation process.
 Create a full debug log of the installation with:
 
 ```
@@ -58,7 +58,7 @@ sh hajime/1base.sh | tee hajime/1base.log
 After execution of the 1base.sh script is finished, copy the log file to the arch-chroot environment:
 
 ```
-mv /hajime/1base.log /mnt/hajime/1base.log
+mv /root/hajime/1base.log /mnt/hajime/1base.log
 ```
 
 The log of the second script can be directly written in de arch-chroot environment:
@@ -73,6 +73,8 @@ therefore logs can be written to the home folder of the current user:
 ```
 sh hajime/3post.sh | tee $HOME/hajime/3post.log
 ```
+
+Be aware of the fact that writing to debug logs can cause some troubles with proper execution of the installation scripts.
 
 # resource reference
 
