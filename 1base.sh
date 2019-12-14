@@ -23,8 +23,6 @@
 
 
 # user customizable variables
-terminus_font="terminus-font"
-console_font="ter-v16n"
 timezone="Europe/Amsterdam"
 sync_system_clock_over_ntp="true"
 rtc_local_timezone="0"
@@ -32,6 +30,8 @@ arch_mirrorlist="https://www.archlinux.org/mirrorlist/?country=NL&protocol=http&
 mirror_country="Netherlands"
 mirror_amount="5"
 install_helpers="reflector"
+#terminus_font="terminus-font"
+#console_font="ter-v16n"
 
 
 # define reply functions
@@ -284,7 +284,7 @@ set_partition_sizes() {
 	printf "ROOT partition size (GB)? [$root_size_calc] "
 	root_size_calc=0
 	reply_plain
-        root_size_calc=$reply
+        root_size_calc="`echo "$reply * 1" | bc`"
         if [ -z "$root_size_calc" ]; then
                 root_size_calc="`echo "$root_perc * $lvm_size_calc" | bc`"
         fi
@@ -295,7 +295,7 @@ set_partition_sizes() {
 	printf "HOME partition size (GB)? [$home_size_calc] "
 	home_size_calc=0
 	reply_plain
-        home_size_calc=$reply
+        home_size_calc="`echo "$reply * 1" | bc`"
         if [ -z "$home_size_calc" ]; then
                 home_size_calc="`echo "$home_perc * $lvm_size_calc" | bc`"
         fi
@@ -306,7 +306,7 @@ set_partition_sizes() {
 	printf "USR  partition size (GB)? [$usr_size_calc] "
 	usr_size_calc=0
 	reply_plain
-	usr_size_calc=$reply
+	usr_size_calc="`echo "$reply * 1" | bc`"
         if [ -z "$usr_size_calc" ]; then
                 usr_size_calc="`echo "$usr_perc * $lvm_size_calc" | bc`"
         fi
@@ -317,7 +317,7 @@ set_partition_sizes() {
 	printf "VAR  partition size (GB)? [$var_size_calc] "
 	var_size_calc=0
 	reply_plain
-	var_size_calc=$reply
+	var_size_calc="`echo "$reply * 1" | bc`"
         if [ -z "$var_size_calc" ]; then
                 var_size_calc="`echo "$var_perc * $lvm_size_calc" | bc`"
         fi
