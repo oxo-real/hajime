@@ -1,4 +1,5 @@
 #!/bin/bash
+
 #
 ##
 ###
@@ -27,6 +28,7 @@ clear
 
 
 # user customizable variables
+tmux_plugin_dir="$HOME/.config/tmux/plugins"
 
 ## core applications
 
@@ -93,6 +95,7 @@ video_tools="youtube-dl mpv youtube-viewer"
 
 weather="wttr metar"
 
+
 #[TODO]
 #photo_editing="gimp"
 
@@ -153,6 +156,10 @@ yay -Sy --noconfirm \
 ## fzf
 git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
 ~/.fzf/install
+
+
+## tmux_plugin_manager
+git clone https://github.com/tmux-plugins/tpm $tmux_plugin_dir/tpm
 
 
 # reset /usr read-only
