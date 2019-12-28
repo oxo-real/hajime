@@ -34,7 +34,7 @@ tmux_plugin_dir="$HOME/.config/tmux/plugins"
 
 wayland="wlroots-git"
 
-dwm="sway-git swaylock-git i3blocks grim-git"
+dwm="sway-git swaylock i3blocks grim-git"
 
 shell="zsh"
 
