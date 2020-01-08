@@ -118,10 +118,11 @@ mozilla_firefox() {
 	[ -d ~/Downloads ] && rm -rf ~/Downloads
 	[ -d ~/.mozilla ] && rm -rf ~/.mozilla
 	git clone https://gitlab.com/cytopyge/ffxd_init ~/.mozilla
+
 	## activate addons branch
-	cd ~/.mozilla
-	git checkout -f addons
-	cd ~
+	#cd ~/.mozilla
+	#git checkout -f addons
+	#cd ~
 
 }
 
