@@ -282,50 +282,43 @@ set_partition_sizes() {
 	## ROOT partition
 	echo
 	printf "ROOT partition size (GB)? [$root_size_calc] "
-	root_size_calc=0
 	reply_plain
-        root_size_calc="`echo "$reply * 1" | bc`"
-        if [ -z "$root_size_calc" ]; then
-                root_size_calc="`echo "$root_perc * $lvm_size_calc" | bc`"
+        if [ ! -z "$reply" ]; then
+            root_size_calc="`echo "$reply * 1" | bc`"
         fi
 	### remove decimals
 	root_size="${root_size_calc%%.*}"
 
 	## HOME partition
 	printf "HOME partition size (GB)? [$home_size_calc] "
-	home_size_calc=0
 	reply_plain
-        home_size_calc="`echo "$reply * 1" | bc`"
-        if [ -z "$home_size_calc" ]; then
-                home_size_calc="`echo "$home_perc * $lvm_size_calc" | bc`"
+        if [ ! -z "$reply" ]; then
+            home_size_calc="`echo "$reply * 1" | bc`"
         fi
 	### remove decimals
 	home_size="${home_size_calc%%.*}"
 
 	## USR  partition
 	printf "USR  partition size (GB)? [$usr_size_calc] "
-	usr_size_calc=0
 	reply_plain
-	usr_size_calc="`echo "$reply * 1" | bc`"
-        if [ -z "$usr_size_calc" ]; then
-                usr_size_calc="`echo "$usr_perc * $lvm_size_calc" | bc`"
+        if [ ! -z "$reply" ]; then
+            usr_size_calc="`echo "$reply * 1" | bc`"
         fi
 	### remove decimals
 	usr_size="${usr_size_calc%%.*}"
 
 	## VAR  partition
 	printf "VAR  partition size (GB)? [$var_size_calc] "
-	var_size_calc=0
+	#var_size_calc=0
 	reply_plain
-	var_size_calc="`echo "$reply * 1" | bc`"
-        if [ -z "$var_size_calc" ]; then
-                var_size_calc="`echo "$var_perc * $lvm_size_calc" | bc`"
+        if [ ! -z "$reply" ]; then
+            var_size_calc="`echo "$reply * 1" | bc`"
         fi
 	### remove decimals
 	var_size="${var_size_calc%%.*}"
 
 	## total
-	total_size_calc="`echo "$root_size + $home_size + $var_size + $usr_size + $swap_size" | bc`"
+	total_size_calc="`echo "$root_size + $home_size + $usr_size + $var_size + $swap_size" | bc`"
 	diff_total_lvm_calc="`echo "$total_size_calc - $lvm_size_calc" | bc`"
 	diff_t="$(echo $diff_total_lvm_calc | awk -F . '{print $1}')"
 	echo
@@ -379,6 +372,10 @@ if printf "$reply" | grep -iq "^y" ; then
 	sleep 1
 	clear
 else
+    echo
+    echo
+    echo
+    printf " Yame! "
 	exit_hajime
 fi
 
