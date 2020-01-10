@@ -75,7 +75,8 @@ exit_hajime () {
         echo
 	sleep 1
 	printf " Bye!\n"
-	echo
+	sleep 1
+	clear
         exit
 
 }
