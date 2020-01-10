@@ -178,7 +178,7 @@ set_boot_partition() {
 	reply_plain
 
 	# boot partition is compulsory
-	if [ -z "$reply_plain" ]; then
+	if [ -z "$reply" ]; then
 	    printf "invalid partition number\n"
 	    sleep 1
 	    set_boot_partition
