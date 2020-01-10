@@ -84,7 +84,7 @@ exit_hajime () {
 set_boot_device() {
 
 	## lsblk for human
-	lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
+	lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint
 	echo
 
 
@@ -94,7 +94,7 @@ set_boot_device() {
 	boot_dev=$reply
 
 	echo
-	printf "$(lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint | grep $boot_dev)\n"
+	printf "$(lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint | grep $boot_dev)\n"
 	echo
 
 	printf "BOOT device: '$boot_dev', correct? (Y/n) "
@@ -126,7 +126,7 @@ set_boot_device() {
 set_lvm_device() {
 
 	## lsblk for human
-	lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
+	lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint
 	echo
 
 
@@ -136,7 +136,7 @@ set_lvm_device() {
 	lvm_dev=$reply
 
 	echo
-	printf "$(lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint | grep $lvm_dev)\n"
+	printf "$(lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint | grep $lvm_dev)\n"
 	echo
 
 	printf "LVM device: '$lvm_dev', correct? (Y/n) "
@@ -170,7 +170,7 @@ set_boot_partition() {
 	## dialog
 	## lsblk for human
 	clear
-	lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
+	lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint
 	echo
 
 	printf "enter BOOT partition number: $boot_dev"
@@ -179,7 +179,7 @@ set_boot_partition() {
 	boot_part=$boot_dev$boot_part_no
 
 	echo
-	printf "$(lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint | grep $boot_dev)\n"
+	printf "$(lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint | grep $boot_dev)\n"
 	echo
 
 	printf "the full BOOT partition is: '$boot_part', correct? (Y/n) "
@@ -202,7 +202,7 @@ set_lvm_partition() {
 	## dialog
 	## lsblk for human
 	clear
-	lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
+	lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint
 	echo
 
 	printf "enter LVM partition number: $lvm_dev"
@@ -211,7 +211,7 @@ set_lvm_partition() {
 	lvm_part=$lvm_dev$lvm_part_no
 
 	echo
-	printf "$(lsblk -i --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint | grep $lvm_dev)\n"
+	printf "$(lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint | grep $lvm_dev)\n"
 	echo
 
 	printf "the full LVM partition is: '$lvm_part', correct? (Y/n) "
