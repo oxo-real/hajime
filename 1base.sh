@@ -176,6 +176,14 @@ set_boot_partition() {
 
 	printf "enter BOOT partition number: $boot_dev"
 	reply_plain
+
+	# boot partition is compulsory
+	if [ -z "$reply_plain" ]; then
+	    printf "invalid partition number\n"
+	    sleep 1
+	    set_boot_partition
+	fi
+	
 	boot_part_no=$reply
 	boot_part=$boot_dev$boot_part_no
 
