@@ -48,7 +48,7 @@ password_security="pass-wl-clipboard bitwarden-cli"
 
 encryption="veracrypt"
 
-secure_connections="wireguard-tools openvpn protonvpn-cli-ng"
+secure_connections="wireguard-tools openvpn"
 
 fonts="terminus-font ttf-inconsolata"
 
