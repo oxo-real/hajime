@@ -93,17 +93,15 @@ pdf_viewers="mupdf zathura-pdf-mupdf"
 
 video_tools="youtube-dl mpv youtube-viewer"
 
+photo_editing="" #"gimp"
+
+photo_management="" #"digikam darktable"
+
+vector_graphics_editing="" #"inkscape"
+
+office_tools="" #"libreoffice-fresh libreoffice-fresh-nl"
+
 weather="wttr metar"
-
-
-#[TODO]
-#photo_editing="gimp"
-
-#[TODO]
-## which one prefers?
-#photo_management="digikam darktable"
-
-#office_tools="libreoffice-fresh libreoffice-fresh-nl"
 
 
 # set /usr writeable
@@ -147,6 +145,7 @@ yay -Sy --noconfirm \
 	$video_tools \
 	$photo_editing \
 	$photo_management \
+	$vector_graphics_editing \
 	$office_tools \
 	$weather
 
