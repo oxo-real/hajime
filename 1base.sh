@@ -103,7 +103,7 @@ set_boot_device() {
 	    printf "invalid device path!\n"
 	    printf "'$boot_dev' is current bootmnt\n"
 	    printf "please try again"
-	    sleep 2
+	    sleep 4
 	    clear
 	    set_boot_device
 	fi
@@ -151,7 +151,7 @@ set_lvm_device() {
 	    printf "invalid device path!\n"
 	    printf "'$lvm_dev' is current bootmnt\n"
 	    printf "please try again"
-	    sleep 2
+	    sleep 4
 	    clear
 	    set_boot_device
 	fi
