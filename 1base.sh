@@ -95,7 +95,7 @@ set_boot_device() {
 	boot_dev=$reply
 
 	echo
-	printf "$(lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint | grep $boot_dev)\n"
+	printf "$(lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint | grep "$boot_dev")\n"
 	echo
 
 	if [ "$boot_dev" == "$bootmnt_dev" ] ; then
@@ -104,6 +104,7 @@ set_boot_device() {
 	    printf "'$boot_dev' is current bootmnt\n"
 	    printf "please try again"
 	    sleep 2
+	    clear
 	    set_boot_device
 	fi
 	
@@ -151,11 +152,12 @@ set_lvm_device() {
 	    printf "'$lvm_dev' is current bootmnt\n"
 	    printf "please try again"
 	    sleep 2
+	    clear
 	    set_boot_device
 	fi
 	
 	echo
-	printf "$(lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint | grep $lvm_dev)\n"
+	printf "$(lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint | grep "$lvm_dev")\n"
 	echo
 
 	printf "LVM device: '$lvm_dev', correct? (Y/n) "
