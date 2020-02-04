@@ -98,6 +98,15 @@ set_boot_device() {
 	printf "$(lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint | grep $boot_dev)\n"
 	echo
 
+	if [ "$boot_dev" == "$bootmnt_dev" ] ; then
+	    echo
+	    printf "invalid device path!\n"
+	    printf "'$boot_dev' is current bootmnt\n"
+	    printf "please try again"
+	    sleep 2
+	    set_boot_device
+	fi
+	
 	printf "BOOT device: '$boot_dev', correct? (Y/n) "
 	reply_single_hidden
 	if printf "$reply" | grep -iq "^n" ; then
@@ -136,6 +145,15 @@ set_lvm_device() {
 	reply_plain
 	lvm_dev=$reply
 
+	if [ "$lvm_dev" == "$bootmnt_dev" ] ; then
+	    echo
+	    printf "invalid device path!\n"
+	    printf "'$lvm_dev' is current bootmnt\n"
+	    printf "please try again"
+	    sleep 2
+	    set_boot_device
+	fi
+	
 	echo
 	printf "$(lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint | grep $lvm_dev)\n"
 	echo
@@ -387,6 +405,10 @@ else
     printf " Yame! "
 	exit_hajime
 fi
+
+
+# get current bootmount blockdevice name
+bootmnt_dev=$(mount | grep bootmnt | awk '{print $1}')
 
 
 # network setup

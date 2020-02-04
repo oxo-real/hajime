@@ -83,7 +83,7 @@ download_utilities="aria2 transmission-cli transmission-remote-cli-git"
 
 system_monitoring="glances ccze"
 
-virtual_machines="" #"virtualbox virtualbox-host-modules-arch"
+virtualization="docker" #"virtualbox virtualbox-host-modules-arch"
 
 image_viewers="feh imv"
 
@@ -138,7 +138,7 @@ yay -Sy --noconfirm \
 	$time_management \
 	$download_utilities \
 	$system_monitoring \
-	$virtual_machines \
+	$virtualization \
 	$image_viewers \
 	$image_editors \
 	$pdf_viewers \
