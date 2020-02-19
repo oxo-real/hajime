@@ -1,23 +1,23 @@
 #!/bin/bash
 #
 ##
-printf "  _            _ _                  _
-printf " | |__   __ _ (_|_)_ __ ___   ___  | |__   __ _ ___  ___
-printf " | '_ \ / _` || | | '_ ` _ \ / _ \ | '_ \ / _` / __|/ _ \
-printf " | | | | (_| || | | | | | | |  __/ | |_) | (_| \__ \  __/
-printf " |_| |_|\__,_|/ |_|_| |_| |_|\___| |_.__/ \__,_|___/\___|1
-printf "            |__/
-printf "
-printf "  _ _|_ _ ._    _  _
-printf " (_\/|_(_)|_)\/(_|(/_
-printf "   /      |  /  _|
-printf "
-printf " hajime_base
-printf " cytopyge arch linux installation 'base'
-printf " first part of a series
-printf "
-printf " (c) 2019 cytopyge
-printf "
+###  _            _ _                  _
+### | |__   __ _ (_|_)_ __ ___   ___  | |__   __ _ ___  ___
+### | '_ \ / _` || | | '_ ` _ \ / _ \ | '_ \ / _` / __|/ _ \
+### | | | | (_| || | | | | | | |  __/ | |_) | (_| \__ \  __/
+### |_| |_|\__,_|/ |_|_| |_| |_|\___| |_.__/ \__,_|___/\___|1
+###            |__/
+###
+###  _ _|_ _ ._    _  _
+### (_\/|_(_)|_)\/(_|(/_
+###   /      |  /  _|
+###
+### hajime_base
+### cytopyge arch linux installation 'base'
+### first part of a series
+###
+### (c) 2019 cytopyge
+###
 ##
 #
 
@@ -32,6 +32,20 @@ mirror_amount="5"
 install_helpers="reflector"
 #terminus_font="terminus-font"
 #console_font="ter-v16n"
+
+
+# define text appearance
+
+## text color
+RED='\033[0;31m' # red
+GREEN='\033[0;32m' # green
+NOC='\033[0m' # no color
+
+## text style
+UL=`tput smul`
+NUL=`tput rmul`
+BOLD=`tput bold`
+NORMAL=`tput sgr0`
 
 
 # define reply functions
@@ -63,19 +77,6 @@ reply_single_hidden() {
         reply=$(head -c 1)
 	stty $stty_0
 
-}
-
-
-hajime_title() {
-
-echo
-echo $'  _            _ _                \n'
-echo $' | |__   __ _ (_|_)_ __ ___   ___ \n'
-echo $' | '_ \ / _` || | | '_ ` _ \ / _ \\n'
-echo $' | | | | (_| || | | | | | | |  __/\n'
-echo $' |_| |_|\__,_|/ |_|_| |_| |_|\___|\n'
-echo $'            |__/			 \n'
-echo
 }
 
 
@@ -298,9 +299,9 @@ set_partition_sizes() {
 	        if [ -z "$swap_size_calc" ]; then
         	        swap_size_calc=$swap_size_recomm
         	fi
-		printf " remove decimals
+		### remove decimals
 		swap_size="${swap_size_calc%%.*}"
-		printf " correct $lvm_size_calc
+		### correct $lvm_size_calc
 		lvm_size_calc="`echo "$lvm_size_calc - $swap_size" | bc`"
 		#lvm_size_calc=`echo "$lvm_size_calc - $swap_size_calc" | bc`
 	else
@@ -319,7 +320,7 @@ set_partition_sizes() {
 	home_size_calc=`echo "$home_perc * $lvm_size_calc" | bc`
 	usr_size_calc=`echo "$usr_perc * $lvm_size_calc" | bc`
 	var_size_calc=`echo "$var_perc * $lvm_size_calc" | bc`
-	printf "[TODO] calculate using awk (posix compliance without bc)
+	###[TODO] calculate using awk (posix compliance without bc)
 
 	## ROOT partition
 	echo
@@ -328,7 +329,7 @@ set_partition_sizes() {
         if [ ! -z "$reply" ]; then
             root_size_calc="`echo "$reply * 1" | bc`"
         fi
-	printf " remove decimals
+	### remove decimals
 	root_size="${root_size_calc%%.*}"
 
 	## HOME partition
@@ -337,7 +338,7 @@ set_partition_sizes() {
         if [ ! -z "$reply" ]; then
             home_size_calc="`echo "$reply * 1" | bc`"
         fi
-	printf " remove decimals
+	### remove decimals
 	home_size="${home_size_calc%%.*}"
 
 	## USR  partition
@@ -346,7 +347,7 @@ set_partition_sizes() {
         if [ ! -z "$reply" ]; then
             usr_size_calc="`echo "$reply * 1" | bc`"
         fi
-	printf " remove decimals
+	### remove decimals
 	usr_size="${usr_size_calc%%.*}"
 
 	## VAR  partition
@@ -356,7 +357,7 @@ set_partition_sizes() {
         if [ ! -z "$reply" ]; then
             var_size_calc="`echo "$reply * 1" | bc`"
         fi
-	printf " remove decimals
+	### remove decimals
 	var_size="${var_size_calc%%.*}"
 
 	## total
@@ -386,22 +387,22 @@ set_partition_sizes() {
 
 # clear screen
 clear
-hajime_title
 echo
 printf " Irasshaimase!\n"
 echo
 echo
-printf " CAUTION!\n"
-printf " This is hajime.\n"
-printf " These scripts will overwrite any existing data on target devices!\n"
-printf " By continuing you will testify that you know what you are doing.\n"
+printf " ${RED}CAUTION${NOC}\n"
+printf " This is Hajime!\n"
+echo
+printf " Continuing will ${BOLD}overwrite existing data${NORMAL} on designated devices.\n"
+printf " By continuing you will testify that you know what you are doing!\n"
 echo
 printf " Be sure to have the most recent version of the arch installation image!\n"
-printf " Use cytopyge's 'isolatest' to get the most recent authentic iso image.\n"
-printf " You can download it via: http://gitlab.com/cytopyge/isolatest\n"
-printf " Or retrieve your installation image via: https://www/archlinux.org/download/\n"
+printf " Use the 'isolatest' package to get the most recent authentic iso image.\n"
+printf " You can download it via: ${UL}http://gitlab.com/cytopyge/isolatest${NUL}\n"
+printf " Or retrieve an installation image via: ${UL}https://www/archlinux.org/download/${NUL}\n"
 echo
-printf " Are you really sure to continue? (y/N) "
+printf " Are you sure to continue? (y/N) "
 
 
 reply_single
@@ -541,7 +542,7 @@ reflector --verbose --country $mirror_country -l $mirror_amount --sort rate --sa
 
 
 # install base & base-devel package groups
-printf " TODO bring to $pacstrap
+### TODO bring to $pacstrap
 pacstrap -i /mnt base linux linux-firmware sudo dhcpcd lvm2 git binutils
 
 
