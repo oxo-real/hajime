@@ -16,7 +16,7 @@
 ### cytopyge arch linux installation 'base'
 ### first part of a series
 ###
-### (c) 2019 cytopyge
+### (c) 2019 - 2020 cytopyge
 ###
 ##
 #
@@ -388,14 +388,17 @@ set_partition_sizes() {
 # clear screen
 clear
 echo
-printf " Irasshaimase!\n"
+printf " HAJIME\n"
+printf " 2019 - 2020 (c) cytopyge\n"
 echo
 echo
 printf " ${RED}CAUTION${NOC}\n"
-printf " This is Hajime!\n"
+printf " Hajime will install a bleeding edge arch linux operating system on this machine.\n"
 echo
 printf " Continuing will ${BOLD}overwrite existing data${NORMAL} on designated devices.\n"
-printf " By continuing you will testify that you know what you are doing!\n"
+printf " Though under continuous development; \n"
+printf " All scripts are provided as is without warranty of any kind.\n"
+printf " By pressing 'y' you will acknowledge and continue at your own risk.\n"
 echo
 printf " Be sure to have the most recent version of the arch installation image!\n"
 printf " Use the 'isolatest' package to get the most recent authentic iso image.\n"
