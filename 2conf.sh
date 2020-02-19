@@ -156,15 +156,18 @@ set_username() {
 
 		echo
 		read -p "enter username: " username
-		printf "username:	'$username', correct? (Y/n) "
+		printf "username: '$username', correct? (Y/n) "
 		reply
 
 		if printf "$reply" | grep -iq "^n"; then
 
-			clear
-			set_username
+		    clear
+		    set_username
+		    
 		else
-			printf "using '$username' as username\n"
+		    
+		    echo
+		    printf "using '$username' as username\n"
 
 		fi
 
@@ -177,11 +180,13 @@ set_username() {
 
 		if printf "$reply" | grep -iq "^n"; then
 
-			clear
-			set_username
+		    clear
+		    set_username
+		    
 		else
-				echo
-				printf "using '$username' as username\n"
+		    
+		    echo
+		    printf "using '$username' as username\n"
 
 		fi
 

@@ -30,8 +30,6 @@ arch_mirrorlist="https://www.archlinux.org/mirrorlist/?country=NL&protocol=http&
 mirror_country="Netherlands"
 mirror_amount="5"
 install_helpers="reflector"
-#terminus_font="terminus-font"
-#console_font="ter-v16n"
 
 
 # define text appearance
@@ -46,6 +44,9 @@ UL=`tput smul`
 NUL=`tput rmul`
 BOLD=`tput bold`
 NORMAL=`tput sgr0`
+
+#terminus_font="terminus-font"
+#console_font="ter-v16n"
 
 
 # define reply functions
