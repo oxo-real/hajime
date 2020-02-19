@@ -402,7 +402,7 @@ printf " By pressing 'y' you will acknowledge and continue at your own risk.\n"
 echo
 printf " Be sure to have the most recent version of the arch installation image!\n"
 printf " Use the 'isolatest' package to get the most recent authentic iso image.\n"
-printf " You can download it via: ${UL}http://gitlab.com/cytopyge/isolatest${NUL}\n"
+printf " You can download your copy via: ${UL}http://gitlab.com/cytopyge/isolatest${NUL}\n"
 printf " Or retrieve an installation image via: ${UL}https://www/archlinux.org/download/${NUL}\n"
 echo
 printf " Are you sure to continue? (y/N) "
