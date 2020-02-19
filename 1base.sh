@@ -1,23 +1,23 @@
 #!/bin/bash
 #
 ##
-###  _            _ _                  _
-### | |__   __ _ (_|_)_ __ ___   ___  | |__   __ _ ___  ___
-### | '_ \ / _` || | | '_ ` _ \ / _ \ | '_ \ / _` / __|/ _ \
-### | | | | (_| || | | | | | | |  __/ | |_) | (_| \__ \  __/
-### |_| |_|\__,_|/ |_|_| |_| |_|\___| |_.__/ \__,_|___/\___|1
-###            |__/
-###
-###  _ _|_ _ ._    _  _
-### (_\/|_(_)|_)\/(_|(/_
-###   /      |  /  _|
-###
-### hajime_base
-### cytopyge arch linux installation 'base'
-### first part of a series
-###
-### (c) 2019 cytopyge
-###
+printf "  _            _ _                  _
+printf " | |__   __ _ (_|_)_ __ ___   ___  | |__   __ _ ___  ___
+printf " | '_ \ / _` || | | '_ ` _ \ / _ \ | '_ \ / _` / __|/ _ \
+printf " | | | | (_| || | | | | | | |  __/ | |_) | (_| \__ \  __/
+printf " |_| |_|\__,_|/ |_|_| |_| |_|\___| |_.__/ \__,_|___/\___|1
+printf "            |__/
+printf "
+printf "  _ _|_ _ ._    _  _
+printf " (_\/|_(_)|_)\/(_|(/_
+printf "   /      |  /  _|
+printf "
+printf " hajime_base
+printf " cytopyge arch linux installation 'base'
+printf " first part of a series
+printf "
+printf " (c) 2019 cytopyge
+printf "
 ##
 #
 
@@ -63,6 +63,19 @@ reply_single_hidden() {
         reply=$(head -c 1)
 	stty $stty_0
 
+}
+
+
+hajime_title() {
+
+echo
+echo $'  _            _ _                \n'
+echo $' | |__   __ _ (_|_)_ __ ___   ___ \n'
+echo $' | '_ \ / _` || | | '_ ` _ \ / _ \\n'
+echo $' | | | | (_| || | | | | | | |  __/\n'
+echo $' |_| |_|\__,_|/ |_|_| |_| |_|\___|\n'
+echo $'            |__/			 \n'
+echo
 }
 
 
@@ -285,9 +298,9 @@ set_partition_sizes() {
 	        if [ -z "$swap_size_calc" ]; then
         	        swap_size_calc=$swap_size_recomm
         	fi
-		### remove decimals
+		printf " remove decimals
 		swap_size="${swap_size_calc%%.*}"
-		### correct $lvm_size_calc
+		printf " correct $lvm_size_calc
 		lvm_size_calc="`echo "$lvm_size_calc - $swap_size" | bc`"
 		#lvm_size_calc=`echo "$lvm_size_calc - $swap_size_calc" | bc`
 	else
@@ -306,7 +319,7 @@ set_partition_sizes() {
 	home_size_calc=`echo "$home_perc * $lvm_size_calc" | bc`
 	usr_size_calc=`echo "$usr_perc * $lvm_size_calc" | bc`
 	var_size_calc=`echo "$var_perc * $lvm_size_calc" | bc`
-	###[TODO] calculate using awk (posix compliance without bc)
+	printf "[TODO] calculate using awk (posix compliance without bc)
 
 	## ROOT partition
 	echo
@@ -315,7 +328,7 @@ set_partition_sizes() {
         if [ ! -z "$reply" ]; then
             root_size_calc="`echo "$reply * 1" | bc`"
         fi
-	### remove decimals
+	printf " remove decimals
 	root_size="${root_size_calc%%.*}"
 
 	## HOME partition
@@ -324,7 +337,7 @@ set_partition_sizes() {
         if [ ! -z "$reply" ]; then
             home_size_calc="`echo "$reply * 1" | bc`"
         fi
-	### remove decimals
+	printf " remove decimals
 	home_size="${home_size_calc%%.*}"
 
 	## USR  partition
@@ -333,7 +346,7 @@ set_partition_sizes() {
         if [ ! -z "$reply" ]; then
             usr_size_calc="`echo "$reply * 1" | bc`"
         fi
-	### remove decimals
+	printf " remove decimals
 	usr_size="${usr_size_calc%%.*}"
 
 	## VAR  partition
@@ -343,7 +356,7 @@ set_partition_sizes() {
         if [ ! -z "$reply" ]; then
             var_size_calc="`echo "$reply * 1" | bc`"
         fi
-	### remove decimals
+	printf " remove decimals
 	var_size="${var_size_calc%%.*}"
 
 	## total
@@ -373,6 +386,7 @@ set_partition_sizes() {
 
 # clear screen
 clear
+hajime_title
 echo
 printf " Irasshaimase!\n"
 echo
@@ -527,7 +541,7 @@ reflector --verbose --country $mirror_country -l $mirror_amount --sort rate --sa
 
 
 # install base & base-devel package groups
-### TODO bring to $pacstrap
+printf " TODO bring to $pacstrap
 pacstrap -i /mnt base linux linux-firmware sudo dhcpcd lvm2 git binutils
 
 
