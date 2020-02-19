@@ -67,7 +67,7 @@ terminal_file_browser="nnn vifm lf-git"
 
 file_tools="srm rsync gdisk"
 
-network_tools="wireshark-cli wireshark-qt mtr iftop"
+network_tools="wireshark-cli wireshark-qt mtr iftop bind-tools"
 
 internet_tools="firefox-developer-edition qutebrowser urlscan"
 
