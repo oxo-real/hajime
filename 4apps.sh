@@ -79,6 +79,8 @@ contact_management="abook"
 
 time_management="calcurse"
 
+accounting="ledger"
+
 download_utilities="aria2 transmission-cli transmission-remote-cli-git"
 
 system_monitoring="glances ccze"
@@ -136,6 +138,7 @@ yay -Sy --noconfirm \
 	$email \
 	$contact_management \
 	$time_management \
+	$accounting \
 	$download_utilities \
 	$system_monitoring \
 	$virtualization \
