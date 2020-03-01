@@ -122,7 +122,7 @@ set_boot_device() {
 	    clear
 	    set_boot_device
 	fi
-	
+
 	printf "BOOT device: '$boot_dev', correct? (Y/n) "
 	reply_single_hidden
 	if printf "$reply" | grep -iq "^n" ; then
@@ -170,7 +170,7 @@ set_lvm_device() {
 	    clear
 	    set_boot_device
 	fi
-	
+
 	echo
 	printf "$(lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint | grep "$lvm_dev")\n"
 	echo
@@ -218,7 +218,7 @@ set_boot_partition() {
 	    sleep 1
 	    set_boot_partition
 	fi
-	
+
 	boot_part_no=$reply
 	boot_part=$boot_dev$boot_part_no
 
@@ -388,9 +388,7 @@ set_partition_sizes() {
 
 # clear screen
 clear
-echo
-printf " HAJIME\n"
-printf " 2019 - 2020 (c) cytopyge\n"
+printf " hajime (c) 2019 - 2020 cytopyge\n"
 echo
 echo
 printf " ${RED}CAUTION${NOC}\n"
