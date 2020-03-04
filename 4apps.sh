@@ -103,8 +103,6 @@ vector_graphics_editing="" #"inkscape"
 
 office_tools="" #"libreoffice-fresh libreoffice-fresh-nl"
 
-weather="wttr metar"
-
 
 # set /usr writeable
 sudo mount -o remount,rw  /usr
@@ -149,8 +147,7 @@ yay -Sy --noconfirm \
 	$photo_editing \
 	$photo_management \
 	$vector_graphics_editing \
-	$office_tools \
-	$weather
+	$office_tools
 
 
 # loose ends
