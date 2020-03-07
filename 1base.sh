@@ -395,9 +395,10 @@ printf " ${RED}CAUTION${NOC}\n"
 printf " Hajime will install a bleeding edge arch linux operating system on this machine.\n"
 echo
 printf " Continuing will ${BOLD}overwrite existing data${NORMAL} on designated devices.\n"
-printf " Though under continuous development; \n"
-printf " All scripts are provided as is without warranty of any kind.\n"
-printf " By pressing 'y' you will acknowledge and continue at your own risk.\n"
+printf " This software is subject to continuous development; \n"
+printf " By entering 'y' or 'Y' below you will consent to the following:\n"
+printf " This software is provided as is without warranty of any kind.\n"
+printf " Continuing execution of this software is at your own risk.\n"
 echo
 printf " Be sure to have the most recent version of the arch installation image!\n"
 printf " Use the 'isolatest' package to get the most recent authentic iso image.\n"
