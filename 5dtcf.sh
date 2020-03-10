@@ -135,40 +135,6 @@ mozilla_firefox
 cd ~/_git
 
 
-# recover public git repositories
-
-## hajime
-clear
-git clone https://gitlab.com/cytopyge/hajime
-### git/hajime becomes the git repo;
-### remove git repo from install directory
-rm -rf $HOME/hajime/.git
-
-## notes
-clear
-git clone https://gitlab.com/cytopyge/notes
-
-## prepare system core code environment
-[ -d ~/_git/code ] || mkdir ~/_git/code
-cd ~/_git/code
-
-## bwsession
-clear
-git clone https://gitlab.com/cytopyge/bwsession
-
-## updater
-clear
-git clone https://gitlab.com/cytopyge/updater
-
-## isolatest
-clear
-git clone https://gitlab.com/cytopyge/isolatest
-
-## netconn
-clear
-git clone https://gitlab.com/cytopyge/netconn
-
-
 finishing_up() {
 
 	# finishing
@@ -195,6 +161,54 @@ finishing_up() {
 	fi
 
 }
+
+
+# recover public git repositories
+
+
+## code
+### prepare system core code environment
+[ -d ~/_git/code ] || mkdir ~/_git/code
+cd ~/_git/code
+
+### bwsession
+clear
+git clone https://gitlab.com/cytopyge/bwsession
+
+### hajime
+clear
+git clone https://gitlab.com/cytopyge/hajime
+#### git/hajime becomes the git repo;
+#### remove git repo from install directory
+rm -rf $HOME/hajime/.git
+
+### isolatest
+clear
+git clone https://gitlab.com/cytopyge/isolatest
+
+### metar
+clear
+git clone https://gitlab.com/cytopyge/metar
+
+### netconn
+clear
+git clone https://gitlab.com/cytopyge/netconn
+
+### snippets
+clear
+git clone https://gitlab.com/cytopyge/snippets
+
+### tools
+clear
+git clone https://gitlab.com/cytopyge/tools
+
+### updater
+clear
+git clone https://gitlab.com/cytopyge/updater
+
+## notes
+clear
+git clone https://gitlab.com/cytopyge/notes
 
 
 recover_cytopyge_private_git() {
