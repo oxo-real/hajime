@@ -30,6 +30,7 @@ arch_mirrorlist="https://www.archlinux.org/mirrorlist/?country=NL&protocol=http&
 mirror_country="Netherlands"
 mirror_amount="5"
 install_helpers="reflector"
+to_pacstrap="base linux linux-firmware sudo dhcpcd lvm2 git binutils"
 
 
 # define text appearance
@@ -321,7 +322,7 @@ set_partition_sizes() {
 	home_size_calc=`echo "$home_perc * $lvm_size_calc" | bc`
 	usr_size_calc=`echo "$usr_perc * $lvm_size_calc" | bc`
 	var_size_calc=`echo "$var_perc * $lvm_size_calc" | bc`
-	###[TODO] calculate using awk (posix compliance without bc)
+	###[TODO] calculate using awk (for posix compliance without bc)
 
 	## ROOT partition
 	echo
@@ -545,8 +546,8 @@ reflector --verbose --country $mirror_country -l $mirror_amount --sort rate --sa
 
 
 # install base & base-devel package groups
-### TODO bring to $pacstrap
-pacstrap -i /mnt base linux linux-firmware sudo dhcpcd lvm2 git binutils
+pacstrap -i /mnt $to_pacstrap
+#pacstrap -i /mnt base linux linux-firmware sudo dhcpcd lvm2 git binutils
 
 
 # generate fstab
