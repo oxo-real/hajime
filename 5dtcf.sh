@@ -25,6 +25,8 @@
 clear
 
 
+repo="https://gitlab.com/cytopyge"
+
 # make /usr read-write
 sudo mount -o remount,rw  /usr
 
@@ -36,7 +38,7 @@ rm -rf ~/.dot
 
 ## clone cytopyge dotfiles
 [ -d ~/.dot ] || mkdir -p ~/.dot
-git clone https://gitlab.com/cytopyge/dotfiles ~/.dot
+git clone $repo/dotfiles ~/.dot
 
 ## sourcing zsh shell
 echo 'source ~/.dot/.zshrc' > ~/.zshrc
@@ -99,7 +101,6 @@ alias vim=nvim
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 
 ## install plugins defined in ~/.dot/.vimrc
-#[TODO] check for duplicity
 #[TODO] add base16-vim here?
 vim +PluginInstall +qall
 clear
@@ -117,7 +118,7 @@ mozilla_firefox() {
 
 	[ -d ~/Downloads ] && rm -rf ~/Downloads
 	[ -d ~/.mozilla ] && rm -rf ~/.mozilla
-	git clone https://gitlab.com/cytopyge/ffxd_init ~/.mozilla
+	git clone $repo/ffxd_init ~/.mozilla
 
 	## activate addons branch
 	#cd ~/.mozilla
@@ -138,10 +139,6 @@ cd ~/_git
 finishing_up() {
 
 	# finishing
-
-	## make all files in '~' owned by current user
-	cd ~
-	sudo chown -R $(whoami):wheel *
 
 	## make /usr read-only
 	sudo mount -o remount,ro  /usr
@@ -171,81 +168,93 @@ finishing_up() {
 [ -d ~/_git/code ] || mkdir ~/_git/code
 cd ~/_git/code
 
+### sources
+clear
+git clone $repo/sources
+
+### tools
+clear
+git clone $repo/tools
+
 ### bwsession
 clear
-git clone https://gitlab.com/cytopyge/bwsession
+git clone $repo/bwsession
 
 ### hajime
 clear
-git clone https://gitlab.com/cytopyge/hajime
+git clone $repo/hajime
+
 #### git/hajime becomes the git repo;
 #### remove git repo from install directory
 rm -rf $HOME/hajime/.git
 
 ### isolatest
 clear
-git clone https://gitlab.com/cytopyge/isolatest
+git clone $repo/isolatest
 
 ### metar
 clear
-git clone https://gitlab.com/cytopyge/metar
+git clone $repo/metar
 
 ### netconn
 clear
-git clone https://gitlab.com/cytopyge/netconn
-
-### snippets
-clear
-git clone https://gitlab.com/cytopyge/snippets
+git clone $repo/netconn
 
 ### tools
 clear
-git clone https://gitlab.com/cytopyge/tools
+git clone $repo/tools
 
 ### updater
 clear
-git clone https://gitlab.com/cytopyge/updater
+git clone $repo/updater
 
 ## notes
 clear
-git clone https://gitlab.com/cytopyge/notes
+git clone $repo/notes
+
+
+
+repo="https://cytopyge@gitlab.com/cytopyge"
+
+
+get_pwd(){
+	bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
+}
 
 
 recover_cytopyge_private_git() {
 
 	sh ~/_git/code/bwsession/bw_vault_unlock
 
-	#`wl-paste`
-
-	### hashr
+	## hashr
 	clear
-	bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
+	get_pwd
 
-	git clone https://cytopyge@gitlab.com/cytopyge/hashr
+	git clone $repo/hashr
 
-	### history
+	## history
 	clear
-	bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
+	get_pwd
 
-	git clone https://cytopyge@gitlab.com/cytopyge/history
+	git clone $repo/history
 
-	### wfa
+	## wfa
 	clear
-	bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
+	get_pwd
 
-	git clone https://cytopyge@gitlab.com/cytopyge/wfa
+	git clone $repo/wfa
 
 	### snapshot
 	clear
-	bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
+	get_pwd
 
-	git clone https://cytopyge@gitlab.com/cytopyge/snapshot
+	git clone $repo/snapshot
 
 	### security
 	clear
-	bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
+	get_pwd
 
-	git clone https://cytopyge@gitlab.com/cytopyge/security
+	git clone $repo/security
 
 	finishing_up
 

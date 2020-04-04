@@ -66,6 +66,14 @@ dhcp_connect() {
 }
 
 
+own_home() {
+
+	cd $HOME
+	sudo chown -R $(whoami):wheel *
+
+}
+
+
 set_read_write() {
 
 
@@ -300,6 +308,7 @@ conclusion() {
 
 dhcp_connect
 set_read_write
+own_home
 modify_pacman_conf
 create_directories
 base_mutations
