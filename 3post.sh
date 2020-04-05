@@ -300,7 +300,7 @@ conclusion() {
 	reply_single
 	clear
 	echo
-	neofetch
+	neofetch --gtk3 off
 
 }
 
