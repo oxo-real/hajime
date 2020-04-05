@@ -20,9 +20,9 @@ setup_wap() {
 	read wap
 	echo
 	printf "enter password for $wap: "
-	wpa_passphrase $wap > wap.wifi
+	sudo wpa_passphrase $wap > wap.wifi
 	echo
-	wpa_supplicant -B -i $interface -c wap.wifi
+	sudo wpa_supplicant -B -i $interface -c wap.wifi
 
 }
 
@@ -65,47 +65,31 @@ echo
 set -e
 
 
-point_in_time
-
-
 printf "connect to wireless access point? (y/N) "
+
 
 reply_single
 
 
 if printf "$reply" | grep -iq "^y" ; then
 
-	if [[ "$pit"=="1" ]]; then
-		ip a
-		printf "please enter interface name: "
-		read interface
-		connect
-		printf "connected\n"
-	elif [[ "$pit"=="0" ]]; then
-		interface="wlan0"
-		setup_wap
-		connect
-		printf "$interface connected to $wap\n"
+	ip a
+	printf "please enter interface name: "
+	read interface
+	setup_wap
+	connect
+	printf "$interface connected to $wap\n"
 
-	fi
 fi
 
 
+point_in_time
+
 
 if [[ $pit==1 ]]; then
-	exit 10
+	exit 0
 else
-	echo
-	echo
-	printf "install git & hajime? (Y/n) "
-
-	reply_single
-
-	if printf "$reply" | grep -iq "^n" ; then
-		exit 0
-	else
-		install
-	fi
+	install
 fi
 
 
