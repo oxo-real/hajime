@@ -29,7 +29,7 @@ setup_wap() {
 
 connect() {
 
-	dhcpcd -w $interface
+	sudo dhcpcd -w $interface
 
 }
 
@@ -45,6 +45,19 @@ install() {
 }
 
 
+point_in_time() {
+
+	if [[ -f $HOME/hajime/1base.done ]]; then
+		# 1base.sh already ran
+		pit="1"
+	else
+		# 1base.sh has not yet ran
+		pit="0"
+	fi
+
+}
+
+
 clear
 printf "hajime_0init\n"
 printf "(c) 2020 cytopyge\n"
@@ -52,29 +65,36 @@ echo
 set -e
 
 
+point_in_time
+
+
 printf "connect to wireless access point? (y/N) "
 
 reply_single
 
+
 if printf "$reply" | grep -iq "^y" ; then
-	interface="wlan0"
-	setup_wap
-	connect
-	# not so neat, but ....
-	printf "$interface connected to $wap"
-else
-	#interface="eth0"
-	connect
-	# not so neat, but ....
-	printf "connected"
+
+	if [[ "$pit"=="1" ]]; then
+		ip a
+		printf "please enter interface name: "
+		read interface
+		connect
+		printf "connected\n"
+	elif [[ "$pit"=="0" ]]; then
+		interface="wlan0"
+		setup_wap
+		connect
+		printf "$interface connected to $wap\n"
+
+	fi
 fi
 
 
-if [[ -f ~/hajime/1base.done ]]; then
-	# 1base.sh already ran
+
+if [[ $pit==1 ]]; then
 	exit 10
 else
-	# 1base.sh has not yet ran
 	echo
 	echo
 	printf "install git & hajime? (Y/n) "
