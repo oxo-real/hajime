@@ -22,9 +22,6 @@
 #
 
 
-clear
-
-
 repo="https://gitlab.com/cytopyge"
 
 # make /usr read-write
@@ -103,7 +100,8 @@ git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 ## install plugins defined in ~/.dot/.vimrc
 #[TODO] add base16-vim here?
 vim +PluginInstall +qall
-clear
+echo
+echo "=============================================================================="
 
 
 # global git configuration
@@ -147,7 +145,7 @@ finishing_up() {
 	sudo touch ~/hajime/5dtcf.done
 
 
-	clear
+
 	echo 'finished installation'
 	read -p "sudo reboot? (Y/n) " -n 1 -r
 
@@ -167,58 +165,42 @@ finishing_up() {
 ### prepare system core code environment
 [ -d ~/_git/code ] || mkdir ~/_git/code
 cd ~/_git/code
-
 ### sources
-clear
 git clone $repo/sources
-
 ### tools
-clear
 git clone $repo/tools
-
 ### bwsession
-clear
 git clone $repo/bwsession
-
 ### hajime
-clear
 git clone $repo/hajime
-
 #### git/hajime becomes the git repo;
 #### remove git repo from install directory
 rm -rf $HOME/hajime/.git
-
 ### isolatest
-clear
 git clone $repo/isolatest
-
 ### metar
-clear
 git clone $repo/metar
-
 ### netconn
-clear
 git clone $repo/netconn
-
 ### tools
-clear
 git clone $repo/tools
-
 ### updater
-clear
 git clone $repo/updater
 
 ## notes
-clear
 git clone $repo/notes
-
 
 
 repo="https://cytopyge@gitlab.com/cytopyge"
 
 
+# recover private git repositories
+
+
 get_pwd(){
+
 	bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
+
 }
 
 
@@ -227,31 +209,31 @@ recover_cytopyge_private_git() {
 	sh ~/_git/code/bwsession/bw_vault_unlock
 
 	## hashr
-	clear
+
 	get_pwd
 
 	git clone $repo/hashr
 
 	## history
-	clear
+
 	get_pwd
 
 	git clone $repo/history
 
 	## wfa
-	clear
+
 	get_pwd
 
 	git clone $repo/wfa
 
 	### snapshot
-	clear
+
 	get_pwd
 
 	git clone $repo/snapshot
 
 	### security
-	clear
+
 	get_pwd
 
 	git clone $repo/security
@@ -261,8 +243,8 @@ recover_cytopyge_private_git() {
 }
 
 
-# recover private git repositories
-clear
+## recover private git repositories
+
 read -p "recover cytopyge private git repositories? (y/N) " -n 1 -r
 echo
 

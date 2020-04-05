@@ -533,7 +533,10 @@ fi
 
 # install helpers
 clear
-pacman -S --noconfirm $install_helpers
+
+for package in "${install_helpers[@]}"; do
+	pacman -S --noconfirm $package
+done
 
 
 # configuring the mirrorlist
@@ -546,8 +549,9 @@ reflector --verbose --country $mirror_country -l $mirror_amount --sort rate --sa
 
 
 # install base & base-devel package groups
-pacstrap -i /mnt $to_pacstrap
-#pacstrap -i /mnt base linux linux-firmware sudo dhcpcd lvm2 git binutils
+for package in "${to_packstrap[@]}"; do
+	pacstrap -i /mnt $package
+done
 
 
 # generate fstab

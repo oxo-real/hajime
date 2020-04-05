@@ -149,29 +149,10 @@ set_username() {
 
 	clear
 	printf "username: '$username'\n"
-	printf "correct? (Y/n) "
+	printf "correct? (y/N) "
 	reply
 
-	if printf "$reply" | grep -iq "^n"; then
-
-		echo
-		read -p "enter username: " username
-		printf "username: '$username', correct? (Y/n) "
-		reply
-
-		if printf "$reply" | grep -iq "^n"; then
-
-		    clear
-		    set_username
-		    
-		else
-		    
-		    echo
-		    printf "using '$username' as username\n"
-
-		fi
-
-	else
+	if printf "$reply" | grep -iq "^y"; then
 
 		echo
 		printf "using '$username' as username\n"
@@ -182,9 +163,28 @@ set_username() {
 
 		    clear
 		    set_username
-		    
+
 		else
-		    
+
+		    echo
+		    printf "using '$username' as username\n"
+
+		fi
+
+	else
+
+		echo
+		read -p "enter username: " username
+		printf "username: '$username', correct? (Y/n) "
+		reply
+
+		if printf "$reply" | grep -iq "^n"; then
+
+		    clear
+		    set_username
+
+		else
+
 		    echo
 		    printf "using '$username' as username\n"
 

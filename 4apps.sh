@@ -109,47 +109,19 @@ sudo mount -o remount,rw  /usr
 
 
 # install core applications
-core_applications="$wayland \
-	$dwm \
-	$shell \
-	$shell_additions \
-	$terminal \
-	$terminal_additions \
-	$password_security \
-	$encryption \
-	$secure_connections \
-	$fonts \
-	$display \
-	$audio \
-	$bluetooth"
+core_applications=($wayland $dwm $shell $shell_additions $terminal $terminal_additions $password_security $encryption $secure_connections $fonts $display $audio $bluetooth)
 
-yay -Sy --noconfirm "$core_applications"
+for package in "${core_applications[@]}"; do
+	yay -S --noconfirm "$package"
+done
 
 
 # install additional tools
-additional_tools="$terminal_text_tools \
-	$terminal_file_browser \
-	$file_tools \
-	$network_tools \
-	$internet_tools \
-	$feeds \
-	$email \
-	$contact_management \
-	$time_management \
-	$accounting \
-	$download_utilities \
-	$system_monitoring \
-	$virtualization \
-	$image_viewers \
-	$image_editors \
-	$pdf_viewers \
-	$video_tools \
-	$photo_editing \
-	$photo_management \
-	$vector_graphics_editing \
-	$office_tools"
+additional_tools=($terminal_text_tools $terminal_file_browser $file_tools $network_tools $internet_tools $feeds $email $contact_management $time_management $accounting $download_utilities $system_monitoring $virtualization $image_viewers $image_editors $pdf_viewers $video_tools $photo_editing $photo_management $vector_graphics_editing $office_tools)
 
-yay -Sy --noconfirm "$additional_tools"
+for package in "${additional_tools[@]}"; do
+	yay -Sy --noconfirm "$package"
+done
 
 
 # loose ends
