@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 
 reply_single() {
@@ -14,8 +14,14 @@ reply_single() {
 
 setup_wap() {
 
-	echo "enter password for $wap "
+	echo
+	echo
+	printf "enter wap name: "
+	read wap
+	echo
+	printf "enter password for $wap: "
 	wpa_passphrase $wap > wap.wifi
+	echo
 	wpa_supplicant -B -i $interface -c wap.wifi
 
 }
@@ -23,7 +29,7 @@ setup_wap() {
 
 connect() {
 
-	dhcpcd -w
+	dhcpcd -w $interface
 
 }
 
@@ -33,14 +39,19 @@ install() {
 	pacman -Sy --noconfirm git
 	git clone https://gitlab.com/cytopyge/hajime
 	echo
-	echo "sh hajime/1base.sh"
+	printf "sh hajime/1base.sh\n"
 	echo
 
 }
 
 
+clear
 printf "hajime_0init\n"
+printf "(c) 2020 cytopyge\n"
 echo
+set -e
+
+
 printf "connect to wireless access point? (y/N) "
 
 reply_single
@@ -50,12 +61,12 @@ if printf "$reply" | grep -iq "^y" ; then
 	setup_wap
 	connect
 	# not so neat, but ....
-	printf "connected succesfully"
+	printf "$interface connected to $wap"
 else
 	#interface="eth0"
 	connect
 	# not so neat, but ....
-	printf "connected succesfully"
+	printf "connected"
 fi
 
 
@@ -64,6 +75,8 @@ if [[ -f ~/hajime/1base.done ]]; then
 	exit 10
 else
 	# 1base.sh has not yet ran
+	echo
+	echo
 	printf "install git & hajime? (Y/n) "
 
 	reply_single
