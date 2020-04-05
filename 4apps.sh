@@ -109,8 +109,7 @@ sudo mount -o remount,rw  /usr
 
 
 # install core applications
-yay -Sy --noconfirm \
-	$wayland \
+core_applications="$wayland \
 	$dwm \
 	$shell \
 	$shell_additions \
@@ -122,12 +121,13 @@ yay -Sy --noconfirm \
 	$fonts \
 	$display \
 	$audio \
-	$bluetooth
+	$bluetooth"
+
+yay -Sy --noconfirm "$core_applications"
 
 
 # install additional tools
-yay -Sy --noconfirm \
-	$terminal_text_tools \
+additional_tools="$terminal_text_tools \
 	$terminal_file_browser \
 	$file_tools \
 	$network_tools \
@@ -147,7 +147,9 @@ yay -Sy --noconfirm \
 	$photo_editing \
 	$photo_management \
 	$vector_graphics_editing \
-	$office_tools
+	$office_tools"
+
+yay -Sy --noconfirm "$additional_tools"
 
 
 # loose ends
