@@ -101,7 +101,6 @@ git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 #[TODO] add base16-vim here?
 vim +PluginInstall +qall
 echo
-echo "=============================================================================="
 
 
 # global git configuration
@@ -186,70 +185,7 @@ git clone $repo/netconn
 git clone $repo/tools
 ### updater
 git clone $repo/updater
-
-## notes
+### notes
 git clone $repo/notes
 
-
-repo="https://cytopyge@gitlab.com/cytopyge"
-
-
-# recover private git repositories
-
-
-get_pwd(){
-
-	bw get item gitlab.com peacto | awk -F, '{print $13}' | awk -F: '{print $2}' | sed 's/"//g' | wl-copy -o
-
-}
-
-
-recover_cytopyge_private_git() {
-
-	sh ~/_git/code/bwsession/bw_vault_unlock
-
-	## hashr
-
-	get_pwd
-
-	git clone $repo/hashr
-
-	## history
-
-	get_pwd
-
-	git clone $repo/history
-
-	## wfa
-
-	get_pwd
-
-	git clone $repo/wfa
-
-	### snapshot
-
-	get_pwd
-
-	git clone $repo/snapshot
-
-	### security
-
-	get_pwd
-
-	git clone $repo/security
-
-	finishing_up
-
-}
-
-
-## recover private git repositories
-
-read -p "recover cytopyge private git repositories? (y/N) " -n 1 -r
-echo
-
-if [[ $REPLY =~ ^[Yy]$ ]] ; then
-	recover_cytopyge_private_git
-else
-	finishing_up
-fi
+finishing_up
