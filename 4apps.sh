@@ -44,6 +44,8 @@ terminal="termite-nocsd tmux"
 
 terminal_additions="rofi"
 
+manpages="man-db man-pages"
+
 password_security="pass-wl-clipboard bitwarden-cli"
 
 encryption="veracrypt"
@@ -109,7 +111,7 @@ sudo mount -o remount,rw  /usr
 
 
 # install core applications
-core_applications=($wayland $dwm $shell $shell_additions $terminal $terminal_additions $password_security $encryption $secure_connections $fonts $display $audio $bluetooth)
+core_applications=($wayland $dwm $shell $shell_additions $terminal $terminal_additions $manpages $password_security $encryption $secure_connections $fonts $display $audio $bluetooth)
 
 for package in "${core_applications[@]}"; do
 	yay -S --noconfirm "$package"
