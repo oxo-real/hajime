@@ -416,7 +416,15 @@ if printf "$reply" | grep -iq "^y" ; then
 	echo
 	echo
 	echo
-	printf " Kamaete ... Hajime! "
+	printf " Kamaete! "
+	sleep 0.5
+	printf "."
+	sleep 0.5
+	printf "."
+	sleep 0.5
+	printf "."
+	sleep 1
+	printf " Hajime! "
 	sleep 1
 	clear
 else

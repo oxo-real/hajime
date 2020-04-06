@@ -43,14 +43,14 @@ reply_single() {
 setup_wap() {
 
 	echo
-	echo
 	wap_list=$(sudo iw dev $interface scan | grep SSID: | sed 's/SSID: //' | \
 		## awk removes leading and trailing whitespace
 		## nl adds line numbers
 		awk '{$1=$1;print}' | sort | uniq | sort | nl)
+	printf "visible wireless access points (wap's):\n"
 	printf "$wap_list\n"
 	echo
-	printf "enter wap number: "
+	printf "please enter wap number: "
 	read wap_number
 	wap=$(echo "$wap_list" | awk '{if ($1=='"$wap_number"') {print $2}}')
 	echo
@@ -84,10 +84,10 @@ point_in_time() {
 
 	if [[ -f $HOME/hajime/1base.done ]]; then
 		# 1base.sh already ran
-		pit="1"
+		pit=1
 	else
 		# 1base.sh has not yet ran
-		pit="0"
+		pit=0
 	fi
 
 }
@@ -95,10 +95,10 @@ point_in_time() {
 
 select_interface() {
 
-	echo
 	if printf "$reply" | grep -iq "^y" ; then
 
 		ip a
+		echo
 		printf "please enter interface number: "
 		read interface_number
 
@@ -117,7 +117,7 @@ select_interface() {
 
 install_or_exit() {
 
-	if [[ "$pit"=="1" ]]; then
+	if [[ "$pit" == "1" ]]; then
 		exit 0
 	else
 		install
@@ -137,6 +137,7 @@ set -e
 
 
 printf "connect to wireless access point? (y/N) "
+echo
 reply_single
 select_interface
 point_in_time
