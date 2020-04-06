@@ -11,7 +11,7 @@
 ### (_\/|_(_)|_)\/(_|(/_
 ###   /      |  /  _|
 ###
-### hajime_init
+### hajime_0init
 ### helper file to get lined up in archiso
 ###
 ### (c) 2020 cytopyge
@@ -105,7 +105,7 @@ select_interface() {
 		# translate number to interface name
 		interface=$(ip a | grep "^$interface_number" | \
 			awk '{print $2}' | sed 's/://')
-		ip link set $interface up
+		sudo ip link set $interface up
 		setup_wap
 		connect
 		printf "$interface connected to $wap\n"
