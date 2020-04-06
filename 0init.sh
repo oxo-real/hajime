@@ -1,4 +1,32 @@
+#!/bin/bash
+#
+##
+###  _            _ _                  _       _ _
+### | |__   __ _ (_|_)_ __ ___   ___  (_)_ __ (_) |_
+### | '_ \ / _` || | | '_ ` _ \ / _ \ | | '_ \| | __|
+### | | | | (_| || | | | | | | |  __/ | | | | | | |_
+### |_| |_|\__,_|/ |_|_| |_| |_|\___| |_|_| |_|_|\__|0
+###            |__/
+###  _ _|_ _ ._    _  _
+### (_\/|_(_)|_)\/(_|(/_
+###   /      |  /  _|
+###
+### hajime_init
+### helper file to get lined up in archiso
+###
+### (c) 2020 cytopyge
+###
+##
+#
 
+
+# initial definitions
+
+## initialize hardcoded variables
+script_name="hajime_0init"
+initial_release_year="2020"
+current_year=$(date "+%Y")
+developer="cytopyge"
 
 
 reply_single() {
@@ -16,16 +44,18 @@ setup_wap() {
 
 	echo
 	echo
-	wap_list=$(sudo iw dev wlp58s0 scan | grep SSID: | sed 's/SSID: //' | \
-		## awk removes leading and trailing whitespace, nl adds line numbers
-		awk '{$1=$1;print}' | sort | uniq | sort | nl
+	wap_list=$(sudo iw dev $interface scan | grep SSID: | sed 's/SSID: //' | \
+		## awk removes leading and trailing whitespace
+		## nl adds line numbers
+		awk '{$1=$1;print}' | sort | uniq | sort | nl)
+	printf "$wap_list\n"
 	echo
 	printf "enter wap number: "
 	read wap_number
-	wap=$(echo $wap_list | grep $wap_number | awk '{print $2}'
+	wap=$(echo "$wap_list" | awk '{if ($1=='"$wap_number"') {print $2}}')
 	echo
-	printf "enter password for $wap: "
-	sudo wpa_passphrase $wap > wap.wifi
+	printf "enter password for "$wap": "
+	sudo wpa_passphrase "$wap" > wap.wifi
 	echo
 	sudo wpa_supplicant -B -i $interface -c wap.wifi
 
@@ -63,21 +93,9 @@ point_in_time() {
 }
 
 
-clear
-printf "hajime_0init\n"
-printf "(c) 2020 cytopyge\n"
-echo
-set -e
-
-
-printf "connect to wireless access point? (y/N) "
-
-
-reply_single
-
-
 select_interface() {
 
+	echo
 	if printf "$reply" | grep -iq "^y" ; then
 
 		ip a
@@ -87,7 +105,7 @@ select_interface() {
 		# translate number to interface name
 		interface=$(ip a | grep "^$interface_number" | \
 			awk '{print $2}' | sed 's/://')
-
+		ip link set $interface up
 		setup_wap
 		connect
 		printf "$interface connected to $wap\n"
@@ -97,14 +115,29 @@ select_interface() {
 }
 
 
+install_or_exit() {
+
+	if [[ "$pit"=="1" ]]; then
+		exit 0
+	else
+		install
+		exit 0
+	fi
+
+}
+
+
+clear
+printf "$script_name\n"
+printf "(c) $initial_release_year "
+[[ $initial_release_year -ne $current_year ]] && printf " - $current_year "
+printf "$developer\n"
+echo
+set -e
+
+
+printf "connect to wireless access point? (y/N) "
+reply_single
+select_interface
 point_in_time
-
-
-if [[ $pit==1 ]]; then
-	exit 0
-else
-	install
-fi
-
-
-exit 0
+install_or_exit
