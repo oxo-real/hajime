@@ -37,7 +37,7 @@ Be sure to first get your latest Arch Linux install image with isolatest (https:
 Boot into the ArchISO live system environment, install git, clone 'hajime' and check the user customizable variables sections before executing the first script:
 
 ### getting wireless internet connection
-#### (before executing 1base.sh and 3post.sh)
+#### (before executing 1base.sh)
 have a hajime clone on a usb device
 after booting into archiso insert the usb device
 designate the '/dev/sdX' name assigned to the device,
@@ -54,6 +54,14 @@ execute the init file form the usb:
 
 ```
 sh /tmp/0init.sh
+```
+
+#### (before executing 3post.sh)
+the system has rebooted and therefore a eventually wireless internet connection is lost
+reconnecting a wireless internet connection by executing:
+
+```
+sh hajime/0init.sh
 ```
 
 ### already have a internet connection
