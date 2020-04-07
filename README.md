@@ -33,7 +33,11 @@ Modifications are made to the package manager, the entire operating system is up
 After 'post' an fully fledged Arch installation is running on the system.
 
 ### 4  Apps
-'hajime apps' prepares the system for a display manager running under Wayland, with wlroots as a modular compositor library. The script will setup the Sway tiling window manager, but it can easily be modifed to be setup for X11 based managers, when preferred. It also installs a variety of tools, among others for: video, text, file management, network management, internet, system monitoring, virtual environments.
+'hajime apps' prepares the system for a display manager running under Wayland, with wlroots as a modular compositor library.
+
+The script will setup the Sway tiling window manager, but it can easily be modifed to be setup for X11 based managers, when preferred.
+
+It also installs a variety of tools, among others for: video, text, file management, network management, internet, system monitoring, virtual environments.
 
 ### 5  Dtcf
 'dtcf' installs the dotfile configuration, which contains settings for the apps and window manager to run smoothly.
@@ -41,15 +45,21 @@ After 'post' an fully fledged Arch installation is running on the system.
 
 ## Take off instructions
 When using the 'hajime' scripts:
-Be sure to first get your latest Arch Linux install image with isolatest (https://gitlab.com/cytopyge/isolatest) or manually via: https://www.archlinux.org/download/.
-Boot into the ArchISO live system environment, install git, clone 'hajime' and check the user customizable variables sections before executing the first script:
+
+Be sure to first get your latest Arch Linux install image with isolatest (https://gitlab.com/cytopyge/isolatest) or manually via: https://www.archlinux.org/download/ .
+
+Boot into the ArchISO live system environment, install git, clone 'hajime' and check the user customizable variables sections in every part before executing the first script:
 
 ### getting wireless internet connection
 #### (before executing 1base.sh)
 have a hajime clone on a usb device
+
 after booting into archiso insert the usb device
+
 designate the '/dev/sdX' name assigned to the device,
+
 then create a temporary mountpoint directory and
+
 mount the usb device to the mountpoint:
 
 ```
@@ -66,6 +76,7 @@ sh tmp/hajime/0init.sh
 
 #### (before executing 3post.sh)
 the system has rebooted and therefore a eventually wireless internet connection is lost
+
 reconnecting a wireless internet connection by executing:
 
 ```
@@ -74,6 +85,7 @@ sh hajime/0init.sh
 
 ### already have a internet connection
 when the system is connected to an ethernet cable
+
 the internet connection should be set up automatically
 
 ```
@@ -83,6 +95,7 @@ git clone https://gitlab.com/cytopyge/hajime
 
 ### starting hajime
 let's roll!
+
 ```
 sh hajime/1base.sh
 ```
