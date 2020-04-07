@@ -16,13 +16,21 @@
 (c) 2019 - 2020 cytopyge
 
 ### 1  Base
-The 'base' script creates a Globally Unique Identifiers (GUID) partition table (GPT) and Unified Extensible Firmware Interface (UEFI) system partition with systemd boot to bootstrap the user space for bleeding edge (BLE) and long term support (LTS) arch linux kernel. BOOT (ro) can be a separate partition / device. Logical volume manager (LVM) is fully encrypted with Linux Unified Key Setup (LUKS2) and contains separate volumes partitions for ROOT, HOME, VAR, USR (ro) and SWAP.
+The 'base' script creates a Globally Unique Identifiers (GUID) partition table (GPT) and Unified Extensible Firmware Interface (UEFI) system partition with systemd boot to bootstrap the user space for bleeding edge (BLE) and long term support (LTS) arch linux kernel.
+
+BOOT (ro) can be a separate partition / device. Logical volume manager (LVM) is fully encrypted with Linux Unified Key Setup (LUKS2) and contains separate volumes partitions for ROOT, HOME, VAR, USR (ro) and SWAP.
 
 ### 2  Conf
-The 'conf' script configures settings for time, network, mirrorlists, bootloader entries for bleeding edge and long term support kernels, ramdisk and creates an user environment. After 'conf' the system is able to boot independently.
+The 'conf' script configures settings for time, network, mirrorlists, bootloader entries for bleeding edge and long term support kernels, ramdisk and creates an user environment.
+
+After 'conf' the system is able to boot independently.
 
 ### 3  Post
-The third script prepares the system 'post install' for the installation of a desktop environment. Modifications are made to the package manager, the entire operating system is updated, a mountpoint environment is beig created and an alternative AUR manager 'yay' is installed alongside the native 'pacman'. After 'post' an fully fledged Arch installation is running on the system.
+The third script prepares the system 'post install' for the installation of a desktop environment.
+
+Modifications are made to the package manager, the entire operating system is updated, a mountpoint environment is beig created and an alternative AUR manager 'yay' is installed alongside the native 'pacman'.
+
+After 'post' an fully fledged Arch installation is running on the system.
 
 ### 4  Apps
 'hajime apps' prepares the system for a display manager running under Wayland, with wlroots as a modular compositor library. The script will setup the Sway tiling window manager, but it can easily be modifed to be setup for X11 based managers, when preferred. It also installs a variety of tools, among others for: video, text, file management, network management, internet, system monitoring, virtual environments.
@@ -53,7 +61,7 @@ mount /dev/sdX tmp
 execute the init file form the usb:
 
 ```
-sh /tmp/0init.sh
+sh tmp/hajime/0init.sh
 ```
 
 #### (before executing 3post.sh)
