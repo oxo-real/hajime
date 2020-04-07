@@ -303,15 +303,12 @@ set_partition_sizes() {
 	if printf "$reply" | grep -iq "^y" ; then
 		printf "SWAP partition size (GB)? [$swap_size_recomm] "
 		reply_plain
-		swap_size_calc=0 #[TODO] necesarry?
 		swap_size_calc=$reply
 	        if [ -z "$swap_size_calc" ]; then
         	        swap_size_calc=$swap_size_recomm
         	fi
 		### remove decimals
 		swap_size="${swap_size_calc%%.*}"
-		### correct $lvm_size_calc
-		#lvm_size_calc="`echo "$lvm_size_calc - $swap_size" | bc`"
 		lvm_size_calc=`echo - | awk "{$lvm_size_calc - $swap_size}"`
 	else
 		swap_size=0
