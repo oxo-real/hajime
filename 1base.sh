@@ -318,24 +318,17 @@ set_partition_sizes() {
 		printf "SWAP partition will NOT be created\n"
 	fi
 
-	#root_size_calc=`echo "$root_perc * $lvm_size_calc" | bc`
-	#home_size_calc=`echo "$home_perc * $lvm_size_calc" | bc`
-	#usr_size_calc=`echo "$usr_perc * $lvm_size_calc" | bc`
-	#var_size_calc=`echo "$var_perc * $lvm_size_calc" | bc`
-	### calculate using awk (for posix compliance without bc)
-	root_size_calc=`echo - | awk "{$root_perc * $lvm_size_calc}"`
-	home_size_calc=`echo - | awk "{$home_perc * $lvm_size_calc}"`
-	usr_size_calc=`echo - | awk  "{$usr_perc * $lvm_size_calc}"`
-	var_size_calc=`echo - | awk  "{$var_perc * $lvm_size_calc}"`
+	root_size_calc=`echo - | awk "{print $root_perc * $lvm_size_calc}"`
+	home_size_calc=`echo - | awk "{print $home_perc * $lvm_size_calc}"`
+	usr_size_calc=`echo - | awk  "{print $usr_perc * $lvm_size_calc}"`
+	var_size_calc=`echo - | awk  "{print $var_perc * $lvm_size_calc}"`
 
 	## ROOT partition
 	echo
 	printf "ROOT partition size (GB)? [$root_size_calc] "
 	reply_plain
         if [ ! -z "$reply" ]; then
-            #root_size_calc="`echo "$reply * 1" | bc`"
-	    ### calculate using awk (for posix compliance without bc)
-            root_size_calc="echo - | awk "{$reply * 1""
+            root_size_calc=`echo - | awk "{print $reply * 1}"`
         fi
 	### remove decimals
 	root_size="${root_size_calc%%.*}"
@@ -344,9 +337,7 @@ set_partition_sizes() {
 	printf "HOME partition size (GB)? [$home_size_calc] "
 	reply_plain
         if [ ! -z "$reply" ]; then
-            #home_size_calc="`echo "$reply * 1" | bc`"
-	    ### calculate using awk (for posix compliance without bc)
-            home_size_calc=`echo - | awk "{$reply * 1}"`
+            home_size_calc=`echo - | awk "{print $reply * 1}"`
         fi
 	### remove decimals
 	home_size="${home_size_calc%%.*}"
@@ -355,9 +346,7 @@ set_partition_sizes() {
 	printf "USR  partition size (GB)? [$usr_size_calc] "
 	reply_plain
         if [ ! -z "$reply" ]; then
-            #usr_size_calc="`echo "$reply * 1" | bc`"
-	    ### calculate using awk (for posix compliance without bc)
-            usr_size_calc=`echo - | awk "{$reply * 1}"`
+            usr_size_calc=`echo - | awk "{print $reply * 1}"`
         fi
 	### remove decimals
 	usr_size="${usr_size_calc%%.*}"
@@ -367,19 +356,14 @@ set_partition_sizes() {
 	#var_size_calc=0
 	reply_plain
         if [ ! -z "$reply" ]; then
-            #var_size_calc="`echo "$reply * 1" | bc`"
-	    ### calculate using awk (for posix compliance without bc)
-            var_size_calc=`echo - | awk "{$reply * 1}"`
+            var_size_calc=`echo - | awk "{print $reply * 1}"`
         fi
 	### remove decimals
 	var_size="${var_size_calc%%.*}"
 
 	## total
-	#total_size_calc="`echo "$root_size + $home_size + $usr_size + $var_size + $swap_size" | bc`"
-	#diff_total_lvm_calc="`echo "$total_size_calc - $lvm_size_calc" | bc`"
-	### calculate using awk (for posix compliance without bc)
-	total_size_calc=`echo - | awk "{$root_size + $home_size + $usr_size + $var_size + $swap_size}"`
-	diff_total_lvm_calc=`echo - | awk "{$total_size_calc - $lvm_size_calc}"`
+	total_size_calc=`echo - | awk "{print $root_size + $home_size + $usr_size + $var_size + $swap_size}"`
+	diff_total_lvm_calc=`echo - | awk "{print $total_size_calc - $lvm_size_calc}"`
 	diff_t="$(echo $diff_total_lvm_calc | awk -F . '{print $1}')"
 	echo
 
@@ -475,12 +459,6 @@ echo
 
 ## set console font temporarily
 #setfont $console_font
-
-
-# for floating point arithmetic in this script
-
-### calculate using awk (for posix compliance without bc)
-#pacman -S --noconfirm bc
 
 
 # hardware clock and system clock
