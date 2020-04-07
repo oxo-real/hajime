@@ -81,6 +81,8 @@ contact_management="abook"
 
 time_management="calcurse"
 
+arithmatic="bc"
+
 accounting="ledger"
 
 download_utilities="aria2 transmission-cli transmission-remote-cli-git"
@@ -119,7 +121,7 @@ done
 
 
 # install additional tools
-additional_tools=($terminal_text_tools $terminal_file_browser $file_tools $network_tools $internet_tools $feeds $email $contact_management $time_management $accounting $download_utilities $system_monitoring $virtualization $image_viewers $image_editors $pdf_viewers $video_tools $photo_editing $photo_management $vector_graphics_editing $office_tools)
+additional_tools=($terminal_text_tools $terminal_file_browser $file_tools $network_tools $internet_tools $feeds $email $contact_management $time_management $arithmatic $accounting $download_utilities $system_monitoring $virtualization $image_viewers $image_editors $pdf_viewers $video_tools $photo_editing $photo_management $vector_graphics_editing $office_tools)
 
 for package in "${additional_tools[@]}"; do
 	yay -Sy --noconfirm "$package"
