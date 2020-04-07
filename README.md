@@ -36,10 +36,39 @@ When using the 'hajime' scripts:
 Be sure to first get your latest Arch Linux install image with isolatest (https://gitlab.com/cytopyge/isolatest) or manually via: https://www.archlinux.org/download/.
 Boot into the ArchISO live system environment, install git, clone 'hajime' and check the user customizable variables sections before executing the first script:
 
+### getting wireless internet connection
+#### (before executing 1base.sh and 3post.sh)
+have a hajime clone on a usb device
+after booting into archiso insert the usb device
+designate the '/dev/sdX' name assigned to the device,
+then create a temporary mountpoint directory and
+mount the usb device to the mountpoint:
+
+```
+lsblk -paf
+mkdir tmp
+mount /dev/sdX tmp
+```
+
+execute the init file form the usb:
+
+```
+sh /tmp/0init.sh
+```
+
+### already have a internet connection
+when the system is connected to an ethernet cable
+the internet connection should be set up automatically
+
 ```
 pacman -Sy git
 git clone https://gitlab.com/cytopyge/hajime
-./hajime/1base.sh
+```
+
+### starting hajime
+let's roll!
+```
+sh hajime/1base.sh
 ```
 
 From here run the scripts in numerical order and follow the in-script instructions. Have fun!
