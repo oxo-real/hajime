@@ -74,19 +74,10 @@ execute the init file form the usb:
 sh tmp/hajime/0init.sh
 ```
 
-#### (before executing 3post.sh)
-the system has rebooted and therefore a eventually wireless internet connection is lost
-
-reconnecting a wireless internet connection by executing:
-
-```
-sh hajime/0init.sh
-```
-
 ### already have a internet connection
 when the system is connected to an ethernet cable
 
-the internet connection should be set up automatically
+the internet connection should be set up automatically during boot
 
 ```
 pacman -Sy git
@@ -100,7 +91,16 @@ let's roll!
 sh hajime/1base.sh
 ```
 
-From here run the scripts in numerical order and follow the in-script instructions. Have fun!
+from here run the scripts in numerical order and follow the in-script instructions
+
+#### (before executing 3post.sh)
+the system has rebooted and therefore a eventually wireless internet connection is lost
+
+reconnecting a wireless internet connection by executing:
+
+```
+sh hajime/0init.sh
+```
 
 ---
 ---
