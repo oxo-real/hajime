@@ -71,6 +71,8 @@ file_tools="srm rsync gdisk"
 
 network_tools="wireshark-cli wireshark-qt mtr iftop bind-tools whois"
 
+python_additions="python-pip"
+
 internet_tools="firefox-developer-edition qutebrowser urlscan"
 
 feeds="newsboat"
@@ -123,7 +125,7 @@ done
 
 
 # install additional tools
-additional_tools=($terminal_text_tools $terminal_file_browser $file_tools $network_tools $internet_tools $feeds $email $contact_management $time_management $arithmatic $accounting $download_utilities $system_monitoring $virtualization $image_capturing $image_viewers $image_editors $pdf_viewers $video_tools $photo_editing $photo_management $vector_graphics_editing $office_tools)
+additional_tools=($terminal_text_tools $terminal_file_browser $file_tools $network_tools $python_additions $internet_tools $feeds $email $contact_management $time_management $arithmatic $accounting $download_utilities $system_monitoring $virtualization $image_capturing $image_viewers $image_editors $pdf_viewers $video_tools $photo_editing $photo_management $vector_graphics_editing $office_tools)
 
 for package in "${additional_tools[@]}"; do
 	yay -Sy --noconfirm "$package"
