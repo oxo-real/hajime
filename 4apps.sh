@@ -67,7 +67,7 @@ terminal_text_tools="emacs figlet qrencode jq xxd-standalone"
 
 terminal_file_browser="nnn vifm lf-git"
 
-file_tools="srm rsync gdisk"
+file_tools="rsync gdisk"
 
 network_tools="wireshark-cli wireshark-qt mtr iftop bind-tools whois"
 
