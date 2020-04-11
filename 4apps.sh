@@ -46,7 +46,7 @@ terminal_additions="rofi"
 
 manpages="man-db man-pages"
 
-password_security="pass pass-wl-clipboard bitwarden-cli"
+password_security="pass bitwarden-cli" #pass-wl-clipboard
 
 encryption="veracrypt"
 
