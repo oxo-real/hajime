@@ -46,9 +46,9 @@ terminal_additions="rofi"
 
 manpages="man-db man-pages"
 
-password_security="pass bitwarden-cli" #pass-wl-clipboard
+password_security="pass pass-tomb bitwarden-cli" #pass-wl-clipboard
 
-encryption="veracrypt"
+encryption="veracrypt tomb"
 
 secure_connections="wireguard-tools openvpn"
 
