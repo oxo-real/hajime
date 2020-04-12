@@ -135,6 +135,19 @@ printf "127.0.0.1	localhost.localdomain	localhost\n" >> /etc/hosts
 printf "::1		localhost.localdomain	localhost\n" >> /etc/hosts
 printf "127.0.1.1	$hostname.localdomain	$hostname\n" >> /etc/hosts
 
+## enable systemd-resolved
+systemctl enable systemd-resolved.service
+### symbolic link to the systemd stub, dns server will be set automaitcally
+ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+### check resolving status
+resolvectl status
+
+## DNS over TLS (DOT)
+mkdir /etc/systemd/resolve.conf.d
+printf "[Resolve]" > /etc/systemd/resolve.conf.d/dns_over_tls.conf
+printf "DNS=9.9.9.9#dns.quad9.net" >> /etc/systemd/resolve.conf.d/dns_over_tls.conf
+printf "DNSOverTLS=yes" >> /etc/systemd/resolve.conf.d/dns_over_tls.conf
+
 
 # set root password
 printf "$(whoami)@$hostname\n"
