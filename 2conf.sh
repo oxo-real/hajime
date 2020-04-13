@@ -46,6 +46,8 @@ micro_code_amd="amd-ucode"
 system_security="arch-audit"
 
 
+
+
 # time settings
 ## set time zone
 ln -sf /usr/share/zoneinfo/$time_zone /etc/localtime
@@ -54,13 +56,17 @@ hwclock --systohc
 
 
 # locale settings
-sed -i "/^#en_US.UTF-8 UTF-8/c\en_US.UTF-8 UTF-8" /etc/locale.gen
+file_etc_locale_gen="/etc/locale.gen"
+file_etc_locale_conf="/etc/locale.conf"
+
+sed -i "/^#en_US.UTF-8 UTF-8/c\en_US.UTF-8 UTF-8" $file_etc_locale_gen
 locale-gen
-echo $locale_conf > /etc/locale.conf
+echo $locale_conf > $etc_locale_conf
 
 
 # vconsole settings
-echo $vconsole_conf > /etc/vconsole.conf
+file_etc_vconsole_conf="/etc/vconsole.conf"
+echo $vconsole_conf > $file_etc_vconsole_conf
 echo
 
 
@@ -128,12 +134,14 @@ set_hostname() {
 set_hostname
 
 ## create hostname file
-printf "$hostname" > /etc/hostname
+file_etc_hostname="/etc/hostname"
+printf "$hostname" > $file_etc_hostname
 
 ## add matching entries to hosts file
-printf "127.0.0.1	localhost.localdomain	localhost\n" >> /etc/hosts
-printf "::1		localhost.localdomain	localhost\n" >> /etc/hosts
-printf "127.0.1.1	$hostname.localdomain	$hostname\n" >> /etc/hosts
+file_etc_hosts="/etc/hosts"
+printf "127.0.0.1	localhost.localdomain	localhost\n" >> $file_etc_hosts
+printf "::1		localhost.localdomain	localhost\n" >> $file_etc_hosts
+printf "127.0.1.1	$hostname.localdomain	$hostname\n" >> $file_etc_hosts
 
 ## enable systemd-resolved
 systemctl enable systemd-resolved.service
@@ -221,10 +229,11 @@ printf "$username@$hostname\n"
 passwd $username
 
 ## priviledge escalation for wheel group
-sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /etc/sudoers
+file_etc_sudoers="/etc/sudoers"
+sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' $file_etc_sudoers
 
 ## keep environment variable with elevated priviledges
-sed -i 's/# Defaults env_keep += "HOME"/Defaults env_keep += "HOME"\nDefaults !always_set_home, !set_home/' /etc/sudoers
+sed -i 's/# Defaults env_keep += "HOME"/Defaults env_keep += "HOME"\nDefaults !always_set_home, !set_home/' $file_etc_sudoers
 
 
 # install helpers
@@ -233,12 +242,13 @@ pacman -Sy --noconfirm $install_helpers
 
 
 # configuring the mirrorlist
+file_etc_pacmand_mirrorlist="/etc/pacman.d/mirrorlist"
 
 ## backup old mirrorlist
-cp /etc/pacman.d/mirrorlist /etc/pacman.d/`date "+%Y%m%d%H%M%S"`_mirrorlist.backup
+cp $file_etc_pacmand_mirrorlist /etc/pacman.d/`date "+%Y%m%d%H%M%S"`_mirrorlist.backup
 
 ## select fastest mirrors
-reflector --verbose --country $mirror_country -l $mirror_amount --sort rate --save /etc/pacman.d/mirrorlist
+reflector --verbose --country $mirror_country -l $mirror_amount --sort rate --save $file_etc_pacmand_mirrorlist
 
 
 #[TODO]
@@ -264,10 +274,12 @@ pacman -S --noconfirm $linux_kernel $linux_lts_kernel $core_applications $comman
 bootctl install
 
 ## boot loader configuration
-printf "default arch\n" > /boot/loader/loader.conf
-printf "timeout $bootloader_timeout\n" >> /boot/loader/loader.conf
-printf "editor $bootloader_editor\n" >> /boot/loader/loader.conf
-printf "console-mode max" >> /boot/loader/loader.conf
+file_boot_loader_loader_conf="/boot/loader/loader.conf"
+
+printf "default arch\n" > $file_boot_loader_loader_conf
+printf "timeout $bootloader_timeout\n" >> $file_boot_loader_loader_conf
+printf "editor $bootloader_editor\n" >> $file_boot_loader_loader_conf
+printf "console-mode max" >> $file_boot_loader_loader_conf
 
 
 # create an initial ramdisk environment (initramfs)
@@ -278,26 +290,30 @@ sed -i "/^HOOKS/c\HOOKS=(base systemd autodetect keyboard sd-vconsole modconf bl
 # adding boot loader entries
 
 ## bleeding edge kernel
-echo 'title arch' > /boot/loader/entries/arch.conf
-echo 'linux /vmlinuz-linux' >> /boot/loader/entries/arch.conf
+file_boot_loader_entries_arch_conf="/boot/loader/entries/arch.conf"
+
+echo 'title arch' > $file_boot_loader_entries_arch_conf
+echo 'linux /vmlinuz-linux' >> $file_boot_loader_entries_arch_conf
 #[TODO] intel / amd check here
-echo 'initrd /intel-ucode.img' >> /boot/loader/entries/arch.conf
-echo 'initrd /initramfs-linux.img' >> /boot/loader/entries/arch.conf
+echo 'initrd /intel-ucode.img' >> $file_boot_loader_entries_arch_conf
+echo 'initrd /initramfs-linux.img' >> $file_boot_loader_entries_arch_conf
 ### if lv_swap does not exist
-[ ! -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> /boot/loader/entries/arch.conf
+[ ! -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> $file_boot_loader_entries_arch_conf
 ### if lv_swap does exists
-[ -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` rw resume=UUID=`blkid | grep lv_swap | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> /boot/loader/entries/arch.conf
+[ -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` rw resume=UUID=`blkid | grep lv_swap | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> $file_boot_loader_entries_arch_conf
 
 ## long term support kernel (LTS)
-echo 'title arch-lts' > /boot/loader/entries/arch-lts.conf
-echo 'linux /vmlinuz-linux-lts' >> /boot/loader/entries/arch-lts.conf
+file_boot_loader_entries_arch_lts_conf="/boot/loader/entries/arch-lts.conf"
+
+echo 'title arch-lts' > $file_boot_loader_entries_arch_lts_conf
+echo 'linux /vmlinuz-linux-lts' >> $file_boot_loader_entries_arch_lts_conf
 #[TODO] intel / amd check here
-echo 'initrd /intel-ucode.img' >> /boot/loader/entries/arch.conf
-echo 'initrd /initramfs-linux-lts.img' >> /boot/loader/entries/arch-lts.conf
+echo 'initrd /intel-ucode.img' >> $file_boot_loader_entries_arch_lts_conf
+echo 'initrd /initramfs-linux-lts.img' >> $file_boot_loader_entries_arch_lts_conf
 ### if lv_swap does not exist
-[ ! -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> /boot/loader/entries/arch-lts.conf
+[ ! -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> $file_boot_loader_entries_arch_lts_conf
 ### if lv_swap does exist
-[ -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` rw resume=UUID=`blkid | grep lv_swap | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> /boot/loader/entries/arch-lts.conf
+[ -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` rw resume=UUID=`blkid | grep lv_swap | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> $file_boot_loader_entries_arch_lts_conf
 
 
 # generate initramfs with mkinitcpio

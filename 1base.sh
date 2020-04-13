@@ -538,10 +538,11 @@ pacman -S --noconfirm $install_helpers
 # configuring the mirrorlist
 
 ## backup old mirrorlist
-cp /etc/pacman.d/mirrorlist /etc/pacman.d/`date "+%Y%m%d%H%M%S"`_mirrorlist_backup
+file_etc_pacmand_mirrorlist="/etc/pacman.d/mirrorlist"
+cp $file_etc_pacmand_mirrorlist /etc/pacman.d/`date "+%Y%m%d%H%M%S"`_mirrorlist_backup
 
 ## select fastest mirrors
-reflector --verbose --country $mirror_country -l $mirror_amount --sort rate --save /etc/pacman.d/mirrorlist
+reflector --verbose --country $mirror_country -l $mirror_amount --sort rate --save $file_etc_pacmand_mirrorlist
 
 
 # install base & base-devel package groups
@@ -550,20 +551,21 @@ pacstrap -i /mnt $to_pacstrap
 
 
 # generate fstab
-genfstab -U -p /mnt >> /mnt/etc/fstab
+file_mnt_etc_fstab="/mnt/etc/fstab"
+
+genfstab -U -p /mnt >> $file_mnt_etc_fstab
 
 
 # modify fstab
 
 ## fstab /usr entry with nopass 0
-sed -i '/\/usr/s/.$/0/' /mnt/etc/fstab
+sed -i '/\/usr/s/.$/0/' $file_mnt_etc_fstab
 
 ## fstab /boot mount as ro
-sed -i '/\/boot/s/rw,/ro,/' /mnt/etc/fstab
+sed -i '/\/boot/s/rw,/ro,/' $file_mnt_etc_fstab
 
 ## fstab /usr mount as ro
-sed -i '/\/usr/s/rw,/ro,/' /mnt/etc/fstab
-
+sed -i '/\/usr/s/rw,/ro,/' $file_mnt_etc_fstab
 
 # preparing /mnt environment
 clear

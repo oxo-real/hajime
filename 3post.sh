@@ -25,15 +25,14 @@
 # user customizable variables
 ## base-devel packages retrieved with: yay -Qg | awk '{print $2}'
 base_devel="autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext grep groff gzip libtool m4 make pacman patch pkgconf sed sudo systemd texinfo util-linux which"
-base_additions="lsof pacman-contrib mlocate neofetch wl-clipboard-git"  #dash
-#old_base_additions="alsi"
-#bloat_ware="nano" # seems to be no more bloatware in the core since kernel v536
+base_additions="lsof pacman-contrib mlocate neofetch wl-clipboard-git"
+#bloat_ware="nano" # there seems to be no more bloatware since kernel v536
 
 
 # functions
 
-reply() {
 
+reply() {
 
 	# first silently entered character goes directly to $reply
 	stty_0=$(stty -g)
@@ -44,25 +43,20 @@ reply() {
 }
 
 
+reply_single() {
+
+        # first entered character goes directly to $reply
+        stty_0=$(stty -g)
+	stty raw #-echo
+        reply=$(head -c 1)
+        stty $stty_0
+
+}
+
+
 dhcp_connect() {
 
 	sh hajime/0init.sh
-## 	# dhcp connect
-## 	ip a
-## 	echo
-## 	echo -n 'enter interface number '
-## 	read interface_number
-## 	interface=$(ip a | grep "^$interface_number" | awk '{print $2}' | sed 's/://')
-## 	sudo dhcpcd -w $interface
-## 	if [[ ! -z $interface ]] ; then
-## 		echo "'$interface' connected"
-## 	else
-## 		printf "$interface not able to obtain lease\n"
-## 		printf "exiting\n"
-## 		exit
-## 	fi
-## 	ping -c 1 9.9.9.9
-## 	ip a
 
 }
 
@@ -77,7 +71,6 @@ own_home() {
 
 set_read_write() {
 
-
 	# set /usr and /boot read-write
 	sudo mount -o remount,rw  /usr
 	sudo mount -o remount,rw  /boot
@@ -87,23 +80,22 @@ set_read_write() {
 
 modify_pacman_conf() {
 
-
 	# modify pacman.conf
+	file_etc_pacman_conf="/etc/pacman.conf"
 
 	## add color
-	sudo sed -i 's/#Color/Color/' /etc/pacman.conf
+	sudo sed -i 's/#Color/Color/' $file_etc_pacman_conf
 
 	## add total download counter
-	sudo sed -i 's/#TotalDownload/TotalDownload/' /etc/pacman.conf
+	sudo sed -i 's/#TotalDownload/TotalDownload/' $file_etc_pacman_conf
 
 	## add multilib repository
-	sudo sed -i 's/\#\[multilib\]/\[multilib\]\nInclude \= \/etc\/pacman.d\/mirrorlist/' /etc/pacman.conf
+	sudo sed -i 's/\#\[multilib\]/\[multilib\]\nInclude \= \/etc\/pacman.d\/mirrorlist/' $file_etc_pacman_conf
 
 }
 
 
 create_directories() {
-
 
 	# create mountpoint docking bays
 
@@ -129,7 +121,6 @@ create_directories() {
 
 
 base_mutations() {
-
 
 	# update package databases
 	sudo pacman -Sy
@@ -158,20 +149,10 @@ base_mutations() {
 	## remove core system bloat
 	yay -Rns --noconfirm $bloat_ware
 
-
-	# Debian Almquist shell (DASH)
-
-	## dsah is a POSIX-compliant implementation of /bin/sh
-	## pacman hook is in: ~/.dot/code/pacman/hooks/relink_dash.hook
-
-	## linking /bin/sh
-	#sudo ln -sfT dash /usr/bin/sh
-
 }
 
 
 system_update() {
-
 
 	# system update
 
@@ -257,7 +238,6 @@ system_update() {
 
 set_read_only() {
 
-
 	# set /usr and /boot read-only
 	sudo mount -o remount,ro  /usr
 	sudo mount -o remount,ro  /boot
@@ -265,19 +245,7 @@ set_read_only() {
 }
 
 
-reply_single() {
-
-        # first entered character goes directly to $reply
-        stty_0=$(stty -g)
-	stty raw #-echo
-        reply=$(head -c 1)
-        stty $stty_0
-
-}
-
-
 conclusion() {
-
 
 	# finishing
 	sudo touch hajime/3post.done
