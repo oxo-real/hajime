@@ -493,7 +493,7 @@ cryptsetup open "$lvm_part" cryptlvm
 ## create physical volume with lvm
 pvcreate /dev/mapper/cryptlvm
 
-## create volumegroup vg0 with lvm
+## create volumegroup 0 (vg0) with lvm
 vgcreate vg0 /dev/mapper/cryptlvm
 
 ## create logical volumes
@@ -532,6 +532,8 @@ fi
 
 # install helpers
 clear
+## refresh package keys & install helpers
+pacman-key --refresh-keys
 pacman -S --noconfirm $install_helpers
 
 
