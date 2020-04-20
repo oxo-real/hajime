@@ -122,6 +122,9 @@ create_directories() {
 
 base_mutations() {
 
+	# own home
+	sudo chown -R $USER:wheel $HOME
+
 	# update package databases
 	sudo pacman -Sy
 
@@ -136,7 +139,7 @@ base_mutations() {
 	cd ~/tmp/yay
 
 	## install yay
-	makepkg -si
+	sudo makepkg -si
 	cd
 	rm -rf ~/tmp
 
