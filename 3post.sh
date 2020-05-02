@@ -139,7 +139,7 @@ base_mutations() {
 	cd ~/tmp/yay
 
 	## install yay
-	sudo makepkg -si
+	makepkg -si
 	cd
 	rm -rf ~/tmp
 
