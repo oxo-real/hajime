@@ -147,13 +147,13 @@ base_mutations() {
 	# add, remove and configure to the standard base packages
 
 	## add base addditions
-	for package in "${base_additions[@]}";
+	for package in $base_additions;
 	do
-		yay -S --noconfirm "$package"
+		yay -S --noconfirm $package
 	done
 
 	## remove core system bloat
-	#yay -Rns --noconfirm $bloat_ware
+	yay -Rns --noconfirm $bloat_ware
 
 }
 
