@@ -309,7 +309,7 @@ set_partition_sizes() {
         	fi
 		### remove decimals
 		swap_size="${swap_size_calc%%.*}"
-		lvm_size_calc=`echo - | awk "{$lvm_size_calc - $swap_size}"`
+		lvm_size_calc=`echo - | awk "{print $lvm_size_calc - $swap_size}"`
 	else
 		swap_size=0
 		printf "SWAP partition will NOT be created\n"
