@@ -164,7 +164,7 @@ create_additional_tools_list() {
 }
 
 
-set_usr() {
+set_usr_rw() {
 
 	## set /usr writeable
 	sudo mount -o remount,rw  /usr
@@ -172,7 +172,7 @@ set_usr() {
 }
 
 
-reset_usr() {
+set_usr_ro() {
 
 	# reset /usr read-only
 	sudo mount -o remount,ro  /usr
@@ -228,15 +228,12 @@ loose_ends() {
 define_core_applications
 create_core_applications_list
 
-set_usr
-install_core_applications
-#reset_usr
-
 define_additional_tools
-create_additional_application_list
+create_additional_tools_list
 
-#set_usr
+set_usr_rw
+install_core_applications
 install_additional_tools
-reset_usr
+set_usr_ro
 
 loose_ends
