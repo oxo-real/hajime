@@ -18,138 +18,225 @@
 ### cytopyge arch linux installation 'apps'
 ### fourth part of an intriguing series
 ###
-### (c) 2019 cytopyge
+### (c) 2019 - 2020 cytopyge
 ###
 ##
 #
 
 
-clear
-
-
 # user customizable variables
 tmux_plugin_dir="$HOME/.config/tmux/plugins"
 
-## core applications
 
-wayland="wlroots-git"
+define_core_applications() {
 
-dwm="sway-git swaylock i3blocks"
+	wayland="wlroots-git"
 
-shell="zsh"
+	dwm="sway-git swaylock i3blocks"
 
-shell_additions="zsh-completions zsh-syntax-highlighting"
+	shell="zsh"
 
-terminal="termite-nocsd tmux"
+	shell_additions="zsh-completions zsh-syntax-highlighting"
 
-terminal_additions="rofi"
+	terminal="termite-nocsd tmux"
 
-manpages="man-db man-pages"
+	terminal_additions="rofi"
 
-password_security="pass pass-tomb bitwarden-cli" #pass-wl-clipboard
+	manpages="man-db man-pages"
 
-encryption="veracrypt tomb"
+	password_security="pass" # pass-tomb bitwarden-cli pass-wl-clipboard
 
-secure_connections="wireguard-tools openvpn"
+	encryption="veracrypt" # tomb
 
-fonts="terminus-font ttf-inconsolata"
+	secure_connections="wireguard-tools openvpn"
 
-display="brightnessctl"
+	fonts="" # "terminus-font ttf-inconsolata"
 
-audio="pulseaudio alsa-utils"
+	display="brightnessctl"
 
-bluetooth="bluez bluez-utils pulseaudio-bluetooth"
+	audio="pulseaudio alsa-utils"
 
+	bluetooth="bluez bluez-utils pulseaudio-bluetooth"
 
-# additional tools
-
-terminal_text_tools="emacs figlet qrencode jq xxd-standalone"
-
-terminal_file_browser="nnn vifm lf-git"
-
-file_tools="rsync gdisk"
-
-network_tools="wireshark-cli wireshark-qt mtr iftop bind-tools whois"
-
-python_additions="python-pip"
-
-internet_tools="firefox-developer-edition qutebrowser urlscan"
-
-feeds="newsboat"
-
-email="neomutt msmtp isync notmuch protonmail-bridge"
-
-contact_management="abook"
-
-time_management="calcurse"
-
-arithmatic="bc"
-
-accounting="ledger"
-
-download_utilities="aria2 transmission-cli transmission-remote-cli-git"
-
-system_monitoring="glances ccze"
-
-virtualization="docker" #"virtualbox virtualbox-host-modules-arch"
-
-image_capturing="grim-git slurp"
-
-image_viewers="feh imv"
-
-image_editors="imagemagick"
-
-pdf_viewers="mupdf zathura-pdf-mupdf"
-
-video_tools="youtube-dl mpv youtube-viewer"
-
-photo_editing="" #"gimp"
-
-photo_management="" #"digikam darktable"
-
-vector_graphics_editing="" #"inkscape"
-
-office_tools="" #"libreoffice-fresh libreoffice-fresh-nl"
+}
 
 
-# set /usr writeable
-sudo mount -o remount,rw  /usr
+define_additional_tools() {
+
+	terminal_text_tools="emacs figlet qrencode jq xxd-standalone"
+
+	terminal_file_browser="vifm lf-git" #nnn
+
+	file_tools="rsync gdisk"
+
+	network_tools="wireshark-cli wireshark-qt mtr iftop bind-tools whois"
+
+	python_additions="python-pip"
+
+	internet_tools="firefox-developer-edition qutebrowser urlscan"
+
+	feeds="newsboat"
+
+	email="neomutt msmtp isync notmuch protonmail-bridge"
+
+	contact_management="abook"
+
+	time_management="calcurse"
+
+	arithmatic="bc"
+
+	accounting="ledger"
+
+	download_utilities="aria2 transmission-cli transmission-remote-cli-git"
+
+	system_monitoring="glances ccze"
+
+	virtualization="docker" #"virtualbox virtualbox-host-modules-arch"
+
+	image_capturing="grim-git slurp"
+
+	image_viewers="feh imv"
+
+	image_editors="imagemagick"
+
+	pdf_viewers="mupdf zathura-pdf-mupdf"
+
+	video_tools="youtube-dl mpv youtube-viewer"
+
+	photo_editing="" #"gimp"
+
+	photo_management="" #"digikam darktable"
+
+	vector_graphics_editing="" #"inkscape"
+
+	office_tools="" #"libreoffice-fresh libreoffice-fresh-nl"
+
+}
 
 
-# install core applications
-core_applications=($wayland $dwm $shell $shell_additions $terminal $terminal_additions $manpages $password_security $encryption $secure_connections $fonts $display $audio $bluetooth)
+create_core_applications_list(){
 
-for package in "${core_applications[@]}"; do
-	yay -S --noconfirm "$package"
-done
+	core_applications=($wayland \
+		$dwm \
+		$shell \
+		$shell_additions \
+		$terminal \
+		$terminal_additions \
+		$manpages \
+		$password_security \
+		$encryption \
+		$secure_connections \
+		$fonts \
+		$display \
+		$audio \
+		$bluetooth)
 
-
-# install additional tools
-additional_tools=($terminal_text_tools $terminal_file_browser $file_tools $network_tools $python_additions $internet_tools $feeds $email $contact_management $time_management $arithmatic $accounting $download_utilities $system_monitoring $virtualization $image_capturing $image_viewers $image_editors $pdf_viewers $video_tools $photo_editing $photo_management $vector_graphics_editing $office_tools)
-
-for package in "${additional_tools[@]}"; do
-	yay -Sy --noconfirm "$package"
-done
-
-
-# loose ends
-
-## fzf
-git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-~/.fzf/install
+}
 
 
-## tmux_plugin_manager
-git clone https://github.com/tmux-plugins/tpm $tmux_plugin_dir/tpm
+create_additional_tools_list() {
+
+	additional_tools=($terminal_text_tools \
+		$terminal_file_browser \
+		$file_tools \
+		$network_tools \
+		$python_additions \
+		$internet_tools \
+		$feeds \
+		$email \
+		$contact_management \
+		$time_management \
+		$arithmatic \
+		$accounting \
+		$download_utilities \
+		$system_monitoring \
+		$virtualization \
+		$image_capturing \
+		$image_viewers \
+		$image_editors \
+		$pdf_viewers \
+		$video_tools \
+		$photo_editing \
+		$photo_management \
+		$vector_graphics_editing \
+		$office_tools)
+
+}
 
 
-# reset /usr read-only
-sudo mount -o remount,ro  /usr
+set_usr() {
+
+	## set /usr writeable
+	sudo mount -o remount,rw  /usr
+
+}
 
 
-# execute dotfiles install script
-echo 'sh hajime/5dtcf.sh'
+reset_usr() {
+
+	# reset /usr read-only
+	sudo mount -o remount,ro  /usr
+
+}
 
 
-# finishing
-sudo touch ~/hajime/4apps.done
+install_core_applications() {
+
+	## loop through core app packages
+	## instead of one whole list entry in yay
+	## this prevents that on error only one package is skipped
+
+	for package in "${core_applications[@]}"; do
+
+		yay -S --noconfirm "$package"
+
+	done
+
+}
+
+
+
+install_additional_tools() {
+
+	for package in "${additional_tools[@]}"; do
+
+		yay -Sy --noconfirm "$package"
+
+	done
+
+}
+
+
+loose_ends() {
+
+	## fzf
+	git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+	~/.fzf/install
+
+	## tmux_plugin_manager
+	git clone https://github.com/tmux-plugins/tpm $tmux_plugin_dir/tpm
+
+	## execute dotfiles install script
+	echo 'sh hajime/5dtcf.sh'
+
+	## finishing
+	sudo touch ~/hajime/4apps.done
+
+}
+
+
+define_core_applications
+create_core_applications_list
+
+set_usr
+install_core_applications
+#reset_usr
+
+define_additional_tools
+create_additional_application_list
+
+#set_usr
+install_additional_tools
+reset_usr
+
+loose_ends

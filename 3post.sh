@@ -16,7 +16,7 @@
 ### cytopyge arch linux installation 'post'
 ### third part of a series
 ###
-### (c) 2019 cytopyge
+### (c) 2019 - 2020 cytopyge
 ###
 ##
 #
@@ -103,6 +103,7 @@ create_directories() {
 	sudo mkdir -p /dock/2
 	sudo mkdir -p /dock/3
 	sudo mkdir -p /dock/4
+	sudo mkdir -p /dock/vault
 
 
 	# create _user directories
@@ -113,8 +114,8 @@ create_directories() {
 	mkdir -p ~/_keys
 	mkdir -p ~/_media
 	mkdir -p ~/_settings
-	mkdir -p ~/_test
 	mkdir -p ~/_temp
+	mkdir -p ~/_test
 	mkdir -p ~/_todo
 
 }

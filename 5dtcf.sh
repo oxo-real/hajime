@@ -55,9 +55,8 @@ sudo mount -o remount,rw  /usr
 ## prepare wallpaper file
 [ -d ~/_media/images/wallpaper ] || mkdir -p ~/_media/images/wallpaper
 ## to be replaced with preferred image
-cd ~/_media/images/wallpaper
-curl -O https://www.archlinux.org/static/logos/archlinux-logo-light-1200dpi.7ccd81fd52dc.png
-mv archlinux-logo-light-1200dpi.7ccd81fd52dc.png active
+#cd ~/_media/images/wallpaper
+#mv image.png active
 cd
 
 
@@ -73,6 +72,12 @@ cd
 #yay -Syu --noconfirm urxvt-resize-font-git
 
 
+# pass
+## create password-store symlink to pass_vault mountpoint
+cd
+ln -s /dock/vault .password-store
+
+
 # zsh shell config
 
 ## set zsh as default shell for current user
@@ -85,14 +90,11 @@ sudo chsh -s /bin/zsh
 ## shell decoration
 ## base16-shell
 git clone https://github.com/chriskempson/base16-shell.git ~/.config/base16-shell
-cd ~
+cd
 base16_irblack
 
 
 # vim
-
-## vim alias
-alias vim=nvim
 
 ## vim vundle
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim

@@ -16,7 +16,7 @@
 ### cytopyge arch linux installation 'configuration'
 ### second part of a series
 ###
-### (c) 2019 cytopyge
+### (c) 2019 - 2020 cytopyge
 ###
 ##
 #
