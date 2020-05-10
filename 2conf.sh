@@ -88,7 +88,6 @@ set_vconsole() {
 
 set_hostname() {
 
-	clear
 	printf "hostname: '$hostname'\n"
 	printf "correct? (y/N) "
 	reply
@@ -102,7 +101,6 @@ set_hostname() {
 
 		if printf "$reply" | grep -iq "^n"; then
 
-			clear
 			set_hostname
 		else
 				echo
@@ -119,7 +117,6 @@ set_hostname() {
 
 		if printf "$reply" | grep -iq "^n"; then
 
-			clear
 			set_hostname
 		else
 				echo
@@ -174,7 +171,6 @@ root_password() {
 
 user_name() {
 
-	clear
 	printf "username: '$username'\n"
 	printf "correct? (y/N) "
 	reply
@@ -188,7 +184,6 @@ user_name() {
 
 		if printf "$reply" | grep -iq "^n"; then
 
-		    clear
 		    set_username
 
 		else
@@ -207,7 +202,6 @@ user_name() {
 
 		if printf "$reply" | grep -iq "^n"; then
 
-		    clear
 		    set_username
 
 		else
