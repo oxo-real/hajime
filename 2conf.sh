@@ -287,6 +287,8 @@ micro_code() {
 
 	fi
 
+	micro_code=$("micro_code_$cpu_type")
+
 }
 
 
@@ -299,10 +301,9 @@ install_core_applications() {
 		$command_line_editor \
 		$wireless \
 		$secure_connections \
-		$micro_code$cpu_type \
 		$system_security \
+		$micro_code \
 		$crypto
-	#TODO ucode
 
 }
 
