@@ -502,7 +502,7 @@ user_password
 wheel_privilege_escalation
 install_helper_files
 mirrorlist_configuration
-#define_micro_code
+define_micro_code
 install_core_applications
 #install_crypto_applications
 install_boot_files
