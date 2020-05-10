@@ -287,7 +287,7 @@ define_micro_code() {
 
 	fi
 
-	micro_code=$("micro_code_$cpu_type")
+	micro_code="micro_code_$cpu_type" #TODO
 
 }
 
