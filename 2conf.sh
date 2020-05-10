@@ -41,7 +41,7 @@ secure_connections="openssh"
 micro_code_intel="intel-ucode iucode-tool"
 micro_code_amd="amd-ucode"
 system_security="arch-audit"
-crypto="cryptboot sbupdate-git"
+crypto="cryptboot sbupdate-git"  ## #TODO pacman
 
 
 reply() {
@@ -184,7 +184,7 @@ user_name() {
 
 		if printf "$reply" | grep -iq "^n"; then
 
-		    set_username
+		    user_name
 
 		else
 
@@ -202,7 +202,7 @@ user_name() {
 
 		if printf "$reply" | grep -iq "^n"; then
 
-		    set_username
+		    user_name
 
 		else
 
@@ -253,7 +253,7 @@ wheel_privilege_escalation() {
 }
 
 
-install_helpers() {
+install_helper_files() {
 
 	pacman -Sy --noconfirm $install_helpers
 
@@ -273,7 +273,7 @@ mirrorlist_configuration() {
 }
 
 
-micro_code() {
+define_micro_code() {
 
 	cpu_name=$(lscpu | grep name | awk '{print $2}')
 
@@ -447,7 +447,7 @@ make_initramfs() {
 }
 
 
-cryto_remainings() {
+crypto_remainings() {
 
 	## ## sbupdate
 	sbupdate
@@ -494,9 +494,9 @@ user_add
 user_groups
 user_password
 wheel_privilege_escalation
-install_helpers
+install_helper_files
 mirrorlist_configuration
-#micro_code
+#define_micro_code
 install_core_applications
 install_boot_files
 configure_boot_loader
