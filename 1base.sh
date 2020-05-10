@@ -550,12 +550,12 @@ set_lvm_partition_sizes() {
 	echo
 
 	if [[ "$diff_t" -gt 0 ]]; then
-		printf "disk size is insufficient for allocated space\n"
+		printf "disk size ($lvm_size_humanGB) is insufficient for allocated space\n"
 		printf "please shrink allocated space and try again\n"
 		set_partition_sizes
 	fi
 
-	echo -n 'continue? (Y/n) '
+	printf "continue? (Y/n) "
 	reply_single
 	if printf "$reply" | grep -iq "^n" ; then
 		exit_hajime
