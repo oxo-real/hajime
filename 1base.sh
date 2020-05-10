@@ -899,6 +899,7 @@ welcome() {
 }
 
 
+define_text_appearance
 welcome
 get_bootmount
 network_setup
