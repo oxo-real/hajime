@@ -72,7 +72,7 @@ set_locale() {
 
 	sed -i "/^#en_US.UTF-8 UTF-8/c\en_US.UTF-8 UTF-8" $file_etc_locale_gen
 	locale-gen
-	echo $locale_conf > $etc_locale_conf
+	echo $locale_conf > $file_etc_locale_conf
 
 }
 
@@ -302,8 +302,14 @@ install_core_applications() {
 		$wireless \
 		$secure_connections \
 		$system_security \
-		$micro_code \
-		$crypto
+		$micro_code
+
+}
+
+
+install_crypto_applications() {
+
+	pacman -S --noconfirm $crypto
 
 }
 
@@ -498,6 +504,7 @@ install_helper_files
 mirrorlist_configuration
 #define_micro_code
 install_core_applications
+#install_crypto_applications
 install_boot_files
 configure_boot_loader
 create_initramfs
