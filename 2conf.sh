@@ -494,7 +494,7 @@ set_hostname
 create_hostname_file
 #enable_systemd_resolved
 root_password
-set_username
+user_name
 user_add
 user_groups
 user_password
