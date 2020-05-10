@@ -277,11 +277,11 @@ define_micro_code() {
 
 	cpu_name=$(lscpu | grep name | awk '{print $2}')
 
-	if [[ -n $($cpu_name | grep -i intel) ]]; then
+	if [[ -n $(printf "$icpu_name" | grep -i intel) ]]; then
 
 		cpu_type="intel"
 
-	elif [[ -n $($cpu_name | grep -i amd) ]]; then
+	elif [[ -n $(printf "$cpu_name" | grep -i amd) ]]; then
 
 		cpu_type="amd"
 
