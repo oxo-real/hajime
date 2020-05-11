@@ -50,20 +50,6 @@ define_core_applications() {
 }
 
 
-create_core_applications_list() {
-
-	core_applications=($linux_kernel \
-		$linux_lts_kernel \
-		$core_applications \
-		$command_line_editor \
-		$wireless \
-		$secure_connections \
-		$system_security)
-		#$micro_code #TODO
-
-
-}
-
 reply() {
 
 	# first silently entered character goes directly to $reply
@@ -312,6 +298,21 @@ define_micro_code() {
 }
 
 
+create_core_applications_list() {
+
+	core_applications=($linux_kernel \
+		$linux_lts_kernel \
+		$core_applications \
+		$command_line_editor \
+		$wireless \
+		$secure_connections \
+		$system_security)
+		#$micro_code #TODO
+
+
+}
+
+
 install_core_applications() {
 
 	for package in "{core_applications[@]}"; do
@@ -519,6 +520,8 @@ wheel_privilege_escalation
 install_helper_files
 mirrorlist_configuration
 define_micro_code
+define_core_applications
+create_core_applications_list
 install_core_applications
 #install_crypto_applications
 install_boot_files
