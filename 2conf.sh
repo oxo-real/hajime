@@ -171,10 +171,14 @@ enable_systemd_resolved() {
 	resolvectl status
 
 	# DNS over TLS (DOT)
-	mkdir /etc/systemd/resolve.conf.d
-	printf "[Resolve]" > /etc/systemd/resolve.conf.d/dns_over_tls.conf
-	printf "DNS=9.9.9.9#dns.quad9.net" >> /etc/systemd/resolve.conf.d/dns_over_tls.conf
-	printf "DNSOverTLS=yes" >> /etc/systemd/resolve.conf.d/dns_over_tls.conf
+	dot_conf_dir="/etc/systemd/resolve.conf.d"
+	dot_conf_file="$dot_conf_dir/dns_over_tls.conf"
+
+	mkdir -p $dot_conf_dir
+
+	printf "[Resolve]" > $dot_conf_file
+	printf "DNS=9.9.9.9#dns.quad9.net" >> $dot_conf_file
+	printf "DNSOverTLS=yes" >> $dot_conf_file
 
 }
 
@@ -327,8 +331,8 @@ create_core_package_list() {
 		$command_line_editor \
 		$wireless \
 		$secure_connections \
-		$system_security) \
-		$micro_code
+		$system_security)
+		#$micro_code
 
 
 }
