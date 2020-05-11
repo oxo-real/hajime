@@ -301,8 +301,8 @@ install_core_applications() {
 		$command_line_editor \
 		$wireless \
 		$secure_connections \
-		$system_security \
-		$micro_code
+		$system_security
+		#$micro_code
 
 }
 
