@@ -308,15 +308,13 @@ define_micro_code() {
 
 	if [[ -n $(printf "$icpu_name" | grep -i intel) ]]; then
 
-		cpu_type="intel"
+		micro_code="$micro_code_intel"
 
 	elif [[ -n $(printf "$cpu_name" | grep -i amd) ]]; then
 
-		cpu_type="amd"
+		micro_code="$micro_code_amd"
 
 	fi
-
-	micro_code="micro_code_$cpu_type" #TODO
 
 }
 
@@ -330,7 +328,7 @@ create_core_package_list() {
 		$wireless \
 		$secure_connections \
 		$system_security) \
-		$micro_code #TODO
+		$micro_code
 
 
 }
