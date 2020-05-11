@@ -32,17 +32,37 @@ hostname="host"
 username="user"
 bootloader_timeout="2"
 bootloader_editor="0"
-linux_kernel="linux-headers" #linux 1base
-linux_lts_kernel="linux-lts linux-lts-headers"
-command_line_editor="emacs neovim"
 install_helpers="reflector" #binutils 3post base-devel group
-wireless="wpa_supplicant wireless_tools iw"
-secure_connections="openssh"
-micro_code_intel="intel-ucode iucode-tool"
-micro_code_amd="amd-ucode"
-system_security="arch-audit"
-crypto="cryptboot sbupdate-git"  ## #TODO pacman
 
+
+define_core_applications() {
+
+	linux_kernel="linux-headers" #linux 1base
+	linux_lts_kernel="linux-lts linux-lts-headers"
+	command_line_editor="emacs neovim"
+	wireless="wpa_supplicant wireless_tools iw"
+	secure_connections="openssh"
+	micro_code_intel="intel-ucode iucode-tool"
+	micro_code_amd="amd-ucode"
+	system_security="arch-audit"
+	crypto="cryptboot sbupdate-git"  ## #TODO pacman
+
+}
+
+
+create_core_applications_list() {
+
+	core_applications=($linux_kernel \
+		$linux_lts_kernel \
+		$core_applications \
+		$command_line_editor \
+		$wireless \
+		$secure_connections \
+		$system_security)
+		#$micro_code #TODO
+
+
+}
 
 reply() {
 
@@ -294,15 +314,11 @@ define_micro_code() {
 
 install_core_applications() {
 
-	pacman -S --noconfirm \
-		$linux_kernel \
-		$linux_lts_kernel \
-		$core_applications \
-		$command_line_editor \
-		$wireless \
-		$secure_connections \
-		$system_security
-		#$micro_code
+	for package in "{core_applications[@]}"; do
+
+		pacman -S --noconfirm "$package"
+
+	done
 
 }
 
