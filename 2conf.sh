@@ -32,10 +32,16 @@ hostname="host"
 username="user"
 bootloader_timeout="2"
 bootloader_editor="0"
-install_helpers="reflector" #binutils 3post base-devel group
 
 
-define_core_applications() {
+define_helper_packages() {
+
+	mirror_management="reflector" #binutils 3post base-devel group
+
+}
+
+
+define_core_packages() {
 
 	linux_kernel="linux-headers" #linux 1base
 	linux_lts_kernel="linux-lts linux-lts-headers"
@@ -45,7 +51,13 @@ define_core_applications() {
 	micro_code_intel="intel-ucode iucode-tool"
 	micro_code_amd="amd-ucode"
 	system_security="arch-audit"
-	crypto="cryptboot sbupdate-git"  ## #TODO pacman
+
+}
+
+
+define_crypto_packages() {
+
+	crypto="cryptboot sbupdate-git" ## #TODO pacman
 
 }
 
@@ -259,9 +271,20 @@ wheel_privilege_escalation() {
 }
 
 
-install_helper_files() {
+create_helper_package_list() {
 
-	pacman -Sy --noconfirm $install_helpers
+	helper_packages=($mirror_management)
+
+}
+
+
+install_helper_packages() {
+
+	for package in "${helper_packages[@]}"; do
+
+		pacman -Sy --noconfirm $package
+
+	done
 
 }
 
@@ -298,24 +321,24 @@ define_micro_code() {
 }
 
 
-create_core_applications_list() {
+create_core_package_list() {
 
-	core_applications=($linux_kernel \
+	core_packages=($linux_kernel \
 		$linux_lts_kernel \
 		$core_applications \
 		$command_line_editor \
 		$wireless \
 		$secure_connections \
-		$system_security)
-		#$micro_code #TODO
+		$system_security) \
+		$micro_code #TODO
 
 
 }
 
 
-install_core_applications() {
+install_core_packages() {
 
-	for package in "{core_applications[@]}"; do
+	for package in "${core_packages[@]}"; do
 
 		pacman -S --noconfirm "$package"
 
@@ -324,9 +347,20 @@ install_core_applications() {
 }
 
 
-install_crypto_applications() {
+create_crypto_package_list() {
 
-	pacman -S --noconfirm $crypto
+	crypto_packages=($crypto)
+
+}
+
+
+install_crypto_packages() {
+
+	for package in "${crypto_packages[@]}"; do
+
+		pacman -S --noconfirm "$package"
+
+	done
 
 }
 
@@ -517,13 +551,17 @@ user_add
 user_groups
 user_password
 wheel_privilege_escalation
-install_helper_files
+define_helper_packages
+create_helper_package_list
+install_helper_packages
 mirrorlist_configuration
 define_micro_code
-define_core_applications
-create_core_applications_list
-install_core_applications
-#install_crypto_applications
+define_core_packages
+create_core_package_list
+install_core_packages
+#define_crypto_packages
+#create_crypto_package_list
+#install_crypto_packages
 install_boot_files
 configure_boot_loader
 create_initramfs
