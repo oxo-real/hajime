@@ -48,7 +48,7 @@ define_core_applications() {
 
 	encryption="veracrypt" # tomb
 
-	secure_connections="wireguard-tools openvpn openvpn-update-systemd-resolved"
+	secure_connections="wireguard-tools openvpn openvpn-update-systemd-resolved sshfs"
 
 	fonts="" # "terminus-font ttf-inconsolata"
 
