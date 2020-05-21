@@ -506,7 +506,6 @@ set_lvm_partition_sizes() {
 	var_size_calc=`echo - | awk  "{print $var_perc * $lvm_size_calc}"`
 
 	## ROOT partition
-	echo
 	printf "ROOT partition size (GB)? [$root_size_calc] "
 	reply_plain
         if [ ! -z "$reply" ]; then
