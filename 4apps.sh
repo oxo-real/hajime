@@ -44,7 +44,7 @@ define_core_applications() {
 
 	manpages="man-db man-pages"
 
-	password_security="pass" # pass-tomb bitwarden-cli pass-wl-clipboard
+	password_security="pass ssss" # pass-tomb bitwarden-cli pass-wl-clipboard
 
 	encryption="veracrypt" # tomb
 
