@@ -150,7 +150,7 @@ base_mutations() {
 	## add base addditions
 	for package in $base_additions;
 	do
-		yay -S --noconfirm $package
+		yay -S --needed --noconfirm $package
 	done
 
 	## remove core system bloat
