@@ -30,7 +30,10 @@ tmux_plugin_dir="$HOME/.config/tmux/plugins"
 
 define_core_applications() {
 
-	wayland="wlroots-git"
+	wayland="wlroots-git qt5-wayland"
+		## qt5-wayland to prevent:
+		## WARNING: Could not find the Qt platform plugin "wayland" in ""
+		## when starting qutebrowser
 
 	dwm="sway-git swaylock i3blocks"
 
