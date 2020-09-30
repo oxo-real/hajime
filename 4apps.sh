@@ -47,7 +47,7 @@ define_core_applications() {
 
 	manpages="man-db man-pages"
 
-	password_security="pass ssss" # pass-tomb bitwarden-cli pass-wl-clipboard
+	password_security="pass ssss yubikey-manager" # pass-tomb bitwarden-cli pass-wl-clipboard
 
 	encryption="veracrypt" # tomb
 
@@ -70,7 +70,7 @@ define_additional_tools() {
 
 	terminal_file_browser="vifm" #lf-git nnn
 
-	file_tools="rsync gdisk"
+	file_tools="rsync gdisk simple-mtpfs"
 
 	network_tools="wireshark-cli wireshark-qt mtr iftop bind-tools whois"
 
