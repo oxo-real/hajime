@@ -47,17 +47,19 @@ define_core_applications() {
 
 	manpages="man-db man-pages"
 
-	password_security="pass ssss yubikey-manager" # pass-tomb bitwarden-cli pass-wl-clipboard
+	password_security="pass ssss yubikey-manager"
+		# pass-tomb bitwarden-cli pass-wl-clipboard
 
 	encryption="veracrypt" # tomb
 
 	secure_connections="wireguard-tools openvpn openvpn-update-systemd-resolved sshfs"
 
-	fonts="" # "terminus-font ttf-inconsolata"
+	fonts=""
+		# "terminus-font ttf-inconsolata"
 
 	display="brightnessctl"
 
-	audio="pulseaudio alsa-utils"
+	audio="pulseaudio pulseaudio-alsa pulsemixer alsa-utils"
 
 	bluetooth="bluez bluez-utils pulseaudio-bluetooth"
 
