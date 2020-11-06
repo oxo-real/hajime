@@ -35,7 +35,7 @@ define_core_applications() {
 		## WARNING: Could not find the Qt platform plugin "wayland" in ""
 		## when starting qutebrowser
 
-	dwm="sway-git swaylock i3blocks"
+	dwm="sway-git swaylock i3blocks waybar-git"
 
 	shell="zsh"
 
