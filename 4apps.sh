@@ -68,7 +68,7 @@ define_core_applications() {
 
 define_additional_tools() {
 
-	terminal_text_tools="emacs figlet qrencode jq xxd-standalone"
+	terminal_text_tools="emacs figlet qrencode zbar jq xxd-standalone"
 
 	terminal_file_browser="vifm" #lf-git nnn
 
