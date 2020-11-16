@@ -72,7 +72,7 @@ define_additional_tools() {
 
 	terminal_file_browser="vifm" #lf-git nnn
 
-	file_tools="rsync gdisk simple-mtpfs"
+	file_tools="rsync gdisk simple-mtpfs tmsu"
 
 	network_tools="wireshark-cli wireshark-qt mtr iftop bind-tools whois"
 
