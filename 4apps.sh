@@ -33,7 +33,7 @@ define_core_applications() {
 	wayland="wlroots-git qt5-wayland"
 		## qt5-wayland to prevent:
 		## WARNING: Could not find the Qt platform plugin "wayland" in ""
-		## when starting qutebrowser
+		## i.e. when starting qutebrowser
 
 	dwm="sway-git swaylock i3blocks waybar-git"
 
@@ -41,21 +41,24 @@ define_core_applications() {
 
 	shell_additions="zsh-completions zsh-syntax-highlighting"
 
-	terminal="termite-nocsd tmux"
+	terminal="alacritty tmux"
+						#"termite-nocsd"
 
-	terminal_additions="rofi"
+	terminal_additions="wofi mako"
+						#"rofi"
 
 	manpages="man-db man-pages"
 
 	password_security="pass ssss yubikey-manager"
-		# pass-tomb bitwarden-cli pass-wl-clipboard
+						#"pass-tomb bitwarden-cli pass-wl-clipboard"
 
-	encryption="veracrypt" # tomb
+	encryption="veracrypt"
+						#"tomb"
 
 	secure_connections="wireguard-tools openvpn openvpn-update-systemd-resolved sshfs"
 
 	fonts=""
-		# "terminus-font ttf-inconsolata"
+						#"terminus-font ttf-inconsolata"
 
 	display="brightnessctl"
 
@@ -70,9 +73,13 @@ define_additional_tools() {
 
 	terminal_text_tools="emacs figlet qrencode zbar jq xxd-standalone"
 
-	terminal_file_browser="vifm" #lf-git nnn
+	terminal_file_browser="vifm"
+						#"lf-git nnn"
 
 	file_tools="rsync gdisk simple-mtpfs tmsu"
+
+	debugging="strace"
+						#"gdb valgrind strace"
 
 	network_tools="wireshark-cli wireshark-qt mtr iftop bind-tools whois"
 
@@ -96,7 +103,8 @@ define_additional_tools() {
 
 	system_monitoring="glances ccze"
 
-	virtualization="docker" #"virtualbox virtualbox-host-modules-arch"
+	virtualization="docker"
+						#"virtualbox virtualbox-host-modules-arch"
 
 	image_capturing="grim-git slurp"
 
@@ -108,13 +116,17 @@ define_additional_tools() {
 
 	video_tools="youtube-dl mpv youtube-viewer"
 
-	photo_editing="" #"gimp"
+	photo_editing=""
+						#"gimp"
 
-	photo_management="" #"digikam darktable"
+	photo_management=""
+						#"digikam darktable"
 
-	vector_graphics_editing="" #"inkscape"
+	vector_graphics_editing=""
+						#"inkscape"
 
-	office_tools="" #"libreoffice-fresh libreoffice-fresh-nl"
+	office_tools=""
+						#"libreoffice-fresh libreoffice-fresh-nl"
 
 }
 
@@ -144,6 +156,7 @@ create_additional_tools_list() {
 	additional_tools=($terminal_text_tools \
 		$terminal_file_browser \
 		$file_tools \
+		$debugging \
 		$network_tools \
 		$python_additions \
 		$internet_tools \
