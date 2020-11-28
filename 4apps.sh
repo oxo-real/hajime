@@ -76,7 +76,7 @@ define_additional_tools() {
 	terminal_file_browser="vifm"
 						#"lf-git nnn"
 
-	file_tools="rsync gdisk simple-mtpfs tmsu"
+	file_tools="rsync gdisk simple-mtpfs fd tmsu"
 
 	debugging="strace"
 						#"gdb valgrind strace"
