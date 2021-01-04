@@ -30,12 +30,12 @@ tmux_plugin_dir="$HOME/.config/tmux/plugins"
 
 define_core_applications() {
 
-	wayland="wlroots-git qt5-wayland"
+	wayland="wlroots-git qt5-wayland wev"
 		## qt5-wayland to prevent:
 		## WARNING: Could not find the Qt platform plugin "wayland" in ""
 		## i.e. when starting qutebrowser
 
-	dwm="sway-git swaylock i3blocks waybar-git"
+	dwm="sway-git swaylock swayidle i3blocks waybar-git"
 
 	shell="zsh"
 
@@ -71,7 +71,7 @@ define_core_applications() {
 
 define_additional_tools() {
 
-	terminal_text_tools="emacs figlet qrencode zbar jq xxd-standalone"
+	terminal_text_tools="emacs figlet qrencode zbar jq xxd-standalone vimball"
 
 	terminal_file_browser="vifm"
 						#"lf-git nnn"
