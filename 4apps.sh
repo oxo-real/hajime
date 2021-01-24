@@ -81,11 +81,12 @@ define_additional_tools() {
 	debugging="strace"
 						#"gdb valgrind strace"
 
-	network_tools="wireshark-cli wireshark-qt mtr iftop bind-tools whois"
+	network_tools="mtr iftop bind-tools whois"
+						#"wireshark-cli wireshark-qt"
 
 	python_additions="python-pip"
 
-	internet_tools="firefox-developer-edition qutebrowser urlscan"
+	internet_tools="firefox-developer-edition qutebrowser urlscan w3m lynx"
 
 	feeds="newsboat"
 
@@ -233,6 +234,11 @@ loose_ends() {
 
 	## tmux_plugin_manager
 	git clone https://github.com/tmux-plugins/tpm $tmux_plugin_dir/tpm
+
+	## create w3mimgdisplay symlink
+	## w3mimgdisplay is not in /usr/bin by default as of 20210114
+	## alternative is to add /usr/lib/w3m to $PATH
+	sudo ln -s /usr/lib/w3m/w3mimgdisplay /usr/bin/w3mimgdisplay
 
 	## execute dotfiles install script
 	echo 'sh hajime/5dtcf.sh'

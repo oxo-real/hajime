@@ -28,7 +28,7 @@ clear
 # user customizable variables
 time_zone="Europe/Amsterdam"
 locale_conf="LANG=en_US.UTF-8"
-vconsole_conf="FONT=ter-v32n"
+vconsole_conf="KEYMAP=us\nFONT=lat1-16\n#FONT=ter-v32n"
 mirror_country="Netherlands"
 mirror_amount="5"
 hostname="host"
