@@ -89,6 +89,9 @@ modify_pacman_conf() {
 	## add total download counter
 	sudo sed -i 's/#TotalDownload/TotalDownload/' $file_etc_pacman_conf
 
+	## add verbose package lists
+	sudo sed -i 's/#VerbosePkgLists/VerbosePkgLists/' $file_etc_pacman_conf
+
 	## add multilib repository
 	sudo sed -i 's/\#\[multilib\]/\[multilib\]\nInclude \= \/etc\/pacman.d\/mirrorlist/' $file_etc_pacman_conf
 
