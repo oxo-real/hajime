@@ -96,12 +96,12 @@ base16_irblack
 
 # vim
 
-## vim vundle
-git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+## vim plug
+sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
+       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 
-## install plugins defined in ~/.dot/.vimrc
-#[TODO] add base16-vim here?
-vim +PluginInstall +qall
+## install plugins defined in: $XDG_CONFIG_HOME/nvim/plugged
+vim +PlugInstall +qall
 echo
 
 
