@@ -16,7 +16,7 @@
 ### cytopyge arch linux installation 'configuration'
 ### second part of a series
 ###
-### (c) 2019 - 2020 cytopyge
+### (c) 2019 - 2021 cytopyge
 ###
 ##
 #
@@ -26,10 +26,10 @@ clear
 
 
 # user customizable variables
-time_zone="Europe/Amsterdam"
+time_zone="Europe/Stockholm"
 locale_conf="LANG=en_US.UTF-8"
-vconsole_conf="KEYMAP=us\nFONT=lat1-16\n#FONT=ter-v32n"
-mirror_country="Netherlands"
+vconsole_conf="KEYMAP=us\nFONT=lat1-16"
+mirror_country="Sweden"
 mirror_amount="5"
 hostname="host"
 username="user"
@@ -37,7 +37,7 @@ bootloader_timeout="2"
 bootloader_editor="0"
 linux_kernel="linux-headers" #linux 1base
 linux_lts_kernel="linux-lts linux-lts-headers"
-command_line_editor="emacs neovim"
+text_editor="emacs neovim"
 install_helpers="reflector" #binutils 3post base-devel group
 wireless="wpa_supplicant wireless_tools iw"
 secure_connections="openssh"
@@ -265,7 +265,7 @@ reflector --verbose --country $mirror_country -l $mirror_amount --sort rate --sa
 
 
 # update repositories and install core applications
-pacman -S --noconfirm $linux_kernel $linux_lts_kernel $core_applications $command_line_editor $wireless $secure_connections $micro_code_intel $system_security
+pacman -S --noconfirm $linux_kernel $linux_lts_kernel $core_applications $text_editor $wireless $secure_connections $micro_code_intel $system_security
 
 
 # installing the EFI boot manager

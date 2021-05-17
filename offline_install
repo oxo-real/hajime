@@ -1,0 +1,23 @@
+# offline arch installation
+https://wiki.archlinux.org/title/Offline_installation
+
+## archiso to local removable storage device [ARCHISO]
+
+isolatest [ARCHISO]
+
+## packages to local removable storage device [REPO]
+
+offline:
+on a up-to-date system copy local packages to [REPO]
+
+cp -r /var/cache/pacman/pkg [REPO]
+
+cp -r $XDG_DATA_HOME/git/code/* [REPO]
+
+OR via internet:
+
+minimal:
+pacman -Syw --cachedir . --dbpath [REPO] base base-devel linux linux-firmware systemd mkinitcpio vim
+
+current system:
+pacman -Syw --cachedir . --dbpath [REPO] $(yay -Q)

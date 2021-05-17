@@ -16,7 +16,7 @@
 ### cytopyge arch linux installation 'post'
 ### third part of a series
 ###
-### (c) 2019 - 2020 cytopyge
+### (c) 2019 - 2021 cytopyge
 ###
 ##
 #
@@ -27,6 +27,8 @@
 base_devel="autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext grep groff gzip libtool m4 make pacman patch pkgconf sed sudo systemd texinfo util-linux which"
 base_additions="lsof pacman-contrib mlocate neofetch wl-clipboard-git"
 bloat_ware="" # there seems to be no more bloatware since kernel v536
+mirror_country="Sweden"
+mirror_amount="5"
 
 
 # functions
@@ -102,24 +104,23 @@ create_directories() {
 
 	# create mountpoint docking bays
 
-	sudo mkdir -p /dock/1
-	sudo mkdir -p /dock/2
-	sudo mkdir -p /dock/3
-	sudo mkdir -p /dock/4
-	sudo mkdir -p /dock/vault
+	sudo mkdir -p $HOME/dock/1
+	sudo mkdir -p $HOME/dock/2
+	sudo mkdir -p $HOME/dock/3
+	sudo mkdir -p $HOME/dock/4
+	sudo mkdir -p $HOME/dock/vault
 
 
 	# create _user directories
 
-	mkdir -p ~/_backup
-	mkdir -p ~/_data
-	mkdir -p ~/_download
-	mkdir -p ~/_keys
-	mkdir -p ~/_media
-	mkdir -p ~/_settings
-	mkdir -p ~/_temp
-	mkdir -p ~/_test
-	mkdir -p ~/_todo
+	mkdir -p $XDG_DATA_HOME/backup
+	mkdir -p $XDG_DATA_HOME/data
+	mkdir -p $XDG_DATA_HOME/download
+	mkdir -p $XDG_DATA_HOME/keys
+	mkdir -p $XDG_DATA_HOME/media
+	mkdir -p $XDG_DATA_HOME/todo
+	mkdir -p $XDG_CACHE_HOME/temp
+	mkdir -p $XDG_CACHE_HOME/test
 
 }
 
@@ -153,11 +154,13 @@ base_mutations() {
 	## add base addditions
 	for package in $base_additions;
 	do
+
 		yay -S --needed --noconfirm $package
+
 	done
 
 	## remove core system bloat
-	yay -Rns --noconfirm $bloat_ware
+	#yay -Rns --noconfirm $bloat_ware
 
 }
 
@@ -169,7 +172,8 @@ system_update() {
 	## [[[git updater version as of 20190525_085600]]]
 	## update mirrorlist
 	sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.old
-	sudo reflector --verbose --country 'Netherlands' -l 5 --sort rate --save /etc/pacman.d/mirrorlist
+	sudo reflector --verbose --country $mirror_country -l $mirror_amount \
+		--sort rate --save /etc/pacman.d/mirrorlist
 
 	## some info
 	yay -Ps

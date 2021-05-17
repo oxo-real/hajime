@@ -16,7 +16,7 @@
 ### cytopyge arch linux installation 'base'
 ### first part of a series
 ###
-### (c) 2019 - 2020 cytopyge
+### (c) 2019 - 2021 cytopyge
 ###
 ##
 #
@@ -24,11 +24,11 @@
 
 # user customizable variables
 
-timezone="Europe/Amsterdam"
+timezone="Europe/Stockholm"
 sync_system_clock_over_ntp="true"
 rtc_local_timezone="0"
-arch_mirrorlist="https://www.archlinux.org/mirrorlist/?country=NL&protocol=http&protocol=https&ip_version=4"
-mirror_country="Netherlands"
+arch_mirrorlist="https://www.archlinux.org/mirrorlist/?country=SE&protocol=http&protocol=https&ip_version=4"
+mirror_country="Sweden"
 mirror_amount="5"
 install_helpers="reflector"
 to_pacstrap="base linux linux-firmware sudo dhcpcd lvm2 git binutils"
@@ -58,9 +58,6 @@ define_text_appearance() {
 	NUL=`tput rmul`
 	BOLD=`tput bold`
 	NORMAL=`tput sgr0`
-
-	#terminus_font="terminus-font"
-	#console_font="ter-v16n"
 
 }
 
@@ -209,7 +206,6 @@ set_key_device() {
 
 	## create key partition
 	## info for human
-	#TODO
 	echo 'add a new 8300 (Linux filesystem) partition'
 	echo
 	echo '<o>	create a new empty GUID partition table (GPT)'

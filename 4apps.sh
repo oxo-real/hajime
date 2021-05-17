@@ -35,25 +35,26 @@ define_core_applications() {
 		## WARNING: Could not find the Qt platform plugin "wayland" in ""
 		## i.e. when starting qutebrowser
 
-	dwm="sway-git swaylock swayidle i3blocks waybar-git"
+	dwm="sway-git swaylock swayidle waybar-git"
+						# i3blocks
 
 	shell="zsh"
 
 	shell_additions="zsh-completions zsh-syntax-highlighting"
 
 	terminal="alacritty tmux"
-						#"termite-nocsd"
+						#"termite-nocsd urxvt"
 
-	terminal_additions="wofi mako"
-						#"rofi"
+	terminal_additions="mako"
+						#"wofi rofi"
 
 	manpages="man-db man-pages"
 
-	password_security="pass ssss yubikey-manager"
+	password_security="pass yubikey-manager"
 						#"pass-tomb bitwarden-cli pass-wl-clipboard"
 
-	encryption="veracrypt"
-						#"tomb"
+	encryption="ssss"
+						#"veracrypt tomb"
 
 	secure_connections="wireguard-tools openvpn openvpn-update-systemd-resolved sshfs"
 
@@ -73,8 +74,8 @@ define_additional_tools() {
 
 	terminal_text_tools="emacs figlet qrencode zbar jq xxd-standalone vimball"
 
-	terminal_file_browser="vifm"
-						#"lf-git nnn"
+	terminal_file_browser="lf"
+						#"vifm lf-git nnn"
 
 	file_tools="rsync gdisk simple-mtpfs fd tmsu"
 
@@ -86,7 +87,8 @@ define_additional_tools() {
 
 	python_additions="python-pip"
 
-	internet_tools="firefox-developer-edition qutebrowser urlscan w3m lynx"
+	internet_tools="firefox-developer-edition qutebrowser urlscan w3m"
+						# lynx
 
 	feeds="newsboat"
 
@@ -94,18 +96,18 @@ define_additional_tools() {
 
 	contact_management="abook"
 
-	time_management="calcurse"
+	time_management="calcurse task"
 
 	arithmatic="bc"
 
-	accounting="ledger"
+	accounting="ledger hledger"
 
 	download_utilities="aria2 transmission-cli transmission-remote-cli-git"
 
 	system_monitoring="glances ccze"
 
-	virtualization="docker"
-						#"virtualbox virtualbox-host-modules-arch"
+	virtualization=""
+						#"docker virtualbox virtualbox-host-modules-arch"
 
 	image_capturing="grim-git slurp"
 
@@ -115,8 +117,8 @@ define_additional_tools() {
 
 	pdf_viewers="mupdf zathura-pdf-mupdf"
 
-	video_tools="youtube-dl mpv youtube-viewer"
-
+	video_tools="youtube-dl mpv pipe-viewer"
+						#"straw-viewer youtube-viewer"
 	photo_editing=""
 						#"gimp"
 

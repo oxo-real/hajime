@@ -41,10 +41,10 @@ git clone $repo/dotfiles ~/.dot
 echo 'source ~/.dot/.zshrc' > ~/.zshrc
 
 ## sourcing vi improved
-echo 'source ~/.dot/.vimrc' > ~/.vimrc
+#echo 'source ~/.dot/.vimrc' > ~/.vimrc
 
 ## sourcing tmux config
-echo 'source ~/.dot/.tmuxrc' > ~/.tmux.conf
+#echo 'source ~/.dot/.tmuxrc' > ~/.tmux.conf
 
 ## restore dotfiles symlinks
 sh ~/.dot/symlinks/restore
@@ -53,7 +53,8 @@ sh ~/.dot/symlinks/restore
 sudo mount -o remount,rw  /usr
 
 ## prepare wallpaper file
-[ -d ~/_media/images/wallpaper ] || mkdir -p ~/_media/images/wallpaper
+[ -d $XDG_DATA_HOME/media/images/wallpaper ] || \
+	mkdir -p $XDG_DATA_HOME/media/images/wallpaper
 ## to be replaced with preferred image
 #cd ~/_media/images/wallpaper
 #mv image.png active
@@ -75,7 +76,7 @@ cd
 # pass
 ## create password-store symlink to pass_vault mountpoint
 cd
-ln -s /dock/vault .password-store
+ln -s $HOME/dock/vault .password-store
 
 
 # zsh shell config
@@ -89,7 +90,7 @@ sudo chsh -s /bin/zsh
 
 ## shell decoration
 ## base16-shell
-git clone https://github.com/chriskempson/base16-shell.git ~/.config/base16-shell
+git clone https://github.com/chriskempson/base16-shell.git $XDG_CONFIG_HOME/base16-shell
 cd
 base16_irblack
 
@@ -117,7 +118,7 @@ mozilla_firefox() {
 
 	[ -d ~/Downloads ] && rm -rf ~/Downloads
 	[ -d ~/.mozilla ] && rm -rf ~/.mozilla
-	git clone $repo/ffxd_init ~/.mozilla
+	#git clone $repo/ffxd_init ~/.mozilla
 
 	## activate addons branch
 	#cd ~/.mozilla
@@ -131,8 +132,8 @@ mozilla_firefox
 
 
 # prepare cytopyge git environment
-[ -d ~/_git ] || mkdir ~/_git
-cd ~/_git
+[ -d $XDG_DATA_HOME/git ] || mkdir $XDG_DATA_HOME/git
+cd $XDG_DATA_HOME/git
 
 
 finishing_up() {
@@ -163,30 +164,41 @@ finishing_up() {
 
 
 ## code
+
 ### prepare system core code environment
-[ -d ~/_git/code ] || mkdir ~/_git/code
-cd ~/_git/code
+[ -d $XDG_DATA_HOME/git/code ] || mkdir $XDG_DATA_HOME/git/code
+cd $XDG_DATA_HOME/git/code
+
 ### sources
 git clone $repo/sources
+
 ### tools
 git clone $repo/tools
+
 ### bwsession
 git clone $repo/bwsession
+
 ### hajime
 git clone $repo/hajime
 #### git/hajime becomes the git repo;
 #### remove git repo from install directory
 rm -rf $HOME/hajime/.git
+
 ### isolatest
 git clone $repo/isolatest
+
 ### metar
 git clone $repo/metar
+
 ### netconn
 git clone $repo/netconn
+
 ### tools
 git clone $repo/tools
+
 ### updater
 git clone $repo/updater
+
 ### notes
 git clone $repo/notes
 
