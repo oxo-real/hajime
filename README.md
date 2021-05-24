@@ -13,7 +13,7 @@
 ```
 # hajime
 ## a five part arch linux installation series
-(c) 2019 - 2020 cytopyge
+(c) 2019 - 2021 cytopyge
 
 ### 1  Base
 The 'base' script creates a Globally Unique Identifiers (GUID) partition table (GPT) and Unified Extensible Firmware Interface (UEFI) system partition with systemd boot to bootstrap the user space for bleeding edge (BLE) and long term support (LTS) arch linux kernel.
