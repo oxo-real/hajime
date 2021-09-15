@@ -18,7 +18,7 @@
 ### cytopyge arch linux installation 'apps'
 ### fourth part of an intriguing series
 ###
-### (c) 2019 - 2020 cytopyge
+### (c) 2019 - 2021 cytopyge
 ###
 ##
 #
@@ -48,7 +48,7 @@ define_core_applications() {
 	terminal_additions="mako"
 						#"wofi rofi"
 
-	manpages="man-db man-pages"
+	manpages="most man-db man-pages"
 
 	password_security="pass yubikey-manager"
 						#"pass-tomb bitwarden-cli pass-wl-clipboard"
@@ -64,6 +64,8 @@ define_core_applications() {
 	display="brightnessctl"
 
 	audio="pulseaudio pulseaudio-alsa pulsemixer alsa-utils"
+
+	images="fim"
 
 	bluetooth="bluez bluez-utils pulseaudio-bluetooth"
 
@@ -100,6 +102,8 @@ define_additional_tools() {
 
 	arithmatic="bc"
 
+	mathematics="gnu-plot"
+
 	accounting="ledger hledger"
 
 	download_utilities="aria2 transmission-cli transmission-remote-cli-git"
@@ -107,7 +111,7 @@ define_additional_tools() {
 	system_monitoring="glances ccze"
 
 	virtualization=""
-						#"docker virtualbox virtualbox-host-modules-arch"
+						#"virtualbox virtualbox-host-modules-arch docker"
 
 	image_capturing="grim-git slurp"
 
@@ -149,6 +153,7 @@ create_core_applications_list(){
 		$fonts \
 		$display \
 		$audio \
+		$images \
 		$bluetooth)
 
 }
@@ -168,6 +173,7 @@ create_additional_tools_list() {
 		$contact_management \
 		$time_management \
 		$arithmatic \
+		$mathematics \
 		$accounting \
 		$download_utilities \
 		$system_monitoring \
