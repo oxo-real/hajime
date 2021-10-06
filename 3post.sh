@@ -113,14 +113,14 @@ create_directories() {
 
 	# create _user directories
 
-	mkdir -p $XDG_DATA_HOME/backup
-	mkdir -p $XDG_DATA_HOME/data
-	mkdir -p $XDG_DATA_HOME/download
-	mkdir -p $XDG_DATA_HOME/keys
-	mkdir -p $XDG_DATA_HOME/media
-	mkdir -p $XDG_DATA_HOME/todo
-	mkdir -p $XDG_CACHE_HOME/temp
-	mkdir -p $XDG_CACHE_HOME/test
+	mkdir -p $HOME/.local/share/backup
+	mkdir -p $HOME/.local/share/data
+	mkdir -p $HOME/.local/share/download
+	mkdir -p $HOME/.local/share/keys
+	mkdir -p $HOME/.local/share/media
+	mkdir -p $HOME/.local/share/todo
+	mkdir -p $HOME/.cache/temp
+	mkdir -p $HOME/.cache/test
 
 }
 

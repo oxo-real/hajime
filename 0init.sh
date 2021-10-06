@@ -14,7 +14,7 @@
 ### hajime_0init
 ### helper file to get lined up in archiso
 ###
-### (c) 2020 cytopyge
+### (c) 2020 - 2021 cytopyge
 ###
 ##
 #
@@ -29,14 +29,13 @@ current_year=$(date "+%Y")
 developer="cytopyge"
 
 
-reply_single() {
-
-        # first entered character goes directly to $reply
-        stty_0=$(stty -g)
-	stty raw #-echo
-        reply=$(head -c 1)
-        stty $stty_0
-
+reply_single()
+{
+# first entered character goes directly to $reply
+stty_0=$(stty -g)
+stty raw #-echo
+reply=$(head -c 1)
+stty $stty_0
 }
 
 
@@ -129,9 +128,9 @@ install_or_exit() {
 
 clear
 printf "$script_name\n"
-printf "(c) $initial_release_year "
+printf "(c) $initial_release_year"
 [[ $initial_release_year -ne $current_year ]] && printf " - $current_year "
-printf "$developer\n"
+printf " $developer\n"
 echo
 set -e
 

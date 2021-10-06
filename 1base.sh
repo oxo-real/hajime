@@ -34,7 +34,7 @@ install_helpers="reflector"
 to_pacstrap="base linux linux-firmware sudo dhcpcd lvm2 git binutils"
 
 ## recommended percentages of $lvm_size_calc
-root_perc=0.01
+root_perc=0.02
 home_perc=0.40
 usr_perc=0.25
 var_perc=0.25
