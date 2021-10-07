@@ -24,10 +24,10 @@
 
 repo="https://gitlab.com/cytopyge"
 
-XDG_DATA_HOME="/home/cytopyge/.local/share"
-XDG_CONFIG_HOME="/home/cytopyge/.config"
-XDG_CACHE_HOME="/home/cytopyge/.cache"
-XDG_LOGS_HOME="/home/cytopyge/.logs"
+XDG_DATA_HOME="$HOME/.local/share"
+XDG_CONFIG_HOME="$HOME/.config"
+XDG_CACHE_HOME="$HOME/.cache"
+XDG_LOGS_HOME="$HOME/.logs"
 XDG_CONFIG_DIRS="/etc/xdg"
 
 
