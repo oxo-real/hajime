@@ -37,57 +37,54 @@ git_clone_dotfiles()
 	rm -rf ~/.dot
 
 	# prepare system core code environment
-	[ -d $HOME/.dot/files ] || mkdir -p $HOME/.dot/files
+	[ -d $HOME/.dot/files ] || mkdir -p $HOME/.dot
 
 	## clone dotfiles
-	git clone $repo/dotfiles $HOME/.dot/files
+	git clone $repo/dotfiles $HOME/.dot
 }
 
 
 git_clone_code()
 {
 	# prepare system core code environment
-	[ -d $XDG_DATA_HOME/git/code ] || mkdir -p $XDG_DATA_HOME/git/code
+	[ -d $XDG_DATA_HOME/git/code ] || mkdir -p $XDG_DATA_HOME/git
 
 	## clone code
+	git_code="$XDG_DATA_HOME/git/code"
 
 	### sources
-	git clone $repo/sources $XDG_DATA_HOME/git/code/sources
+	git clone $repo/sources $git_code
 
 	### tools
-	git clone $repo/tools $XDG_DATA_HOME/git/code/tools
+	git clone $repo/tools $git_code
 
 	### hajime
-	git clone $repo/hajime $XDG_DATA_HOME/git/code/hajime
+	git clone $repo/hajime $git_code
 	#### git/hajime becomes the git repo;
 	#### remove git repo from install directory
-	rm -rf $HOME/hajime/.git
+	mv $HOME/hajime/.git $HOME/hajime/.was.git
 
 	### isolatest
-	git clone $repo/isolatest $XDG_DATA_HOME/git/code/isolatest
+	git clone $repo/isolatest $git_code
 
 	### metar
-	git clone $repo/metar $XDG_DATA_HOME/git/code/metar
+	git clone $repo/metar $git_code
 
 	### netconn
-	git clone $repo/netconn $XDG_DATA_HOME/git/code/netconn
+	git clone $repo/netconn $git_code
 
 	### tools
-	git clone $repo/tools $XDG_DATA_HOME/git/code/tools
+	git clone $repo/tools $git_code
 
 	### updater
-	git clone $repo/updater $XDG_DATA_HOME/git/code/updater
+	git clone $repo/updater $git_code
 }
 
 
 git_clone_notes()
 {
-	# prepare system core notes environment
-	cd $XDG_DATA_HOME/git
-	[ -d $XDG_DATA_HOME/git/notes ] || mkdir -p $XDG_DATA_HOME/git/notes
-
 	## clone notes
-	git clone $repo/notes $XDG_DATA_HOME/git/notes
+	git clone $repo/notes $XDG_DATA_HOME/git
 }
 
 
@@ -97,14 +94,13 @@ git_clone_notes
 
 
 # restore .config from .dot
-#[TODO] $XDG_DATA_HOME is unknown in dotbu
 sh $XDG_DATA_HOME/git/code/tools/dotbu restore $HOME/.dot/files $XDG_CONFIG_HOME
 
 
 # zsh shell config
 
 ## sourcing zsh shell
-echo 'source ~/.dot/.zshrc' > ~/.zshrc
+echo 'source ~/.config/zsh/.zshrc' > ~/.zshrc
 
 ## set zsh as default shell for current user
 ## re-login for changes to take effect
