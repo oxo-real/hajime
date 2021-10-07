@@ -108,8 +108,8 @@ define_additional_tools() {
 
 	download_utilities="aria2 transmission-cli transmission-remote-cli-git"
 
-	system_monitoring="glances ccze"
-
+	system_monitoring="glances"
+						# ccze
 	virtualization=""
 						#"virtualbox virtualbox-host-modules-arch docker"
 
