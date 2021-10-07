@@ -22,34 +22,32 @@
 #
 
 
-git_remote="https://gitlab.com/cytopyge"
-git_local="$XDG_DATA_HOME/git"
-
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_LOGS_HOME="$HOME/.logs"
 export XDG_CONFIG_DIRS="/etc/xdg"
 
+git_remote="https://gitlab.com/cytopyge"
+git_local="$XDG_DATA_HOME/git"
+
 
 git_clone_dotfiles()
 {
 	# remove existing ~/.dot
 	rm -rf ~/.dot
-
-	# prepare system core code environment
-	[ -d $HOME/.dot/files ] || mkdir -p $HOME/.dot/files
+	[ -d "$HOME/.dot" ] || mkdir -p $HOME/.dot
 
 	repo="dotfiles"
-	sub_dir=".dot/files"
-	git clone $git_remote/$repo $HOME/$sub_dir
+	local_dir=".dot"
+	git clone $git_remote/$repo $HOME/$local_dir
 }
 
 
 git_clone_code()
 {
 	git_code="$git_local/code"
-	[ -d $git_code ] || mkdir -p $git_code
+	#[ -d "$git_code" ] || mkdir -p $git_code
 
 	### sources
 	repo="sources"
