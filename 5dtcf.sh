@@ -98,7 +98,7 @@ git_clone_notes
 
 # restore .config from .dot
 #[TODO] $XDG_DATA_HOME is unknown in dotbu
-sh /home/cytopyge/.local/share/git/code/tools/dotbu restore $HOME/.dot/files $XDG_CONFIG_HOME
+sh $XDG_DATA_HOME/git/code/tools/dotbu restore $HOME/.dot/files $XDG_CONFIG_HOME
 
 
 # zsh shell config
