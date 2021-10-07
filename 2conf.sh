@@ -22,9 +22,6 @@
 #
 
 
-clear
-
-
 # user customizable variables
 time_zone="Europe/Stockholm"
 locale_conf="LANG=en_US.UTF-8"
@@ -46,6 +43,7 @@ micro_code_amd="amd-ucode"
 system_security="arch-audit"
 
 
+clear
 
 
 # time settings

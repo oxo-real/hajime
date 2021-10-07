@@ -34,10 +34,10 @@ install_helpers="reflector"
 to_pacstrap="base linux linux-firmware sudo dhcpcd lvm2 git binutils"
 
 ## recommended percentages of $lvm_size_calc
-root_perc=0.02
-home_perc=0.40
-usr_perc=0.25
-var_perc=0.25
+root_perc=0.01	## recommended minimum 1G
+home_perc=0.75
+usr_perc=0.10	## recommended minimum 10G
+var_perc=0.10	## recommended minimum 10G
 
 ## boot size (MB)
 boot_size=256
@@ -502,7 +502,7 @@ set_lvm_partition_sizes() {
 	var_size_calc=`echo - | awk  "{print $var_perc * $lvm_size_calc}"`
 
 	## ROOT partition
-	printf "ROOT partition size (GB)? [$root_size_calc] "
+	printf "ROOT partition size {>=1G} (GB)? [$root_size_calc] "
 	reply_plain
         if [ ! -z "$reply" ]; then
             root_size_calc=`echo - | awk "{print $reply * 1}"`
@@ -520,7 +520,7 @@ set_lvm_partition_sizes() {
 	home_size="${home_size_calc%%.*}"
 
 	## USR  partition
-	printf "USR  partition size (GB)? [$usr_size_calc] "
+	printf "USR  partition size {>=10G} (GB)? [$usr_size_calc] "
 	reply_plain
         if [ ! -z "$reply" ]; then
             usr_size_calc=`echo - | awk "{print $reply * 1}"`
@@ -529,7 +529,7 @@ set_lvm_partition_sizes() {
 	usr_size="${usr_size_calc%%.*}"
 
 	## VAR  partition
-	printf "VAR  partition size (GB)? [$var_size_calc] "
+	printf "VAR  partition size {>=10G} (GB)? [$var_size_calc] "
 	#var_size_calc=0
 	reply_plain
         if [ ! -z "$reply" ]; then
