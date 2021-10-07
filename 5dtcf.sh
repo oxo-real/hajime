@@ -37,7 +37,7 @@ git_clone_dotfiles()
 	rm -rf ~/.dot
 
 	# prepare system core code environment
-	[ -d $HOME/.dot ] || mkdir -p $HOME/.dot
+	[ -d $HOME/.dotfiles ] || mkdir -p $HOME/.dot/files
 
 	## clone dotfiles
 	git clone $repo/dotfiles $HOME/.dot
