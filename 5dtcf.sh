@@ -33,61 +33,61 @@ XDG_CONFIG_DIRS="/etc/xdg"
 
 git_clone_dotfiles()
 {
-# remove existing ~/.dot
-rm -rf ~/.dot
+	# remove existing ~/.dot
+	rm -rf ~/.dot
 
-# prepare system core code environment
-[ -d $HOME/.dot ] || mkdir $HOME/.dot
+	# prepare system core code environment
+	[ -d $HOME/.dot ] || mkdir -p $HOME/.dot
 
-## clone dotfiles
-git clone $repo/dotfiles $HOME/.dot
+	## clone dotfiles
+	git clone $repo/dotfiles $HOME/.dot
 }
 
 
 git_clone_code()
 {
-# prepare system core code environment
-[ -d $XDG_DATA_HOME/git/code ] || mkdir $XDG_DATA_HOME/git/code
+	# prepare system core code environment
+	[ -d $XDG_DATA_HOME/git/code ] || mkdir -p $XDG_DATA_HOME/git/code
 
-## clone code
+	## clone code
 
-### sources
-git clone $repo/sources $XDG_DATA_HOME/git/code
+	### sources
+	git clone $repo/sources $XDG_DATA_HOME/git/code/sources
 
-### tools
-git clone $repo/tools $XDG_DATA_HOME/git/code
+	### tools
+	git clone $repo/tools $XDG_DATA_HOME/git/code/tools
 
-### hajime
-git clone $repo/hajime $XDG_DATA_HOME/git/code
-#### git/hajime becomes the git repo;
-#### remove git repo from install directory
-rm -rf $HOME/hajime/.git
+	### hajime
+	git clone $repo/hajime $XDG_DATA_HOME/git/code/hajime
+	#### git/hajime becomes the git repo;
+	#### remove git repo from install directory
+	rm -rf $HOME/hajime/.git
 
-### isolatest
-git clone $repo/isolatest $XDG_DATA_HOME/git/code
+	### isolatest
+	git clone $repo/isolatest $XDG_DATA_HOME/git/code/isolatest
 
-### metar
-git clone $repo/metar $XDG_DATA_HOME/git/code
+	### metar
+	git clone $repo/metar $XDG_DATA_HOME/git/code/metar
 
-### netconn
-git clone $repo/netconn $XDG_DATA_HOME/git/code
+	### netconn
+	git clone $repo/netconn $XDG_DATA_HOME/git/code/netconn
 
-### tools
-git clone $repo/tools $XDG_DATA_HOME/git/code
+	### tools
+	git clone $repo/tools $XDG_DATA_HOME/git/code/tools
 
-### updater
-git clone $repo/updater $XDG_DATA_HOME/git/code
+	### updater
+	git clone $repo/updater $XDG_DATA_HOME/git/code/updater
 }
 
 
 git_clone_notes()
 {
-# prepare system core notes environment
-cd $XDG_DATA_HOME/git
-[ -d $XDG_DATA_HOME/git/notes ] || mkdir $XDG_DATA_HOME/git/notes
+	# prepare system core notes environment
+	cd $XDG_DATA_HOME/git
+	[ -d $XDG_DATA_HOME/git/notes ] || mkdir -p $XDG_DATA_HOME/git/notes
 
-## clone notes
-git clone $repo/notes $XDG_DATA_HOME/git
+	## clone notes
+	git clone $repo/notes $XDG_DATA_HOME/git/notes
 }
 
 
