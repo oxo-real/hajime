@@ -97,6 +97,7 @@ git_clone_notes
 
 
 # restore .config from .dot
+#[TODO] $XDG_DATA_HOME is unknown in dotbu
 sh /home/cytopyge/.local/share/git/code/tools/dotbu restore $HOME/.dot/files $XDG_CONFIG_HOME
 
 
@@ -115,9 +116,9 @@ sudo chsh -s /bin/zsh
 ## shell decoration
 ## base16-shell
 #[TODO] create source variable on top of file
-git clone https://github.com/chriskempson/base16-shell.git $XDG_CONFIG_HOME/base16-shell
-cd
-base16_irblack
+#git clone https://github.com/chriskempson/base16-shell.git $XDG_CONFIG_HOME/base16-shell
+#cd
+#base16_irblack
 
 
 # vim
