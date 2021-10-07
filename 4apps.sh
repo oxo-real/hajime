@@ -266,6 +266,5 @@ create_additional_tools_list
 set_usr_rw
 install_core_applications
 install_additional_tools
-set_usr_ro
-
 loose_ends
+set_usr_ro
