@@ -38,57 +38,56 @@ git_clone_dotfiles()
 	rm -rf ~/.dot
 
 	# prepare system core code environment
-	[ -d $HOME/.dot/files ] || mkdir -p $HOME/.dot
+	[ -d $HOME/.dot/files ] || mkdir -p $HOME/.dot/files
 
-	## clone dotfiles
-	git clone $git_remote/dotfiles $HOME/.dot
+	repo="dotfiles"
+	sub_dir=".dot/files"
+	git clone $git_remote/$repo $HOME/$sub_dir
 }
 
 
 git_clone_code()
 {
-	# prepare system core code environment
-	[ -d $XDG_DATA_HOME/git/code ] || mkdir -p $XDG_DATA_HOME/git
-
 	git_code="$git_local/code"
+	[ -d $git_code ] || mkdir -p $git_code
 
 	### sources
-	sub_dir="sources"
-	git clone $git_remote/$sub_dir $git_code/$sub_dir
+	repo="sources"
+	git clone $git_remote/$repo $git_code/$repo
 
 	### tools
-	sub_dir="tools"
-	git clone $git_remote/$sub_dir $git_code/$sub_dir
+	repo="tools"
+	git clone $git_remote/$repo $git_code/$repo
 
 	### hajime
-	sub_dir="hajime"
-	git clone $git_remote/$sub_dir $git_code/$sub_dir
+	repo="hajime"
+	git clone $git_remote/$repo $git_code/$repo
 	#### git/hajime becomes the git repo;
 	#### remove git repo from install directory
 	mv $HOME/hajime/.git $HOME/hajime/.was.git
 
 	### isolatest
-	sub_dir="isolatest"
-	git clone $git_remote/$sub_dir $git_code/$sub_dir
+	repo="isolatest"
+	git clone $git_remote/$repo $git_code/$repo
 
 	### metar
-	sub_dir="metar"
-	git clone $git_remote/$sub_dir $git_code/$sub_dir
+	repo="metar"
+	git clone $git_remote/$repo $git_code/$repo
 
 	### netconn
-	sub_dir="netconn"
-	git clone $git_remote/$sub_dir $git_code/$sub_dir
+	repo="netconn"
+	git clone $git_remote/$repo $git_code/$repo
 
 	### updater
-	sub_dir="updater"
-	git clone $git_remote/$sub_dir $git_code/$sub_dir
+	repo="updater"
+	git clone $git_remote/$repo $git_code/$repo
 }
 
 
 git_clone_notes()
 {
-	sub_dir="notes"
-	git clone $git_remote/$sub_dir $git_local/$sub_dir
+	repo="notes"
+	git clone $git_remote/$repo $git_local/$repo
 }
 
 
