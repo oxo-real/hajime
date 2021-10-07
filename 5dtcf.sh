@@ -39,9 +39,7 @@ rm -rf ~/.dot
 # prepare system core code environment
 [ -d $HOME/.dot ] || mkdir $HOME/.dot
 
-## clone
-
-### dotfiles
+## clone dotfiles
 git clone $repo/dotfiles $HOME/.dot
 }
 
@@ -84,11 +82,12 @@ git clone $repo/updater $XDG_DATA_HOME/git/code
 
 git_clone_notes()
 {
-### prepare system core notes environment
+# prepare system core notes environment
 cd $XDG_DATA_HOME/git
 [ -d $XDG_DATA_HOME/git/notes ] || mkdir $XDG_DATA_HOME/git/notes
 
-git clone $repo/notes
+## clone notes
+git clone $repo/notes $XDG_DATA_HOME/git
 }
 
 
