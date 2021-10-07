@@ -98,7 +98,7 @@ git_clone_notes
 
 
 # restore .config from .dot
-sh /home/cytopyge/.local/share/git/code/tools/dotbu restore $HOME/.dot $XDG_CONFIG_HOME
+sh /home/cytopyge/.local/share/git/code/tools/dotbu restore $HOME/.dot/files $XDG_CONFIG_HOME
 
 
 # zsh shell config
