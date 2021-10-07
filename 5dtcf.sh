@@ -22,7 +22,8 @@
 #
 
 
-repo="https://gitlab.com/cytopyge"
+git_remote="https://gitlab.com/cytopyge"
+git_local="$XDG_DATA_HOME/git"
 
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_CONFIG_HOME="$HOME/.config"
@@ -40,7 +41,7 @@ git_clone_dotfiles()
 	[ -d $HOME/.dot/files ] || mkdir -p $HOME/.dot
 
 	## clone dotfiles
-	git clone $repo/dotfiles $HOME/.dot
+	git clone $git_remote/dotfiles $HOME/.dot
 }
 
 
@@ -49,42 +50,45 @@ git_clone_code()
 	# prepare system core code environment
 	[ -d $XDG_DATA_HOME/git/code ] || mkdir -p $XDG_DATA_HOME/git
 
-	## clone code
-	git_code="$XDG_DATA_HOME/git/code"
+	git_code="$git_local/code"
 
 	### sources
-	git clone $repo/sources $git_code
+	sub_dir="sources"
+	git clone $git_remote/$sub_dir $git_code/$sub_dir
 
 	### tools
-	git clone $repo/tools $git_code
+	sub_dir="tools"
+	git clone $git_remote/$sub_dir $git_code/$sub_dir
 
 	### hajime
-	git clone $repo/hajime $git_code
+	sub_dir="hajime"
+	git clone $git_remote/$sub_dir $git_code/$sub_dir
 	#### git/hajime becomes the git repo;
 	#### remove git repo from install directory
 	mv $HOME/hajime/.git $HOME/hajime/.was.git
 
 	### isolatest
-	git clone $repo/isolatest $git_code
+	sub_dir="isolatest"
+	git clone $git_remote/$sub_dir $git_code/$sub_dir
 
 	### metar
-	git clone $repo/metar $git_code
+	sub_dir="metar"
+	git clone $git_remote/$sub_dir $git_code/$sub_dir
 
 	### netconn
-	git clone $repo/netconn $git_code
-
-	### tools
-	git clone $repo/tools $git_code
+	sub_dir="netconn"
+	git clone $git_remote/$sub_dir $git_code/$sub_dir
 
 	### updater
-	git clone $repo/updater $git_code
+	sub_dir="updater"
+	git clone $git_remote/$sub_dir $git_code/$sub_dir
 }
 
 
 git_clone_notes()
 {
-	## clone notes
-	git clone $repo/notes $XDG_DATA_HOME/git
+	sub_dir="notes"
+	git clone $git_remote/$sub_dir $git_local/$sub_dir
 }
 
 
