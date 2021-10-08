@@ -237,11 +237,13 @@ install_additional_tools() {
 loose_ends() {
 
 	## fzf
-	git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-	~/.fzf/install
+	ulsf="/usr/local/src/fzf"
+	sudo mkdir -p $ulsf
+	sudo git clone --depth 1 https://github.com/junegunn/fzf.git $ulsf
+	sh $ulsf/install --xdg
 
 	## tmux_plugin_manager
-	git clone https://github.com/tmux-plugins/tpm $tmux_plugin_dir/tpm
+	#git clone https://github.com/tmux-plugins/tpm $tmux_plugin_dir/tpm
 
 	## create w3mimgdisplay symlink
 	## w3mimgdisplay is not in /usr/bin by default as of 20210114
@@ -252,7 +254,7 @@ loose_ends() {
 	echo 'sh hajime/5dtcf.sh'
 
 	## finishing
-	sudo touch ~/hajime/4apps.done
+	sudo touch $HOME/hajime/4apps.done
 
 }
 
