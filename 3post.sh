@@ -26,7 +26,7 @@
 ## base-devel packages retrieved with: yay -Qg | awk '{print $2}'
 base_devel="autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext grep groff gzip libtool m4 make pacman patch pkgconf sed sudo systemd texinfo util-linux which"
 base_additions="lsof pacman-contrib mlocate neofetch wl-clipboard-git"
-bloat_ware="" # there seems to be no more bloatware since kernel v536
+bloat_ware="" # there seems to be no more bloatware since kernel v536 (nano was removed)
 mirror_country="Sweden"
 mirror_amount="5"
 
@@ -111,8 +111,9 @@ create_directories() {
 	sudo mkdir -p $HOME/dock/vault
 
 
-	# create _user directories
+	# create xdg directories
 
+	mkdir -p $HOME/.local/share/archive
 	mkdir -p $HOME/.local/share/backup
 	mkdir -p $HOME/.local/share/data
 	mkdir -p $HOME/.local/share/download
@@ -121,6 +122,9 @@ create_directories() {
 	mkdir -p $HOME/.local/share/todo
 	mkdir -p $HOME/.cache/temp
 	mkdir -p $HOME/.cache/test
+	mkdir -p $HOME/.config
+	mkdir -p $HOME/.logs
+	mkdir -p $HOME/.dot
 
 }
 
@@ -268,15 +272,19 @@ conclusion() {
 	# human info
 	clear
 	echo
-	printf "congratulations, with your Arch Linux OS!\n"
+	printf "congratulations, with your new Arch Linux OS!\n"
 	echo
-	printf "your terminal is now ready to run\n"
 	echo
+	printf "your terminal is now ready to run independently\n"
 	printf "proceed with your own personal configuration,\n"
-	printf "use an alternative desktop environment\n"
-	printf "or continue with this installation series by entering:\n"
+	printf "or use an alternative desktop environment.\n"
+	echo
+	echo
+	printf "continue with this installation series"
+	printf "by running 4apps.sh (recommended):\n"
 	echo
 	printf "sh hajime/4apps.sh\n"
+	echo
 	echo
 	printf "press any key to continue... "
 	reply_single

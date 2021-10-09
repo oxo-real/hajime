@@ -45,7 +45,7 @@ define_core_applications() {
 	terminal="alacritty tmux"
 						#"termite-nocsd urxvt"
 
-	terminal_additions="mako"
+	terminal_additions="bemenu mako"
 						#"wofi rofi"
 
 	manpages="most man-db man-pages"
@@ -84,7 +84,7 @@ define_additional_tools() {
 	debugging="strace"
 						#"gdb valgrind strace"
 
-	network_tools="mtr iftop bind-tools whois"
+	network_tools="mtr iftop bind-tools whois protonvpn-cli"
 						#"wireshark-cli wireshark-qt"
 
 	python_additions="python-pip"
