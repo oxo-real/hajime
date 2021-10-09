@@ -53,7 +53,7 @@ define_core_applications() {
 	password_security="pass yubikey-manager"
 						#"pass-tomb bitwarden-cli pass-wl-clipboard"
 
-	encryption="ssss"
+	encryption="ssss gnupg"
 						#"veracrypt tomb"
 
 	secure_connections="wireguard-tools openvpn openvpn-update-systemd-resolved sshfs"
