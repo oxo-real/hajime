@@ -208,12 +208,12 @@ set_key_device() {
 
 	## create key partition
 	## info for human
-	echo 'add a new ${BOLD}8300${NORMAL} (Linux filesystem) partition'
+	printf "add a new ${BOLD}8300${NORMAL} (Linux filesystem) partition\n"
 	echo
-	echo '<o>	create a new empty GUID partition table (GPT)'
-	echo '<n>	add a new partition'
-	echo '<w>	write table to disk and exit'
-	echo '<q>	quit without saving changes'
+	printf "<o>	create a new empty GUID partition table (GPT)\n"
+	printf "<n>	add a new partition\n"
+	printf "<w>	write table to disk and exit\n"
+	printf "<q>	quit without saving changes\n"
 	echo
 	gdisk "$key_dev"
 	clear
@@ -263,12 +263,12 @@ set_boot_device() {
 
 	## create boot partition
 	## info for human
-	echo 'add a new ${BOLD}ef00${NORMAL} (EFI System) partition'
+	printf "add a new ${BOLD}ef00${NORMAL} (EFI System) partition\n"
 	echo
-	echo '<o>	create a new empty GUID partition table (GPT)'
-	echo '<n>	add a new partition'
-	echo '<w>	write table to disk and exit'
-	echo '<q>	quit without saving changes'
+	printf "<o>	create a new empty GUID partition table (GPT)\n"
+	printf "<n>	add a new partition\n"
+	printf "<w>	write table to disk and exit\n"
+	printf "<q>	quit without saving changes\n"
 	echo
 	gdisk "$boot_dev"
 	clear
@@ -317,12 +317,12 @@ set_lvm_device() {
 
 	## create lvm partition
 	## info for human
-	echo 'add a new ${BOLD}8e00${NORMAL} (Linux LVM) partition'
+	printf "add a new ${BOLD}8e00${NORMAL} (Linux LVM) partition\n"
 	echo
-	echo '<o>	create a new empty GUID partition table (GPT)'
-	echo '<n>	add a new partition'
-	echo '<w>	write table to disk and exit'
-	echo '<q>	quit without saving changes'
+	printf "<o>	create a new empty GUID partition table (GPT)\n"
+	printf "<n>	add a new partition\n"
+	printf "<w>	write table to disk and exit\n"
+	printf "<q>	quit without saving changes\n"
 	echo
 	gdisk "$lvm_dev"
 	clear

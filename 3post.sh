@@ -171,6 +171,8 @@ base_mutations() {
 
 system_update() {
 
+	#[TODO] updater
+
 	# system update
 
 	## [[[git updater version as of 20190525_085600]]]
@@ -299,7 +301,7 @@ conclusion() {
 
 dhcp_connect
 set_read_write
-own_home
+#own_home
 modify_pacman_conf
 create_directories
 base_mutations
