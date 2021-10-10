@@ -483,24 +483,35 @@ set_lvm_partition_sizes() {
 	reply_single_hidden
 	swap_bool=$reply
 	echo
+
 	if printf "$reply" | grep -iq "^n" ; then
+
 		swap_size=0
 		printf "SWAP partition will NOT be created\n"
+
 	else
+
 		printf "SWAP partition size (GB)? [$swap_size_recomm] "
 		reply_plain
 		swap_size_calc=$reply
-	        if [ -z "$swap_size_calc" ]; then
-        	        swap_size_calc=$swap_size_recomm
-        	fi
+
+		if [ -z "$swap_size_calc" ]; then
+
+			swap_size_calc=$swap_size_recomm
+
+		fi
+
 		### remove decimals
 		swap_size="${swap_size_calc%%.*}"
+
 		# space_left is a running number
 		# it decreases with every partition size chosen
 		# space left after swap size chosen
 		space_left=`echo - | awk "{print $lvm_size_calc - $swap_size}"`
+
 	fi
 
+	## calculate initial recommended sizes
 	root_size_calc=`echo - | awk "{print $root_perc * $space_left}"`
 	usr_size_calc=`echo - | awk  "{print $usr_perc * $space_left}"`
 	var_size_calc=`echo - | awk  "{print $var_perc * $space_left}"`
@@ -521,9 +532,11 @@ set_lvm_partition_sizes() {
 			space_left=`echo - | awk "{print $space_left - $root_size}"`
 
 			### percentages
-			usr_perc=`echo - | awk "{print $usr_perc / ($home_perc + $usr_perc + $var_perc)}"`
-			var_perc=`echo - | awk "{print $var_perc / ($home_perc + $usr_perc + $var_perc)}"`
-			home_perc=`echo - | awk "{print $home_perc / ($home_perc + $usr_perc + $var_perc)}"`
+			tot_perc=`echo - | awk "{print $usr_perc + $var_perc + $home_perc}"`
+
+			usr_perc=`echo - | awk "{print $usr_perc / $tot_perc}"`
+			var_perc=`echo - | awk "{print $var_perc / $tot_perc}"`
+			home_perc=`echo - | awk "{print $home_perc / $tot_perc}"
 
 			### sizes
 			usr_size_calc=`echo - | awk  "{print $usr_perc * $space_left}"`
@@ -532,7 +545,7 @@ set_lvm_partition_sizes() {
 
         fi
 
-	printf "			ROOT set to "$root_size"GB ("$space_left"GB space left on "$lvm_part")\n"
+	printf "						ROOT set to "$root_size"GB ("$space_left"GB space left on "$lvm_part")\n"
 
 	## USR  partition
 	printf "USR  partition size {>=10G} (GB)? [$usr_size_calc] "
@@ -549,16 +562,18 @@ set_lvm_partition_sizes() {
 			space_left=`echo - | awk "{print $space_left - $usr_size}"`
 
 			### percentages
-			var_perc=`echo - | awk "{print $var_perc / ($home_perc + $var_perc)}"`
-			home_perc=`echo - | awk "{print $home_perc / ($home_perc + $var_perc)}"`
+			tot_perc=`echo - | awk "{print $var_perc + $home_perc}"`
 
-			### new sizes
+			var_perc=`echo - | awk "{print $var_perc / $tot_perc}"`
+			home_perc=`echo - | awk "{print $home_perc / $tot_perc}"
+
+			### sizes
 			var_size_calc=`echo - | awk  "{print $var_perc * $space_left}"`
 			home_size_calc=`echo - | awk "{print $home_perc * $space_left}"`
 
 		fi
 
-	printf "			USR  set to "$usr_size"GB ("$space_left"GB space left on "$lvm_part")\n"
+	printf "						USR  set to "$usr_size"GB ("$space_left"GB space left on "$lvm_part")\n"
 
 	## VAR  partition
 	printf "VAR  partition size {>=10G} (GB)? [$var_size_calc] "
@@ -576,14 +591,16 @@ set_lvm_partition_sizes() {
 			space_left=`echo - | awk "{print $space_left - $var_size}"`
 
 			### percentage
-			home_perc=`echo - | awk "{print $home_perc / $home_perc}"`
+			tot_perc=`echo - | awk "{print $home_perc}"`
+
+			home_perc=`echo - | awk "{print $home_perc / $tot_perc}"
 
 			### new size
 			home_size_calc=`echo - | awk "{print $home_perc * $space_left}"`
 
 		fi
 
-	printf "			VAR  set to "$var_size"GB ("$space_left"GB space left on "$lvm_part")\n"
+	printf "						VAR  set to "$var_size"GB ("$space_left"GB space left on "$lvm_part")\n"
 
 	## HOME partition
 	printf "HOME partition size (GB)? [$home_size_calc] "
@@ -597,7 +614,7 @@ set_lvm_partition_sizes() {
 
 		fi
 
-	printf "			HOME set to "$home_size"GB ("$space_left"GB space left on "$lvm_part")\n"
+	printf "						HOME set to "$home_size"GB ("$space_left"GB space left on "$lvm_part")\n"
 
 	## total
 	total_size_calc=`echo - | awk "{print $swap_size + $root_size + $usr_size + $var_size + $home_size}"`
