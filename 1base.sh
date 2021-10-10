@@ -536,7 +536,7 @@ set_lvm_partition_sizes() {
 
 			usr_perc=`echo - | awk "{print $usr_perc / $tot_perc}"`
 			var_perc=`echo - | awk "{print $var_perc / $tot_perc}"`
-			home_perc=`echo - | awk "{print $home_perc / $tot_perc}"
+			home_perc=`echo - | awk "{print $home_perc / $tot_perc}"`
 
 			### sizes
 			usr_size_calc=`echo - | awk  "{print $usr_perc * $space_left}"`
@@ -565,7 +565,7 @@ set_lvm_partition_sizes() {
 			tot_perc=`echo - | awk "{print $var_perc + $home_perc}"`
 
 			var_perc=`echo - | awk "{print $var_perc / $tot_perc}"`
-			home_perc=`echo - | awk "{print $home_perc / $tot_perc}"
+			home_perc=`echo - | awk "{print $home_perc / $tot_perc}"`
 
 			### sizes
 			var_size_calc=`echo - | awk  "{print $var_perc * $space_left}"`
@@ -593,7 +593,7 @@ set_lvm_partition_sizes() {
 			### percentage
 			tot_perc=`echo - | awk "{print $home_perc}"`
 
-			home_perc=`echo - | awk "{print $home_perc / $tot_perc}"
+			home_perc=`echo - | awk "{print $home_perc / $tot_perc}"`
 
 			### new size
 			home_size_calc=`echo - | awk "{print $home_perc * $space_left}"`
