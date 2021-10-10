@@ -529,6 +529,10 @@ set_lvm_partition_sizes() {
 	### remove decimals
 	root_size="${root_size_calc%%.*}"
 
+	## recalculate
+	### space left after root size chosen
+	space_left=`echo - | awk "{print $space_left - $root_size}"`
+
     if [ ! -z "$reply" ]; then
 
 		root_size_calc=`echo - | awk "{print $reply * 1}"`
@@ -562,6 +566,10 @@ set_lvm_partition_sizes() {
 	### remove decimals
 	usr_size="${usr_size_calc%%.*}"
 
+	## recalculate
+	### space left after usr size chosen
+	space_left=`echo - | awk "{print $space_left - $usr_size}"`
+
 	if [ ! -z "$reply" ]; then
 
 		usr_size_calc=`echo - | awk "{print $reply * 1}"`
@@ -594,6 +602,10 @@ set_lvm_partition_sizes() {
 	### remove decimals
 	var_size="${var_size_calc%%.*}"
 
+	## recalculate
+	### space left after var size chosen
+	space_left=`echo - | awk "{print $space_left - $var_size}"`
+
     if [ ! -z "$reply" ]; then
 
 		var_size_calc=`echo - | awk "{print $reply * 1}"`
@@ -623,11 +635,19 @@ set_lvm_partition_sizes() {
 	### remove decimals
 	home_size="${home_size_calc%%.*}"
 
+	## recalculate
+	### space left after home size chosen
+	space_left=`echo - | awk "{print $space_left - $home_size}"`
+
     if [ ! -z "$reply" ]; then
 
         home_size_calc=`echo - | awk "{print $reply * 1}"`
 		### remove decimals
 		home_size="${home_size_calc%%.*}"
+
+		## recalculate
+		### space left after home size chosen
+		space_left=`echo - | awk "{print $space_left - $home_size}"`
 
 	fi
 
