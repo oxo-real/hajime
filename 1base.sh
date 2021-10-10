@@ -159,6 +159,8 @@ clock() {
 	hwclock -rv
 	timedatectl status
 	echo
+	sleep 3
+	clear
 
 }
 
@@ -493,13 +495,16 @@ set_lvm_partition_sizes() {
         	fi
 		### remove decimals
 		swap_size="${swap_size_calc%%.*}"
-		lvm_size_calc=`echo - | awk "{print $lvm_size_calc - $swap_size}"`
+		# space_left is a running number
+		# it decreases with every partition size chosen
+		# space left after swap size chosen
+		space_left=`echo - | awk "{print $lvm_size_calc - $swap_size}"`
 	fi
 
-	root_size_calc=`echo - | awk "{print $root_perc * $lvm_size_calc}"`
-	home_size_calc=`echo - | awk "{print $home_perc * $lvm_size_calc}"`
-	usr_size_calc=`echo - | awk  "{print $usr_perc * $lvm_size_calc}"`
-	var_size_calc=`echo - | awk  "{print $var_perc * $lvm_size_calc}"`
+	root_size_calc=`echo - | awk "{print $root_perc * $space_left}"`
+	usr_size_calc=`echo - | awk  "{print $usr_perc * $space_left}"`
+	var_size_calc=`echo - | awk  "{print $var_perc * $space_left}"`
+	home_size_calc=`echo - | awk "{print $home_perc * $space_left}"`
 
 	## ROOT partition
 	printf "ROOT partition size {>=1G} (GB)? [$root_size_calc] "
@@ -511,30 +516,23 @@ set_lvm_partition_sizes() {
 			### remove decimals
 			root_size="${root_size_calc%%.*}"
 
-			## recalculate space left
-			lvm_size_calc=`echo - | awk "{print $lvm_size_calc - $swap_size - $root_size}"`
-			home_size_calc=`echo - | awk "{print $home_perc * $lvm_size_calc}"`
-			usr_size_calc=`echo - | awk  "{print $usr_perc * $lvm_size_calc}"`
-			var_size_calc=`echo - | awk  "{print $var_perc * $lvm_size_calc}"`
+			## recalculate
+			### space left after root size chosen
+			space_left=`echo - | awk "{print $space_left - $root_size}"`
+
+			### percentages
+			usr_perc=`echo - | awk "{print $usr_perc / ($home_perc + $usr_perc + $var_perc)}"`
+			var_perc=`echo - | awk "{print $var_perc / ($home_perc + $usr_perc + $var_perc)}"`
+			home_perc=`echo - | awk "{print $home_perc / ($home_perc + $usr_perc + $var_perc)}"`
+
+			### sizes
+			usr_size_calc=`echo - | awk  "{print $usr_perc * $space_left}"`
+			var_size_calc=`echo - | awk  "{print $var_perc * $space_left}"`
+			home_size_calc=`echo - | awk "{print $home_perc * $space_left}"`
 
         fi
 
-	## HOME partition
-	printf "HOME partition size (GB)? [$home_size_calc] "
-	reply_plain
-
-        if [ ! -z "$reply" ]; then
-
-            home_size_calc=`echo - | awk "{print $reply * 1}"`
-			### remove decimals
-			home_size="${home_size_calc%%.*}"
-
-			## recalculate space left
-			lvm_size_calc=`echo - | awk "{print $lvm_size_calc - $swap_size - $home_size}"`
-			usr_size_calc=`echo - | awk  "{print $usr_perc * $lvm_size_calc}"`
-			var_size_calc=`echo - | awk  "{print $var_perc * $lvm_size_calc}"`
-
-		fi
+	printf "			ROOT set to "$root_size"GB ("$space_left"GB space left on "$lvm_part")\n"
 
 	## USR  partition
 	printf "USR  partition size {>=10G} (GB)? [$usr_size_calc] "
@@ -546,11 +544,21 @@ set_lvm_partition_sizes() {
 			### remove decimals
 			usr_size="${usr_size_calc%%.*}"
 
-			## recalculate space left
-			lvm_size_calc=`echo - | awk "{print $lvm_size_calc - $swap_size - $usr_size}"`
-			var_size_calc=`echo - | awk  "{print $var_perc * $lvm_size_calc}"`
+			## recalculate
+			### space left after usr size chosen
+			space_left=`echo - | awk "{print $space_left - $usr_size}"`
+
+			### percentages
+			var_perc=`echo - | awk "{print $var_perc / ($home_perc + $var_perc)}"`
+			home_perc=`echo - | awk "{print $home_perc / ($home_perc + $var_perc)}"`
+
+			### new sizes
+			var_size_calc=`echo - | awk  "{print $var_perc * $space_left}"`
+			home_size_calc=`echo - | awk "{print $home_perc * $space_left}"`
 
 		fi
+
+	printf "			USR  set to "$usr_size"GB ("$space_left"GB space left on "$lvm_part")\n"
 
 	## VAR  partition
 	printf "VAR  partition size {>=10G} (GB)? [$var_size_calc] "
@@ -560,21 +568,48 @@ set_lvm_partition_sizes() {
         if [ ! -z "$reply" ]; then
 
 			var_size_calc=`echo - | awk "{print $reply * 1}"`
+			### remove decimals
+			var_size="${var_size_calc%%.*}"
+
+			## recalculate
+			### space left after var size chosen
+			space_left=`echo - | awk "{print $space_left - $var_size}"`
+
+			### percentage
+			home_perc=`echo - | awk "{print $home_perc / $home_perc}"`
+
+			### new size
+			home_size_calc=`echo - | awk "{print $home_perc * $space_left}"`
 
 		fi
 
-	### remove decimals
-	var_size="${var_size_calc%%.*}"
+	printf "			VAR  set to "$var_size"GB ("$space_left"GB space left on "$lvm_part")\n"
+
+	## HOME partition
+	printf "HOME partition size (GB)? [$home_size_calc] "
+	reply_plain
+
+        if [ ! -z "$reply" ]; then
+
+            home_size_calc=`echo - | awk "{print $reply * 1}"`
+			### remove decimals
+			home_size="${home_size_calc%%.*}"
+
+		fi
+
+	printf "			HOME set to "$home_size"GB ("$space_left"GB space left on "$lvm_part")\n"
 
 	## total
-	total_size_calc=`echo - | awk "{print $root_size + $home_size + $usr_size + $var_size + $swap_size}"`
+	total_size_calc=`echo - | awk "{print $swap_size + $root_size + $usr_size + $var_size + $home_size}"`
 	diff_total_lvm_calc=`echo - | awk "{print $total_size_calc - $lvm_size_calc}"`
 	diff_t="$(echo $diff_total_lvm_calc | awk -F . '{print $1}')"
 	echo
 
 	if [[ "$diff_t" -gt 0 ]]; then
-		printf "disk size ($lvm_size_humanGB) is insufficient for allocated space\n"
+		printf "disk size ("$lvm_size_human"GB) is insufficient for allocated space\n"
 		printf "please shrink allocated space and try again\n"
+		sleep 5
+		clear
 		set_lvm_partition_sizes
 	fi
 
@@ -873,7 +908,7 @@ switch_to_installation_environment() {
 welcome() {
 
 	clear
-	printf " hajime (c) 2019 - 2020 cytopyge\n"
+	printf " hajime (c) 2019 - 2021 cytopyge\n"
 	echo
 	echo
 	printf " ${RED}CAUTION${NOC}\n"
