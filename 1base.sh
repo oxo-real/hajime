@@ -504,37 +504,65 @@ set_lvm_partition_sizes() {
 	## ROOT partition
 	printf "ROOT partition size {>=1G} (GB)? [$root_size_calc] "
 	reply_plain
+
         if [ ! -z "$reply" ]; then
-            root_size_calc=`echo - | awk "{print $reply * 1}"`
+
+			root_size_calc=`echo - | awk "{print $reply * 1}"`
+			### remove decimals
+			root_size="${root_size_calc%%.*}"
+
+			## recalculate space left
+			lvm_size_calc=`echo - | awk "{print $lvm_size_calc - $swap_size - $root_size}"`
+			home_size_calc=`echo - | awk "{print $home_perc * $lvm_size_calc}"`
+			usr_size_calc=`echo - | awk  "{print $usr_perc * $lvm_size_calc}"`
+			var_size_calc=`echo - | awk  "{print $var_perc * $lvm_size_calc}"`
+
         fi
-	### remove decimals
-	root_size="${root_size_calc%%.*}"
 
 	## HOME partition
 	printf "HOME partition size (GB)? [$home_size_calc] "
 	reply_plain
+
         if [ ! -z "$reply" ]; then
+
             home_size_calc=`echo - | awk "{print $reply * 1}"`
-        fi
-	### remove decimals
-	home_size="${home_size_calc%%.*}"
+			### remove decimals
+			home_size="${home_size_calc%%.*}"
+
+			## recalculate space left
+			lvm_size_calc=`echo - | awk "{print $lvm_size_calc - $swap_size - $home_size}"`
+			usr_size_calc=`echo - | awk  "{print $usr_perc * $lvm_size_calc}"`
+			var_size_calc=`echo - | awk  "{print $var_perc * $lvm_size_calc}"`
+
+		fi
 
 	## USR  partition
 	printf "USR  partition size {>=10G} (GB)? [$usr_size_calc] "
 	reply_plain
-        if [ ! -z "$reply" ]; then
-            usr_size_calc=`echo - | awk "{print $reply * 1}"`
-        fi
-	### remove decimals
-	usr_size="${usr_size_calc%%.*}"
+
+		if [ ! -z "$reply" ]; then
+
+			usr_size_calc=`echo - | awk "{print $reply * 1}"`
+			### remove decimals
+			usr_size="${usr_size_calc%%.*}"
+
+			## recalculate space left
+			lvm_size_calc=`echo - | awk "{print $lvm_size_calc - $swap_size - $usr_size}"`
+			var_size_calc=`echo - | awk  "{print $var_perc * $lvm_size_calc}"`
+
+		fi
 
 	## VAR  partition
 	printf "VAR  partition size {>=10G} (GB)? [$var_size_calc] "
 	#var_size_calc=0
 	reply_plain
+
         if [ ! -z "$reply" ]; then
-            var_size_calc=`echo - | awk "{print $reply * 1}"`
-        fi
+
+			var_size_calc=`echo - | awk "{print $reply * 1}"`
+
+		fi
+
 	### remove decimals
 	var_size="${var_size_calc%%.*}"
 
@@ -547,7 +575,7 @@ set_lvm_partition_sizes() {
 	if [[ "$diff_t" -gt 0 ]]; then
 		printf "disk size ($lvm_size_humanGB) is insufficient for allocated space\n"
 		printf "please shrink allocated space and try again\n"
-		set_partition_sizes
+		set_lvm_partition_sizes
 	fi
 
 	printf "continue? (Y/n) "
