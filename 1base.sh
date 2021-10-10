@@ -35,9 +35,9 @@ to_pacstrap="base linux linux-firmware sudo dhcpcd lvm2 git binutils"
 
 ## recommended percentages of $lvm_size_calc
 root_perc=0.01	## recommended minimum 1G
-home_perc=0.75
 usr_perc=0.10	## recommended minimum 10G
 var_perc=0.10	## recommended minimum 10G
+home_perc=0.75
 
 ## boot size (MB)
 boot_size=256
@@ -208,7 +208,7 @@ set_key_device() {
 
 	## create key partition
 	## info for human
-	echo 'add a new 8300 (Linux filesystem) partition'
+	echo 'add a new ${BOLD}8300${NORMAL} (Linux filesystem) partition'
 	echo
 	echo '<o>	create a new empty GUID partition table (GPT)'
 	echo '<n>	add a new partition'
@@ -263,7 +263,7 @@ set_boot_device() {
 
 	## create boot partition
 	## info for human
-	echo 'add a new ef00 (EFI System) partition'
+	echo 'add a new ${BOLD}ef00${NORMAL} (EFI System) partition'
 	echo
 	echo '<o>	create a new empty GUID partition table (GPT)'
 	echo '<n>	add a new partition'
@@ -317,7 +317,7 @@ set_lvm_device() {
 
 	## create lvm partition
 	## info for human
-	echo 'add a new 8e00 (Linux LVM) partition'
+	echo 'add a new ${BOLD}8e00${NORMAL} (Linux LVM) partition'
 	echo
 	echo '<o>	create a new empty GUID partition table (GPT)'
 	echo '<n>	add a new partition'
@@ -469,11 +469,16 @@ set_lvm_partition() {
 
 set_lvm_partition_sizes() {
 
+	## lsblk for human
+	clear
+	lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint
+	echo
+
 	lvm_size_bytes=$(lsblk -o path,size -b | grep $lvm_part | awk '{print $2}')
 	lvm_size_human=$(lsblk -o path,size | grep $lvm_part | awk '{print $2}')
 	lvm_size_calc=$(lsblk -o path,size | grep $lvm_part | awk '{print $2+0}')
 	printf "size of the encrypted LVM volumegroup '$lvm_part' is $lvm_size_human\n"
-	printf "logical volumes ROOT, HOME, USR & VAR are being created\n"
+	printf "logical volumes ROOT, USR, VAR & HOME are being created\n"
 	echo
 
 	## optional swap partition
