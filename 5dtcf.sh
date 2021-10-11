@@ -98,12 +98,12 @@ git_clone_notes
 sh $XDG_DATA_HOME/git/code/tools/dotbu restore $HOME/.dot/files $XDG_CONFIG_HOME
 
 ## rewrite symlinks (they are hardcoded with users home)
-symlink_dir="ls -1 $XDG_CONFIG_HOME/shln"
+symlinks="$(ls -1 $XDG_CONFIG_HOME/shln)"
 
-for symlink in $symlink_dir; do
+for symlink in $symlinks; do
 
 	dest="$(readlink $symlink | cut -d \/ -f 4-)"
-	ln -s $($HOME/$dest) $symlink
+	ln -s $HOME/$dest $symlink
 
 done
 
