@@ -110,12 +110,16 @@ sudo usermod -s `whereis zsh | awk '{print $2}'` $(whoami)
 ## change shell
 sudo chsh -s /bin/zsh
 
+## enable command history
+[[ -d "$XDG_LOGS_HOME/history" ]] || mkdir $XDG_LOGS_HOME/history
+touch $XDG_LOGS_HOME/history/history
+
 ## shell decoration
 ## base16-shell
 #[TODO] create source variable on top of file
-#git clone https://github.com/chriskempson/base16-shell.git $XDG_CONFIG_HOME/base16-shell
-#cd
-#base16_irblack
+git clone https://github.com/chriskempson/base16-shell.git $XDG_CONFIG_HOME/base16-shell
+cd
+base16_irblack
 
 
 # vim

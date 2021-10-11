@@ -45,7 +45,7 @@ define_core_applications() {
 	terminal="alacritty tmux"
 						#"termite-nocsd urxvt"
 
-	terminal_additions="bemenu mako"
+	terminal_additions="bemenu-wayland mako fzf"
 						#"wofi rofi"
 
 	manpages="most man-db man-pages"
@@ -235,12 +235,6 @@ install_additional_tools() {
 
 
 loose_ends() {
-
-	## fzf
-	ulsf="/usr/local/src/fzf"
-	sudo mkdir -p $ulsf
-	sudo git clone --depth 1 https://github.com/junegunn/fzf.git $ulsf
-	sh $ulsf/install --xdg
 
 	## tmux_plugin_manager
 	#git clone https://github.com/tmux-plugins/tpm $tmux_plugin_dir/tpm
