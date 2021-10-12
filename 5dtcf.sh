@@ -103,7 +103,7 @@ symlinks="$(ls -1 $XDG_CONFIG_HOME/shln)"
 for symlink in $symlinks; do
 
 	dest="$(readlink $symlink | cut -d \/ -f 4-)"
-	ln -s $HOME/$dest $symlink
+	ln -sf $HOME/$dest $symlink
 
 done
 
