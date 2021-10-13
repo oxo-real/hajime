@@ -108,7 +108,10 @@ create_directories() {
 	sudo mkdir -p $HOME/dock/2
 	sudo mkdir -p $HOME/dock/3
 	sudo mkdir -p $HOME/dock/4
-	sudo mkdir -p $HOME/dock/vault
+	sudo mkdir -p $HOME/dock/android
+	sudo mkdir -p $HOME/dock/transfer
+	sudo mkdir -p $HOME/dock/vlt
+
 
 
 	# create xdg directories

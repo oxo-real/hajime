@@ -104,12 +104,14 @@ define_additional_tools() {
 
 	mathematics="gnu-plot"
 
-	accounting="ledger hledger"
+	accounting= ""
+						#"ledger hledger"
 
 	download_utilities="aria2 transmission-cli transmission-remote-cli-git"
 
 	system_monitoring="glances"
 						# ccze
+
 	virtualization=""
 						#"virtualbox virtualbox-host-modules-arch docker"
 
@@ -123,6 +125,7 @@ define_additional_tools() {
 
 	video_tools="youtube-dl mpv pipe-viewer"
 						#"straw-viewer youtube-viewer"
+
 	photo_editing=""
 						#"gimp"
 
