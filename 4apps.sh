@@ -242,6 +242,9 @@ loose_ends() {
 	## tmux_plugin_manager
 	#git clone https://github.com/tmux-plugins/tpm $tmux_plugin_dir/tpm
 
+	## fzf-tab
+	git clone https://github.com/Aloxaf/fzf-tab $XDG_DATA_HOME/fzf-tab
+
 	## create w3mimgdisplay symlink
 	## w3mimgdisplay is not in /usr/bin by default as of 20210114
 	## alternative is to add /usr/lib/w3m to $PATH
