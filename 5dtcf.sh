@@ -154,7 +154,7 @@ git config --global user.name "$(whoami)"
 
 ## create password-store symlink to pass_vault mountpoint
 cd
-ln -s $HOME/dock/vlt .password-store
+ln -s $HOME/dock/vlt/pass .password-store
 
 
 # mozilla firefox settings
