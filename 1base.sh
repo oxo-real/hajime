@@ -170,7 +170,7 @@ set_key_device() {
 ## usb device where detached luks header and keyfile will be stored
 
 	## lsblk for human
-	lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint
+	lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint
 	echo
 
 
@@ -182,7 +182,7 @@ set_key_device() {
 	key_dev=$reply
 
 	echo
-	printf "$(lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint | grep "$key_dev")\n"
+	printf "$(lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint | grep "$key_dev")\n"
 	echo
 
 	if [ "$key_dev" == "$bootmnt_dev" ] ; then
@@ -226,7 +226,7 @@ set_boot_device() {
 ## on its own (first) partition on the system device
 
 	## lsblk for human
-	lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint
+	lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint
 	echo
 
 
@@ -237,7 +237,7 @@ set_boot_device() {
 	boot_dev=$reply
 
 	echo
-	printf "$(lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint | grep "$boot_dev")\n"
+	printf "$(lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint | grep "$boot_dev")\n"
 	echo
 
 	if [ "$boot_dev" == "$bootmnt_dev" ] ; then
@@ -280,7 +280,7 @@ set_lvm_device() {
 ## LVM system partition installation target
 
 	## lsblk for human
-	lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint
+	lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint
 	echo
 
 
@@ -301,7 +301,7 @@ set_lvm_device() {
 	fi
 
 	echo
-	printf "$(lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint | grep "$lvm_dev")\n"
+	printf "$(lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint | grep "$lvm_dev")\n"
 	echo
 
 	printf "LVM device: '$lvm_dev', correct? (Y/n) "
@@ -335,7 +335,7 @@ set_key_partition() {
 	## dialog
 	## lsblk for human
 	clear
-	lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint
+	lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint
 	echo
 
 	printf "enter KEY partition number: $key_dev"
@@ -352,7 +352,7 @@ set_key_partition() {
 	key_part=$key_dev$key_part_no
 
 	echo
-	printf "$(lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint | grep $key_dev)\n"
+	printf "$(lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint | grep $key_dev)\n"
 	echo
 
 	## check partition exists in lsblk
@@ -383,7 +383,7 @@ set_boot_partition() {
 	## dialog
 	## lsblk for human
 	clear
-	lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint
+	lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint
 	echo
 
 	printf "enter BOOT partition number: $boot_dev"
@@ -400,7 +400,7 @@ set_boot_partition() {
 	boot_part=$boot_dev$boot_part_no
 
 	echo
-	printf "$(lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint | grep $boot_dev)\n"
+	printf "$(lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint | grep $boot_dev)\n"
 	echo
 
 	## check partition exists in lsblk
@@ -431,7 +431,7 @@ set_lvm_partition() {
 	## dialog
 	## lsblk for human
 	clear
-	lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint
+	lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint
 	echo
 
 	printf "inside the LVM partition the LVM volumegroup will be created\n"
@@ -441,7 +441,7 @@ set_lvm_partition() {
 	lvm_part=$lvm_dev$lvm_part_no
 
 	echo
-	printf "$(lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint | grep $lvm_dev)\n"
+	printf "$(lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint | grep $lvm_dev)\n"
 	echo
 
 	## check partition exists in lsblk
@@ -471,7 +471,7 @@ set_lvm_partition_sizes() {
 
 	## lsblk for human
 	clear
-	lsblk -i --tree -o name,fstype,size,fsuse%,fsused,uuid,path,label,mountpoint
+	lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint
 	echo
 
 	lvm_size_bytes=$(lsblk -o path,size -b | grep $lvm_part | awk '{print $2}')
