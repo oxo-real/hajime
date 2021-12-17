@@ -45,10 +45,10 @@ define_core_applications() {
 	terminal="alacritty tmux"
 						#"termite-nocsd urxvt"
 
-	terminal_additions="bemenu-wayland mako fzf"
-						#"wofi rofi"
+	terminal_additions="fzf mako"
+						#"wofi rofi bemenu-wayland"
 
-	manpages="most man-db man-pages"
+	manpages="man-db man-pages"
 
 	password_security="pass yubikey-manager"
 						#"pass-tomb bitwarden-cli pass-wl-clipboard"
@@ -79,15 +79,17 @@ define_additional_tools() {
 	terminal_file_browser="lf"
 						#"vifm lf-git nnn"
 
-	file_tools="rsync gdisk simple-mtpfs fd tmsu"
+	file_tools="rsync gdisk simple-mtpfs fd"
+						#"tmsu"
 
 	debugging="strace"
-						#"gdb valgrind strace"
+						#"gdb valgrind"
 
 	network_tools="mtr iftop bind-tools whois protonvpn-cli"
 						#"wireshark-cli wireshark-qt"
 
-	python_additions="python-pip"
+	python_additions=""
+						#"python-pip"
 
 	internet_tools="firefox-developer-edition qutebrowser urlscan w3m"
 						# lynx
@@ -98,11 +100,13 @@ define_additional_tools() {
 
 	contact_management="abook"
 
-	time_management="calcurse task"
+	time_management=""
+						#"calcurse task"
 
 	arithmatic="bc"
 
-	mathematics="gnu-plot"
+	mathematics=""
+						#"gnu-plot"
 
 	accounting= ""
 						#"ledger hledger"
@@ -136,7 +140,7 @@ define_additional_tools() {
 						#"inkscape"
 
 	office_tools=""
-						#"libreoffice-fresh libreoffice-fresh-nl"
+						#"libreoffice-fresh"
 
 }
 
