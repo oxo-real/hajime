@@ -89,10 +89,14 @@ modify_pacman_conf() {
 	sudo sed -i 's/#Color/Color/' $file_etc_pacman_conf
 
 	## add total download counter
-	sudo sed -i 's/#TotalDownload/TotalDownload/' $file_etc_pacman_conf
+	#sudo sed -i 's/#TotalDownload/TotalDownload/' $file_etc_pacman_conf
 
 	## add verbose package lists
 	sudo sed -i 's/#VerbosePkgLists/VerbosePkgLists/' $file_etc_pacman_conf
+
+	## add parallel downloads
+	sudo awk '/VerbosePkgLists/ { print; print "ParallelDownloads = 5"; next }1' \
+		$file_etc_pacman_conf > $file_etc_pacman_conf
 
 	## add multilib repository
 	sudo sed -i 's/\#\[multilib\]/\[multilib\]\nInclude \= \/etc\/pacman.d\/mirrorlist/' $file_etc_pacman_conf
