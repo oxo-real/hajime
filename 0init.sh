@@ -14,7 +14,7 @@
 ### hajime_0init
 ### helper file to get lined up in archiso
 ###
-### (c) 2020 - 2021 cytopyge
+### (c) 2020 - 2022 cytopyge
 ###
 ##
 #

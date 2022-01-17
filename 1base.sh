@@ -16,7 +16,7 @@
 ### cytopyge arch linux installation 'base'
 ### first part of a series
 ###
-### (c) 2019 - 2021 cytopyge
+### (c) 2019 - 2022 cytopyge
 ###
 ##
 #
@@ -24,19 +24,22 @@
 
 # user customizable variables
 
+offline=1 #0 online_installation
 timezone="Europe/Stockholm"
 sync_system_clock_over_ntp="true"
 rtc_local_timezone="0"
-arch_mirrorlist="https://www.archlinux.org/mirrorlist/?country=SE&protocol=http&protocol=https&ip_version=4"
 mirror_country="Sweden"
+mc_abbr='SE'
 mirror_amount="5"
+arch_mirrorlist="https://www.archlinux.org/mirrorlist/?country=$mc_abbr&protocol=http&protocol=https&ip_version=4"
 install_helpers="reflector"
 to_pacstrap="base linux linux-firmware sudo dhcpcd lvm2 git binutils"
 
 ## recommended percentages of $lvm_size_calc
-root_perc=0.01	## recommended minimum 1G
-usr_perc=0.10	## recommended minimum 10G
-var_perc=0.10	## recommended minimum 10G
+#[TODO] if size < 1 G
+root_perc=0.01	## recommended minimum 01G
+usr_perc=0.10	## recommended minimum 15G
+var_perc=0.10	## recommended minimum 15G
 home_perc=0.75
 
 ## boot size (MB)
@@ -873,6 +876,8 @@ create_swap_partition() {
 
 install_helpers() {
 
+	#[TODO] if offline=1 then pacman.conf_offline
+
 	sleep 5
 	#clear
 	## refresh package keys & install helpers
@@ -883,6 +888,8 @@ install_helpers() {
 
 
 configure_mirrorlists() {
+
+	#[TODO] how does this relate to offline?
 
 	## backup old mirrorlist
 	file_etc_pacmand_mirrorlist="/etc/pacman.d/mirrorlist"
@@ -899,6 +906,33 @@ install_base_devel_package_groups() {
 	pacstrap -i /mnt $to_pacstrap
 	#pacstrap -i /mnt base linux linux-firmware sudo dhcpcd lvm2 git binutils
 
+}
+
+
+copy_base_offline()
+{
+	printf "copying base to live env ..."
+	cp -ax / /mnt
+	#	-a, --archive
+    #		same as -dR --preserve=all
+	#			-d
+	#				same as --no-dereference --preserve=links
+	#			-R, -r, --recursive
+	#				copy directories recursively
+	#			--preserve[=ATTR_LIST]
+	#				preserve the specified attributes
+	#				(default: mode,ownership,timestamps),
+	#				if possible  additional attributes:
+	#					context, links, xattr, all
+	#	-x, --one-file-system
+    #		stay on this file system
+}
+
+
+copy_kernel_img_offline()
+{
+	cp -vaT /run/archiso/bootmnt/arch/boot/$(uname -m)/vmlinuz \
+		/mnt/boot/vm-linuz-linux
 }
 
 
@@ -925,7 +959,7 @@ modify_fstab() {
 
 
 prepare_mnt_environment() {
-
+#[TODO] !offline
 	#clear
 	echo 'installing git and hajime to new environment'
 	arch-chroot /mnt git clone https://gitlab.com/cytopyge/hajime
@@ -962,7 +996,7 @@ switch_to_installation_environment() {
 welcome() {
 
 	clear
-	printf " hajime (c) 2019 - 2021 cytopyge\n"
+	printf " hajime (c) 2019 - 2022 cytopyge\n"
 	echo
 	echo
 	printf " ${RED}CAUTION${NOC}\n"

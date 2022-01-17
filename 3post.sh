@@ -16,7 +16,7 @@
 ### cytopyge arch linux installation 'post'
 ### third part of a series
 ###
-### (c) 2019 - 2021 cytopyge
+### (c) 2019 - 2022 cytopyge
 ###
 ##
 #
@@ -25,7 +25,8 @@
 # user customizable variables
 ## base-devel packages retrieved with: yay -Qg | awk '{print $2}'
 base_devel="autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext grep groff gzip libtool m4 make pacman patch pkgconf sed sudo systemd texinfo util-linux which"
-base_additions="lsof pacman-contrib mlocate neofetch wl-clipboard-git"
+base_additions="lsof pacman-contrib mlocate neofetch wl-clipboard"
+#base_additions="lsof pacman-contrib mlocate neofetch wl-clipboard-git"
 bloat_ware="" # there seems to be no more bloatware since kernel v536 (nano was removed)
 mirror_country="Sweden"
 mirror_amount="5"
@@ -87,9 +88,6 @@ modify_pacman_conf() {
 
 	## add color
 	sudo sed -i 's/#Color/Color/' $file_etc_pacman_conf
-
-	## add total download counter
-	#sudo sed -i 's/#TotalDownload/TotalDownload/' $file_etc_pacman_conf
 
 	## add verbose package lists
 	sudo sed -i 's/#VerbosePkgLists/VerbosePkgLists/' $file_etc_pacman_conf
@@ -178,7 +176,7 @@ base_mutations() {
 
 system_update() {
 
-	#[TODO] updater
+	#[TODO] run updater after it is installed and skip this step
 
 	# system update
 
@@ -272,16 +270,11 @@ set_read_only() {
 }
 
 
-conclusion() {
-
-	# finishing
-	sudo touch hajime/3post.done
-
-
+wrap_up() {
 	# human info
 	clear
 	echo
-	printf "congratulations, with your new Arch Linux OS!\n"
+	printf "congratulations, with your Arch Linux OS!\n"
 	echo
 	echo
 	printf "your terminal is now ready to run independently\n"
@@ -300,7 +293,7 @@ conclusion() {
 	clear
 	echo
 	neofetch --gtk3 off
-
+	sudo touch hajime/3post.done
 }
 
 
@@ -312,6 +305,6 @@ set_read_write
 modify_pacman_conf
 create_directories
 base_mutations
-system_update
+#system_update
+wrap_up
 set_read_only
-conclusion

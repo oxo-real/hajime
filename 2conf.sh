@@ -16,13 +16,14 @@
 ### cytopyge arch linux installation 'configuration'
 ### second part of a series
 ###
-### (c) 2019 - 2021 cytopyge
+### (c) 2019 - 2022 cytopyge
 ###
 ##
 #
 
 
 # user customizable variables
+offline_install=0
 time_zone="Europe/Stockholm"
 locale_conf="LANG=en_US.UTF-8"
 vconsole_conf="KEYMAP=us\nFONT=lat1-16"
@@ -32,10 +33,10 @@ hostname="host"
 username="user"
 bootloader_timeout="2"
 bootloader_editor="0"
-linux_kernel="linux-headers" #linux 1base
+linux_kernel="linux-headers"	#linux 1base
 linux_lts_kernel="linux-lts linux-lts-headers"
 text_editor="emacs neovim"
-install_helpers="reflector" #binutils 3post base-devel group
+install_helpers="reflector"		#binutils 3post base-devel group
 wireless="wpa_supplicant wireless_tools iw"
 secure_connections="openssh"
 micro_code_intel="intel-ucode iucode-tool"

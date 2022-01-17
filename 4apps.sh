@@ -18,7 +18,7 @@
 ### cytopyge arch linux installation 'apps'
 ### fourth part of an intriguing series
 ###
-### (c) 2019 - 2021 cytopyge
+### (c) 2019 - 2022 cytopyge
 ###
 ##
 #
@@ -30,12 +30,14 @@ tmux_plugin_dir="$HOME/.config/tmux/plugins"
 
 define_core_applications() {
 
-	wayland="wlroots-git qt5-wayland wev"
+	wayland="wlroots qt5-wayland wev"
+	#wayland="wlroots-git qt5-wayland wev"
 		## qt5-wayland to prevent:
 		## WARNING: Could not find the Qt platform plugin "wayland" in ""
 		## i.e. when starting qutebrowser
 
-	dwm="sway-git swaylock swayidle waybar-git"
+	dwm="sway swaylock swayidle waybar"
+	#dwm="sway-git swaylock swayidle waybar-git"
 						# i3blocks
 
 	shell="zsh"

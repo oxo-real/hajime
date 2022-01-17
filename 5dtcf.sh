@@ -16,7 +16,7 @@
 ### cytopyge arch linux installation 'dotfiles configuration'
 ### fifth and final part of a series
 ###
-### (c) 2019 - 2021 cytopyge
+### (c) 2019 - 2022 cytopyge
 ###
 ##
 #
