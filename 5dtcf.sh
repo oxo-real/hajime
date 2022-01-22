@@ -97,15 +97,13 @@ git_clone_notes
 # restore .config from .dot
 sh $XDG_DATA_HOME/git/code/tools/dotbu restore $HOME/.dot/files $XDG_CONFIG_HOME
 
-## rewrite symlinks (they are hardcoded with users home)
-symlinks="$(ls -1 $XDG_CONFIG_HOME/shln)"
 
-for symlink in $symlinks; do
+# rewrite symlinks in shln to current users home
+sh $XDG_DATA_HOME/git/code/tools/chln
 
-	dest="$(readlink $symlink | cut -d \/ -f 4-)"
-	ln -sf $HOME/$dest $symlink
 
-done
+# set right permissions for gnupg home
+sh /home/cytopyge/.local/share/git/notes/crypto/gpg/gnupg_set_permissions
 
 
 # zsh shell config
@@ -129,7 +127,8 @@ touch $XDG_LOGS_HOME/history/history
 #[TODO] create source variable on top of file
 git clone https://github.com/chriskempson/base16-shell.git $XDG_CONFIG_HOME/base16-shell
 cd
-base16_irblack
+## base16_irblack
+_base16 "/home/cytopyge/.config/base16-shell/scripts/base16-irblack.sh" irblack
 
 
 # vim
@@ -141,13 +140,6 @@ sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.
 ## install plugins defined in: $XDG_CONFIG_HOME/nvim/plugins
 vim +PlugInstall +qall
 echo
-
-
-# global git configuration
-
-## affects ~/.gitconfig
-git config --global user.email "$(whoami)@protonmail.com"
-git config --global user.name "$(whoami)"
 
 
 # pass

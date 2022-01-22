@@ -23,13 +23,13 @@
 
 
 # user customizable variables
-## base-devel packages retrieved with: yay -Qg | awk '{print $2}'
-base_devel="autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext grep groff gzip libtool m4 make pacman patch pkgconf sed sudo systemd texinfo util-linux which"
-base_additions="lsof pacman-contrib mlocate neofetch wl-clipboard"
-#base_additions="lsof pacman-contrib mlocate neofetch wl-clipboard-git"
+## base-devel packages list as of 01/2022:
+## autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext grep groff gzip libtool m4 make pacman patch pkgconf sed sudo texinfo which
+base_devel="$(pacman -Qg | awk '{print $2}' | tr "\n" " ")"
+base_additions='lsof pacman-contrib mlocate neofetch wl-clipboard nvim'
 bloat_ware="" # there seems to be no more bloatware since kernel v536 (nano was removed)
-mirror_country="Sweden"
-mirror_amount="5"
+mirror_country='Sweden'
+mirror_amount='5'
 
 
 # functions
@@ -48,11 +48,11 @@ reply() {
 
 reply_single() {
 
-        # first entered character goes directly to $reply
-        stty_0=$(stty -g)
+	# first entered character goes directly to $reply
+	stty_0=$(stty -g)
 	stty raw #-echo
-        reply=$(head -c 1)
-        stty $stty_0
+	reply=$(head -c 1)
+	stty $stty_0
 
 }
 

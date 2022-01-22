@@ -31,13 +31,11 @@ tmux_plugin_dir="$HOME/.config/tmux/plugins"
 define_core_applications() {
 
 	wayland="wlroots qt5-wayland wev"
-	#wayland="wlroots-git qt5-wayland wev"
 		## qt5-wayland to prevent:
 		## WARNING: Could not find the Qt platform plugin "wayland" in ""
 		## i.e. when starting qutebrowser
 
 	dwm="sway swaylock swayidle waybar"
-	#dwm="sway-git swaylock swayidle waybar-git"
 						# i3blocks
 
 	shell="zsh"
@@ -47,18 +45,18 @@ define_core_applications() {
 	terminal="alacritty tmux"
 						#"termite-nocsd urxvt"
 
-	terminal_additions="fzf mako"
+	terminal_additions="fzf fzf-tab-git mako"
 						#"wofi rofi bemenu-wayland"
 
 	manpages="man-db man-pages"
 
-	password_security="pass yubikey-manager"
+	password_security="pass pass-otp yubikey-manager"
 						#"pass-tomb bitwarden-cli pass-wl-clipboard"
 
 	encryption="ssss gnupg"
 						#"veracrypt tomb"
 
-	secure_connections="wireguard-tools openvpn openvpn-update-systemd-resolved sshfs"
+	secure_connections="wireguard-tools protonvpn-cli-ng sshfs"
 
 	fonts=""
 						#"terminus-font ttf-inconsolata"
@@ -88,7 +86,7 @@ define_additional_tools() {
 	debugging="strace"
 						#"gdb valgrind"
 
-	network_tools="mtr iftop bind-tools whois protonvpn-cli"
+	network_tools="mtr iftop bind-tools whois"
 						#"wireshark-cli wireshark-qt"
 
 	python_additions=""
@@ -122,7 +120,7 @@ define_additional_tools() {
 	virtualization=""
 						#"virtualbox virtualbox-host-modules-arch docker"
 
-	image_capturing="grim-git slurp"
+	image_capturing="grim slurp"
 
 	image_viewers="feh imv"
 
@@ -249,15 +247,12 @@ loose_ends() {
 	## tmux_plugin_manager
 	#git clone https://github.com/tmux-plugins/tpm $tmux_plugin_dir/tpm
 
-	## fzf-tab
-	git clone https://github.com/Aloxaf/fzf-tab $XDG_DATA_HOME/fzf-tab
-
 	## create w3mimgdisplay symlink
 	## w3mimgdisplay is not in /usr/bin by default as of 20210114
 	## alternative is to add /usr/lib/w3m to $PATH
 	sudo ln -s /usr/lib/w3m/w3mimgdisplay /usr/bin/w3mimgdisplay
 
-	## execute dotfiles install script
+	## recommend human to execute dotfiles install script
 	echo 'sh hajime/5dtcf.sh'
 
 	## finishing
