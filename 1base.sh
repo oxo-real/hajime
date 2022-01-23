@@ -24,22 +24,19 @@
 
 # user customizable variables
 
-offline=1 #0 online_installation
 timezone="Europe/Stockholm"
 sync_system_clock_over_ntp="true"
 rtc_local_timezone="0"
+arch_mirrorlist="https://www.archlinux.org/mirrorlist/?country=SE&protocol=http&protocol=https&ip_version=4"
 mirror_country="Sweden"
-mc_abbr='SE'
 mirror_amount="5"
-arch_mirrorlist="https://www.archlinux.org/mirrorlist/?country=$mc_abbr&protocol=http&protocol=https&ip_version=4"
 install_helpers="reflector"
 to_pacstrap="base linux linux-firmware sudo dhcpcd lvm2 git binutils"
 
 ## recommended percentages of $lvm_size_calc
-#[TODO] if size < 1 G
-root_perc=0.01	## recommended minimum 01G
-usr_perc=0.10	## recommended minimum 15G
-var_perc=0.10	## recommended minimum 15G
+root_perc=0.01	## recommended minimum 1G
+usr_perc=0.10	## recommended minimum 10G
+var_perc=0.10	## recommended minimum 10G
 home_perc=0.75
 
 ## boot size (MB)
@@ -512,12 +509,12 @@ set_lvm_partition_sizes() {
 		### remove decimals
 		swap_size="${swap_size_calc%%.*}"
 
-		# space_left is a running number
-		# it decreases with every partition size chosen
-		# space left after swap size chosen
-		space_left=`echo - | awk "{print $lvm_size_calc - $swap_size}"`
-
 	fi
+
+	# space_left is a running number
+	# it decreases with every partition size chosen
+	# space left after swap size chosen
+	space_left=`echo - | awk "{print $lvm_size_calc - $swap_size}"`
 
 	## calculate initial recommended sizes
 	root_size_calc=`echo - | awk "{print $root_perc * $space_left}"`
@@ -529,36 +526,34 @@ set_lvm_partition_sizes() {
 	printf "ROOT partition size {>=1G} (GB)? [$root_size_calc] "
 	reply_plain
 
-	### remove decimals
-	root_size="${root_size_calc%%.*}"
-
-	## recalculate
-	### space left after root size chosen
-	space_left=`echo - | awk "{print $space_left - $root_size}"`
-
-    if [ ! -z "$reply" ]; then
+    if [ -n "$reply" ]; then
 
 		root_size_calc=`echo - | awk "{print $reply * 1}"`
 		### remove decimals
 		root_size="${root_size_calc%%.*}"
 
-		## recalculate
-		### space left after root size chosen
-		space_left=`echo - | awk "{print $space_left - $root_size}"`
+	else
 
-		### percentages
-		tot_perc=`echo - | awk "{print $usr_perc + $var_perc + $home_perc}"`
-
-		usr_perc=`echo - | awk "{print $usr_perc / $tot_perc}"`
-		var_perc=`echo - | awk "{print $var_perc / $tot_perc}"`
-		home_perc=`echo - | awk "{print $home_perc / $tot_perc}"`
-
-		### sizes
-		usr_size_calc=`echo - | awk  "{print $usr_perc * $space_left}"`
-		var_size_calc=`echo - | awk  "{print $var_perc * $space_left}"`
-		home_size_calc=`echo - | awk "{print $home_perc * $space_left}"`
+		### remove decimals
+		root_size="${root_size_calc%%.*}"
 
     fi
+
+	## recalculate
+	### space left after root size chosen
+	space_left=`echo - | awk "{print $space_left - $root_size}"`
+
+	### percentages
+	tot_perc=`echo - | awk "{print $usr_perc + $var_perc + $home_perc}"`
+
+	usr_perc=`echo - | awk "{print $usr_perc / $tot_perc}"`
+	var_perc=`echo - | awk "{print $var_perc / $tot_perc}"`
+	home_perc=`echo - | awk "{print $home_perc / $tot_perc}"`
+
+	### sizes
+	usr_size_calc=`echo - | awk  "{print $usr_perc * $space_left}"`
+	var_size_calc=`echo - | awk  "{print $var_perc * $space_left}"`
+	home_size_calc=`echo - | awk "{print $home_perc * $space_left}"`
 
 	printf "						ROOT set to "$root_size"GB ("$space_left"GB space left on "$lvm_part")\n"
 
@@ -566,34 +561,32 @@ set_lvm_partition_sizes() {
 	printf "USR  partition size {>=10G} (GB)? [$usr_size_calc] "
 	reply_plain
 
-	### remove decimals
-	usr_size="${usr_size_calc%%.*}"
-
-	## recalculate
-	### space left after usr size chosen
-	space_left=`echo - | awk "{print $space_left - $usr_size}"`
-
-	if [ ! -z "$reply" ]; then
+	if [ -n "$reply" ]; then
 
 		usr_size_calc=`echo - | awk "{print $reply * 1}"`
 		### remove decimals
 		usr_size="${usr_size_calc%%.*}"
 
-		## recalculate
-		### space left after usr size chosen
-		space_left=`echo - | awk "{print $space_left - $usr_size}"`
+	else
 
-		### percentages
-		tot_perc=`echo - | awk "{print $var_perc + $home_perc}"`
-
-		var_perc=`echo - | awk "{print $var_perc / $tot_perc}"`
-		home_perc=`echo - | awk "{print $home_perc / $tot_perc}"`
-
-		### sizes
-		var_size_calc=`echo - | awk  "{print $var_perc * $space_left}"`
-		home_size_calc=`echo - | awk "{print $home_perc * $space_left}"`
+		### remove decimals
+		usr_size="${usr_size_calc%%.*}"
 
 	fi
+
+	## recalculate
+	### space left after usr size chosen
+	space_left=`echo - | awk "{print $space_left - $usr_size}"`
+
+	### percentages
+	tot_perc=`echo - | awk "{print $var_perc + $home_perc}"`
+
+	var_perc=`echo - | awk "{print $var_perc / $tot_perc}"`
+	home_perc=`echo - | awk "{print $home_perc / $tot_perc}"`
+
+	### sizes
+	var_size_calc=`echo - | awk  "{print $var_perc * $space_left}"`
+	home_size_calc=`echo - | awk "{print $home_perc * $space_left}"`
 
 	printf "						USR  set to "$usr_size"GB ("$space_left"GB space left on "$lvm_part")\n"
 
@@ -602,32 +595,30 @@ set_lvm_partition_sizes() {
 	#var_size_calc=0
 	reply_plain
 
-	### remove decimals
-	var_size="${var_size_calc%%.*}"
-
-	## recalculate
-	### space left after var size chosen
-	space_left=`echo - | awk "{print $space_left - $var_size}"`
-
-    if [ ! -z "$reply" ]; then
+    if [ -n "$reply" ]; then
 
 		var_size_calc=`echo - | awk "{print $reply * 1}"`
 		### remove decimals
 		var_size="${var_size_calc%%.*}"
 
-		## recalculate
-		### space left after var size chosen
-		space_left=`echo - | awk "{print $space_left - $var_size}"`
+	else
 
-		### percentage
-		tot_perc=`echo - | awk "{print $home_perc}"`
-
-		home_perc=`echo - | awk "{print $home_perc / $tot_perc}"`
-
-		### new size
-		home_size_calc=`echo - | awk "{print $home_perc * $space_left}"`
+		### remove decimals
+		var_size="${var_size_calc%%.*}"
 
 	fi
+
+	## recalculate
+	### space left after var size chosen
+	space_left=`echo - | awk "{print $space_left - $var_size}"`
+
+	### percentage
+	tot_perc=`echo - | awk "{print $home_perc}"`
+
+	home_perc=`echo - | awk "{print $home_perc / $tot_perc}"`
+
+	### new size
+	home_size_calc=`echo - | awk "{print $home_perc * $space_left}"`
 
 	printf "						VAR  set to "$var_size"GB ("$space_left"GB space left on "$lvm_part")\n"
 
@@ -635,24 +626,22 @@ set_lvm_partition_sizes() {
 	printf "HOME partition size (GB)? [$home_size_calc] "
 	reply_plain
 
-	### remove decimals
-	home_size="${home_size_calc%%.*}"
-
-	## recalculate
-	### space left after home size chosen
-	space_left=`echo - | awk "{print $space_left - $home_size}"`
-
-    if [ ! -z "$reply" ]; then
+    if [ -n "$reply" ]; then
 
         home_size_calc=`echo - | awk "{print $reply * 1}"`
 		### remove decimals
 		home_size="${home_size_calc%%.*}"
 
-		## recalculate
-		### space left after home size chosen
-		space_left=`echo - | awk "{print $space_left - $home_size}"`
+	else
+
+		### remove decimals
+		home_size="${home_size_calc%%.*}"
 
 	fi
+
+	## recalculate
+	### space left after home size chosen
+	space_left=`echo - | awk "{print $space_left - $home_size}"`
 
 	printf "						HOME set to "$home_size"GB ("$space_left"GB space left on "$lvm_part")\n"
 
@@ -876,8 +865,6 @@ create_swap_partition() {
 
 install_helpers() {
 
-	#[TODO] if offline=1 then pacman.conf_offline
-
 	sleep 5
 	#clear
 	## refresh package keys & install helpers
@@ -888,8 +875,6 @@ install_helpers() {
 
 
 configure_mirrorlists() {
-
-	#[TODO] how does this relate to offline?
 
 	## backup old mirrorlist
 	file_etc_pacmand_mirrorlist="/etc/pacman.d/mirrorlist"
@@ -906,33 +891,6 @@ install_base_devel_package_groups() {
 	pacstrap -i /mnt $to_pacstrap
 	#pacstrap -i /mnt base linux linux-firmware sudo dhcpcd lvm2 git binutils
 
-}
-
-
-copy_base_offline()
-{
-	printf "copying base to live env ..."
-	cp -ax / /mnt
-	#	-a, --archive
-    #		same as -dR --preserve=all
-	#			-d
-	#				same as --no-dereference --preserve=links
-	#			-R, -r, --recursive
-	#				copy directories recursively
-	#			--preserve[=ATTR_LIST]
-	#				preserve the specified attributes
-	#				(default: mode,ownership,timestamps),
-	#				if possible  additional attributes:
-	#					context, links, xattr, all
-	#	-x, --one-file-system
-    #		stay on this file system
-}
-
-
-copy_kernel_img_offline()
-{
-	cp -vaT /run/archiso/bootmnt/arch/boot/$(uname -m)/vmlinuz \
-		/mnt/boot/vm-linuz-linux
 }
 
 
@@ -959,7 +917,7 @@ modify_fstab() {
 
 
 prepare_mnt_environment() {
-#[TODO] !offline
+
 	#clear
 	echo 'installing git and hajime to new environment'
 	arch-chroot /mnt git clone https://gitlab.com/cytopyge/hajime
@@ -996,7 +954,7 @@ switch_to_installation_environment() {
 welcome() {
 
 	clear
-	printf " hajime (c) 2019 - 2022 cytopyge\n"
+	printf " hajime (c) 2019 - 2021 cytopyge\n"
 	echo
 	echo
 	printf " ${RED}CAUTION${NOC}\n"
