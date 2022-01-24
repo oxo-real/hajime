@@ -109,7 +109,7 @@ define_additional_tools() {
 	mathematics=""
 						#"gnu-plot"
 
-	accounting= ""
+	accounting=""
 						#"ledger hledger"
 
 	download_utilities="aria2 transmission-cli transmission-remote-cli-git"

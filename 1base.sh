@@ -954,22 +954,25 @@ switch_to_installation_environment() {
 welcome() {
 
 	clear
-	printf " hajime (c) 2019 - 2021 cytopyge\n"
+	printf " hajime (c) 2019 - 2022 cytopyge\n"
 	echo
 	echo
-	printf " ${RED}CAUTION${NOC}\n"
+	printf " ${MAGENTA}CAUTION!${NOC}\n"
 	printf " Hajime will install a bleeding edge arch linux operating system on this machine.\n"
 	echo
 	printf " Continuing will ${BOLD}overwrite existing data${NORMAL} on designated devices.\n"
-	printf " This software is subject to continuous development; \n"
-	printf " By entering 'y' or 'Y' below you will consent to the following:\n"
-	printf " This software is provided as is without warranty of any kind.\n"
-	printf " Continuing execution of this software is at your own risk.\n"
+	printf " This software is subject to continuous development, carefully consider its beta state. \n"
+
+	printf " By pressing 'y' or 'Y' you consent fully to the following:\n"
+	printf " This software is provided 'as is' without warranty of any kind.\n"
+	printf " Continuing execution and usage of this software is at own risk.\n"
+	printf " Pressing any other key immediate cancels the operation.\n"
 	echo
-	printf " Be sure to have the most recent version of the arch installation image!\n"
+	printf " Be sure to have the most recent version of the arch installation media!\n"
 	printf " Use the 'isolatest' package to get the most recent authentic iso image.\n"
 	printf " You can download your copy via: ${UL}https://gitlab.com/cytopyge/isolatest${NUL}\n"
 	printf " Or retrieve an installation image via: ${UL}https://www/archlinux.org/download/${NUL}\n"
+	echo
 	echo
 	printf " Are you sure to continue? (y/N) "
 
@@ -981,7 +984,7 @@ welcome() {
 		echo
 		echo
 		echo
-		printf " Kamaete! "
+		printf " Kamaete "
 		sleep 0.5
 		printf "."
 		sleep 0.4
@@ -989,14 +992,14 @@ welcome() {
 		sleep 0.3
 		printf "."
 		sleep 0.2
-		printf " Hajime! "
+		printf " HAJIME! "
 		sleep 1
 		clear
 	else
 	    echo
 	    echo
 	    echo
-	    printf " Yame! "
+	    printf " YAME! "
 		exit_hajime
 	fi
 
