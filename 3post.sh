@@ -86,17 +86,18 @@ modify_pacman_conf() {
 	# modify pacman.conf
 	file_etc_pacman_conf="/etc/pacman.conf"
 
-	## add color
+	## activate color
 	sudo sed -i 's/#Color/Color/' $file_etc_pacman_conf
 
-	## add verbose package lists
+	## activate verbose package lists
 	sudo sed -i 's/#VerbosePkgLists/VerbosePkgLists/' $file_etc_pacman_conf
 
-	## add parallel downloads
-	sudo awk '/VerbosePkgLists/ { print; print "ParallelDownloads = 5"; next }1' \
-		$file_etc_pacman_conf > $file_etc_pacman_conf
+	## activate parallel downloads
+	sudo sed -i 's/#Parallel/Parallel/' pacman.conf
+	#sudo awk '/VerbosePkgLists/ { print; print "ParallelDownloads = 5"; next }1' \
+	#	$file_etc_pacman_conf > $file_etc_pacman_conf
 
-	## add multilib repository
+	## activate multilib repository
 	sudo sed -i 's/\#\[multilib\]/\[multilib\]\nInclude \= \/etc\/pacman.d\/mirrorlist/' $file_etc_pacman_conf
 
 }

@@ -114,6 +114,8 @@ define_additional_tools() {
 
 	download_utilities="aria2 transmission-cli transmission-remote-cli-git"
 
+	system_info="lshw"
+
 	system_monitoring="glances"
 						# ccze
 
@@ -184,6 +186,7 @@ create_additional_tools_list() {
 		$mathematics \
 		$accounting \
 		$download_utilities \
+		$system_info \
 		$system_monitoring \
 		$virtualization \
 		$image_capturing \
