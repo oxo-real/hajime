@@ -12,7 +12,7 @@
 ###   /      |  /  _|
 ###
 ### hajime_0init
-### helper file to get lined up in archiso
+### helper file to get lined up after archiso boot
 ###
 ### (c) 2020 - 2022 cytopyge
 ###
@@ -31,21 +31,78 @@ developer="cytopyge"
 
 reply_single()
 {
-# first entered character goes directly to $reply
-stty_0=$(stty -g)
-stty raw #-echo
-reply=$(head -c 1)
-stty $stty_0
+	# first entered character goes directly to $reply
+	stty_0=$(stty -g)
+	stty raw #-echo
+	reply=$(head -c 1)
+	stty $stty_0
 }
 
 
-setup_wap() {
+header()
+{
+	clear
+	printf "$script_name\n"
+	printf "$initial_release_year"
+	[[ $initial_release_year -ne $current_year ]] && printf " - $current_year "
+	printf " |  $developer\n"
+	echo
+	set -e
+}
 
+
+set_offline()
+{
+	printf "offline? (Y/n) "
+	reply_single
+
+	case $reply in
+
+		y|Y)
+			offline=1
+			;;
+
+		*)
+			select_interface
+			;;
+
+	esac
+	echo
+}
+
+
+select_interface()
+{
+	if printf "$reply" | grep -iq "^y" ; then
+
+		ip a
+		echo
+
+		printf "please enter interface number: "
+		read interface_number
+
+		# translate number to interface name
+		interface=$(ip a | grep "^$interface_number" | \
+			awk '{print $2}' | sed 's/://')
+
+		sudo ip link set $interface up
+		setup_wap
+		connect
+
+		printf "$interface connected to $wap\n"
+
+	fi
+}
+
+
+setup_wap()
+{
 	echo
 	wap_list=$(sudo iw dev $interface scan | grep SSID: | sed 's/SSID: //' | \
 		## awk removes leading and trailing whitespace
 		## nl adds line numbers
 		awk '{$1=$1;print}' | sort | uniq | sort | nl)
+
 	printf "visible wireless access points (wap's):\n"
 	printf "$wap_list\n"
 	echo
@@ -57,30 +114,62 @@ setup_wap() {
 	sudo wpa_passphrase "$wap" > wap.wifi
 	echo
 	sudo wpa_supplicant -B -i $interface -c wap.wifi
-
 }
 
 
-connect() {
-
+connect()
+{
 	sudo dhcpcd -w $interface
-
 }
 
 
-install() {
+#offline_manual()
+#{{{
+#	: '
+#
+#	# requirements
+#
+#	1 usb1 archiso		(isolatest)
+#	2 usb2 part 1 repo	(pkg_copy)
+#	3 usb2 part 2 code	(cp_core)
+#
+#
+#	# STEP1; on source system (with internet)
+#
+#	mount usb partition 2 [repo] as user;
+#
+#	% pkg_copy repo
+#
+#	which copies packages to repo
+#	   cp /var/cache/pacman/pkg repo
+#	and write offline database to repo
+#	   repo-add repo/offline.db.tar.zst repo/*.pkg.tar.zst
+#	   repo-add repo/offline.db.tar.zst repo/*.pkg.tar.xz
+#
+#
+#	# STEP2; on source system (with internet)
+#
+#	mount usb partition 3 [code] as user;
+#
+#	% rsync -aAXv --delete $XDG_DATA_HOME/c/git/code	~/dock/3
+#	% rsync -aAXv --delete $XDG_DATA_HOME/c/git/notes	~/dock/3
+#	% rsync -aAXv --delete $XDG_DATA_HOME/c/keys		~/dock/3
+#
+#
+#	# STEP3; on source system (with internet)
+#
+#	archiso boot
+#
+#	% mkdir tmp repo
+#	% mount dev/sdX2 repo
+#	% mount dev/sdX3 tmp
+#
+#	# '
+#}}}
 
-	pacman -Sy --noconfirm git
-	git clone https://gitlab.com/cytopyge/hajime
-	echo
-	printf "sh hajime/1base.sh\n"
-	echo
 
-}
-
-
-point_in_time() {
-
+point_in_time()
+{
 	if [[ -f $HOME/hajime/1base.done ]]; then
 		# 1base.sh already ran
 		pit=1
@@ -88,29 +177,6 @@ point_in_time() {
 		# 1base.sh has not yet ran
 		pit=0
 	fi
-
-}
-
-
-select_interface() {
-
-	if printf "$reply" | grep -iq "^y" ; then
-
-		ip a
-		echo
-		printf "please enter interface number: "
-		read interface_number
-
-		# translate number to interface name
-		interface=$(ip a | grep "^$interface_number" | \
-			awk '{print $2}' | sed 's/://')
-		sudo ip link set $interface up
-		setup_wap
-		connect
-		printf "$interface connected to $wap\n"
-
-	fi
-
 }
 
 
@@ -126,18 +192,65 @@ install_or_exit() {
 }
 
 
-clear
-printf "$script_name\n"
-printf "(c) $initial_release_year"
-[[ $initial_release_year -ne $current_year ]] && printf " - $current_year "
-printf " $developer\n"
-echo
-set -e
+install()
+{
+	case $offline in
+
+		1)
+			mount_repo
+
+			cp -prv /root/tmp/code/hajime /root
+
+			cp -prv /root/hajime/misc/ol_pacman.conf /etc/pacman.conf
+
+			pacman -Sy
+			;;
+
+		*)
+			git clone https://gitlab.com/cytopyge/hajime
+			pacman -Sy --noconfirm git
+			;;
+
+	esac
+
+	echo
+	printf "sh hajime/1base.sh\n"
+	echo
+}
 
 
-printf "connect to wireless access point? (y/N) "
-echo
-reply_single
-select_interface
-point_in_time
-install_or_exit
+mount_repo()
+{
+	# ! repo_dir must be same as repo_dir in 1base
+	# ! repo_dir must be same as Server in misc/ol_pacman.conf
+	repo_lbl='REPO'
+	repo_dir='/root/tmp/repo'
+	repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
+
+	mkdir -p "$repo_dir"
+
+	mount "$repo_dev" "$repo_dir"
+}
+
+
+mount_code()
+{
+	code_lbl='CODE'
+	code_dir='/root/tmp'
+	code_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
+
+	mkdir -p "$code_dir"
+
+	mount "$code_dev" "$code_dir"
+}
+
+
+main()
+{
+	header
+	set_offline
+	point_in_time
+	install_or_exit
+}
+
+main

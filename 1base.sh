@@ -24,14 +24,25 @@
 
 # user customizable variables
 
+offline=1
+# ! repo_dir must be same as repo_dir in 0init
+# ! repo_dir must be same as Server in misc/ol_pacman.conf
+repo_dir='/mnt/repo'
+
 timezone="Europe/Stockholm"
 sync_system_clock_over_ntp="true"
 rtc_local_timezone="0"
-arch_mirrorlist="https://www.archlinux.org/mirrorlist/?country=SE&protocol=http&protocol=https&ip_version=4"
+
+arch_mirrorlist="https://archlinux.org/mirrorlist/?country=SE&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on"
 mirror_country="Sweden"
 mirror_amount="5"
+
 install_helpers="reflector"
-to_pacstrap="base linux linux-firmware sudo dhcpcd lvm2 git binutils"
+pkg_base_to_pacstrap="base linux linux-firmware sudo dhcpcd lvm2 git binutils"
+pacman -Sy >/dev/null
+pkg_group_base_devel="$(pacman -Qg base-devel | sed 's/base-devel //g' | tr '\n' ' ')"
+# autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext
+# grep groff gzip libtool m4 make pacman patch pkgconf sed sudo texinfo which
 
 ## recommended percentages of $lvm_size_calc
 root_perc=0.01	## recommended minimum 1G
@@ -46,80 +57,75 @@ boot_size=256
 swap_size_recomm=4.00
 
 
-define_text_appearance() {
-
+define_text_appearance()
+{
 	## text color
-	RED='\033[0;31m' # red
-	GREEN='\033[0;32m' # green
-	NOC='\033[0m' # no color
+	MAGENTA='\033[0;35m'	# magenta
+	GREEN='\033[0;32m'		# green
+	RED='\033[0;31m'		# red
+	NOC='\033[0m'			# no color
 
 	## text style
-	UL=`tput smul`
-	NUL=`tput rmul`
-	BOLD=`tput bold`
-	NORMAL=`tput sgr0`
-
+	UL=`tput smul`			# underline
+	NUL=`tput rmul`			# no underline
+	BOLD=`tput bold`		# bold
+	NORMAL=`tput sgr0`		# normal
 }
 
 
 # define reply functions
 
-reply_plain() {
-
+reply_plain()
+{
 	# entry must be confirmed explicitly (by pushing enter)
 	read reply
-
 }
 
 
-reply_single() {
-
-        # first entered character goes directly to $reply
-        stty_0=$(stty -g)
+reply_single()
+{
+    # first entered character goes directly to $reply
+	stty_0=$(stty -g)
 	stty raw #-echo
-        reply=$(head -c 1)
-        stty $stty_0
-
+    reply=$(head -c 1)
+    stty $stty_0
 }
 
 
-reply_single_hidden() {
-
-        # first entered character goes silently to $reply
+reply_single_hidden()
+{
+    # first entered character goes silently to $reply
 	stty_0=$(stty -g)
 	stty raw -echo
-        reply=$(head -c 1)
+    reply=$(head -c 1)
 	stty $stty_0
-
 }
 
 
 # define exit function
-exit_hajime () {
-
-        echo
+exit_hajime ()
+{
+    echo
 	echo
-        printf " Hajime aborted by user!\n"
-        echo
+    printf " Hajime aborted by user!\n"
+    echo
 	sleep 1
 	printf " Bye!\n"
 	sleep 1
 	clear
-        exit
-
+    exit
 }
 
 
-get_bootmount() {
-
+get_bootmount()
+{
 	# get current bootmount blockdevice name
 	bootmnt_dev=$(mount | grep bootmnt | awk '{print $1}')
-
 }
 
 
-network_setup() {
-
+network_setup()
+{
 	# network setup
 
 	## get network interface
@@ -128,26 +134,24 @@ network_setup() {
 	## connect to network interface
 	dhcpcd $i
 	echo
-
 }
 
 
-console_font() {
-
+console_font()
+{
 	## especially useful for hiDPI screens on X
 
 	## install terminus font
-	pacman -Sy --noconfirm $terminus_font
+	pacman -S --noconfirm $terminus_font
 	pacman -Ql $terminus_font
 
 	## set console font temporarily
 	setfont $console_font
-
 }
 
 
-clock() {
-
+clock()
+{
 	## hardware clock (rtc) coordinated universal time (UTC)
 	timedatectl set-local-rtc $rtc_local_timezone
 	## network time protocol
@@ -161,18 +165,17 @@ clock() {
 	echo
 	sleep 3
 	clear
-
 }
 
 
 
-set_key_device() {
-## usb device where detached luks header and keyfile will be stored
+set_key_device()
+{
+	## usb device where detached luks header and keyfile will be stored
 
 	## lsblk for human
 	lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint
 	echo
-
 
 	## request key device path
 	printf "the KEY device has to be a physically detachable device\n"
@@ -182,7 +185,7 @@ set_key_device() {
 	key_dev=$reply
 
 	echo
-	printf "$(lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint | grep "$key_dev")\n"
+	printf '%s\n' "$(lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint | grep "$key_dev")"
 	echo
 
 	if [ "$key_dev" == "$bootmnt_dev" ] ; then
@@ -217,13 +220,13 @@ set_key_device() {
 	echo
 	gdisk "$key_dev"
 	clear
-
 }
 
 
-set_boot_device() {
-## boot partition can be on its own separate device or
-## on its own (first) partition on the system device
+set_boot_device()
+{
+	## boot partition can be on its own separate device or
+	## on its own (first) partition on the system device
 
 	## lsblk for human
 	lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint
@@ -237,7 +240,7 @@ set_boot_device() {
 	boot_dev=$reply
 
 	echo
-	printf "$(lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint | grep "$boot_dev")\n"
+	printf '%s\n' "$(lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint | grep "$boot_dev")"
 	echo
 
 	if [ "$boot_dev" == "$bootmnt_dev" ] ; then
@@ -272,12 +275,12 @@ set_boot_device() {
 	echo
 	gdisk "$boot_dev"
 	clear
-
 }
 
 
-set_lvm_device() {
-## LVM system partition installation target
+set_lvm_device()
+{
+	## LVM system partition installation target
 
 	## lsblk for human
 	lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint
@@ -301,7 +304,7 @@ set_lvm_device() {
 	fi
 
 	echo
-	printf "$(lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint | grep "$lvm_dev")\n"
+	printf '%s\n' "$(lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint | grep "$lvm_dev")"
 	echo
 
 	printf "LVM device: '$lvm_dev', correct? (Y/n) "
@@ -326,12 +329,11 @@ set_lvm_device() {
 	echo
 	gdisk "$lvm_dev"
 	clear
-
 }
 
 
-set_key_partition() {
-
+set_key_partition()
+{
 	## dialog
 	## lsblk for human
 	clear
@@ -352,7 +354,7 @@ set_key_partition() {
 	key_part=$key_dev$key_part_no
 
 	echo
-	printf "$(lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint | grep $key_dev)\n"
+	printf '%s\n' "$(lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint | grep $key_dev)"
 	echo
 
 	## check partition exists in lsblk
@@ -374,12 +376,11 @@ set_key_partition() {
 	fi
 
 	echo
-
 }
 
 
-set_boot_partition() {
-
+set_boot_partition()
+{
 	## dialog
 	## lsblk for human
 	clear
@@ -400,7 +401,7 @@ set_boot_partition() {
 	boot_part=$boot_dev$boot_part_no
 
 	echo
-	printf "$(lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint | grep $boot_dev)\n"
+	printf '%s\n' "$(lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint | grep "$boot_dev")"
 	echo
 
 	## check partition exists in lsblk
@@ -422,12 +423,11 @@ set_boot_partition() {
 	fi
 
 	echo
-
 }
 
 
-set_lvm_partition() {
-
+set_lvm_partition()
+{
 	## dialog
 	## lsblk for human
 	clear
@@ -441,7 +441,7 @@ set_lvm_partition() {
 	lvm_part=$lvm_dev$lvm_part_no
 
 	echo
-	printf "$(lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint | grep $lvm_dev)\n"
+	printf '%s\n' "$(lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint | grep "$lvm_dev")"
 	echo
 
 	## check partition exists in lsblk
@@ -463,12 +463,11 @@ set_lvm_partition() {
 	fi
 
 	echo
-
 }
 
 
-set_lvm_partition_sizes() {
-
+set_lvm_partition_sizes()
+{
 	## lsblk for human
 	clear
 	lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint
@@ -667,21 +666,20 @@ set_lvm_partition_sizes() {
 		echo
 		printf "encrypt partition and create lvm volumes\n"
 	fi
-
 }
 
 
-legacy_cryptsetup() {
-#cryptsetup on designated partition
+legacy_cryptsetup()
+{
+	#cryptsetup on designated partition
 
 	cryptsetup luksFormat --type luks2 "$lvm_part"
 	cryptsetup open "$lvm_part" cryptlvm
-
 }
 
 
-cryptboot() {
-
+cryptboot()
+{
 	## parameters
 	cryptboot_hash="sha512"
 	cryptboot_cipher="twofish-xts-plain64"
@@ -721,12 +719,11 @@ cryptboot() {
 	keyimg_file="$keyimg_directory/$keyimg_filename"
 
 	dd if=/dev/urandom of=$keyimg_file bs=$keyimg_filesize count=1
-
 }
 
 
-cryptkey() {
-
+cryptkey()
+{
 	## parameters
 	keyimg_hash="sha512"
 	keyimg_cipher="serpent-xts-plain64"
@@ -759,12 +756,11 @@ cryptkey() {
 	#cd /mnt/cryptkey
 
 	truncate -s 2M header.img
-
 }
 
 
-cryptlvm() {
-
+cryptlvm()
+{
 	## parameters
 	header_hash="sha512"
 	header_cipher="serpent-xts-plain64"
@@ -798,13 +794,11 @@ cryptlvm() {
 		#--keyfile-size=$header_keyfile_size \
 		$lvm_part cryptlvm
 		## /dev/mapper/cryptlvm
-
 }
 
 
-# creating lvm volumes with lvm
-create_lvm_volumes() {
-
+create_lvm_volumes()
+{
 	## create physical volume with lvm
 	pvcreate /dev/mapper/cryptlvm
 
@@ -816,94 +810,89 @@ create_lvm_volumes() {
 	lvcreate -L "$home_size"G vg0 -n lv_home
 	lvcreate -L "$usr_size"G vg0 -n lv_var
 	lvcreate -L "$var_size"G vg0 -n lv_usr
-
 }
 
 
-make_filesystems() {
-
+make_filesystems()
+{
 	mkfs.vfat -F 32 -n BOOT "$boot_part"
 	mkfs.ext4 -L ROOT /dev/mapper/vg0-lv_root
 	mkfs.ext4 -L HOME /dev/mapper/vg0-lv_home
 	mkfs.ext4 -L USR /dev/mapper/vg0-lv_usr
 	mkfs.ext4 -L VAR /dev/mapper/vg0-lv_var
-
 }
 
 
-create_mountpoints() {
-
+create_mountpoints()
+{
 	mount /dev/mapper/vg0-lv_root /mnt
 	mkdir /mnt/boot
 	mkdir /mnt/home
 	mkdir /mnt/usr
 	mkdir /mnt/var
-
 }
 
 
-mount_partitions() {
-
+mount_partitions()
+{
 	mount "$boot_part" /mnt/boot
 	mount /dev/mapper/vg0-lv_home /mnt/home
 	mount /dev/mapper/vg0-lv_usr /mnt/usr
 	mount /dev/mapper/vg0-lv_var /mnt/var
-
 }
 
 
-create_swap_partition() {
-
+create_swap_partition()
+{
 	if [[ $swap_bool == "Y" || $swap_bool == "y" ]]; then
 		lvcreate -L "$swap_size"G vg0 -n lv_swap
 		mkswap -L SWAP /dev/mapper/vg0-lv_swap
 		swapon /dev/mapper/vg0-lv_swap
 	fi
-
 }
 
 
-install_helpers() {
-
+install_helpers()
+{
 	sleep 5
 	#clear
 	## refresh package keys & install helpers
 	#pacman-key --refresh-keys
 	pacman -S --noconfirm $install_helpers
-
 }
 
 
-configure_mirrorlists() {
-
+configure_mirrorlists()
+{
 	## backup old mirrorlist
 	file_etc_pacmand_mirrorlist="/etc/pacman.d/mirrorlist"
 	cp $file_etc_pacmand_mirrorlist /etc/pacman.d/`date "+%Y%m%d%H%M%S"`_mirrorlist_backup
 
+	#[TODO] error offline
 	## select fastest mirrors
 	reflector --verbose --country $mirror_country -l $mirror_amount --sort rate --save $file_etc_pacmand_mirrorlist
-
 }
 
 
-install_base_devel_package_groups() {
-
-	pacstrap -i /mnt $to_pacstrap
-	#pacstrap -i /mnt base linux linux-firmware sudo dhcpcd lvm2 git binutils
-
+install_base_devel_package_groups()
+{
+	# 20220201 in the arch repository;
+	# base is a package, while
+	# base-devel is a package group
+	pacstrap -i /mnt $pkg_base_to_pacstrap
+	pacstrap -i /mnt $pkg_group_base_devel
 }
 
 
-generate_fstab() {
-
+generate_fstab()
+{
 	file_mnt_etc_fstab="/mnt/etc/fstab"
 	genfstab -U -p /mnt >> $file_mnt_etc_fstab
-
 }
 
 
-modify_fstab() {
-
+modify_fstab()
+{
 	## fstab /usr entry with nopass 0
 	sed -i '/\/usr/s/.$/0/' $file_mnt_etc_fstab
 
@@ -912,47 +901,63 @@ modify_fstab() {
 
 	## fstab /usr mount as ro
 	sed -i '/\/usr/s/rw,/ro,/' $file_mnt_etc_fstab
-
 }
 
 
-prepare_mnt_environment() {
+prepare_mnt_environment()
+{
+	echo 'installing hajime into the new environment'
 
-	#clear
-	echo 'installing git and hajime to new environment'
-	arch-chroot /mnt git clone https://gitlab.com/cytopyge/hajime
+	case $offline in
+
+		1)
+			[[ -d $repo_dir ]] || mkdir -p $repo_dir
+			cp -prv /root/tmp/repo $repo_dir
+
+			cp -prv /root/tmp/code/hajime /mnt
+
+			cp -prv /root/tmp/code/hajime/misc/ol_pacman.conf /mnt/etc/pacman.conf
+
+			;;
+
+		*)
+			# chroot changes the apparent root directory
+			# commands will run isolated inside their root jail
+			# here: /mnt will become the future root
+			arch-chroot /mnt git clone https://gitlab.com/cytopyge/hajime
+			;;
+
+	esac
+
 	echo
-
 }
 
 
-user_advice() {
-
+user_advice()
+{
 	echo 'changing root'
 	echo
-	echo 'to continue execute manually:'
+	echo 'to continue execute:'
 	echo 'sh hajime/2conf.sh'
 	echo
-
 }
 
 
-finishing() {
-
+finishing()
+{
 	arch-chroot /mnt touch hajime/1base.done
-
 }
 
 
-switch_to_installation_environment() {
-
+switch_to_installation_environment()
+{
+	# default bash will be ran inside the root jail
 	arch-chroot /mnt
-
 }
 
 
-welcome() {
-
+welcome()
+{
 	clear
 	printf " hajime (c) 2019 - 2022 cytopyge\n"
 	echo
@@ -965,7 +970,7 @@ welcome() {
 
 	printf " By pressing 'y' or 'Y' you consent fully to the following:\n"
 	printf " This software is provided 'as is' without warranty of any kind.\n"
-	printf " Continuing execution and usage of this software is at own risk.\n"
+	printf " Continuing execution and usage of this software is ${BOLD}at own risk${NORMAL}.\n"
 	printf " Pressing any other key immediate cancels the operation.\n"
 	echo
 	printf " Be sure to have the most recent version of the arch installation media!\n"
@@ -976,9 +981,7 @@ welcome() {
 	echo
 	printf " Are you sure to continue? (y/N) "
 
-
 	reply_single
-
 
 	if printf "$reply" | grep -iq "^y" ; then
 		echo
@@ -1002,38 +1005,41 @@ welcome() {
 	    printf " YAME! "
 		exit_hajime
 	fi
-
 }
 
+main()
+{
+	define_text_appearance
+	welcome
+	get_bootmount
+	network_setup
+	#console_font
+	clock
+	## ##set_key_device
+	set_boot_device
+	set_lvm_device
+	## ##set_key_partition
+	set_boot_partition
+	set_lvm_partition
+	set_lvm_partition_sizes
+	## ##cryptboot
+	## ##cryptkey
+	## ##cryptlvm
+	legacy_cryptsetup
+	create_lvm_volumes
+	make_filesystems
+	create_mountpoints
+	mount_partitions
+	create_swap_partition
+	install_helpers
+	configure_mirrorlists
+	install_base_devel_package_groups
+	generate_fstab
+	modify_fstab
+	prepare_mnt_environment
+	user_advice
+	finishing
+	switch_to_installation_environment
+}
 
-define_text_appearance
-welcome
-get_bootmount
-network_setup
-#console_font
-clock
-## ##set_key_device
-set_boot_device
-set_lvm_device
-## ##set_key_partition
-set_boot_partition
-set_lvm_partition
-set_lvm_partition_sizes
-## ##cryptboot
-## ##cryptkey
-## ##cryptlvm
-legacy_cryptsetup
-create_lvm_volumes
-make_filesystems
-create_mountpoints
-mount_partitions
-create_swap_partition
-install_helpers
-configure_mirrorlists
-install_base_devel_package_groups
-generate_fstab
-modify_fstab
-prepare_mnt_environment
-user_advice
-finishing
-switch_to_installation_environment
+main

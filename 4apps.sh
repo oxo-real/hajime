@@ -30,7 +30,7 @@ tmux_plugin_dir="$HOME/.config/tmux/plugins"
 
 define_core_applications() {
 
-	wayland="wlroots qt5-wayland wev"
+	wayland="wlroots qt5-wayland wev xorg-xwayland"
 		## qt5-wayland to prevent:
 		## WARNING: Could not find the Qt platform plugin "wayland" in ""
 		## i.e. when starting qutebrowser
