@@ -864,13 +864,21 @@ install_helpers()
 
 configure_mirrorlists()
 {
-	## backup old mirrorlist
-	file_etc_pacmand_mirrorlist="/etc/pacman.d/mirrorlist"
-	cp $file_etc_pacmand_mirrorlist /etc/pacman.d/`date "+%Y%m%d%H%M%S"`_mirrorlist_backup
+	if [[ $offline -ne 1 ]]; then
 
-	#[TODO] error offline
-	## select fastest mirrors
-	reflector --verbose --country $mirror_country -l $mirror_amount --sort rate --save $file_etc_pacmand_mirrorlist
+		## backup old mirrorlist
+		file_etc_pacmand_mirrorlist="/etc/pacman.d/mirrorlist"
+		cp $file_etc_pacmand_mirrorlist /etc/pacman.d/`date "+%Y%m%d%H%M%S"`_mirrorlist_backup
+
+		## select fastest mirrors
+		reflector \
+			--verbose \
+			--country $mirror_country \
+			-l $mirror_amount \
+			--sort rate \
+			--save $file_etc_pacmand_mirrorlist
+
+	fi
 }
 
 
@@ -879,8 +887,10 @@ install_base_devel_package_groups()
 	# 20220201 in the arch repository;
 	# base is a package, while
 	# base-devel is a package group
-	pacstrap -i /mnt $pkg_base_to_pacstrap
-	pacstrap -i /mnt $pkg_group_base_devel
+	pacstrap /mnt $pkg_base_to_pacstrap
+	pacstrap /mnt $pkg_group_base_devel
+	#[DEV] or?:
+	pacstrap /mnt base base-devel
 }
 
 
@@ -911,8 +921,7 @@ prepare_mnt_environment()
 	case $offline in
 
 		1)
-			[[ -d $repo_dir ]] || mkdir -p $repo_dir
-			cp -prv /root/tmp/repo $repo_dir
+			#cp -prv /root/tmp/repo /mnt
 
 			cp -prv /root/tmp/code/hajime /mnt
 

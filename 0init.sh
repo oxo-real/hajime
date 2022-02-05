@@ -221,13 +221,11 @@ install()
 
 mount_repo()
 {
-	# ! repo_dir must be same as repo_dir in 1base
-	# ! repo_dir must be same as Server in misc/ol_pacman.conf
 	repo_lbl='REPO'
 	repo_dir='/root/tmp/repo'
 	repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
 
-	mkdir -p "$repo_dir"
+	[[ -d $repo_dir ]] || mkdir -p "$repo_dir"
 
 	mount "$repo_dev" "$repo_dir"
 }

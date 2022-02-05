@@ -23,6 +23,7 @@
 
 
 # user customizable variables
+offline=1
 ## base-devel packages list as of 01/2022:
 ## autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext grep groff gzip libtool m4 make pacman patch pkgconf sed sudo texinfo which
 base_devel="$(pacman -Qg | awk '{print $2}' | tr "\n" " ")"
@@ -54,6 +55,34 @@ reply_single() {
 	reply=$(head -c 1)
 	stty $stty_0
 
+}
+
+
+reconfigure_pacman_conf()
+{
+	case $offline in
+		1)
+			sed -i "s|\/repo|$HOME\/repo|" $file_pacman_conf
+			;;
+	esac
+}
+
+reconfigure_pacman_conf
+
+
+mount_repo()
+{
+	case $offline in
+		1)
+			repo_lbl='REPO'
+			repo_dir='repo'
+			repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
+
+			[[ -d $repo_dir ]] || mkdir -p "$repo_dir"
+
+			mount "$repo_dev" "$repo_dir"
+			;;
+	esac
 }
 
 
@@ -300,6 +329,8 @@ wrap_up() {
 
 # execution
 
+reconfigure_pacman_conf
+mount_repo
 dhcp_connect
 set_read_write
 #own_home

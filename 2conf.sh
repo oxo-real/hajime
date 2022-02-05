@@ -23,7 +23,25 @@
 
 
 # user customizable variables
+
+## offline installation
 offline=1
+repo_dir='/repo'
+
+## file locations
+file_pacman_conf='/etc/pacman.conf'
+file_etc_locale_gen="/etc/locale.gen"
+file_etc_locale_conf="/etc/locale.conf"
+file_etc_vconsole_conf="/etc/vconsole.conf"
+file_etc_hosts="/etc/hosts"
+file_etc_hostname="/etc/hostname"
+file_etc_sudoers="/etc/sudoers"
+file_etc_pacmand_mirrorlist="/etc/pacman.d/mirrorlist"
+file_boot_loader_loader_conf="/boot/loader/loader.conf"
+file_boot_loader_entries_arch_conf="/boot/loader/entries/arch.conf"
+file_boot_loader_entries_arch_lts_conf="/boot/loader/entries/arch-lts.conf"
+
+## variable values
 time_zone="Europe/Stockholm"
 locale_conf="LANG=en_US.UTF-8"
 vconsole_conf="KEYMAP=us\nFONT=lat1-16"
@@ -49,28 +67,6 @@ system_security="arch-audit"
 clear
 
 
-# time settings
-## set time zone
-ln -sf /usr/share/zoneinfo/$time_zone /etc/localtime
-## set hwclock
-hwclock --systohc
-
-
-# locale settings
-file_etc_locale_gen="/etc/locale.gen"
-file_etc_locale_conf="/etc/locale.conf"
-
-sed -i "/^#en_US.UTF-8 UTF-8/c\en_US.UTF-8 UTF-8" $file_etc_locale_gen
-locale-gen
-echo $locale_conf > $file_etc_locale_conf
-
-
-# vconsole settings
-file_etc_vconsole_conf="/etc/vconsole.conf"
-echo $vconsole_conf > $file_etc_vconsole_conf
-echo
-
-
 reply()
 {
 	# first silently entered character goes directly to $reply
@@ -81,9 +77,34 @@ reply()
 }
 
 
-# network configuration
+time_settings()
+{
+	## set time zone
+	ln -sf /usr/share/zoneinfo/$time_zone /etc/localtime
+	## set hwclock
+	hwclock --systohc
+}
 
-## set hostname
+time_settings
+
+
+locale_settings()
+{
+	sed -i "/^#en_US.UTF-8 UTF-8/c\en_US.UTF-8 UTF-8" $file_etc_locale_gen
+	locale-gen
+	echo $locale_conf > $file_etc_locale_conf
+}
+
+
+#[TODO] vconsole is not written
+vconsole_settings()
+{
+	echo $vconsole_conf > $file_etc_vconsole_conf
+	echo
+}
+
+
+# network configuration
 
 set_hostname()
 {
@@ -136,11 +157,9 @@ set_hostname
 set_host_file()
 {
 	## create host file
-	file_etc_hostname="/etc/hostname"
 	printf "$hostname" > $file_etc_hostname
 
 	## add matching entries to hosts file
-	file_etc_hosts="/etc/hosts"
 	printf "127.0.0.1	localhost.localdomain	localhost\n" >> $file_etc_hosts
 	printf "::1		localhost.localdomain	localhost\n" >> $file_etc_hosts
 	printf "127.0.1.1	$hostname.localdomain	$hostname\n" >> $file_etc_hosts
@@ -226,6 +245,7 @@ set_username()
 
 add_username()
 {
+	#[TODO] user is not in sudoers file!!
 	useradd -m -g wheel $username
 }
 
@@ -248,7 +268,6 @@ set_passphrase()
 set_privileges()
 {
 	## priviledge escalation for wheel group
-	file_etc_sudoers="/etc/sudoers"
 	sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' $file_etc_sudoers
 
 	## keep environment variable with elevated priviledges
@@ -269,6 +288,35 @@ add_user()
 add_user
 
 
+reconfigure_pacman_conf()
+{
+	sed -i 's|root\/tmp\/repo|repo|' $file_pacman_conf
+}
+
+reconfigure_pacman_conf
+
+
+mount_repo()
+{
+	repo_lbl='REPO'
+	repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
+
+	[[ -d $repo_dir ]] || mkdir -p "$repo_dir"
+
+	mount "$repo_dev" "$repo_dir"
+}
+
+mount_repo
+
+
+initialize_pacman()
+{
+	pacman -Sy
+}
+
+initialize_pacman
+
+
 install_helpers()
 {
 	case offline in
@@ -284,7 +332,6 @@ install_helpers()
 
 
 			# configuring the mirrorlist
-			file_etc_pacmand_mirrorlist="/etc/pacman.d/mirrorlist"
 
 			## backup old mirrorlist
 			cp $file_etc_pacmand_mirrorlist /etc/pacman.d/`date "+%Y%m%d%H%M%S"`_mirrorlist.backup
@@ -346,7 +393,6 @@ install_bootloader()
 	bootctl install
 
 	## boot loader configuration
-	file_boot_loader_loader_conf="/boot/loader/loader.conf"
 
 	printf "default arch\n" > $file_boot_loader_loader_conf
 	printf "timeout $bootloader_timeout\n" >> $file_boot_loader_loader_conf
@@ -363,7 +409,6 @@ install_bootloader()
 	# adding boot loader entries
 
 	## bleeding edge kernel
-	file_boot_loader_entries_arch_conf="/boot/loader/entries/arch.conf"
 
 	echo 'title arch' > $file_boot_loader_entries_arch_conf
 	echo 'linux /vmlinuz-linux' >> $file_boot_loader_entries_arch_conf
@@ -376,7 +421,6 @@ install_bootloader()
 	[ -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` rw resume=UUID=`blkid | grep lv_swap | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> $file_boot_loader_entries_arch_conf
 
 	## long term support kernel (LTS)
-	file_boot_loader_entries_arch_lts_conf="/boot/loader/entries/arch-lts.conf"
 
 	echo 'title arch-lts' > $file_boot_loader_entries_arch_lts_conf
 	echo 'linux /vmlinuz-linux-lts' >> $file_boot_loader_entries_arch_lts_conf
