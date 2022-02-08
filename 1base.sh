@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 ##
 ###  _            _ _                  _
@@ -7,7 +7,6 @@
 ### | | | | (_| || | | | | | | |  __/ | |_) | (_| \__ \  __/
 ### |_| |_|\__,_|/ |_|_| |_| |_|\___| |_.__/ \__,_|___/\___|1
 ###            |__/
-###
 ###  _ _|_ _ ._    _  _
 ### (_\/|_(_)|_)\/(_|(/_
 ###   /      |  /  _|
@@ -16,7 +15,7 @@
 ### cytopyge arch linux installation 'base'
 ### first part of a series
 ###
-### (c) 2019 - 2022 cytopyge
+### 2019 - 2022  |  cytopyge
 ###
 ##
 #
@@ -25,9 +24,6 @@
 # user customizable variables
 
 offline=1
-# ! repo_dir must be same as repo_dir in 0init
-# ! repo_dir must be same as Server in misc/ol_pacman.conf
-repo_dir='/mnt/repo'
 
 timezone="Europe/Stockholm"
 sync_system_clock_over_ntp="true"
@@ -37,12 +33,29 @@ arch_mirrorlist="https://archlinux.org/mirrorlist/?country=SE&protocol=https&ip_
 mirror_country="Sweden"
 mirror_amount="5"
 
-install_helpers="reflector"
-pkg_base_to_pacstrap="base linux linux-firmware sudo dhcpcd lvm2 git binutils"
-pacman -Sy >/dev/null
-pkg_group_base_devel="$(pacman -Qg base-devel | sed 's/base-devel //g' | tr '\n' ' ')"
+pkg_help="reflector"
+pkg_core="base linux linux-firmware lvm2 dhcpcd git"
+pkg_base_devel="$(pacman -Qg base-devel | sed 's/base-devel //g' | tr '\n' ' ')"
+#
+# 20220201 in the arch repository;
+# base was a package group, but now is a package, while
+# base-devel is (still) a package group
+#
+# base (package):
+# --------------------------------
+# bash bzip2 coreutils file filesystem findutils gawk gcc-libs gettext glibc
+# grep gzip iproute2 iputils licenses pacman pciutils procps-ng psmisc sed shadow
+# systemd systemd-sysvcompat tar util-linux xz linux (optional)
+# https://github.com/archlinux/svntogit-packages/blob/master/base/repos/core-any/PKGBUILD
+#
+# base-devel (package-group):
+# --------------------------------
 # autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext
 # grep groff gzip libtool m4 make pacman patch pkgconf sed sudo texinfo which
+# https://archlinux.org/groups/x86_64/base-devel/
+#
+
+## ##pacman -Sy >/dev/null
 
 ## recommended percentages of $lvm_size_calc
 root_perc=0.01	## recommended minimum 1G
@@ -71,6 +84,9 @@ define_text_appearance()
 	BOLD=`tput bold`		# bold
 	NORMAL=`tput sgr0`		# normal
 }
+
+## files
+file_mnt_etc_fstab="/mnt/etc/fstab"
 
 
 # define reply functions
@@ -126,14 +142,18 @@ get_bootmount()
 
 network_setup()
 {
-	# network setup
+	if [[ $offline -ne 1 ]]; then
 
-	## get network interface
-	i=$(ip -o -4 route show to default | awk '{print $5}')
+		# network setup
 
-	## connect to network interface
-	dhcpcd $i
-	echo
+		## get network interface
+		i=$(ip -o -4 route show to default | awk '{print $5}')
+
+		## connect to network interface
+		dhcpcd $i
+		echo
+
+	fi
 }
 
 
@@ -854,11 +874,13 @@ create_swap_partition()
 
 install_helpers()
 {
-	sleep 5
-	#clear
-	## refresh package keys & install helpers
-	#pacman-key --refresh-keys
-	pacman -S --noconfirm $install_helpers
+	if [[ $offline -ne 1 ]]; then
+
+		## refresh package keys & install helpers
+		#pacman-key --refresh-keys
+		pacman -S --noconfirm $pkg_help
+
+	fi
 }
 
 
@@ -884,19 +906,14 @@ configure_mirrorlists()
 
 install_base_devel_package_groups()
 {
-	# 20220201 in the arch repository;
-	# base is a package, while
-	# base-devel is a package group
-	pacstrap /mnt $pkg_base_to_pacstrap
-	pacstrap /mnt $pkg_group_base_devel
-	#[DEV] or?:
-	pacstrap /mnt base base-devel
+	packages="${pkg_core} ${pkg_base_devel}"
+	pacstrap /mnt $packages
 }
 
 
 generate_fstab()
 {
-	file_mnt_etc_fstab="/mnt/etc/fstab"
+	# file system table
 	genfstab -U -p /mnt >> $file_mnt_etc_fstab
 }
 
@@ -921,8 +938,7 @@ prepare_mnt_environment()
 	case $offline in
 
 		1)
-			#cp -prv /root/tmp/repo /mnt
-
+			# copy hajime to root (/hajime in conf)
 			cp -prv /root/tmp/code/hajime /mnt
 
 			cp -prv /root/tmp/code/hajime/misc/ol_pacman.conf /mnt/etc/pacman.conf
@@ -944,9 +960,9 @@ prepare_mnt_environment()
 
 user_advice()
 {
-	echo 'changing root'
-	echo
+	echo 'now changing root'
 	echo 'to continue execute:'
+	echo
 	echo 'sh hajime/2conf.sh'
 	echo
 }
@@ -968,7 +984,8 @@ switch_to_installation_environment()
 welcome()
 {
 	clear
-	printf " hajime (c) 2019 - 2022 cytopyge\n"
+	printf " hajime\n"
+	printf " 2019 - 2022  |  cytopyge\n"
 	echo
 	echo
 	printf " ${MAGENTA}CAUTION!${NOC}\n"
@@ -979,7 +996,7 @@ welcome()
 
 	printf " By pressing 'y' or 'Y' you consent fully to the following:\n"
 	printf " This software is provided 'as is' without warranty of any kind.\n"
-	printf " Continuing execution and usage of this software is ${BOLD}at own risk${NORMAL}.\n"
+	printf " Continuing execution and usage of this software is ${BOLD}at own risk!${NORMAL}\n"
 	printf " Pressing any other key immediate cancels the operation.\n"
 	echo
 	printf " Be sure to have the most recent version of the arch installation media!\n"
@@ -993,6 +1010,7 @@ welcome()
 	reply_single
 
 	if printf "$reply" | grep -iq "^y" ; then
+
 		echo
 		echo
 		echo
@@ -1007,14 +1025,18 @@ welcome()
 		printf " HAJIME! "
 		sleep 1
 		clear
+
 	else
-	    echo
+
+		echo
 	    echo
 	    echo
 	    printf " YAME! "
 		exit_hajime
+
 	fi
 }
+
 
 main()
 {

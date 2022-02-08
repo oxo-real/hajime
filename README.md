@@ -5,32 +5,34 @@
 | | | | (_| || | | | | | | |  __/
 |_| |_|\__,_|/ |_|_| |_| |_|\___|
            |__/
-
  _ _|_ _ ._    _  _
 (_\/|_(_)|_)\/(_|(/_
   /      |  /  _|
 
 ```
+
+
 # hajime
+
 ## a five part arch linux installation series
-(c) 2019 - 2022 cytopyge
+2019 - 2022  |  cytopyge
 
 ### 1  Base
 The 'base' script creates a Globally Unique Identifiers (GUID) partition table (GPT) and Unified Extensible Firmware Interface (UEFI) system partition with systemd boot to bootstrap the user space for bleeding edge (BLE) and long term support (LTS) arch linux kernel.
 
-BOOT (ro) can be a separate partition / device. Logical volume manager (LVM) is fully encrypted with Linux Unified Key Setup (LUKS2) and contains separate volumes partitions for ROOT, HOME, VAR, USR (ro) and SWAP.
+BOOT (ro) can and is recommended to be a separate device partition and physical separate storage medium. Logical volume manager (LVM) is fully encrypted with Linux Unified Key Setup (LUKS2) and contains the separate volume partitions ROOT, USR (ro), VAR (ro), HOME and SWAP (optional).
 
 ### 2  Conf
 The 'conf' script configures settings for time, network, mirrorlists, bootloader entries for bleeding edge and long term support kernels, ramdisk and creates an user environment.
 
-After 'conf' the system is able to boot independently.
+After execution of 'conf' the system is able to boot independently.
 
 ### 3  Post
 The third script prepares the system 'post install' for the installation of a desktop environment.
 
-Modifications are made to the package manager, the entire operating system is updated, a mountpoint environment is beig created and an alternative AUR manager 'yay' is installed alongside the native 'pacman'.
+Modifications are made to the package manager, the entire operating system is updated, a mountpoint environment is beig created and an alternative AUR manager can be installed alongside the native 'pacman'.
 
-After 'post' an fully fledged Arch installation is running on the system.
+After execution of 'post' an fully fledged Arch Linux installation is running on the system.
 
 ### 4  Apps
 'hajime apps' prepares the system for a display manager running under Wayland, with wlroots as a modular compositor library.
@@ -43,15 +45,21 @@ It also installs a variety of tools, among others for: video, text, file managem
 'dtcf' installs the dotfile configuration, which contains settings for the apps and window manager to run smoothly.
 
 
-## Take off instructions
+# Take off instructions
 When using the 'hajime' scripts:
 
 Be sure to first get your latest Arch Linux install image with isolatest (https://gitlab.com/cytopyge/isolatest) or manually via: https://www.archlinux.org/download/ .
 
 Boot into the ArchISO live system environment, install git, clone 'hajime' and check the user customizable variables sections in every part before executing the first script:
 
-### getting wireless internet connection
-#### (before executing 1base.sh)
+
+## offline
+Be sure to have a package repository on a 'REPO' labelled offline medium, which is recommeded to be prepared with use of the tool: pkg_copy.
+
+
+## getting wireless internet connection
+
+### (before executing 1base.sh)
 have a hajime clone on a usb device
 
 after booting into archiso insert the usb device
@@ -63,8 +71,8 @@ then create a temporary mountpoint directory and
 mount the usb device to the mountpoint:
 
 ```
-lsblk -paf
 mkdir tmp
+lsblk -paf
 mount /dev/sdX tmp
 ```
 
@@ -171,14 +179,14 @@ https://freedesktop.org/wiki/Software/systemd
 ## Sway
 https://swaywm.org/
 
-## rice inspirations
+## inspirations
 * https://github.com/budlabs
-* https://github.com/lukesmithxyz
-* https://github.com/kaihendry
-* https://github.com/gotbletu
-* https://github.com/tpope
 * https://github.com/christoomey
+* https://github.com/gotbletu
+* https://github.com/kaihendry
+* https://github.com/lukesmithxyz
 * https://github.com/r00k
+* https://github.com/tpope
 
 many thanks for sharing!
 

@@ -16,7 +16,7 @@
 ### cytopyge arch linux installation 'dotfiles configuration'
 ### fifth and final part of a series
 ###
-### (c) 2019 - 2022 cytopyge
+### 2019 - 2022  |  cytopyge
 ###
 ##
 #
@@ -29,6 +29,7 @@ export XDG_LOGS_HOME="$HOME/.logs"
 export XDG_CONFIG_DIRS="/etc/xdg"
 
 git_remote="https://gitlab.com/cytopyge"
+git_remote="https://codeberg.org/cytopyge"
 git_local="$XDG_DATA_HOME/git"
 
 

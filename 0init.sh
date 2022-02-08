@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 ##
 ###  _            _ _                  _       _ _
@@ -14,7 +14,7 @@
 ### hajime_0init
 ### helper file to get lined up after archiso boot
 ###
-### (c) 2020 - 2022 cytopyge
+### 2020 - 2022  |  cytopyge
 ###
 ##
 #
@@ -123,51 +123,6 @@ connect()
 }
 
 
-#offline_manual()
-#{{{
-#	: '
-#
-#	# requirements
-#
-#	1 usb1 archiso		(isolatest)
-#	2 usb2 part 1 repo	(pkg_copy)
-#	3 usb2 part 2 code	(cp_core)
-#
-#
-#	# STEP1; on source system (with internet)
-#
-#	mount usb partition 2 [repo] as user;
-#
-#	% pkg_copy repo
-#
-#	which copies packages to repo
-#	   cp /var/cache/pacman/pkg repo
-#	and write offline database to repo
-#	   repo-add repo/offline.db.tar.zst repo/*.pkg.tar.zst
-#	   repo-add repo/offline.db.tar.zst repo/*.pkg.tar.xz
-#
-#
-#	# STEP2; on source system (with internet)
-#
-#	mount usb partition 3 [code] as user;
-#
-#	% rsync -aAXv --delete $XDG_DATA_HOME/c/git/code	~/dock/3
-#	% rsync -aAXv --delete $XDG_DATA_HOME/c/git/notes	~/dock/3
-#	% rsync -aAXv --delete $XDG_DATA_HOME/c/keys		~/dock/3
-#
-#
-#	# STEP3; on source system (with internet)
-#
-#	archiso boot
-#
-#	% mkdir tmp repo
-#	% mount dev/sdX2 repo
-#	% mount dev/sdX3 tmp
-#
-#	# '
-#}}}
-
-
 point_in_time()
 {
 	if [[ -f $HOME/hajime/1base.done ]]; then
@@ -180,15 +135,14 @@ point_in_time()
 }
 
 
-install_or_exit() {
-
+install_or_exit()
+{
 	if [[ "$pit" == "1" ]]; then
 		exit 0
 	else
 		install
 		exit 0
 	fi
-
 }
 
 
@@ -199,9 +153,9 @@ install()
 		1)
 			mount_repo
 
-			cp -prv /root/tmp/code/hajime /root
+			cp -pr /root/tmp/code/hajime /root
 
-			cp -prv /root/hajime/misc/ol_pacman.conf /etc/pacman.conf
+			cp -pr /root/hajime/misc/ol_pacman.conf /etc/pacman.conf
 
 			pacman -Sy
 			;;
@@ -224,10 +178,11 @@ mount_repo()
 	repo_lbl='REPO'
 	repo_dir='/root/tmp/repo'
 	repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
+	local mountpoint=$(mount | grep $repo_dir)
 
 	[[ -d $repo_dir ]] || mkdir -p "$repo_dir"
 
-	mount "$repo_dev" "$repo_dir"
+	[[ -n $mountpoint ]] || mount "$repo_dev" "$repo_dir"
 }
 
 
@@ -237,7 +192,7 @@ mount_code()
 	code_dir='/root/tmp'
 	code_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
 
-	mkdir -p "$code_dir"
+	[[ -d $code_dir ]] || mkdir -p "$code_dir"
 
 	mount "$code_dev" "$code_dir"
 }

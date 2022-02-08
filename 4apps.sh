@@ -1,15 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #
 ##
-###
 ###  _            _ _
 ### | |__   __ _ (_|_)_ __ ___   ___    __ _ _ __  _ __  ___
 ### | '_ \ / _` || | | '_ ` _ \ / _ \  / _` | '_ \| '_ \/ __|
 ### | | | | (_| || | | | | | | |  __/ | (_| | |_) | |_) \__ \
 ### |_| |_|\__,_|/ |_|_| |_| |_|\___|  \__,_| .__/| .__/|___/4
 ###            |__/                         |_|   |_|
-###
 ###  _ _|_ _ ._    _  _
 ### (_\/|_(_)|_)\/(_|(/_
 ###   /      |  /  _|
@@ -18,18 +16,18 @@
 ### cytopyge arch linux installation 'apps'
 ### fourth part of an intriguing series
 ###
-### (c) 2019 - 2022 cytopyge
+### 2019 - 2022  |  cytopyge
 ###
 ##
 #
 
 
 # user customizable variables
-tmux_plugin_dir="$HOME/.config/tmux/plugins"
+offline=1
 
 
-define_core_applications() {
-
+define_core_applications()
+{
 	wayland="wlroots qt5-wayland wev xorg-xwayland"
 		## qt5-wayland to prevent:
 		## WARNING: Could not find the Qt platform plugin "wayland" in ""
@@ -69,12 +67,11 @@ define_core_applications() {
 						#"geekie"
 
 	bluetooth="bluez bluez-utils pulseaudio-bluetooth"
-
 }
 
 
-define_additional_tools() {
-
+define_additional_tools()
+{
 	terminal_text_tools="emacs figlet qrencode zbar jq xxd-standalone vimball"
 
 	terminal_file_browser="lf"
@@ -144,13 +141,76 @@ define_additional_tools() {
 
 	office_tools=""
 						#"libreoffice-fresh"
-
 }
 
 
-create_core_applications_list(){
+mount_repo()
+{
+	repo_lbl='REPO'
+	repo_dir="/home/$(id -un)/repo"
+	repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
+	#local mountpoint=$(mount | grep $repo_dir)
 
-	core_applications=($wayland \
+	[[ -d $repo_dir ]] || mkdir -p "$repo_dir"
+
+	sudo mount "$repo_dev" "$repo_dir"
+	#[[ -n $mountpoint ]] || sudo mount "$repo_dev" "$repo_dir"
+}
+
+
+get_offline_repo()
+{
+	case $offline in
+		1)
+			mount_repo
+			;;
+	esac
+}
+
+
+mount_code()
+{
+	code_lbl='CODE'
+	code_dir="/home/$(id -un)/tmp/code"
+	code_dev=$(lsblk -o label,path | grep "$code_lbl" | awk '{print $2}')
+	#local mountpoint=$(mount | grep $code_dir)
+
+	[[ -d $code_dir ]] || mkdir -p "$code_dir"
+
+	sudo mount "$code_dev" "$code_dir"
+	#[[ -n $mountpoint ]] || sudo mount "$code_dev" "$code_dir"
+}
+
+
+get_offline_code()
+{
+	case $offline in
+		1)
+			mount_code
+			;;
+	esac
+}
+
+
+qent_install()
+{
+	# pacman -Qent
+	# explicity installed native packages that are not dependencies
+
+	get_offline_code
+
+	# install trizen
+	## have the proper source in PKGBUILD
+	## source=("${pkgname}-${pkgver}.tar.gz")
+	cd "$code_dir/source/trizen"
+	makepkg -si
+}
+
+
+create_core_applications_list()
+{
+	core_applications=(\
+		$wayland \
 		$dwm \
 		$shell \
 		$shell_additions \
@@ -164,14 +224,15 @@ create_core_applications_list(){
 		$display \
 		$audio \
 		$images \
-		$bluetooth)
-
+		$bluetooth\
+	)
 }
 
 
-create_additional_tools_list() {
-
-	additional_tools=($terminal_text_tools \
+create_additional_tools_list()
+{
+	additional_tools=(\
+		$terminal_text_tools \
 		$terminal_file_browser \
 		$file_tools \
 		$debugging \
@@ -197,70 +258,74 @@ create_additional_tools_list() {
 		$photo_editing \
 		$photo_management \
 		$vector_graphics_editing \
-		$office_tools)
-
+		$office_tools\
+	)
 }
 
 
-set_usr_rw() {
-
+set_usr_rw()
+{
 	## set /usr writeable
 	sudo mount -o remount,rw  /usr
-
 }
 
 
-set_usr_ro() {
-
+set_usr_ro()
+{
 	# reset /usr read-only
 	sudo mount -o remount,ro  /usr
-
 }
 
 
-install_core_applications() {
-
+install_core_applications()
+{
 	## loop through core app packages
 	## instead of one whole list entry in yay
 	## this prevents that on error only one package is skipped
+	#local packages=$(echo "${core_applications[*]}")
+	#sudo pacman -S --noconfirm --needed $packages
+	for pkg_ca in "${core_applications[@]}"; do
 
-	for package in "${core_applications[@]}"; do
-
-		yay -S --noconfirm "$package"
+		sudo pacman -S --noconfirm --needed "$pkg_ca"
 
 	done
-
 }
 
 
 
-install_additional_tools() {
+install_additional_tools()
+{
+	## loop through core app packages
+	## instead of one whole list entry in yay
+	## this prevents that on error only one package is skipped
+	#local packages=$(echo "${additional_tools[*]}")
+	#sudo pacman -S --noconfirm --needed $packages
+	for pkg_at in "${additional_tools[@]}"; do
 
-	for package in "${additional_tools[@]}"; do
-
-		yay -Sy --noconfirm "$package"
+		sudo pacman -Sy --noconfirm --needed "$pkg_at"
 
 	done
-
 }
 
 
-loose_ends() {
-
+loose_ends()
+{
+	#[TODO]remove candidate
 	## tmux_plugin_manager
+	#tmux_plugin_dir="$HOME/.config/tmux/plugins"
 	#git clone https://github.com/tmux-plugins/tpm $tmux_plugin_dir/tpm
 
+	#[TODO]remove candidate
 	## create w3mimgdisplay symlink
 	## w3mimgdisplay is not in /usr/bin by default as of 20210114
 	## alternative is to add /usr/lib/w3m to $PATH
-	sudo ln -s /usr/lib/w3m/w3mimgdisplay /usr/bin/w3mimgdisplay
+	#sudo ln -s /usr/lib/w3m/w3mimgdisplay /usr/bin/w3mimgdisplay
 
 	## recommend human to execute dotfiles install script
 	echo 'sh hajime/5dtcf.sh'
 
 	## finishing
 	sudo touch $HOME/hajime/4apps.done
-
 }
 
 
@@ -273,5 +338,6 @@ create_additional_tools_list
 set_usr_rw
 install_core_applications
 install_additional_tools
+qent_install
 loose_ends
 set_usr_ro

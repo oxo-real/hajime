@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 ##
 ###  _            _ _                                   __
@@ -7,7 +7,6 @@
 ### | | | | (_| || | | | | | | |  __/ | (_| (_) | | | |  _|
 ### |_| |_|\__,_|/ |_|_| |_| |_|\___|  \___\___/|_| |_|_|  2
 ###            |__/
-###
 ###  _ _|_ _ ._    _  _
 ### (_\/|_(_)|_)\/(_|(/_
 ###   /      |  /  _|
@@ -16,7 +15,7 @@
 ### cytopyge arch linux installation 'configuration'
 ### second part of a series
 ###
-### (c) 2019 - 2022 cytopyge
+### 2019 - 2022  |  cytopyge
 ###
 ##
 #
@@ -27,9 +26,10 @@
 ## offline installation
 offline=1
 repo_dir='/repo'
+code_dir='/tmp'
 
 ## file locations
-file_pacman_conf='/etc/pacman.conf'
+file_etc_pacman_conf='/etc/pacman.conf'
 file_etc_locale_gen="/etc/locale.gen"
 file_etc_locale_conf="/etc/locale.conf"
 file_etc_vconsole_conf="/etc/vconsole.conf"
@@ -59,8 +59,8 @@ text_editor="emacs neovim"
 install_helpers="reflector"		#binutils 3post base-devel group
 wireless="wpa_supplicant wireless_tools iw"
 secure_connections="openssh"
-micro_code_intel="intel-ucode iucode-tool"
-micro_code_amd="amd-ucode"
+#micro_code_intel="intel-ucode iucode-tool"
+#micro_code_amd="amd-ucode"
 system_security="arch-audit"
 
 
@@ -77,6 +77,54 @@ reply()
 }
 
 
+mount_repo()
+{
+	repo_lbl='REPO'
+	repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
+	#local mountpoint=$(mount | grep $repo_dir)
+
+	[[ -d $repo_dir ]] || mkdir -p "$repo_dir"
+
+	sudo mount "$repo_dev" "$repo_dir"
+	#[[ -n $mountpoint ]] || sudo mount "$repo_dev" "$repo_dir"
+}
+
+
+mount_code()
+{
+	code_lbl='CODE'
+	code_dev=$(lsblk -o label,path | grep "$code_lbl" | awk '{print $2}')
+	#local mountpoint=$(mount | grep $code_dir)
+
+	[[ -d $code_dir ]] || mkdir -p "$code_dir"
+
+	sudo mount "$code_dev" "$code_dir"
+	#[[ -n $mountpoint ]] || sudo mount "$code_dev" "$code_dir"
+}
+
+
+get_offline_repo()
+{
+	case $offline in
+		1)
+			mount_repo
+			;;
+	esac
+}
+
+
+reconfigure_pacman_conf()
+{
+	case $offline in
+		1)
+			sed -i '/^\[offline\]/{n;s/.*/Server = file:\/\/\/repo/}' $file_etc_pacman_conf
+			#sed -i "s|\/root\/tmp\/repo|\/repo|" $file_etc_pacman_conf
+			pacman -Syy
+			;;
+	esac
+}
+
+
 time_settings()
 {
 	## set time zone
@@ -84,8 +132,6 @@ time_settings()
 	## set hwclock
 	hwclock --systohc
 }
-
-time_settings
 
 
 locale_settings()
@@ -96,7 +142,6 @@ locale_settings()
 }
 
 
-#[TODO] vconsole is not written
 vconsole_settings()
 {
 	echo $vconsole_conf > $file_etc_vconsole_conf
@@ -151,8 +196,6 @@ set_hostname()
 	echo
 }
 
-set_hostname
-
 
 set_host_file()
 {
@@ -178,8 +221,6 @@ set_host_file()
 	#printf "DNSOverTLS=yes" >> /etc/systemd/resolve.conf.d/dns_over_tls.conf
 }
 
-set_host_file
-
 
 # set root password
 pass_root()
@@ -187,8 +228,6 @@ pass_root()
 	printf "$(whoami)@$hostname\n"
 	passwd
 }
-
-pass_root
 
 
 ## set username
@@ -268,7 +307,7 @@ set_passphrase()
 set_privileges()
 {
 	## priviledge escalation for wheel group
-	sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' $file_etc_sudoers
+	sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' $file_etc_sudoers
 
 	## keep environment variable with elevated priviledges
 	sed -i 's/# Defaults env_keep += "HOME"/Defaults env_keep += "HOME"\nDefaults !always_set_home, !set_home/' $file_etc_sudoers
@@ -285,36 +324,11 @@ add_user()
 	set_privileges
 }
 
-add_user
-
-
-reconfigure_pacman_conf()
-{
-	sed -i 's|root\/tmp\/repo|repo|' $file_pacman_conf
-}
-
-reconfigure_pacman_conf
-
-
-mount_repo()
-{
-	repo_lbl='REPO'
-	repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
-
-	[[ -d $repo_dir ]] || mkdir -p "$repo_dir"
-
-	mount "$repo_dev" "$repo_dir"
-}
-
-mount_repo
-
 
 initialize_pacman()
 {
-	pacman -Sy
+	pacman -Syy
 }
-
-initialize_pacman
 
 
 install_helpers()
@@ -348,23 +362,25 @@ install_helpers()
 	esac
 }
 
-install_helpers
 
-
-
-ucode()
+micro_code()
 {
-	#[TODO]
-	## check if cpu_name contains "Intel"
-	cpu_name=$(lscpu | grep name)
-	if [[ $cpu_name == *"Intel"*  ]]; then
-		cpu_type="intel"
-		ucode="intel-ucode iucode-tool"
+	cpu_name=$(lscpu | grep 'Model name:' | awk '{print $3}')
+
+	if [[ $cpu_name == 'AMD' ]]; then
+
+		cpu_type='amd'
+		pkg_ucode='amd-ucode'
+
 	else
-		#[TODO] proper check?
-		cpu_type="amd"
-		ucode="amd-ucode"
+
+		cpu_type='intel'
+		pkg_ucode='intel-ucode iucode-tool'
+
 	fi
+
+	#[TODO] check
+	ucode="$cpu_type-ucode"
 }
 
 
@@ -378,11 +394,10 @@ install_core()
 		$text_editor \
 		$wireless \
 		$secure_connections \
-		$micro_code_intel \
+		$pkg_ucode \
 		$system_security
 }
 
-install_core
 
 
 install_bootloader()
@@ -403,29 +418,28 @@ install_bootloader()
 	# create an initial ramdisk environment (initramfs)
 	## enable systemd hooks
 	sed -i "/^HOOKS/c\HOOKS=(base systemd autodetect keyboard sd-vconsole modconf block sd-encrypt lvm2 filesystems fsck)" /etc/mkinitcpio.conf
-	#sed -i "/^HOOKS/c\HOOKS=(base systemd autodetect keyboard sd-vconsole modconf block sd-encrypt sd-lvm2 filesystems fsck)" /etc/mkinitcpio.conf
 
 
 	# adding boot loader entries
 
-	## bleeding edge kernel
+	## linux kernel
 
+	file_boot_loader_entries_arch_conf="/boot/loader/entries/arch.conf"
 	echo 'title arch' > $file_boot_loader_entries_arch_conf
 	echo 'linux /vmlinuz-linux' >> $file_boot_loader_entries_arch_conf
-	#[TODO] intel / amd check here
-	echo 'initrd /intel-ucode.img' >> $file_boot_loader_entries_arch_conf
+	echo "initrd /$ucode.img" >> $file_boot_loader_entries_arch_conf
 	echo 'initrd /initramfs-linux.img' >> $file_boot_loader_entries_arch_conf
 	### if lv_swap does not exist
 	[ ! -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> $file_boot_loader_entries_arch_conf
 	### if lv_swap does exists
 	[ -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` rw resume=UUID=`blkid | grep lv_swap | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> $file_boot_loader_entries_arch_conf
 
-	## long term support kernel (LTS)
+	## linux long term support kernel (LTS)
 
+	file_boot_loader_entries_arch_lts_conf="/boot/loader/entries/arch-lts.conf"
 	echo 'title arch-lts' > $file_boot_loader_entries_arch_lts_conf
 	echo 'linux /vmlinuz-linux-lts' >> $file_boot_loader_entries_arch_lts_conf
-	#[TODO] intel / amd check here
-	echo 'initrd /intel-ucode.img' >> $file_boot_loader_entries_arch_lts_conf
+	echo "initrd /$ucode.img" >> $file_boot_loader_entries_arch_conf
 	echo 'initrd /initramfs-linux-lts.img' >> $file_boot_loader_entries_arch_lts_conf
 	### if lv_swap does not exist
 	[ ! -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> $file_boot_loader_entries_arch_lts_conf
@@ -442,27 +456,50 @@ install_bootloader()
 	mkinitcpio -p linux-lts
 }
 
-install_bootloader
+
+move_hajime()
+{
+	# move /hajime to $user home
+	cp -r /hajime /home/$username
+	sudo rm -rf /hajime
+}
 
 
-# move /hajime to $user home
-cp -r /hajime /home/$username
-sudo rm -rf /hajime
+exit_arch_chroot_mnt()
+{
+	## return to archiso environment
+	echo
+	echo 'exit'
+	# reboot advice
+	echo 'umount -R /mnt'
+	echo 'reboot'
+	echo
+	echo 'sh hajime/3post.sh'
+	echo
+
+	# finishing
+	touch /home/$username/hajime/2conf.done
+}
 
 
-# exit arch-chroot environment
+main()
+{
+	get_offline_repo
+	reconfigure_pacman_conf
+	time_settings
+	locale_settings
+	vconsole_settings
+	set_hostname
+	set_host_file
+	pass_root
+	add_user
+	initialize_pacman
+	install_helpers
+	micro_code
+	install_core
+	install_bootloader
+	move_hajime
+	exit_arch_chroot_mnt
+}
 
-## return to archiso environment
-echo
-echo 'exit'
-
-
-# reboot advice
-echo 'umount -R /mnt'
-echo 'reboot'
-echo 'sh hajime/3post.sh'
-echo
-
-
-# finishing
-touch /home/$username/hajime/2conf.done
+main

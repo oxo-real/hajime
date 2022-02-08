@@ -7,7 +7,6 @@
 ### | | | | (_| || | | | | | | |  __/ | |_) | (_) \__ \ |_
 ### |_| |_|\__,_|/ |_|_| |_| |_|\___| | .__/ \___/|___/\__|3
 ###            |__/                   |_|
-###
 ###  _ _|_ _ ._    _  _
 ### (_\/|_(_)|_)\/(_|(/_
 ###   /      |  /  _|
@@ -16,7 +15,7 @@
 ### cytopyge arch linux installation 'post'
 ### third part of a series
 ###
-### (c) 2019 - 2022 cytopyge
+### 2019 - 2022  |  cytopyge
 ###
 ##
 #
@@ -24,10 +23,10 @@
 
 # user customizable variables
 offline=1
-## base-devel packages list as of 01/2022:
-## autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext grep groff gzip libtool m4 make pacman patch pkgconf sed sudo texinfo which
-base_devel="$(pacman -Qg | awk '{print $2}' | tr "\n" " ")"
-base_additions='lsof pacman-contrib mlocate neofetch wl-clipboard nvim'
+repo_dir="/home/$(id -un)/repo"
+file_etc_pacman_conf='/etc/pacman.conf'
+
+post_core_additions='lsof pacman-contrib mlocate neofetch wl-clipboard nvim archlinux-keyring'
 bloat_ware="" # there seems to be no more bloatware since kernel v536 (nano was removed)
 mirror_country='Sweden'
 mirror_amount='5'
@@ -36,114 +35,136 @@ mirror_amount='5'
 # functions
 
 
-reply() {
-
+reply()
+{
 	# first silently entered character goes directly to $reply
 	stty_0=$(stty -g)
 	stty raw -echo
 	reply=$(head -c 1)
 	stty $stty_0
-
 }
 
 
-reply_single() {
-
+reply_single()
+{
 	# first entered character goes directly to $reply
 	stty_0=$(stty -g)
 	stty raw #-echo
 	reply=$(head -c 1)
 	stty $stty_0
-
 }
 
 
-reconfigure_pacman_conf()
+dhcp_connect()
+{
+	sh hajime/0init.sh
+}
+
+
+set_read_write()
+{
+	# set /usr and /boot read-write
+	sudo mount -o remount,rw  /usr
+	sudo mount -o remount,rw  /boot
+}
+
+
+own_home()
+{
+	sudo chown -R $(id -un):$(id -gn) /home/$(id -un)
+}
+
+
+modify_pacman_conf()
 {
 	case $offline in
+
 		1)
-			sed -i "s|\/repo|$HOME\/repo|" $file_pacman_conf
+			## set offline repo
+			sudo sed -i "/^\[offline\]/{n;s/.*/Server = file:\/\/\/home\/$(id -un)\/repo/}" $file_etc_pacman_conf
+			#sudo sed -i "s|\/repo|$HOME\/repo|" $file_etc_pacman_conf
 			;;
+
+		*)
+			## activate color
+			sudo sed -i 's/#Color/Color/' $file_etc_pacman_conf
+
+			## activate verbose package lists
+			sudo sed -i 's/#VerbosePkgLists/VerbosePkgLists/' $file_etc_pacman_conf
+
+			## activate parallel downloads
+			sudo sed -i 's/#Parallel/Parallel/' pacman.conf
+			#sudo awk '/VerbosePkgLists/ { print; print "ParallelDownloads = 5"; next }1' \
+			#	$file_etc_pacman_conf > $file_etc_pacman_conf
+
+			## activate multilib repository
+			sudo sed -i 's/\#\[multilib\]/\[multilib\]\nInclude \= \/etc\/pacman.d\/mirrorlist/' $file_etc_pacman_conf
+			;;
+
 	esac
 }
 
-reconfigure_pacman_conf
+
+pacman_init()
+{
+	sudo pacman-key --init
+	sudo pacman-key --populate archlinux
+}
 
 
 mount_repo()
 {
+	repo_lbl='REPO'
+	repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
+	#local mountpoint=$(mount | grep $repo_dir)
+
+	[[ -d $repo_dir ]] || mkdir -p "$repo_dir"
+
+	sudo mount "$repo_dev" "$repo_dir"
+	#[[ -n $mountpoint ]] || sudo mount "$repo_dev" "$repo_dir"
+}
+
+
+mount_code()
+{
+	code_lbl='CODE'
+	code_dev=$(lsblk -o label,path | grep "$code_lbl" | awk '{print $2}')
+	#local mountpoint=$(mount | grep $code_dir)
+
+	[[ -d $code_dir ]] || mkdir -p "$code_dir"
+
+	sudo mount "$code_dev" "$code_dir"
+	#[[ -n $mountpoint ]] || sudo mount "$code_dev" "$code_dir"
+}
+
+
+get_offline_repo()
+{
 	case $offline in
 		1)
-			repo_lbl='REPO'
-			repo_dir='repo'
-			repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
-
-			[[ -d $repo_dir ]] || mkdir -p "$repo_dir"
-
-			mount "$repo_dev" "$repo_dir"
+			mount_repo
 			;;
 	esac
 }
 
 
-dhcp_connect() {
-
-	sh hajime/0init.sh
-
-}
-
-
-own_home() {
-
-	cd $HOME
-	sudo rm -rf .
-
-}
-
-
-set_read_write() {
-
-	# set /usr and /boot read-write
-	sudo mount -o remount,rw  /usr
-	sudo mount -o remount,rw  /boot
-
-}
-
-
-modify_pacman_conf() {
-
-	# modify pacman.conf
-	file_etc_pacman_conf="/etc/pacman.conf"
-
-	## activate color
-	sudo sed -i 's/#Color/Color/' $file_etc_pacman_conf
-
-	## activate verbose package lists
-	sudo sed -i 's/#VerbosePkgLists/VerbosePkgLists/' $file_etc_pacman_conf
-
-	## activate parallel downloads
-	sudo sed -i 's/#Parallel/Parallel/' pacman.conf
-	#sudo awk '/VerbosePkgLists/ { print; print "ParallelDownloads = 5"; next }1' \
-	#	$file_etc_pacman_conf > $file_etc_pacman_conf
-
-	## activate multilib repository
-	sudo sed -i 's/\#\[multilib\]/\[multilib\]\nInclude \= \/etc\/pacman.d\/mirrorlist/' $file_etc_pacman_conf
-
-}
-
-
 create_directories() {
-
 	# create mountpoint docking bays
 
-	sudo mkdir -p $HOME/dock/1
-	sudo mkdir -p $HOME/dock/2
-	sudo mkdir -p $HOME/dock/3
-	sudo mkdir -p $HOME/dock/4
-	sudo mkdir -p $HOME/dock/android
-	sudo mkdir -p $HOME/dock/transfer
-	sudo mkdir -p $HOME/dock/vlt
-
+	mkdir -p $HOME/dock/1
+	mkdir -p $HOME/dock/2
+	mkdir -p $HOME/dock/3
+	mkdir -p $HOME/dock/4
+	mkdir -p $HOME/dock/android
+	mkdir -p $HOME/dock/transfer
+	mkdir -p $HOME/dock/vlt
+	#sudo mkdir -p $HOME/dock/1
+	#sudo mkdir -p $HOME/dock/2
+	#sudo mkdir -p $HOME/dock/3
+	#sudo mkdir -p $HOME/dock/4
+	#sudo mkdir -p $HOME/dock/android
+	#sudo mkdir -p $HOME/dock/transfer
+	#sudo mkdir -p $HOME/dock/vlt
 
 
 	# create xdg directories
@@ -160,147 +181,70 @@ create_directories() {
 	mkdir -p $HOME/.config
 	mkdir -p $HOME/.logs
 	mkdir -p $HOME/.dot
-
 }
 
 
-base_mutations() {
+base_mutations()
+{
+	## own home
+	#sudo chown -R $USER:wheel $HOME
 
-	# own home
-	sudo chown -R $USER:wheel $HOME
-
-	# update package databases
-	sudo pacman -Sy
-
-	# install base-devel package group
-	sudo pacman -S base-devel
-	#sudo pacman -S $base_devel
-
-	# yay, a packagemanager written in go
-	## build yay
-	mkdir -p ~/tmp/yay
-	git clone -q https://aur.archlinux.org/yay.git ~/tmp/yay
-	cd ~/tmp/yay
-
-	## install yay
-	makepkg -si
-	cd
-	rm -rf ~/tmp
-
-
-	# add, remove and configure to the standard base packages
-
-	## add base addditions
-	for package in $base_additions;
+	## add post core addditions
+	for package in $post_core_additions;
 	do
 
-		yay -S --needed --noconfirm $package
+		sudo pacman -S --needed --noconfirm $package
 
 	done
 
-	## remove core system bloat
-	#yay -Rns --noconfirm $bloat_ware
-
-}
+	## remove base system bloat
+	#pacman -Rns --noconfirm $bloat_ware
 
 
-system_update() {
+	## aur helper
+	if [[ $offline -ne 1 ]]; then
 
-	#[TODO] run updater after it is installed and skip this step
+		trizen()
+		{
+			mkdir -p $HOME/tmp/trizen
+			git clone -q https://aur.archlinux.org/trizen.git $HOME/tmp/trizen
+			cd $HOME/tmp/trizen
+			makepkg -si
+			cd
+			#rm -rf $HOME/tmp
+			trizen --version
+		}
 
-	# system update
+		trizen
 
-	## [[[git updater version as of 20190525_085600]]]
-	## update mirrorlist
-	sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.old
-	sudo reflector --verbose --country $mirror_country -l $mirror_amount \
-		--sort rate --save /etc/pacman.d/mirrorlist
 
-	## some info
-	yay -Ps
+		: '
+		yay()
+		{
+			mkdir -p ~/tmp/yay
+			git clone -q https://aur.archlinux.org/yay.git ~/tmp/yay
+			cd ~/tmp/yay
+			makepkg -si
+			cd
+			rm -rf ~/tmp
+		}
+		#yay
+		# '
 
-	echo
-	printf "package statistics\n"
-	printf "%7s %s\n" "$(yay -Qe | wc -l)" "explicit"
-	printf "%7s %s\n" "$(yay -Qd | wc -l)" "dependend"
-	printf "\033[1m%7s %s\033[0m\n" "$(yay -Q | wc -l)" "total count"
-	#total count matches: -4 + $(ls -ila /var/lib/pacman/local | grep wc -l)
-	printf "%7s %s\n" "$(yay -Qn | wc -l)" "native"
-	printf "%7s %s\n" "$(yay -Qm | wc -l)" "foreign"
-	echo
-	printf "file statistics\n"
-	printf "\033[1m%7s %s\033[0m\n" "$(yay -Ql | wc -l)" "total count"
-	printf "  top10 files per package\n"
-	yay -Ql | awk {'print $1'} | uniq -c | sort -k1,1nr | head
-	echo
-
-	printf "arch linux news (Pw)\n"
-	if [ -z $(yay -Pw) ]; then
-		printf "no recent entries\n"
-	else
-		yay -Pw
-		echo
-		printf "Press any key to continue "
-		reply
 	fi
-	echo
-
-
-	# update packages
-	clear
-	printf "package update (Syu)\n"
-	yay -Syu
-	echo
-
-
-	# cleaning up
-	printf "package cleanup\n"
-	#printf "yay\n"
-	#printf "[Rns Qtdq]\n"
-	#yay -Rns $(yay -Qtdq) 2>/dev/null
-	printf "> done\n"
-
-	printf "[c]\n"
-	yay -c
-	printf "> done\n"
-
-	printf "paccache\n"
-	printf "[rv]\n"
-	paccache -rv
-	printf "> done\n"
-	echo
-
-
-	# show missing package files
-
-	## i3blocks is filtered out from results
-	printf "missing package files\n"
-	#printf "yay\n"
-	printf "[Qk]\n"
-	yay -Qk | grep -v '0 m' || printf " no missing package files detected\n"
-	echo
-
-
-	# updatedb
-	## in order to user locate (faster than find)
-	## mlocate is required
-	printf "update locate database\n"
-	sudo updatedb
-	printf "done\n"
-
 }
 
 
-set_read_only() {
-
+set_read_only()
+{
 	# set /usr and /boot read-only
 	sudo mount -o remount,ro  /usr
 	sudo mount -o remount,ro  /boot
-
 }
 
 
-wrap_up() {
+wrap_up()
+{
 	# human info
 	clear
 	echo
@@ -327,16 +271,18 @@ wrap_up() {
 }
 
 
-# execution
+main()
+{
+	dhcp_connect
+	set_read_write
+	own_home
+	modify_pacman_conf
+	pacman_init
+	mount_repo
+	create_directories
+	base_mutations
+	set_read_only
+	wrap_up
+}
 
-reconfigure_pacman_conf
-mount_repo
-dhcp_connect
-set_read_write
-#own_home
-modify_pacman_conf
-create_directories
-base_mutations
-#system_update
-wrap_up
-set_read_only
+main
