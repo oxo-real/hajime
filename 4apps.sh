@@ -12,9 +12,9 @@
 ### (_\/|_(_)|_)\/(_|(/_
 ###   /      |  /  _|
 ###
-### hajime_apps
-### cytopyge arch linux installation 'apps'
+### hajime_4apps
 ### fourth part of an intriguing series
+### cytopyge arch linux installation 'apps'
 ###
 ### 2019 - 2022  |  cytopyge
 ###
@@ -23,7 +23,14 @@
 
 
 # user customizable variables
+
+## offline installation
 offline=1
+code_dir="/home/$(id -un)/dock/3"
+repo_dir="/home/$(id -un)/dock/2"
+repo_re="\/home\/$(id -un)\/dock\/2"
+file_etc_pacman_conf='/etc/pacman.conf'
+aur_dir="$repo_dir/aur"
 
 
 define_core_applications()
@@ -147,7 +154,6 @@ define_additional_tools()
 mount_repo()
 {
 	repo_lbl='REPO'
-	repo_dir="/home/$(id -un)/repo"
 	repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
 	#local mountpoint=$(mount | grep $repo_dir)
 
@@ -171,7 +177,6 @@ get_offline_repo()
 mount_code()
 {
 	code_lbl='CODE'
-	code_dir="/home/$(id -un)/tmp/code"
 	code_dev=$(lsblk -o label,path | grep "$code_lbl" | awk '{print $2}')
 	#local mountpoint=$(mount | grep $code_dir)
 
@@ -192,18 +197,22 @@ get_offline_code()
 }
 
 
-qent_install()
+aur_install()
 {
-	# pacman -Qent
-	# explicity installed native packages that are not dependencies
+	## install all aur packages
+	for package in $(ls $aur_dir); do
 
-	get_offline_code
+		cd $aur_dir/$package
+		makepkg -i --noconfirm --needed
+		cd ..
 
-	# install trizen
-	## have the proper source in PKGBUILD
-	## source=("${pkgname}-${pkgver}.tar.gz")
-	cd "$code_dir/source/trizen"
-	makepkg -si
+	done
+
+	## generate a development package database
+	yay -Y --gendb
+
+	## update local repo
+	yay -Syy
 }
 
 
@@ -286,7 +295,8 @@ install_core_applications()
 	#sudo pacman -S --noconfirm --needed $packages
 	for pkg_ca in "${core_applications[@]}"; do
 
-		sudo pacman -S --noconfirm --needed "$pkg_ca"
+		yay -S --noconfirm --needed "$pkg_ca"
+		#sudo pacman -S --noconfirm --needed "$pkg_ca"
 
 	done
 }
@@ -302,7 +312,8 @@ install_additional_tools()
 	#sudo pacman -S --noconfirm --needed $packages
 	for pkg_at in "${additional_tools[@]}"; do
 
-		sudo pacman -Sy --noconfirm --needed "$pkg_at"
+		yay -S --noconfirm --needed "$pkg_at"
+		#sudo pacman -Sy --noconfirm --needed "$pkg_at"
 
 	done
 }
@@ -336,8 +347,10 @@ define_additional_tools
 create_additional_tools_list
 
 set_usr_rw
+get_offline_repo
+get_offline_code
+aur_install
 install_core_applications
 install_additional_tools
-qent_install
 loose_ends
 set_usr_ro

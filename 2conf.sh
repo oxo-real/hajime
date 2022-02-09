@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 #
 ##
 ###  _            _ _                                   __
@@ -11,9 +12,9 @@
 ### (_\/|_(_)|_)\/(_|(/_
 ###   /      |  /  _|
 ###
-### hajime_conf
-### cytopyge arch linux installation 'configuration'
+### hajime_2conf
 ### second part of a series
+### cytopyge arch linux installation 'configuration'
 ###
 ### 2019 - 2022  |  cytopyge
 ###
@@ -25,8 +26,9 @@
 
 ## offline installation
 offline=1
-repo_dir='/repo'
 code_dir='/tmp'
+repo_dir='/repo'
+repo_re='\/repo'
 
 ## file locations
 file_etc_pacman_conf='/etc/pacman.conf'
@@ -90,6 +92,16 @@ mount_repo()
 }
 
 
+get_offline_repo()
+{
+	case $offline in
+		1)
+			mount_repo
+			;;
+	esac
+}
+
+
 mount_code()
 {
 	code_lbl='CODE'
@@ -103,11 +115,11 @@ mount_code()
 }
 
 
-get_offline_repo()
+get_offline_code()
 {
 	case $offline in
 		1)
-			mount_repo
+			mount_code
 			;;
 	esac
 }
@@ -117,9 +129,10 @@ reconfigure_pacman_conf()
 {
 	case $offline in
 		1)
-			sed -i '/^\[offline\]/{n;s/.*/Server = file:\/\/\/repo/}' $file_etc_pacman_conf
+			sed -i "/^\[offline\]/{n;s/.*/Server = file:\/\/$repo_re/}" $file_etc_pacman_conf
 			#sed -i "s|\/root\/tmp\/repo|\/repo|" $file_etc_pacman_conf
 			pacman -Syy
+			echo
 			;;
 	esac
 }

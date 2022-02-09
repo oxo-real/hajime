@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 #
 ##
 ###  _            _ _                                  _
@@ -11,9 +12,9 @@
 ### (_\/|_(_)|_)\/(_|(/_
 ###   /      |  /  _|
 ###
-### hajime_post
-### cytopyge arch linux installation 'post'
+### hajime_3post
 ### third part of a series
+### cytopyge arch linux installation 'post'
 ###
 ### 2019 - 2022  |  cytopyge
 ###
@@ -22,8 +23,12 @@
 
 
 # user customizable variables
+
+## offline installation
 offline=1
-repo_dir="/home/$(id -un)/repo"
+code_dir="/home/$(id -un)/dock/3"
+repo_dir="/home/$(id -un)/dock/2"
+repo_re="\/home\/$(id -un)\/dock\/2"
 file_etc_pacman_conf='/etc/pacman.conf'
 
 post_core_additions='lsof pacman-contrib mlocate neofetch wl-clipboard nvim archlinux-keyring'
@@ -81,7 +86,7 @@ modify_pacman_conf()
 
 		1)
 			## set offline repo
-			sudo sed -i "/^\[offline\]/{n;s/.*/Server = file:\/\/\/home\/$(id -un)\/repo/}" $file_etc_pacman_conf
+			sudo sed -i "/^\[offline\]/{n;s/.*/Server = file:\/\/$repo_re/}" $file_etc_pacman_conf
 			#sudo sed -i "s|\/repo|$HOME\/repo|" $file_etc_pacman_conf
 			;;
 
@@ -125,6 +130,16 @@ mount_repo()
 }
 
 
+get_offline_repo()
+{
+	case $offline in
+		1)
+			mount_repo
+			;;
+	esac
+}
+
+
 mount_code()
 {
 	code_lbl='CODE'
@@ -138,11 +153,11 @@ mount_code()
 }
 
 
-get_offline_repo()
+get_offline_code()
 {
 	case $offline in
 		1)
-			mount_repo
+			mount_code
 			;;
 	esac
 }
@@ -158,13 +173,6 @@ create_directories() {
 	mkdir -p $HOME/dock/android
 	mkdir -p $HOME/dock/transfer
 	mkdir -p $HOME/dock/vlt
-	#sudo mkdir -p $HOME/dock/1
-	#sudo mkdir -p $HOME/dock/2
-	#sudo mkdir -p $HOME/dock/3
-	#sudo mkdir -p $HOME/dock/4
-	#sudo mkdir -p $HOME/dock/android
-	#sudo mkdir -p $HOME/dock/transfer
-	#sudo mkdir -p $HOME/dock/vlt
 
 
 	# create xdg directories
@@ -199,39 +207,6 @@ base_mutations()
 
 	## remove base system bloat
 	#pacman -Rns --noconfirm $bloat_ware
-
-
-	## aur helper
-	if [[ $offline -ne 1 ]]; then
-
-		trizen()
-		{
-			mkdir -p $HOME/tmp/trizen
-			git clone -q https://aur.archlinux.org/trizen.git $HOME/tmp/trizen
-			cd $HOME/tmp/trizen
-			makepkg -si
-			cd
-			#rm -rf $HOME/tmp
-			trizen --version
-		}
-
-		trizen
-
-
-		: '
-		yay()
-		{
-			mkdir -p ~/tmp/yay
-			git clone -q https://aur.archlinux.org/yay.git ~/tmp/yay
-			cd ~/tmp/yay
-			makepkg -si
-			cd
-			rm -rf ~/tmp
-		}
-		#yay
-		# '
-
-	fi
 }
 
 
@@ -278,8 +253,9 @@ main()
 	own_home
 	modify_pacman_conf
 	pacman_init
-	mount_repo
 	create_directories
+	get_offline_repo
+	get_offline_code
 	base_mutations
 	set_read_only
 	wrap_up

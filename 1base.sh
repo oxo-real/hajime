@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 #
 ##
 ###  _            _ _                  _
@@ -11,9 +12,9 @@
 ### (_\/|_(_)|_)\/(_|(/_
 ###   /      |  /  _|
 ###
-### hajime_base
-### cytopyge arch linux installation 'base'
+### hajime_1base
 ### first part of a series
+### cytopyge arch linux installation 'base'
 ###
 ### 2019 - 2022  |  cytopyge
 ###
@@ -22,8 +23,9 @@
 
 
 # user customizable variables
-
+## offline installation
 offline=1
+# mountpoints set in 0init are unchanged
 
 timezone="Europe/Stockholm"
 sync_system_clock_over_ntp="true"
@@ -33,10 +35,6 @@ arch_mirrorlist="https://archlinux.org/mirrorlist/?country=SE&protocol=https&ip_
 mirror_country="Sweden"
 mirror_amount="5"
 
-pkg_help="reflector"
-pkg_core="base linux linux-firmware lvm2 dhcpcd git"
-pkg_base_devel="$(pacman -Qg base-devel | sed 's/base-devel //g' | tr '\n' ' ')"
-#
 # 20220201 in the arch repository;
 # base was a package group, but now is a package, while
 # base-devel is (still) a package group
@@ -53,9 +51,10 @@ pkg_base_devel="$(pacman -Qg base-devel | sed 's/base-devel //g' | tr '\n' ' ')"
 # autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext
 # grep groff gzip libtool m4 make pacman patch pkgconf sed sudo texinfo which
 # https://archlinux.org/groups/x86_64/base-devel/
-#
+pkg_help="reflector"
+pkg_core="base linux linux-firmware lvm2 dhcpcd git"
+pkg_base_devel="$(pacman -Qg base-devel | sed 's/base-devel //g' | tr '\n' ' ')"
 
-## ##pacman -Sy >/dev/null
 
 ## recommended percentages of $lvm_size_calc
 root_perc=0.01	## recommended minimum 1G

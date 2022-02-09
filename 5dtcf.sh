@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 #
 ##
 ###  _            _ _                      _ _        __
@@ -7,19 +8,28 @@
 ### | | | | (_| || | | | | | | |  __/ | (_| | || (__|  _|
 ### |_| |_|\__,_|/ |_|_| |_| |_|\___|  \__,_|\__\___|_| 5
 ###            |__/
-###
 ###  _ _|_ _ ._    _  _
 ### (_\/|_(_)|_)\/(_|(/_
 ###   /      |  /  _|
 ###
-### hajime_dtcf
+### hajime_5dtcf
+### grande finale fifth and last part
 ### cytopyge arch linux installation 'dotfiles configuration'
-### fifth and final part of a series
 ###
 ### 2019 - 2022  |  cytopyge
 ###
 ##
 #
+
+
+# user customizable variables
+
+## offline installation
+offline=1
+code_dir="/home/$(id -un)/dock/3"
+repo_dir="/home/$(id -un)/dock/2"
+repo_re="\/home\/$(id -un)\/dock\/2"
+file_etc_pacman_conf='/etc/pacman.conf'
 
 
 export XDG_DATA_HOME="$HOME/.local/share"
@@ -28,10 +38,10 @@ export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_LOGS_HOME="$HOME/.logs"
 export XDG_CONFIG_DIRS="/etc/xdg"
 
-git_remote="https://gitlab.com/cytopyge"
-git_remote="https://codeberg.org/cytopyge"
-git_local="$XDG_DATA_HOME/git"
-
+git_local="$XDG_DATA_HOME/c/git"
+git_remote_gl="https://gitlab.com/cytopyge"
+git_remote_cb="https://codeberg.org/cytopyge"
+git_remote=$git_remote_cb
 
 git_clone_dotfiles()
 {
@@ -63,7 +73,7 @@ git_clone_code()
 	git clone $git_remote/$repo $git_code/$repo
 	#### git/hajime becomes the git repo;
 	#### remove git repo from install directory
-	mv $HOME/hajime/.git $HOME/hajime/.was.git
+	mv $HOME/hajime/.git $HOME/hajime/.git.DEL
 
 	### isolatest
 	repo="isolatest"
@@ -90,13 +100,36 @@ git_clone_notes()
 }
 
 
-git_clone_dotfiles
-git_clone_code
-git_clone_notes
+if [[ $offline -ne 1 ]]; then
+
+	git_clone_dotfiles
+	git_clone_code
+	git_clone_notes
+
+elif [[ $offline -eq 1 ]]; then
+
+	home_dir_dst="$HOME"
+	git_dir_dst="$XDG_DATA_HOME/c/git"
+
+	[[ -d $home_dir_dst/.config ]] || mkdir -p	$home_dir_dst/.config
+	[[ -d $git_dir_dst/code ]] || mkdir -p		$git_dir_dst/code
+	[[ -d $git_dir_dst/notes ]] || mkdir -p		$git_dir_dst/notes
+	[[ -d $git_dir_dst/provate ]] || mkdir -p	$git_dir_dst/private
+
+	cp -pr $code_dir/.config	$home_dir_dst
+	cp -pr $code_dir/code		$git_dir_dst
+	cp -pr $code_dir/notes		$git_dir_dst
+	cp -pr $code_dir/private	$git_dir_dst
+
+fi
 
 
-# restore .config from .dot
-sh $XDG_DATA_HOME/git/code/tools/dotbu restore $HOME/.dot/files $XDG_CONFIG_HOME
+if [[ $offline -ne 1 ]]; then
+
+	# restore .config from .dot
+	sh $XDG_DATA_HOME/git/code/tools/dotbu restore $HOME/.dot/files $XDG_CONFIG_HOME
+
+fi
 
 
 # rewrite symlinks in shln to current users home
@@ -123,25 +156,36 @@ sudo chsh -s /bin/zsh
 [[ -d "$XDG_LOGS_HOME/history" ]] || mkdir $XDG_LOGS_HOME/history
 touch $XDG_LOGS_HOME/history/history
 
-## shell decoration
-## base16-shell
-#[TODO] create source variable on top of file
-git clone https://github.com/chriskempson/base16-shell.git $XDG_CONFIG_HOME/base16-shell
-cd
-## base16_irblack
-_base16 "/home/cytopyge/.config/base16-shell/scripts/base16-irblack.sh" irblack
 
+## [WARNING] ## no offline alternative
+#
+if [[ $offline -ne 1 ]]; then
 
-# vim
+	## shell decoration
+	## base16-shell
+	#[TODO] create source variable on top of file
+	git clone https://github.com/chriskempson/base16-shell.git $XDG_CONFIG_HOME/base16-shell
+	cd
+	## base16_irblack
+	_base16 "/home/cytopyge/.config/base16-shell/scripts/base16-irblack.sh" irblack
 
-## vim plug
-sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
-       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+fi
 
-## install plugins defined in: $XDG_CONFIG_HOME/nvim/plugins
-vim +PlugInstall +qall
-echo
+## [WARNING] ## no offline alternative
+#
+if [[ $offline -ne 1 ]]; then
 
+	# vim
+
+	## vim plug
+	sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
+	       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+
+	## install plugins defined in: $XDG_CONFIG_HOME/nvim/plugins
+	vim +PlugInstall +qall
+	echo
+
+fi
 
 # pass
 
@@ -154,10 +198,9 @@ ln -s $HOME/dock/vlt/pass .password-store
 
 mozilla_firefox()
 {
-	[ -d ~/Downloads ] && rm -rf ~/Downloads
-	[ -d ~/.mozilla ] && rm -rf ~/.mozilla
+	[ -d $HOME/Downloads ] && rm -rf $HOME/Downloads
+	[ -d $HOME/.mozilla ] && rm -rf $HOME/.mozilla
 }
-
 
 mozilla_firefox
 

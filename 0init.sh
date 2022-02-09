@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 #
 ##
 ###  _            _ _                  _       _ _
@@ -12,6 +13,7 @@
 ###   /      |  /  _|
 ###
 ### hajime_0init
+### zeroth part of six scripts in total
 ### helper file to get lined up after archiso boot
 ###
 ### 2020 - 2022  |  cytopyge
@@ -27,6 +29,9 @@ script_name="hajime_0init"
 initial_release_year="2020"
 current_year=$(date "+%Y")
 developer="cytopyge"
+
+## offline installation
+# see point_in_time (if pit=0)
 
 
 reply_single()
@@ -128,9 +133,16 @@ point_in_time()
 	if [[ -f $HOME/hajime/1base.done ]]; then
 		# 1base.sh already ran
 		pit=1
+		#code_dir	comes from script that has called 0init
+		#repo_dir	comes from script that has called 0init
+		#repo_re	comes from script that has called 0init
+
 	else
 		# 1base.sh has not yet ran
 		pit=0
+		code_dir='/root/tmp'
+		repo_dir='/root/tmp/repo'
+		repo_re='\/root\/tmp\/repo'
 	fi
 }
 
@@ -151,12 +163,14 @@ install()
 	case $offline in
 
 		1)
-			mount_repo
+			## mount repo
+			get_offline_repo
 
+			## copy hajime to /root
 			cp -pr /root/tmp/code/hajime /root
 
+			## update pacman.conf
 			cp -pr /root/hajime/misc/ol_pacman.conf /etc/pacman.conf
-
 			pacman -Sy
 			;;
 
@@ -176,25 +190,46 @@ install()
 mount_repo()
 {
 	repo_lbl='REPO'
-	repo_dir='/root/tmp/repo'
 	repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
-	local mountpoint=$(mount | grep $repo_dir)
+	#local mountpoint=$(mount | grep $repo_dir)
 
 	[[ -d $repo_dir ]] || mkdir -p "$repo_dir"
 
-	[[ -n $mountpoint ]] || mount "$repo_dev" "$repo_dir"
+	mount "$repo_dev" "$repo_dir"
+	#[[ -n $mountpoint ]] || mount "$repo_dev" "$repo_dir"
+}
+
+
+get_offline_repo()
+{
+	case $offline in
+		1)
+			mount_repo
+			;;
+	esac
 }
 
 
 mount_code()
 {
 	code_lbl='CODE'
-	code_dir='/root/tmp'
-	code_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
+	code_dev=$(lsblk -o label,path | grep "$code_lbl" | awk '{print $2}')
+	#local mountpoint=$(mount | grep $code_dir)
 
 	[[ -d $code_dir ]] || mkdir -p "$code_dir"
 
 	mount "$code_dev" "$code_dir"
+	#[[ -n $mountpoint ]] || mount "$code_dev" "$code_dir"
+}
+
+
+get_offline_code()
+{
+	case $offline in
+		1)
+			mount_code
+			;;
+	esac
 }
 
 
