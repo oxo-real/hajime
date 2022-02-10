@@ -127,13 +127,18 @@ get_public_data()
 		[[ -d $git_dir_dst/code ]] || mkdir -p		$git_dir_dst/code
 		[[ -d $git_dir_dst/notes ]] || mkdir -p		$git_dir_dst/notes
 
+		printf "copying system configuration files... "
 		cp -pr $code_dir/.config	$home_dir_dst
+		printf "done\n"
+		printf "copying code repository... "
 		cp -pr $code_dir/code		$git_dir_dst
+		printf "done\n"
+		printf "copying notes repository... "
 		cp -pr $code_dir/notes		$git_dir_dst
+		printf "done\n"
 
 	fi
 }
-get_public_data
 
 
 get_private_data()
@@ -149,11 +154,12 @@ get_private_data()
 
 		[[ -d $git_dir_dst/private ]] || mkdir -p	$git_dir_dst/private
 
+		printf "copying private repository... "
 		cp -pr $code_dir/private	$git_dir_dst
+		printf "done\n"
 
 	fi
 }
-get_private_data
 
 
 run_dotbu()
@@ -165,7 +171,6 @@ run_dotbu()
 
 	fi
 }
-run_dotbu
 
 
 rewrite_symlinks()
@@ -182,7 +187,6 @@ rewrite_symlinks()
 	### change network_ua
 	sh $XDG_DATA_HOME/c/git/code/tools/chln $XDG_CONFIG_HOME/network/ua
 }
-rewrite_symlinks
 
 
 set_permissions()
@@ -190,13 +194,12 @@ set_permissions()
 	# set right permissions for gnupg home
 	sh $XDG_DATA_HOME/c/git/notes/crypto/gpg/gnupg_set_permissions
 }
-set_permissions
 
 
 z_shell_config()
 {
 	## symlink in etc_zsh to zshenv
-	sudo ln -s $XDG_CONFIG_HOME/zsh/etc_zsh_env /etc/zsh/zshenv
+	sudo ln -s $XDG_CONFIG_HOME/zsh/etc_zsh_zshenv /etc/zsh/zshenv
 
 	## set zsh as default shell for current user
 	## re-login for changes to take effect
@@ -209,58 +212,63 @@ z_shell_config()
 	[[ -d "$XDG_LOGS_HOME/history" ]] || mkdir $XDG_LOGS_HOME/history
 	touch $XDG_LOGS_HOME/history/history
 }
-z_shell_config
 
 
-## [WARNING] ## no offline alternative
-#
-if [[ $offline -ne 1 ]]; then
+base16()
+{
+	if [[ $offline -ne 1 ]]; then
 
-	## shell decoration
-	## base16-shell
-	#[TODO] create source variable on top of file
-	git clone https://github.com/chriskempson/base16-shell.git $XDG_CONFIG_HOME/base16-shell
-	cd
-	## base16_irblack
-	_base16 "$XDG_CONFIG_HOME/base16-shell/scripts/base16-irblack.sh" irblack
+		## shell decoration
+		## base16-shell
+		#[TODO] create source variable on top of file
+		git clone https://github.com/chriskempson/base16-shell.git $XDG_CONFIG_HOME/base16-shell
 
-fi
+	elif [[ $offline -eq 1 ]]; then
 
+		cp -pr $repo_dir/aur/base16-shell $XDG_CONFIG_HOME
 
-## [WARNING] ## no offline alternative
-#
-if [[ $offline -ne 1 ]]; then
+	fi
 
-	# vim
-
-	## vim plug
-	sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
-	       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-
-	## install plugins defined in: $XDG_CONFIG_HOME/nvim/plugins
-	vim +PlugInstall +qall
-	echo
-
-fi
+	## set base16_irblack
+	export BASE16_THEME=irblack
+}
 
 
-# mozilla firefox settings
+vim_plug()
+{
+	if [[ $offline -ne 1 ]]; then
+
+		# vim
+
+		## vim plug
+		sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
+		       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+
+		## install plugins defined in: $XDG_CONFIG_HOME/nvim/plugins
+		vim +PlugInstall +qall
+		echo
+
+	fi
+}
+
 
 mozilla_firefox()
 {
+	# mozilla firefox settings
 	[ -d $HOME/Downloads ] && rm -rf $HOME/Downloads
 	[ -d $HOME/.mozilla ] && rm -rf $HOME/.mozilla
 }
 
-mozilla_firefox
 
+wallpaper()
+{
+	# prepare wallpaper file
 
-# prepare wallpaper file
-
-[ -d $XDG_DATA_HOME/media/images/wallpaper ] || \
-	mkdir -p $XDG_DATA_HOME/media/images/wallpaper
-## to be replaced with preferred image
-#cp $XDG_DATA_HOME/media/images/wallpaper/image.png $XDG_DATA_HOME/media/images/wallpaper/active
+	[ -d $XDG_DATA_HOME/media/images/wallpaper ] || \
+		mkdir -p $XDG_DATA_HOME/media/images/wallpaper
+	## to be replaced with preferred image
+	#cp $XDG_DATA_HOME/media/images/wallpaper/image.png $XDG_DATA_HOME/media/images/wallpaper/active
+}
 
 
 finishing_up() {
@@ -283,4 +291,19 @@ finishing_up() {
 }
 
 
-finishing_up
+main()
+{
+	get_public_data
+	get_private_data
+	run_dotbu
+	rewrite_symlinks
+	set_permissions
+	z_shell_config
+	mozilla_firefox
+	base16
+	vim_plug
+	wallpaper
+	finishing_up
+}
+
+main
