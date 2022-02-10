@@ -31,17 +31,19 @@ repo_dir="/home/$(id -un)/dock/2"
 repo_re="\/home\/$(id -un)\/dock\/2"
 file_etc_pacman_conf='/etc/pacman.conf'
 
-
+## main xdg locations
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_LOGS_HOME="$HOME/.logs"
 export XDG_CONFIG_DIRS="/etc/xdg"
 
+## main git locations
 git_local="$XDG_DATA_HOME/c/git"
 git_remote_gl="https://gitlab.com/cytopyge"
 git_remote_cb="https://codeberg.org/cytopyge"
 git_remote=$git_remote_cb
+
 
 git_clone_dotfiles()
 {
@@ -100,61 +102,114 @@ git_clone_notes()
 }
 
 
-if [[ $offline -ne 1 ]]; then
-
-	git_clone_dotfiles
-	git_clone_code
-	git_clone_notes
-
-elif [[ $offline -eq 1 ]]; then
-
-	home_dir_dst="$HOME"
-	git_dir_dst="$XDG_DATA_HOME/c/git"
-
-	[[ -d $home_dir_dst/.config ]] || mkdir -p	$home_dir_dst/.config
-	[[ -d $git_dir_dst/code ]] || mkdir -p		$git_dir_dst/code
-	[[ -d $git_dir_dst/notes ]] || mkdir -p		$git_dir_dst/notes
-	[[ -d $git_dir_dst/provate ]] || mkdir -p	$git_dir_dst/private
-
-	cp -pr $code_dir/.config	$home_dir_dst
-	cp -pr $code_dir/code		$git_dir_dst
-	cp -pr $code_dir/notes		$git_dir_dst
-	cp -pr $code_dir/private	$git_dir_dst
-
-fi
+git_clone_private()
+{
+	#[TODO] check name
+	repo="private"
+	git clone $git_remote/$repo $git_local/$repo
+}
 
 
-if [[ $offline -ne 1 ]]; then
+get_public_data()
+{
+	if [[ $offline -ne 1 ]]; then
 
-	# restore .config from .dot
-	sh $XDG_DATA_HOME/git/code/tools/dotbu restore $HOME/.dot/files $XDG_CONFIG_HOME
+		git_clone_dotfiles
+		git_clone_code
+		git_clone_notes
 
-fi
+	elif [[ $offline -eq 1 ]]; then
+
+		home_dir_dst="$HOME"
+		git_dir_dst="$XDG_DATA_HOME/c/git"
+
+		[[ -d $home_dir_dst/.config ]] || mkdir -p	$home_dir_dst/.config
+		[[ -d $git_dir_dst/code ]] || mkdir -p		$git_dir_dst/code
+		[[ -d $git_dir_dst/notes ]] || mkdir -p		$git_dir_dst/notes
+
+		cp -pr $code_dir/.config	$home_dir_dst
+		cp -pr $code_dir/code		$git_dir_dst
+		cp -pr $code_dir/notes		$git_dir_dst
+
+	fi
+}
+get_public_data
 
 
-# rewrite symlinks in shln to current users home
-sh $XDG_DATA_HOME/git/code/tools/chln
+get_private_data()
+{
+	if [[ $offline -ne 1 ]]; then
+
+		git_clone_private
+
+	elif [[ $offline -eq 1 ]]; then
+
+		home_dir_dst="$HOME"
+		git_dir_dst="$XDG_DATA_HOME/c/git"
+
+		[[ -d $git_dir_dst/private ]] || mkdir -p	$git_dir_dst/private
+
+		cp -pr $code_dir/private	$git_dir_dst
+
+	fi
+}
+get_private_data
 
 
-# set right permissions for gnupg home
-sh /home/cytopyge/.local/share/git/notes/crypto/gpg/gnupg_set_permissions
+run_dotbu()
+{
+	if [[ $offline -ne 1 ]]; then
+
+		# restore .config from .dot
+		sh $XDG_DATA_HOME/git/code/tools/dotbu restore $HOME/.dot/files $XDG_CONFIG_HOME
+
+	fi
+}
+run_dotbu
 
 
-# zsh shell config
+rewrite_symlinks()
+{
+	# rewrite symlinks in shln to current users home
 
-## sourcing zsh shell
-echo 'source ~/.config/zsh/.zshrc' > ~/.zshrc
+	## create symlinks
+	### create symlink to pass_vault mountpoint (vlt_pass)
+	ln -s $HOME/dock/vlt/pass $HOME/.password-store
 
-## set zsh as default shell for current user
-## re-login for changes to take effect
-sudo usermod -s `whereis zsh | awk '{print $2}'` $(whoami)
+	## change symlinks
+	### change config_shln
+	sh $XDG_DATA_HOME/c/git/code/tools/chln
+	### change network_ua
+	sh $XDG_DATA_HOME/c/git/code/tools/chln $XDG_CONFIG_HOME/network/ua
+}
+rewrite_symlinks
 
-## change shell
-sudo chsh -s /bin/zsh
 
-## enable command history
-[[ -d "$XDG_LOGS_HOME/history" ]] || mkdir $XDG_LOGS_HOME/history
-touch $XDG_LOGS_HOME/history/history
+set_permissions()
+{
+	# set right permissions for gnupg home
+	sh $XDG_DATA_HOME/c/git/notes/crypto/gpg/gnupg_set_permissions
+}
+set_permissions
+
+
+z_shell_config()
+{
+	## symlink in etc_zsh to zshenv
+	sudo ln -s $XDG_CONFIG_HOME/zsh/etc_zsh_env /etc/zsh/zshenv
+
+	## set zsh as default shell for current user
+	## re-login for changes to take effect
+	sudo usermod -s `whereis zsh | awk '{print $2}'` $(whoami)
+
+	## change shell
+	sudo chsh -s /bin/zsh
+
+	## enable command history
+	[[ -d "$XDG_LOGS_HOME/history" ]] || mkdir $XDG_LOGS_HOME/history
+	touch $XDG_LOGS_HOME/history/history
+}
+z_shell_config
 
 
 ## [WARNING] ## no offline alternative
@@ -167,9 +222,10 @@ if [[ $offline -ne 1 ]]; then
 	git clone https://github.com/chriskempson/base16-shell.git $XDG_CONFIG_HOME/base16-shell
 	cd
 	## base16_irblack
-	_base16 "/home/cytopyge/.config/base16-shell/scripts/base16-irblack.sh" irblack
+	_base16 "$XDG_CONFIG_HOME/base16-shell/scripts/base16-irblack.sh" irblack
 
 fi
+
 
 ## [WARNING] ## no offline alternative
 #
@@ -186,12 +242,6 @@ if [[ $offline -ne 1 ]]; then
 	echo
 
 fi
-
-# pass
-
-## create password-store symlink to pass_vault mountpoint
-cd
-ln -s $HOME/dock/vlt/pass .password-store
 
 
 # mozilla firefox settings
