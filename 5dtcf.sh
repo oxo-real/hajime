@@ -271,6 +271,17 @@ wallpaper()
 }
 
 
+pacman_conf()
+{
+	# disbling offline repo
+	sudo sed -i '/^\[offline\]/ s/./#&/' $file_etc_pacman_conf
+	sudo sed -i '/^Server = file:\/\// s/./#&/' $file_etc_pacman_conf
+
+	# enabling original repositories
+	sudo sed -i 's/^#X--//' $file_etc_pacman_conf
+}
+
+
 finishing_up() {
 
 	# finishing
