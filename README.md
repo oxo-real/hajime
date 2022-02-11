@@ -210,14 +210,14 @@ usb3	optional boot stick
 
 The installation phase is executed on the target machine.
 
-## 10
+## 11
 WARNING! ALL DATA ON TARGET MACHINE WILL BE DESTROYED!
 
 switch the target machine off
 insert usb1
 switch the target machine on
 
-## 11
+## 12
 after booting into archiso insert usb2
 mount usb2 to tmp
 ```
@@ -235,7 +235,7 @@ it is recommended to install entirely offline and connect to any network
 not earlier than after the installation is fully completed.
 
 
-## 12	start hajime
+## 13	start hajime
 let's roll!
 
 ```
