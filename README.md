@@ -11,8 +11,13 @@
 
 ```
 
+================================
+# overview
+--------------------------------
 
 # hajime
+
+When the right preparations are made this installation script installs an up-to-date Arch Linux system on an x64 architecture.
 
 ## a five part arch linux installation series
 2019 - 2022  |  cytopyge
@@ -45,70 +50,193 @@ It also installs a variety of tools, among others for: video, text, file managem
 'dtcf' installs the dotfile configuration, which contains settings for the apps and window manager to run smoothly.
 
 
-# Take off instructions
-When using the 'hajime' scripts:
+================================
+# requirements
+--------------------------------
+(what)
 
-Be sure to first get your latest Arch Linux install image with isolatest (https://gitlab.com/cytopyge/isolatest) or manually via: https://www.archlinux.org/download/ .
+## hardware
 
-Boot into the ArchISO live system environment, install git, clone 'hajime' and check the user customizable variables sections in every part before executing the first script:
+### REQUIRED	host machine
+An (Arch) Linux machine, in order to be able to copy an offline repository.
+The host machine must have an internet connection.
+
+	*	operating system		archlinux
+	*	network					internet access
+
+### REQUIRED	target machine
+Arch Linux is expected to run on almost every contemporary computer.
+The (minimum) requirements are:
+
+	*	architecture			x86-64	(or compatible)
+	*	storage capacity		>=	2G
+	*	RA memory				>=	512M
+
+### REQUIRED	usb1 archiso
+An empty data storage device with a size of at least 5G to install the Arch Linux Installer.
+
+	*	usb1					>=	5G
+
+### REQUIRED	usb2 repocode
+An empty data storage device with a recommended size of at least 20G storage capacity.
+The exact required size is heavily customizable and depends on which (and how many versions of) packages are copied from the host machine.
+
+	*	usb2					>=	20G
+
+### OPTIONAL	usb3 boot
+Optional, but a privacy recommendation, is a separate boot device. It does not to be big.
+
+	*	usb3					>=	256M
+
+## software
+
+### REQUIRED	archlinux iso
+In order to boot the live environment, from where hajime will be ran, we need the archlinux installation image.
+
+	*	archiso					https://www.archlinux.org/download/
+
+### OPTIONAL	isolatest
+Use isolatest to automatically download the iso image, verify signatures and prepare archiso. Download it from the internet via Codeberg (recommended) or Gitlab.
+
+	* isolatest					https://codeberg.org/cytopyg3/isolatest
+								https://gitlab.com/cytopyge/isolatest
 
 
-## offline
-Be sure to have a package repository on a 'REPO' labelled offline medium, which is recommeded to be prepared with use of the tool: pkg_copy.
+### REQUIRED	hajime
+The installer script itself. Download it from the internet via Codeberg (recommended) or Gitlab.
+
+	* hajime					https://codeberg.org/cytopyg3/hajime
+								https://gitlab.com/cytopyge/hajime
+
+##	OPT / REQ	network
+For the preparation phase an internet connection is required.
+During installation an internet connection is optional
 
 
-## getting wireless internet connection
+================================
+# preparation
+--------------------------------
 
-### (before executing 1base.sh)
-have a hajime clone on a usb device
+The preparation phase is executed on the host machine.
 
-after booting into archiso insert the usb device
+step-by-step hands-on guide
+enter and execute code after '%' sign on your own host machine
 
-designate the '/dev/sdX' name assigned to the device,
+## 01
+Connect a host machine to the internet.
 
-then create a temporary mountpoint directory and
+install git if it is not already done so
+% sudo pacman -S git
 
-mount the usb device to the mountpoint:
+download isolatest via codeberg:
+% git clone https://codeberg.org/cytopyg3/isolatest
 
-```
-mkdir tmp
-lsblk -paf
-mount /dev/sdX tmp
-```
 
-execute the init file form the usb:
+CAUTION!
+{values} between curly braces are specific and volatile!
+be sure to take the right one in your case!
+i.e. /dev/sd{RC1} can be /dev/sdc1
 
-```
-sh tmp/hajime/0init.sh
-```
+## 02
+insert usb1
+CAUTION! DESIGNATE THE RIGHT DEVICE!
+WARNING! ALL DATA WILL BE DESTROYED!
+designate (verify!) the device name of usb1
 
-### already have a internet connection
-when the system is connected to an ethernet cable
+% lsblk -paf
 
-the internet connection should be set up automatically during boot
+## 03
+execute isolatest
 
-```
-pacman -Sy git
-git clone https://gitlab.com/cytopyge/hajime
-```
+% sh isolatest /dev/sd{AI}
 
-### starting hajime
+## 04
+insert usb2
+create an ext4 partition labeled REPO
+CAUTION! DESIGNATE THE RIGHT DEVICE!
+WARNING! ALL DATA WILL BE DESTROYED!
+
+% sudo gdisk /dev/sd{RC}
+
+enter:	o	to rewrite GPT table
+		n	create a 10G 8300 partition (REPO)
+		n	create a 10G 8300 partition (CODE)
+		w	write changes to device
+		q	quit gdisk
+
+% sudo mkfs.ext4 -L REPO /dev/sd{RC2}
+% sudo mkfs.ext4 -L CODE /dev/sd{RC3}
+% mkdir dock/{2,3,3/code}
+
+## 05
+Prepare the CODE partition
+
+% sudo mount /dev/sdR3 dock/3
+
+download scripts from repository
+% git clone https://codeberg.org/cytopyg3/hajime	dock/3/code/hajime
+% git clone https://codeberg.org/cytopyg3/isolatest	dock/3/code/isolatest
+% git clone https://codeberg.org/cytopyg3/netconn	dock/3/code/netconn
+% git clone https://codeberg.org/cytopyg3/sources	dock/3/code/sources
+% git clone https://codeberg.org/cytopyg3/tools		dock/3/code/tools
+% git clone https://codeberg.org/cytopyg3/updater	dock/3/code/updater
+
+## 05
+Prepare the REPO partition
+
+% sudo mount /dev/sdR2 dock/2
+
+% sh dock/3/code/tools/make_offl_repo dock/2
+
+Preparation is now finished. We now have:
+
+usb1	with archiso
+usb2	with REPO and CODE partitions
+usb3	optional boot stick
+
+================================
+# installation
+--------------------------------
+
+The installation phase is executed on the target machine.
+
+## 10
+WARNING! ALL DATA ON TARGET MACHINE WILL BE DESTROYED!
+
+switch the target machine off
+insert usb1
+switch the target machine on
+
+## 11
+after booting into archiso insert usb2
+mount usb2 to tmp
+% mkdir tmp
+% lsblk -paf
+CAUTION! DESIGNATE THE RIGHT DEVICE!
+% mount /dev/sdX tmp
+% sh tmp/code/hajime/0init.sh
+
+hajime is primarily designed to run without internet connection
+it is recommended to install entirely offline and connect to any network
+not earlier than after the installation is fully completed.
+
+
+## 12	start hajime
 let's roll!
 
 ```
-sh hajime/1base.sh
+% sh hajime/1base.sh
 ```
 
-from here run the scripts in numerical order and follow the in-script instructions
+from here run the scripts in their numerical order:
+	1base.sh
+	2conf.sh
+	3post.sh
+	4apps.sh
+	5dtcf.sh
 
-#### (before executing 3post.sh)
-the system has rebooted and therefore a eventually wireless internet connection is lost
+CAUTION! READ AND EXECUTE THE ON-SCREEN INSTRUCTIONS THOROUGHLY!
 
-reconnecting a wireless internet connection by executing:
-
-```
-sh hajime/0init.sh
-```
 
 ---
 ---
