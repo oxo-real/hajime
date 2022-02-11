@@ -56,6 +56,7 @@ It also installs a variety of tools, among others for: video, text, file managem
 
 ### REQUIRED	host machine
 An (Arch) Linux machine, in order to be able to copy an offline repository.
+
 The host machine must have an internet connection.
 
 	*	operating system		archlinux
@@ -63,6 +64,7 @@ The host machine must have an internet connection.
 
 ### REQUIRED	target machine
 Arch Linux is expected to run on almost every contemporary computer.
+
 The (minimum) requirements are:
 
 	*	architecture			x86-64	(or compatible)
@@ -76,7 +78,9 @@ An empty data storage device with a size of at least 5G to install the Arch Linu
 
 ### REQUIRED	usb2 repocode
 An empty data storage device with a recommended size of at least 20G storage capacity.
-The exact required size is heavily customizable and depends on which (and how many versions of) packages are copied from the host machine.
+
+The exact required size is heavily customizable and depends on which (and how many versions of)
+packages are copied from the host machine.
 
 	*	usb2					>=	20G
 
