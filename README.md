@@ -105,7 +105,7 @@ The installer script itself. Download it from the internet via Codeberg (recomme
 	* hajime					https://codeberg.org/cytopyg3/hajime
 								https://gitlab.com/cytopyge/hajime
 
-##	OPT / REQ	network
+###	OPT / REQ	network
 For the preparation phase an internet connection is required.
 During installation an internet connection is optional
 
