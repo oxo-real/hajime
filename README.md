@@ -80,6 +80,7 @@ An empty data storage device with a size of at least 5G to install the Arch Linu
 An empty data storage device with a recommended size of at least 20G storage capacity.
 
 The exact required size is heavily customizable and depends on which (and how many versions of)
+
 packages are copied from the host machine.
 
 	*	usb2					>=	20G
@@ -92,34 +93,41 @@ Optional, but a privacy recommendation, is a separate boot device. It does not t
 ## software
 
 ### REQUIRED	archlinux iso
-In order to boot the live environment, from where hajime will be ran, we need the archlinux installation image.
+In order to boot the live environment, from where hajime will be ran,
+
+we need the archlinux installation image.
 
 	*	archiso					https://www.archlinux.org/download/
 
 ### OPTIONAL	isolatest
-Use isolatest to automatically download the iso image, verify signatures and prepare archiso. Download it from the internet via Codeberg (recommended) or Gitlab.
+Use isolatest to automatically download the iso image, verify signatures and prepare archiso.
+
+Download it from the internet via Codeberg (recommended) or Gitlab.
 
 	* isolatest					https://codeberg.org/cytopyg3/isolatest
 								https://gitlab.com/cytopyge/isolatest
 
 
 ### REQUIRED	hajime
-The installer script itself. Download it from the internet via Codeberg (recommended) or Gitlab.
+The installer script itself.
+
+Download it from the internet via Codeberg (recommended) or Gitlab.
 
 	* hajime					https://codeberg.org/cytopyg3/hajime
 								https://gitlab.com/cytopyge/hajime
 
 ###	OPT / REQ	network
 For the preparation phase an internet connection is required.
+
 During installation an internet connection is optional
 
+# step-by-step guide
 
 # preparation
 --------------------------------
 
 The preparation phase is executed on the host machine.
 
-step-by-step hands-on guide
 enter and execute code after '%' sign on your own host machine
 
 ## 01
@@ -138,13 +146,18 @@ download isolatest via codeberg:
 
 CAUTION!
 {values} between curly braces are specific and volatile!
+
 be sure to take the right one in your case!
+
 i.e. /dev/sd{RC1} can be /dev/sdc1
 
 ## 02
 insert usb1
+
 CAUTION! DESIGNATE THE RIGHT DEVICE!
+
 WARNING! ALL DATA WILL BE DESTROYED!
+
 designate (verify!) the device name of usb1
 
 ```
@@ -160,8 +173,11 @@ execute isolatest
 
 ## 04
 insert usb2
+
 create an ext4 partition labeled REPO
+
 CAUTION! DESIGNATE THE RIGHT DEVICE!
+
 WARNING! ALL DATA WILL BE DESTROYED!
 
 ```
@@ -169,14 +185,20 @@ WARNING! ALL DATA WILL BE DESTROYED!
 ```
 
 enter:	o	to rewrite GPT table
+
 		n	create a 10G 8300 partition (REPO)
+
 		n	create a 10G 8300 partition (CODE)
+
 		w	write changes to device
+
 		q	quit gdisk
 
+```
 % sudo mkfs.ext4 -L REPO /dev/sd{RC2}
 % sudo mkfs.ext4 -L CODE /dev/sd{RC3}
 % mkdir dock/{2,3,3/code}
+```
 
 ## 05
 Prepare the CODE partition
@@ -186,12 +208,14 @@ Prepare the CODE partition
 ```
 
 download scripts from repository
+```
 % git clone https://codeberg.org/cytopyg3/hajime	dock/3/code/hajime
 % git clone https://codeberg.org/cytopyg3/isolatest	dock/3/code/isolatest
 % git clone https://codeberg.org/cytopyg3/netconn	dock/3/code/netconn
 % git clone https://codeberg.org/cytopyg3/sources	dock/3/code/sources
 % git clone https://codeberg.org/cytopyg3/tools		dock/3/code/tools
 % git clone https://codeberg.org/cytopyg3/updater	dock/3/code/updater
+```
 
 ## 06
 Prepare the REPO partition
@@ -205,7 +229,9 @@ Prepare the REPO partition
 Preparation is now finished. We now have:
 
 usb1	with archiso
+
 usb2	with REPO and CODE partitions
+
 usb3	optional boot stick
 
 
@@ -218,28 +244,38 @@ The installation phase is executed on the target machine.
 WARNING! ALL DATA ON TARGET MACHINE WILL BE DESTROYED!
 
 switch the target machine off
+
 insert usb1
+
 switch the target machine on
 
 ## 12
 after booting into archiso insert usb2
+
 mount usb2 to tmp
+
 ```
 % mkdir tmp
 % lsblk -paf
 ```
+
 CAUTION! DESIGNATE THE RIGHT DEVICE!
+
 ```
 % mount /dev/sdX tmp
 % sh tmp/code/hajime/0init.sh
 ```
 
 hajime is primarily designed to run without internet connection
+
 it is recommended to install entirely offline and connect to any network
+
 not earlier than after the installation is fully completed.
 
 
 ## 13	start hajime
+insert usb3 (optional)
+
 let's roll!
 
 ```
@@ -254,6 +290,10 @@ from here run the scripts in their numerical order:
 	5dtcf.sh
 
 CAUTION! READ AND EXECUTE THE ON-SCREEN INSTRUCTIONS THOROUGHLY!
+
+the system reboots after 2conf has been executed
+
+CAUTION! REMOVE USB1 BEFORE REBOOTING!
 
 
 ## install log
@@ -291,32 +331,32 @@ Be aware of the fact that writing to debug logs can cause some troubles with pro
 --------------------------------
 
 ## general installation guide
-https://wiki.archlinux.org/index.php/installation_guide
+* https://wiki.archlinux.org/index.php/installation_guide
 
 ## post install recommendations
-https://wiki.archlinux.org/index.php/General_recommendations
+* https://wiki.archlinux.org/index.php/General_recommendations
 
 ## partitioning
-https://wiki.archlinux.org/index.php/Partitioning
+* https://wiki.archlinux.org/index.php/Partitioning
 
 ## UEFI
-https://wiki.archlinux.org/index.php/EFI_System_Partition
+* https://wiki.archlinux.org/index.php/EFI_System_Partition
 
 ## ramfs
-https://wiki.archlinux.org/index.php/Mkinitcpio
+* https://wiki.archlinux.org/index.php/Mkinitcpio
 
 ## encryption
-https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system
+* https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system
 
 ## LUKS2
-https://gitlab.com/cryptsetup/LUKS2-docs
+* https://gitlab.com/cryptsetup/LUKS2-docs
 
 ## LVM
 * https://wiki.archlinux.org/index.php/LVM
 * https://wiki.archlinux.org/index.php/Resizing_LVM-on-LUKS
 
 ## systemd
-https://freedesktop.org/wiki/Software/systemd
+* https://freedesktop.org/wiki/Software/systemd
 
 ## Wayland
 * https://wayland.freedesktop.org
@@ -326,6 +366,7 @@ https://freedesktop.org/wiki/Software/systemd
 https://swaywm.org/
 
 ## inspirations
+among others:
 * https://github.com/budlabs
 * https://github.com/christoomey
 * https://github.com/gotbletu
@@ -334,7 +375,7 @@ https://swaywm.org/
 * https://github.com/r00k
 * https://github.com/tpope
 
-many thanks for sharing!
+ thanks for sharing!
 
 ## more inspirational
 * https://www.fsf.org/
