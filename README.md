@@ -11,16 +11,15 @@
 
 ```
 
-================================
 # overview
 --------------------------------
 
 # hajime
+2019 - 2022  |  cytopyge
 
 When the right preparations are made this installation script installs an up-to-date Arch Linux system on an x64 architecture.
 
 ## a five part arch linux installation series
-2019 - 2022  |  cytopyge
 
 ### 1  Base
 The 'base' script creates a Globally Unique Identifiers (GUID) partition table (GPT) and Unified Extensible Firmware Interface (UEFI) system partition with systemd boot to bootstrap the user space for bleeding edge (BLE) and long term support (LTS) arch linux kernel.
@@ -50,10 +49,8 @@ It also installs a variety of tools, among others for: video, text, file managem
 'dtcf' installs the dotfile configuration, which contains settings for the apps and window manager to run smoothly.
 
 
-================================
 # requirements
 --------------------------------
-(what)
 
 ## hardware
 
@@ -113,7 +110,6 @@ For the preparation phase an internet connection is required.
 During installation an internet connection is optional
 
 
-================================
 # preparation
 --------------------------------
 
@@ -126,10 +122,14 @@ enter and execute code after '%' sign on your own host machine
 Connect a host machine to the internet.
 
 install git if it is not already done so
+```
 % sudo pacman -S git
+```
 
 download isolatest via codeberg:
+```
 % git clone https://codeberg.org/cytopyg3/isolatest
+```
 
 
 CAUTION!
@@ -143,12 +143,16 @@ CAUTION! DESIGNATE THE RIGHT DEVICE!
 WARNING! ALL DATA WILL BE DESTROYED!
 designate (verify!) the device name of usb1
 
+```
 % lsblk -paf
+```
 
 ## 03
 execute isolatest
 
+```
 % sh isolatest /dev/sd{AI}
+```
 
 ## 04
 insert usb2
@@ -156,7 +160,9 @@ create an ext4 partition labeled REPO
 CAUTION! DESIGNATE THE RIGHT DEVICE!
 WARNING! ALL DATA WILL BE DESTROYED!
 
+```
 % sudo gdisk /dev/sd{RC}
+```
 
 enter:	o	to rewrite GPT table
 		n	create a 10G 8300 partition (REPO)
@@ -171,7 +177,9 @@ enter:	o	to rewrite GPT table
 ## 05
 Prepare the CODE partition
 
+```
 % sudo mount /dev/sdR3 dock/3
+```
 
 download scripts from repository
 % git clone https://codeberg.org/cytopyg3/hajime	dock/3/code/hajime
@@ -181,12 +189,14 @@ download scripts from repository
 % git clone https://codeberg.org/cytopyg3/tools		dock/3/code/tools
 % git clone https://codeberg.org/cytopyg3/updater	dock/3/code/updater
 
-## 05
+## 06
 Prepare the REPO partition
 
+```
 % sudo mount /dev/sdR2 dock/2
 
 % sh dock/3/code/tools/make_offl_repo dock/2
+```
 
 Preparation is now finished. We now have:
 
@@ -194,7 +204,7 @@ usb1	with archiso
 usb2	with REPO and CODE partitions
 usb3	optional boot stick
 
-================================
+
 # installation
 --------------------------------
 
@@ -210,11 +220,15 @@ switch the target machine on
 ## 11
 after booting into archiso insert usb2
 mount usb2 to tmp
+```
 % mkdir tmp
 % lsblk -paf
+```
 CAUTION! DESIGNATE THE RIGHT DEVICE!
+```
 % mount /dev/sdX tmp
 % sh tmp/code/hajime/0init.sh
+```
 
 hajime is primarily designed to run without internet connection
 it is recommended to install entirely offline and connect to any network
@@ -238,10 +252,8 @@ from here run the scripts in their numerical order:
 CAUTION! READ AND EXECUTE THE ON-SCREEN INSTRUCTIONS THOROUGHLY!
 
 
----
----
-
 ## install log
+--------------------------------
 For debug purposes it can be useful to be able to review an logging of the installation process.
 Create a full debug log of the installation with:
 
@@ -270,7 +282,9 @@ sh hajime/3post.sh | tee $HOME/hajime/3post.log
 
 Be aware of the fact that writing to debug logs can cause some troubles with proper execution of the installation scripts.
 
+
 # resource reference
+--------------------------------
 
 ## general installation guide
 https://wiki.archlinux.org/index.php/installation_guide
