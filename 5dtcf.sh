@@ -282,6 +282,11 @@ pacman_conf()
 }
 
 
+identify_io()
+{
+	#[TODO] see config_sway_dev
+}
+
 finishing_up() {
 
 	# finishing
