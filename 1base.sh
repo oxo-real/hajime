@@ -988,23 +988,23 @@ welcome()
 	echo
 	echo
 	printf " ${MAGENTA}CAUTION!${NOC}\n"
-	printf " Hajime will install a bleeding edge arch linux operating system on this machine.\n"
+	printf " Hajime will install an Arch Linux operating system on this machine.\n"
+	echo
+	printf " By entering 'y/Y' you consent fully to the following:\n"
+	printf " This software is provided 'as is' and without warranty of any kind.\n"
+	printf " Continuing execution and usage of this software is ${BOLD}at own risk!${NORMAL}\n"
+	printf " Opting out by entering 'n/N' and cancel the installation.\n"
 	echo
 	printf " Continuing will ${BOLD}overwrite existing data${NORMAL} on designated devices.\n"
 	printf " This software is subject to continuous development, carefully consider its beta state. \n"
 
-	printf " By pressing 'y' or 'Y' you consent fully to the following:\n"
-	printf " This software is provided 'as is' without warranty of any kind.\n"
-	printf " Continuing execution and usage of this software is ${BOLD}at own risk!${NORMAL}\n"
-	printf " Pressing any other key immediate cancels the operation.\n"
-	echo
 	printf " Be sure to have the most recent version of the arch installation media!\n"
 	printf " Use the 'isolatest' package to get the most recent authentic iso image.\n"
 	printf " You can download your copy via: ${UL}https://gitlab.com/cytopyge/isolatest${NUL}\n"
 	printf " Or retrieve an installation image via: ${UL}https://www/archlinux.org/download/${NUL}\n"
 	echo
 	echo
-	printf " Are you sure to continue? (y/N) "
+	printf " Continue installation? (y/N) "
 
 	reply_single
 

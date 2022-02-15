@@ -220,7 +220,6 @@ base16()
 
 		## shell decoration
 		## base16-shell
-		#[TODO] create source variable on top of file
 		git clone https://github.com/chriskempson/base16-shell.git $XDG_CONFIG_HOME/base16-shell
 
 	elif [[ $offline -eq 1 ]]; then
@@ -237,8 +236,6 @@ base16()
 vim_plug()
 {
 	if [[ $offline -ne 1 ]]; then
-
-		# vim
 
 		## vim plug
 		sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
@@ -279,16 +276,20 @@ pacman_conf()
 
 	# enabling original repositories
 	sudo sed -i 's/^#X--//' $file_etc_pacman_conf
+
+	# when internet is available do:
+	#sudo pacman -Syy
 }
 
 
 identify_io()
 {
 	#[TODO] see config_sway_dev
+	:
 }
 
-finishing_up() {
-
+finishing_up()
+{
 	# finishing
 
 	## administration
@@ -303,7 +304,6 @@ finishing_up() {
 	else
 		sudo reboot
 	fi
-
 }
 
 
@@ -319,6 +319,7 @@ main()
 	base16
 	vim_plug
 	wallpaper
+	pacman_conf
 	finishing_up
 }
 

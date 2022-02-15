@@ -22,12 +22,12 @@ When the right preparations are made this installation script installs an up-to-
 ## a five part arch linux installation series
 
 ### 1  Base
-The 'base' script creates a Globally Unique Identifiers (GUID) partition table (GPT) and Unified Extensible Firmware Interface (UEFI) system partition with systemd boot to bootstrap the user space for bleeding edge (BLE) and long term support (LTS) arch linux kernel.
+The 'base' script creates a Globally Unique Identifiers (GUID) partition table (GPT) and Unified Extensible Firmware Interface (UEFI) system partition with systemd boot to bootstrap the user space for latest stable release (LSR) and long term support (LTS) arch linux kernel.
 
 BOOT (ro) can and is recommended to be a separate device partition and physical separate storage medium. Logical volume manager (LVM) is fully encrypted with Linux Unified Key Setup (LUKS2) and contains the separate volume partitions ROOT, USR (ro), VAR (ro), HOME and SWAP (optional).
 
 ### 2  Conf
-The 'conf' script configures settings for time, network, mirrorlists, bootloader entries for bleeding edge and long term support kernels, ramdisk and creates an user environment.
+The 'conf' script configures settings for time, network, mirrorlists, bootloader entries for both latest stable release (LSR) and long term support (LTS) kernel, ramdisk and creates an user environment.
 
 After execution of 'conf' the system is able to boot independently.
 
