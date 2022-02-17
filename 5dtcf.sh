@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 #
 ##
 ###  _            _ _                      _ _        __
@@ -15,13 +14,48 @@
 ### hajime_5dtcf
 ### grande finale fifth and last part
 ### cytopyge arch linux installation 'dotfiles configuration'
+### copyright (c) 2019 - 2022  |  cytopyge
 ###
-### 2019 - 2022  |  cytopyge
+### GNU GPLv3 GENERAL PUBLIC LICENSE
+### This file is part of hajime.
+###
+### Hajime is free software: you can redistribute it and/or modify
+### it under the terms of the GNU General Public License as published by
+### the Free Software Foundation, either version 3 of the License, or
+### (at your option) any later version.
+###
+### This program is distributed in the hope that it will be useful,
+### but WITHOUT ANY WARRANTY; without even the implied warranty of
+### MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+### GNU General Public License for more details.
+###
+### You should have received a copy of the GNU General Public License
+### along with this program.  If not, see <https://www.gnu.org/licenses/>.
+### https://www.gnu.org/licenses/gpl-3.0.txt
+###
+### y3l0b3b5z2u=:matrix.org @cytopyge@mastodon.social
 ###
 ##
 #
 
+## dependencies
+#	arch installation
 
+## usage
+#	sh hajime/5dtcf.sh
+
+## example
+#	none
+
+
+# initial definitions
+
+## script
+script_name="5dtcf.sh"
+developer="cytopyge"
+licence='gplv3'
+
+## hardcoded variables
 # user customizable variables
 
 ## offline installation
@@ -43,6 +77,8 @@ git_local="$XDG_DATA_HOME/c/git"
 git_remote_gl="https://gitlab.com/cytopyge"
 git_remote_cb="https://codeberg.org/cytopyge"
 git_remote=$git_remote_cb
+
+#--------------------------------
 
 
 git_clone_dotfiles()

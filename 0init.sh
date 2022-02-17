@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 #
 ##
 ###  _            _ _                  _       _ _
@@ -15,23 +14,56 @@
 ### hajime_0init
 ### zeroth part of six scripts in total
 ### helper file to get lined up after archiso boot
+### copyright (c) 2020 - 2022  |  cytopyge
 ###
-### 2020 - 2022  |  cytopyge
+### GNU GPLv3 GENERAL PUBLIC LICENSE
+### This file is part of hajime.
+###
+### Hajime is free software: you can redistribute it and/or modify
+### it under the terms of the GNU General Public License as published by
+### the Free Software Foundation, either version 3 of the License, or
+### (at your option) any later version.
+###
+### This program is distributed in the hope that it will be useful,
+### but WITHOUT ANY WARRANTY; without even the implied warranty of
+### MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+### GNU General Public License for more details.
+###
+### You should have received a copy of the GNU General Public License
+### along with this program.  If not, see <https://www.gnu.org/licenses/>.
+### https://www.gnu.org/licenses/gpl-3.0.txt
+###
+### y3l0b3b5z2u=:matrix.org @cytopyge@mastodon.social
 ###
 ##
 #
 
+## dependencies
+#	archiso, REPO
+
+## usage
+#	sh hajime/0init.sh
+
+## example
+#	none
+
 
 # initial definitions
 
-## initialize hardcoded variables
-script_name="hajime_0init"
-initial_release_year="2020"
-current_year=$(date "+%Y")
+## script
+script_name="0init.sh"
 developer="cytopyge"
+licence='gplv3'
+
+## hardcoded variables
+#	none
+
+#--------------------------------
+
+
 
 ## offline installation
-# see point_in_time (if pit=0)
+#	see point_in_time (if pit=0)
 
 
 reply_single()

@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 #
 ##
 ###  _            _ _
@@ -15,13 +14,48 @@
 ### hajime_4apps
 ### fourth part of an intriguing series
 ### cytopyge arch linux installation 'apps'
+### copyright (c) 2019 - 2022  |  cytopyge
 ###
-### 2019 - 2022  |  cytopyge
+### GNU GPLv3 GENERAL PUBLIC LICENSE
+### This file is part of hajime
+###
+### Hajime is free software: you can redistribute it and/or modify
+### it under the terms of the GNU General Public License as published by
+### the Free Software Foundation, either version 3 of the License, or
+### (at your option) any later version.
+###
+### This program is distributed in the hope that it will be useful,
+### but WITHOUT ANY WARRANTY; without even the implied warranty of
+### MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+### GNU General Public License for more details.
+###
+### You should have received a copy of the GNU General Public License
+### along with this program.  If not, see <https://www.gnu.org/licenses/>.
+### https://www.gnu.org/licenses/gpl-3.0.txt
+###
+### y3l0b3b5z2u=:matrix.org @cytopyge@mastodon.social
 ###
 ##
 #
 
+## dependencies
+#	archlinux installation
 
+## usage
+#	sh hajime/4apps.sh
+
+## example
+#	none
+
+
+# initial definitions
+
+## script
+script_name="4apps.sh"
+developer="cytopyge"
+licence='gplv3'
+
+## hardcoded variables
 # user customizable variables
 
 ## offline installation
@@ -31,6 +65,8 @@ repo_dir="/home/$(id -un)/dock/2"
 repo_re="\/home\/$(id -un)\/dock\/2"
 file_etc_pacman_conf='/etc/pacman.conf'
 aur_dir="$repo_dir/aur"
+
+#--------------------------------
 
 
 define_core_applications()
