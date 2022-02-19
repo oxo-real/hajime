@@ -51,9 +51,10 @@
 # initial definitions
 
 ## script
-script_name="1base.sh"
-developer="cytopyge"
-licence='gplv3'
+script_name='1base.sh'
+developer='cytopyge'
+license='gplv3'
+initial_release='2017'
 
 ## hardcoded variables
 
@@ -743,29 +744,32 @@ cryptboot()
 	cryptboot_iter_msecs=6000	# secure minimum = 6000ms
 
 	## create
-	cryptsetup \
+	sudo cryptsetup \
+		luksFormat \
 		--hash=$cryptboot_hash \
 		--cipher=$cryptboot_cipher \
 		--key-size=$cryptboot_keysize \
 		-i $cryptboot_iter_msecs \
-		luksFormat $boot_part
+		$boot_part
+	# TODO boot_part prob dnw > boot_dev
 
 	## open
-	cryptsetup open \
+	sudo cryptsetup open \
 		$boot_part cryptboot
 		## /dev/mapper/cryptboot
 
-
-	# create ext2 fs in cryptboot
-
-	mkfs.ext2 /dev/mapper/cryptboot
+	## create ext2 fs in cryptboot
+	sudo mkfs.ext2 /dev/mapper/cryptboot
 
 	## mount cryptboot to /mnt
-	mount /dev/mapper/cryptboot /mnt
+	sudo mount /dev/mapper/cryptboot /mnt
 
 	cd /mnt
+}
 
 
+cryptkey()
+{
 	## create key file inside cryptboot (on key_device mounted on /mnt)
 	# create crytpkey.img on key device for cryptkey
 
@@ -774,12 +778,8 @@ cryptboot()
 	keyimg_filename="cryptkey.img"
 	keyimg_file="$keyimg_directory/$keyimg_filename"
 
-	dd if=/dev/urandom of=$keyimg_file bs=$keyimg_filesize count=1
-}
+	sudo dd if=/dev/urandom of=$keyimg_file bs=$keyimg_filesize count=1
 
-
-cryptkey()
-{
 	## parameters
 	keyimg_hash="sha512"
 	keyimg_cipher="serpent-xts-plain64"
@@ -787,13 +787,15 @@ cryptkey()
 	keyimg_iter_msecs="6000" 	# secure minimum = 6000ms
 
 	## create
-	cryptsetup \
+	## keyimg_file is nested inside cryptboot
+	sudo cryptsetup \
+		luksFormat \
 		--hash=$keyimg_hash \
 		--cipher=$keyimg_cipher \
 		--key-size=$keyimg_keysize \
 		-i $keyimg_iter_msecs \
 		#--align-payload=1 \
-		luksFormat $keyimg_file
+		$keyimg_file
 
 	## open
 	cryptsetup open \

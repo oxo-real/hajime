@@ -51,9 +51,10 @@
 # initial definitions
 
 ## script
-script_name="4apps.sh"
-developer="cytopyge"
-licence='gplv3'
+script_name='4apps.sh'
+developer='cytopyge'
+license='gplv3'
+initial_release='2019'
 
 ## hardcoded variables
 # user customizable variables

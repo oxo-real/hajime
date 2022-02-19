@@ -51,9 +51,10 @@
 # initial definitions
 
 ## script
-script_name="2conf.sh"
-developer="cytopyge"
-licence='gplv3'
+script_name='2conf.sh'
+developer='cytopyge'
+license='gplv3'
+initial_release='2017'
 
 ## hardcoded variables
 # user customizable variables
