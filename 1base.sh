@@ -291,7 +291,8 @@ set_boot_device()
 
 
 	## request boot device path
-	printf "the BOOT device will contain the linux kernel files\n"
+	printf "the BOOT device will contain the systemd-boot bootloader and\n"
+	printf "the init ramdisk environment (initramfs) for booting the linux kernel\n"
 	printf "enter full path of the BOOT device (i.e. /dev/sdB): "
 	reply_plain
 	boot_dev=$reply
