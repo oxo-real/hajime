@@ -101,11 +101,11 @@ git_clone_code()
 
 	### sources
 	repo="sources"
-	git clone $git_remote/$repo $git_code/$repo
+	git clone $git_remote/$repo $git_code/source
 
 	### tools
 	repo="tools"
-	git clone $git_remote/$repo $git_code/$repo
+	git clone $git_remote/$repo $git_code/tool
 
 	### hajime
 	repo="hajime"
@@ -132,18 +132,10 @@ git_clone_code()
 }
 
 
-git_clone_notes()
+git_clone_note()
 {
 	repo="notes"
-	git clone $git_remote/$repo $git_local/$repo
-}
-
-
-git_clone_private()
-{
-	#[TODO] check name
-	repo="private"
-	git clone $git_remote/$repo $git_local/$repo
+	git clone $git_remote/$repo $git_local/note
 }
 
 
@@ -153,28 +145,36 @@ get_public_data()
 
 		git_clone_dotfiles
 		git_clone_code
-		git_clone_notes
+		git_clone_note
 
 	elif [[ $offline -eq 1 ]]; then
 
 		home_dir_dst="$HOME"
 		git_dir_dst="$XDG_DATA_HOME/c/git"
 
-		[[ -d $home_dir_dst/.config ]] || mkdir -p	$home_dir_dst/.config
-		[[ -d $git_dir_dst/code ]] || mkdir -p		$git_dir_dst/code
-		[[ -d $git_dir_dst/notes ]] || mkdir -p		$git_dir_dst/notes
+		[[ -d $home_dir_dst/.config ]] || mkdir -p  $home_dir_dst/.config
+		[[ -d $git_dir_dst/code ]] || mkdir -p	    $git_dir_dst/code
+		[[ -d $git_dir_dst/note ]] || mkdir -p	    $git_dir_dst/note
 
 		printf "copying system configuration files... "
-		cp -pr $code_dir/.config	$home_dir_dst
+		cp -pr $code_dir/.config    $home_dir_dst
 		printf "done\n"
 		printf "copying code repository... "
-		cp -pr $code_dir/code		$git_dir_dst
+		cp -pr $code_dir/code	    $git_dir_dst
 		printf "done\n"
-		printf "copying notes repository... "
-		cp -pr $code_dir/notes		$git_dir_dst
+		printf "copying note repository... "
+		cp -pr $code_dir/note	    $git_dir_dst
 		printf "done\n"
 
 	fi
+}
+
+
+git_clone_prvt()
+{
+	#[TODO] check name
+	repo="private"
+	git clone $git_remote/$repo $git_local/prvt
 }
 
 
@@ -182,17 +182,17 @@ get_private_data()
 {
 	if [[ $offline -ne 1 ]]; then
 
-		git_clone_private
+		git_clone_prvt
 
 	elif [[ $offline -eq 1 ]]; then
 
 		home_dir_dst="$HOME"
 		git_dir_dst="$XDG_DATA_HOME/c/git"
 
-		[[ -d $git_dir_dst/private ]] || mkdir -p	$git_dir_dst/private
+		[[ -d $git_dir_dst/prvt ]] || mkdir -p   $git_dir_dst/prvt
 
-		printf "copying private repository... "
-		cp -pr $code_dir/private	$git_dir_dst
+		printf "copying prvt repository... "
+		cp -pr $code_dir/prvt	$git_dir_dst
 		printf "done\n"
 
 	fi
@@ -204,7 +204,7 @@ run_dotbu()
 	if [[ $offline -ne 1 ]]; then
 
 		# restore .config from .dot
-		sh $XDG_DATA_HOME/git/code/tools/dotbu restore $HOME/.dot/files $XDG_CONFIG_HOME
+		sh $XDG_DATA_HOME/git/code/tool/dotbu restore $HOME/.dot/files $XDG_CONFIG_HOME
 
 	fi
 }
@@ -220,16 +220,16 @@ rewrite_symlinks()
 
 	## change symlinks
 	### change config_shln
-	sh $XDG_DATA_HOME/c/git/code/tools/chln
+	sh $XDG_DATA_HOME/c/git/code/tool/chln
 	### change network_ua
-	sh $XDG_DATA_HOME/c/git/code/tools/chln $XDG_CONFIG_HOME/network/ua
+	sh $XDG_DATA_HOME/c/git/code/tool/chln $XDG_CONFIG_HOME/network/ua
 }
 
 
 set_permissions()
 {
 	# set right permissions for gnupg home
-	sh $XDG_DATA_HOME/c/git/notes/crypto/gpg/gnupg_set_permissions
+	sh $XDG_DATA_HOME/c/git/note/crypto/gpg/gnupg_set_permissions
 }
 
 
@@ -248,6 +248,13 @@ z_shell_config()
 	## enable command history
 	[[ -d "$XDG_LOGS_HOME/history" ]] || mkdir $XDG_LOGS_HOME/history
 	touch $XDG_LOGS_HOME/history/history
+}
+
+
+set_hardware()
+{
+    current_device='dl3189'
+    ln -s -f $XDG_CONFIG_HOME/sway/dev/$current_device $XDG_CONFIG_HOME/sway/current
 }
 
 
@@ -272,17 +279,21 @@ base16()
 
 vim_plug()
 {
-	if [[ $offline -ne 1 ]]; then
+    if [[ $offline -ne 1 ]]; then
 
-		## vim plug
-		sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
-		       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+	## vim plug
+	curl -fLo "${XDG_CONFIG_HOME:-$HOME/.config}"/nvim/site/autoload/plug.vim \
+	    --create-dirs \
+	    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+	# sh -c 'curl -fLo "${XDG_CONFIG_HOME:-$HOME/.config}"/nvim/site/autoload/plug.vim --create-dirs \
+	#       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 
-		## install plugins defined in: $XDG_CONFIG_HOME/nvim/plugins
-		vim +PlugInstall +qall
-		echo
+    fi
 
-	fi
+    ## install plugins defined in: $XDG_CONFIG_HOME/nvim/plugins
+    [[ -d $XDG_CONFIG_HOME/nvim/plugins ]] && vim +PlugInstall +qall
+    echo
+
 }
 
 
