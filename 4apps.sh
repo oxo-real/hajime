@@ -108,7 +108,7 @@ define_core_applications()
 	audio="pulseaudio pulseaudio-alsa pulsemixer alsa-utils"
 
 	images="fim"
-						#"geekie"
+						#"ueberzug geekie"
 
 	bluetooth="bluez bluez-utils pulseaudio-bluetooth"
 }
