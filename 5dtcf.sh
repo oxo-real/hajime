@@ -219,10 +219,10 @@ rewrite_symlinks()
 	ln -s $HOME/dock/vlt/pass $HOME/.password-store
 
 	## change symlinks
-	### change config_shln
+	### change config_shln (default)
 	sh $XDG_DATA_HOME/c/git/code/tool/chln
-	### change network_ua
-	sh $XDG_DATA_HOME/c/git/code/tool/chln $XDG_CONFIG_HOME/network/ua
+	### change network_ua (non default)
+	sh $XDG_DATA_HOME/c/git/code/tool/chln $XDG_CONFIG_HOME/network/ua $XDG_CONFIG_HOME/network/ua
 }
 
 
@@ -305,6 +305,14 @@ mozilla_firefox()
 }
 
 
+qutebrowser()
+{
+	# qutebrowser download directory
+	qb_dl_dir="$XDG_DATA_HOME/c/download"
+	[ -d $qb_dl_dir ] || mkdir -p $qb_dl_dir
+}
+
+
 wallpaper()
 {
 	# prepare wallpaper file
@@ -364,6 +372,7 @@ main()
 	set_permissions
 	z_shell_config
 	mozilla_firefox
+	qutebrowser
 	base16
 	vim_plug
 	wallpaper
