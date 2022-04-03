@@ -338,6 +338,12 @@ pacman_conf()
 }
 
 
+tmux_conf()
+{
+    sudo ln -s -f $XDG_CONFIG_HOME/tmux/.tmuxrc /etc/tmux.conf
+}
+
+
 identify_io()
 {
 	#[TODO] see config_sway_dev
