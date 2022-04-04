@@ -251,10 +251,9 @@ z_shell_config()
 }
 
 
-set_hardware()
+set_sway_hardware()
 {
-    current_device='dl3189'
-    ln -s -f $XDG_CONFIG_HOME/sway/dev/$current_device $XDG_CONFIG_HOME/sway/current
+    sh $XDG_CONFIG_HOME/sway/hw/select_current_machine
 }
 
 
@@ -338,18 +337,6 @@ pacman_conf()
 }
 
 
-tmux_conf()
-{
-    sudo ln -s -f $XDG_CONFIG_HOME/tmux/.tmuxrc /etc/tmux.conf
-}
-
-
-identify_io()
-{
-	#[TODO] see config_sway_dev
-	:
-}
-
 finishing_up()
 {
 	# finishing
@@ -377,10 +364,11 @@ main()
 	rewrite_symlinks
 	set_permissions
 	z_shell_config
-	mozilla_firefox
-	qutebrowser
+	set_sway_hardware
 	base16
 	vim_plug
+	mozilla_firefox
+	qutebrowser
 	wallpaper
 	pacman_conf
 	finishing_up
