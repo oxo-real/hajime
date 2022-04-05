@@ -21,31 +21,31 @@ When the right preparations are made this installation script installs an up-to-
 
 ## a five part arch linux installation series
 
-### 1  Base
+### 1  base
 The 'base' script creates a Globally Unique Identifiers (GUID) partition table (GPT) and Unified Extensible Firmware Interface (UEFI) system partition with systemd boot to bootstrap the user space for latest stable release (LSR) and long term support (LTS) arch linux kernel.
 
 BOOT (ro) can and is recommended to be a separate device partition and physical separate storage medium. Logical volume manager (LVM) is fully encrypted with Linux Unified Key Setup (LUKS2) and contains the separate volume partitions ROOT, USR (ro), VAR (ro), HOME and SWAP (optional).
 
-### 2  Conf
+### 2  conf
 The 'conf' script configures settings for time, network, mirrorlists, bootloader entries for both latest stable release (LSR) and long term support (LTS) kernel, ramdisk and creates an user environment.
 
 After execution of 'conf' the system is able to boot independently.
 
-### 3  Post
+### 3  post
 The third script prepares the system 'post install' for the installation of a desktop environment.
 
 Modifications are made to the package manager, the entire operating system is updated, a mountpoint environment is beig created and an alternative AUR manager can be installed alongside the native 'pacman'.
 
 After execution of 'post' an fully fledged Arch Linux installation is running on the system.
 
-### 4  Apps
+### 4  apps
 'hajime apps' prepares the system for a display manager running under Wayland, with wlroots as a modular compositor library.
 
 The script will setup the Sway tiling window manager, but it can easily be modifed to be setup for X11 based managers, when preferred.
 
 It also installs a variety of tools, among others for: video, text, file management, network management, internet, system monitoring, virtual environments.
 
-### 5  Dtcf
+### 5  dtcf
 'dtcf' installs the dotfile configuration, which contains settings for the apps and window manager to run smoothly.
 
 
@@ -60,7 +60,7 @@ An (Arch) Linux machine, in order to be able to copy an offline repository.
 The host machine must have an internet connection.
 
 	*	operating system		archlinux
-	*	network					internet access
+	*	network				internet access
 
 ### REQUIRED	target machine
 Arch Linux is expected to run on almost every contemporary computer.
@@ -69,12 +69,12 @@ The (minimum) requirements are:
 
 	*	architecture			x86-64	(or compatible)
 	*	storage capacity		>=	2G
-	*	RA memory				>=	512M
+	*	RA memory			>=	512M
 
 ### REQUIRED	usb1 archiso
 An empty data storage device with a size of at least 5G to install the Arch Linux Installer.
 
-	*	usb1					>=	5G
+	*	usb1				>=	5G
 
 ### REQUIRED	usb2 repocode
 An empty data storage device with a recommended size of at least 20G storage capacity.
@@ -83,12 +83,12 @@ The exact required size is heavily customizable and depends on which (and how ma
 
 packages are copied from the host machine.
 
-	*	usb2					>=	20G
+	*	usb2				>=	20G
 
 ### OPTIONAL	usb3 boot
 Optional, but a privacy recommendation, is a separate boot device. It does not to be big.
 
-	*	usb3					>=	256M
+	*	usb3				>=	256M
 
 ## software
 
@@ -97,15 +97,15 @@ In order to boot the live environment, from where hajime will be ran,
 
 we need the archlinux installation image.
 
-	*	archiso					https://www.archlinux.org/download/
+	*	archiso				https://www.archlinux.org/download/
 
 ### OPTIONAL	isolatest
 Use isolatest to automatically download the iso image, verify signatures and prepare archiso.
 
 Download it from the internet via Codeberg (recommended) or Gitlab.
 
-	* isolatest					https://codeberg.org/cytopyg3/isolatest
-								https://gitlab.com/cytopyge/isolatest
+	* isolatest				https://codeberg.org/cytopyg3/isolatest
+						https://gitlab.com/cytopyge/isolatest
 
 
 ### REQUIRED	hajime

@@ -13,7 +13,7 @@
 ###
 ### hajime_5dtcf
 ### grande finale fifth and last part
-### cytopyge arch linux installation 'dotfiles configuration'
+### cytopyge arch linux installation 'dotfile configuration'
 ### copyright (c) 2019 - 2022  |  cytopyge
 ###
 ### GNU GPLv3 GENERAL PUBLIC LICENSE
@@ -82,29 +82,27 @@ git_remote=$git_remote_cb
 #--------------------------------
 
 
-git_clone_dotfiles()
+git_clone_dotfile()
 {
-	# remove existing ~/.dot
-	rm -rf ~/.dot
-	[ -d "$HOME/.dot" ] || mkdir -p $HOME/.dot
+	local repo="dotfile"
+	local_dir="$git_local/$repo"
 
-	repo="dotfiles"
-	local_dir=".dot"
-	git clone $git_remote/$repo $HOME/$local_dir
+	[ -d $local_dir ] || mkdir -p $local_dir
+
+	git clone $git_remote/$repo $local_dir
 }
 
 
 git_clone_code()
 {
 	git_code="$git_local/code"
-	#[ -d "$git_code" ] || mkdir -p $git_code
 
 	### sources
-	repo="sources"
+	repo="source"
 	git clone $git_remote/$repo $git_code/source
 
 	### tools
-	repo="tools"
+	repo="tool"
 	git clone $git_remote/$repo $git_code/tool
 
 	### hajime
@@ -134,7 +132,7 @@ git_clone_code()
 
 git_clone_note()
 {
-	repo="notes"
+	repo="note"
 	git clone $git_remote/$repo $git_local/note
 }
 
@@ -143,7 +141,7 @@ get_public_data()
 {
 	if [[ $offline -ne 1 ]]; then
 
-		git_clone_dotfiles
+		git_clone_dotfile
 		git_clone_code
 		git_clone_note
 
