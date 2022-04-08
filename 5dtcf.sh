@@ -216,7 +216,7 @@ rewrite_symlinks()
 	### create symlink to pass_vault mountpoint (vlt_pass)
 	ln -s $HOME/dock/vlt/pass $HOME/.password-store
 
-	## change symlinks
+	## change $USER symlinks
 	### change config_shln (default)
 	sh $XDG_DATA_HOME/c/git/code/tool/chln
 	### change network_ua (non default)
@@ -344,12 +344,16 @@ finishing_up()
 
 
 	echo 'finished installation'
-	read -p "sudo reboot? (Y/n) " -n 1 -r
+	read -p "sudo reboot? (Y/n) " -n 1 -r reply
 
-	if [[ $REPLY =~ ^[Nn]$ ]] ; then
-		exit
+	if [[ $reply =~ ^[Nn]$ ]] ; then
+
+	    exit
+
 	else
-		sudo reboot
+
+	    sudo reboot
+
 	fi
 }
 
