@@ -276,6 +276,9 @@ base16()
 
 vim_plug()
 {
+    #TODO for vim-autoswap-git
+    #yay -S wmctrl
+
     if [[ $offline -ne 1 ]]; then
 
 	## vim plug
