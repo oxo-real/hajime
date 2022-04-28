@@ -333,7 +333,6 @@ set_username()
 
 add_username()
 {
-	#[TODO] user is not in sudoers file!!
 	useradd -m -g wheel $username
 }
 

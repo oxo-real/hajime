@@ -262,7 +262,7 @@ mount usb2 to tmp
 CAUTION! DESIGNATE THE RIGHT DEVICE!
 
 ```
-% mount /dev/sdX tmp
+% mount -o ro /dev/sdX tmp
 % sh tmp/code/hajime/0init.sh
 ```
 

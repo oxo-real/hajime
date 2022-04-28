@@ -133,7 +133,9 @@ define_additional_tools()
 	python_additions=""
 						#"python-pip"
 
-	internet_tools="firefox-developer-edition qutebrowser urlscan w3m"
+	programming="go lisp perl python"
+
+	internet_tools="firefox-developer-edition qutebrowser nyxt urlscan w3m"
 						# lynx
 
 	feeds="newsboat"
@@ -284,6 +286,7 @@ create_additional_tools_list()
 		$debugging \
 		$network_tools \
 		$python_additions \
+		$programming \
 		$internet_tools \
 		$feeds \
 		$email \
