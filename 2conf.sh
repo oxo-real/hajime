@@ -311,6 +311,7 @@ set_username()
 
 		echo
 		read -p "enter username: " username
+		test_username
 		printf "username: '$username', correct? (Y/n) "
 		reply
 
@@ -328,6 +329,28 @@ set_username()
 
 	fi
 	echo
+}
+
+
+test_username() {
+	username_length="$(printf "$username" | wc -c)"
+	if [[ $username_length -gt 32 ]]; then
+
+	    printf "${MAGENTA}$username${NOC} contains $username_length characters\n"
+	    printf "usernames may only be up to 32 characters long\n"
+	    sleep 5
+	    set_username
+
+	fi
+
+	if [[ ! "$username" =~ ^[a-z_][a-z0-9_-]*[$]? ]]; then
+
+	    printf "${MAGENTA}$username${NOC} not matching useradd criteria\n"
+	    printf "see useradd(8)\n"
+	    sleep 5
+	    set_username
+
+	fi
 }
 
 
