@@ -12,6 +12,7 @@
 ###   /      |  /  _|
 ###
 ### hajime_4apps
+###
 ### fourth part of an intriguing series
 ### cytopyge arch linux installation 'apps'
 ### copyright (c) 2019 - 2022  |  cytopyge
