@@ -7,15 +7,14 @@
 ### | | | | (_| || | | | | | | |  __/ | (_| | |_) | |_) \__ \
 ### |_| |_|\__,_|/ |_|_| |_| |_|\___|  \__,_| .__/| .__/|___/4
 ###            |__/                         |_|   |_|
-###  _ _|_ _ ._    _  _
-### (_\/|_(_)|_)\/(_|(/_
-###   /      |  /  _|
+###  _    _
+### (_)><(_)
 ###
 ### hajime_4apps
 ###
 ### fourth part of an intriguing series
-### cytopyge arch linux installation 'apps'
-### copyright (c) 2019 - 2022  |  cytopyge
+### arch linux installation 'apps'
+### copyright (c) 2019 - 2022  |  oxo
 ###
 ### GNU GPLv3 GENERAL PUBLIC LICENSE
 ### This file is part of hajime
@@ -34,7 +33,7 @@
 ### along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ### https://www.gnu.org/licenses/gpl-3.0.txt
 ###
-### y3l0b3b5z2u=:matrix.org @cytopyge@mastodon.social
+### y3l0b3b5z2u=:matrix.org @oxo@qoto.org
 ###
 ##
 #
@@ -53,7 +52,7 @@
 
 ## script
 script_name='4apps.sh'
-developer='cytopyge'
+developer='oxo'
 license='gplv3'
 initial_release='2019'
 

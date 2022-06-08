@@ -7,14 +7,14 @@
 ### | | | | (_| || | | | | | | |  __/ | |_) | (_| \__ \  __/
 ### |_| |_|\__,_|/ |_|_| |_| |_|\___| |_.__/ \__,_|___/\___|1
 ###            |__/
-###  _ _|_ _ ._    _  _
-### (_\/|_(_)|_)\/(_|(/_
-###   /      |  /  _|
+###  _    _
+### (_)><(_)
 ###
 ### hajime_1base
+###
 ### first part of a series
-### cytopyge arch linux installation 'base'
-### copyright (c) 2017 - 2022  |  cytopyge
+### arch linux installation 'base'
+### copyright (c) 2017 - 2022  |  oxo
 ###
 ### GNU GPLv3 GENERAL PUBLIC LICENSE
 ### This file is part of hajime.
@@ -33,7 +33,7 @@
 ### along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ### https://www.gnu.org/licenses/gpl-3.0.txt
 ###
-### y3l0b3b5z2u=:matrix.org @cytopyge@mastodon.social
+### y3l0b3b5z2u=:matrix.org @oxo@qoto.org
 ###
 ##
 #
