@@ -220,7 +220,9 @@ rewrite_symlinks()
 	### change config_shln (default)
 	sh $XDG_DATA_HOME/c/git/code/tool/chln
 	### change network_ua (non default)
-	sh $XDG_DATA_HOME/c/git/code/tool/chln $XDG_CONFIG_HOME/network/ua $XDG_CONFIG_HOME/network/ua
+	sh $XDG_DATA_HOME/c/git/code/tool/chln $XDG_CONFIG_HOME/network/ua
+	### change code_blocklist (non default)
+	sh $XDG_DATA_HOME/c/git/code/tool/chln $XDG_CONFIG_HOME/code/blocklist
 }
 
 
@@ -291,7 +293,18 @@ vim_plug()
     fi
 
     ## install plugins defined in: $XDG_CONFIG_HOME/nvim/plugins
-    [[ -d $XDG_CONFIG_HOME/nvim/plugins ]] && vim +PlugInstall +qall
+    if [[ -d $XDG_CONFIG_HOME/nvim/plugins ]]; then
+
+	for plugin in $(ls); do
+
+	    cd $plugin
+	    git pull
+	    cd ..
+
+	done
+
+    fi
+
     echo
 
 }

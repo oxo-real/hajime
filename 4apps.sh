@@ -105,7 +105,7 @@ define_core_applications()
 
 	display="brightnessctl"
 
-	audio="pulseaudio pulseaudio-alsa pulsemixer alsa-utils"
+	audio="sof-firmware pulseaudio pulseaudio-alsa pulsemixer alsa-utils"
 
 	images="sxiv"
 						#"fim ueberzug geekie"
@@ -116,6 +116,8 @@ define_core_applications()
 
 define_additional_tools()
 {
+    build_tools='make'
+
 	terminal_text_tools="emacs figlet qrencode zbar jq xxd-standalone vimball"
 
 	terminal_file_browser="lf"
@@ -280,6 +282,7 @@ create_core_applications_list()
 create_additional_tools_list()
 {
 	additional_tools=(\
+		$build_tools \
 		$terminal_text_tools \
 		$terminal_file_browser \
 		$file_tools \
