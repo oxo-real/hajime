@@ -214,18 +214,11 @@ create_directories() {
 
 	# create xdg directories
 
-	mkdir -p $HOME/.local/share/archive
-	mkdir -p $HOME/.local/share/backup
-	mkdir -p $HOME/.local/share/data
-	mkdir -p $HOME/.local/share/download
-	mkdir -p $HOME/.local/share/keys
-	mkdir -p $HOME/.local/share/media
-	mkdir -p $HOME/.local/share/todo
 	mkdir -p $HOME/.cache/temp
 	mkdir -p $HOME/.cache/test
 	mkdir -p $HOME/.config
+	mkdir -p $HOME/.local/share
 	mkdir -p $HOME/.logs
-	mkdir -p $HOME/.dot
 }
 
 

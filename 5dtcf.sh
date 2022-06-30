@@ -223,6 +223,8 @@ rewrite_symlinks()
 	sh $XDG_DATA_HOME/c/git/code/tool/chln $XDG_CONFIG_HOME/network/ua
 	### change code_blocklist (non default)
 	sh $XDG_DATA_HOME/c/git/code/tool/chln $XDG_CONFIG_HOME/code/blocklist
+	sh $XDG_DATA_HOME/c/git/code/tool/chln $XDG_DATA_HOME/c/git/code/blocklist
+	# TODO which one of the two to remove?
 }
 
 
