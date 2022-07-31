@@ -202,7 +202,7 @@ run_dotbu()
 	if [[ $offline -ne 1 ]]; then
 
 		# restore .config from .dot
-		sh $XDG_DATA_HOME/git/code/tool/dotbu restore $HOME/.dot/files $XDG_CONFIG_HOME
+		sh $XDG_DATA_HOME/c/git/code/tool/dotbu restore $XDG_DATA_HOME/c/git/dotf/ $XDG_CONFIG_HOME
 
 	fi
 }
@@ -213,8 +213,13 @@ rewrite_symlinks()
 	# rewrite symlinks in shln to current users home
 
 	## create symlinks
-	### create symlink to pass_vault mountpoint (vlt_pass)
+	### to pass_vault mountpoint (vlt_pass)
 	ln -s $HOME/dock/vlt/pass $HOME/.password-store
+
+	### to archive, backup and current
+	ln -s $HOME/a $HOME/.local/share/a
+	ln -s $HOME/b $HOME/.local/share/b
+	ln -s $HOME/c $HOME/.local/share/c
 
 	## change $USER symlinks
 	### change config_shln (default)
@@ -332,8 +337,8 @@ wallpaper()
 {
 	# prepare wallpaper file
 
-	[ -d $XDG_DATA_HOME/media/images/wallpaper ] || \
-		mkdir -p $XDG_DATA_HOME/media/images/wallpaper
+	[ -d $XDG_DATA_HOME/a/media/images/wallpaper ] || \
+		mkdir -p $XDG_DATA_HOME/a/media/images/wallpaper
 	## to be replaced with preferred image
 	#cp $XDG_DATA_HOME/media/images/wallpaper/image.png $XDG_DATA_HOME/media/images/wallpaper/active
 }
@@ -358,7 +363,7 @@ finishing_up()
 	# finishing
 
 	## administration
-	sudo touch ~/hajime/5dtcf.done
+	sudo touch $HOME/hajime/5dtcf.done
 
 
 	echo 'finished installation'
