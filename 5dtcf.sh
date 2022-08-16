@@ -110,7 +110,7 @@ git_clone_code()
 	git clone $git_remote/$repo $git_code/$repo
 	#### git/hajime becomes the git repo;
 	#### remove git repo from install directory
-	mv $HOME/hajime/.git $HOME/hajime/.git.DEL
+	rm -rf $HOME/hajime
 
 	### isolatest
 	repo="isolatest"

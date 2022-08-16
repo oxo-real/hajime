@@ -100,6 +100,8 @@ define_core_applications()
 
 	secure_connections="wireguard-tools protonvpn-cli-ng sshfs"
 
+	filesystems="dosfstools ntfs-3g"
+
 	fonts=""
 						#"terminus-font ttf-inconsolata"
 
@@ -143,8 +145,6 @@ define_additional_tools()
 	feeds="newsboat"
 
 	email="neomutt msmtp isync notmuch protonmail-bridge"
-
-	contact_management="abook"
 
 	time_management=""
 						#"calcurse task"
@@ -270,6 +270,7 @@ create_core_applications_list()
 		$password_security \
 		$encryption \
 		$secure_connections \
+		$filesystems \
 		$fonts \
 		$display \
 		$audio \
@@ -293,7 +294,6 @@ create_additional_tools_list()
 		$internet_tools \
 		$feeds \
 		$email \
-		$contact_management \
 		$time_management \
 		$arithmatic \
 		$mathematics \
