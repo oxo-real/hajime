@@ -5,7 +5,7 @@
 ### | |__   __ _ (_|_)_ __ ___   ___    __ _ _ __  _ __  ___
 ### | '_ \ / _` || | | '_ ` _ \ / _ \  / _` | '_ \| '_ \/ __|
 ### | | | | (_| || | | | | | | |  __/ | (_| | |_) | |_) \__ \
-### |_| |_|\__,_|/ |_|_| |_| |_|\___|  \__,_| .__/| .__/|___/4
+    ### |_| |_|\__,_|/ |_|_| |_| |_|\___|  \__,_| .__/| .__/|___/4
 ###            |__/                         |_|   |_|
 ###  _    _
 ### (_)><(_)
@@ -72,47 +72,47 @@ aur_dir="$repo_dir/aur"
 
 define_core_applications()
 {
-	wayland="wlroots qt5-wayland wev xorg-xwayland"
-		## qt5-wayland to prevent:
-		## WARNING: Could not find the Qt platform plugin "wayland" in
-		## i.e. when starting qutebrowser
+    wayland="wlroots qt5-wayland wev xorg-xwayland"
+    ## qt5-wayland to prevent:
+    ## WARNING: Could not find the Qt platform plugin "wayland" in
+    ## i.e. when starting qutebrowser
 
-	dwm="sway swaybg swaylock swayidle waybar"
-						# i3blocks
+    dwm="sway swaybg swaylock swayidle swaynagmode i3blocks"
+    # waybar
 
-	shell="zsh"
+    shell="zsh"
 
-	shell_additions="zsh-completions zsh-syntax-highlighting"
+    shell_additions="zsh-completions zsh-syntax-highlighting"
 
-	terminal="alacritty tmux"
-						#"termite-nocsd urxvt"
+    terminal="alacritty tmux"
+    #"termite-nocsd urxvt"
 
-	terminal_additions="fzf fzf-tab-git mako"
-						#"wofi rofi bemenu-wayland"
+    terminal_additions="fzf fzf-tab-git mako"
+    #"wofi rofi bemenu-wayland"
 
-	manpages="man-db man-pages"
+    manpages="man-db man-pages"
 
-	password_security="pass pass-otp yubikey-manager"
-						#"pass-tomb bitwarden-cli pass-wl-clipboard"
+    password_security="pass pass-otp yubikey-manager"
+    #"pass-tomb bitwarden-cli pass-wl-clipboard"
 
-	encryption="ssss gnupg"
-						#"veracrypt tomb"
+    encryption="ssss gnupg"
+    #"veracrypt tomb"
 
-	secure_connections="wireguard-tools protonvpn-cli-ng sshfs"
+    secure_connections="wireguard-tools protonvpn-cli-ng sshfs"
 
-	filesystems="dosfstools ntfs-3g"
+    filesystems="dosfstools ntfs-3g"
 
-	fonts=""
-						#"terminus-font ttf-inconsolata"
+    fonts=""
+    #"terminus-font ttf-inconsolata"
 
-	display="brightnessctl"
+    display="brightnessctl"
 
-	audio="sof-firmware pulseaudio pulseaudio-alsa pulsemixer alsa-utils"
+    audio="sof-firmware pulseaudio pulseaudio-alsa pulsemixer alsa-utils"
 
-	images="sxiv"
-						#"fim ueberzug geekie"
+    images="sxiv"
+    #"fim ueberzug geekie"
 
-	bluetooth="bluez bluez-utils pulseaudio-bluetooth"
+    bluetooth="bluez bluez-utils pulseaudio-bluetooth"
 }
 
 
@@ -120,266 +120,266 @@ define_additional_tools()
 {
     build_tools='make'
 
-	terminal_text_tools="emacs figlet qrencode zbar jq xxd-standalone vimball"
+    terminal_text_tools="emacs figlet qrencode zbar jq xxd-standalone vimball"
 
-	terminal_file_browser="lf"
-						#"vifm lf-git nnn"
+    terminal_file_browser="lf"
+    #"vifm lf-git nnn"
 
-	file_tools="rsync gdisk simple-mtpfs fd"
-						#"tmsu"
+    file_tools="rsync gdisk simple-mtpfs fd"
+    #"tmsu"
 
-	debugging="strace"
-						#"gdb valgrind"
+    debugging="strace"
+    #"gdb valgrind"
 
-	network_tools="mtr iftop bind-tools whois"
-						#"wireshark-cli wireshark-qt"
+    network_tools="mtr iftop bind-tools whois"
+    #"wireshark-cli wireshark-qt"
 
-	python_additions=""
-						#"python-pip"
+    python_additions=""
+    #"python-pip"
 
-	programming="go lisp perl python"
+    programming="go lisp perl python"
 
-	internet_tools="firefox-developer-edition qutebrowser nyxt urlscan w3m"
-						# lynx
+    internet_tools="firefox-developer-edition qutebrowser nyxt urlscan w3m"
+    # lynx
 
-	feeds="newsboat"
+    feeds="newsboat"
 
-	email="neomutt msmtp isync notmuch protonmail-bridge"
+    email="neomutt msmtp isync notmuch protonmail-bridge"
 
-	time_management=""
-						#"calcurse task"
+    time_management=""
+    #"calcurse task"
 
-	arithmatic="bc"
+    arithmatic="bc"
 
-	mathematics=""
-						#"gnu-plot"
+    mathematics=""
+    #"gnu-plot"
 
-	accounting=""
-						#"ledger hledger"
+    accounting=""
+    #"ledger hledger"
 
-	download_utilities="aria2 transmission-cli transmission-remote-cli-git"
+    download_utilities="aria2 transmission-cli transmission-remote-cli-git"
 
-	system_info="lshw"
+    system_info="lshw"
 
-	system_monitoring="glances"
-						# ccze
+    system_monitoring="glances"
+    # ccze
 
-	virtualization="qemu qemu-arch-extra virt-manager bridge-utils dnsmasq vde2 openbsd-netcat"
-						#"ovmf ebtables virt-viewer virtualbox virtualbox-host-modules-arch docker"
+    virtualization="qemu qemu-arch-extra virt-manager bridge-utils dnsmasq vde2 openbsd-netcat"
+    #"ovmf ebtables virt-viewer virtualbox virtualbox-host-modules-arch docker"
 
-	image_capturing="grim slurp"
+    image_capturing="grim slurp"
 
-	image_viewers="feh imv"
+    image_viewers="feh imv"
 
-	image_editors="imagemagick"
+    image_editors="imagemagick"
 
-	pdf_viewers="mupdf zathura-pdf-mupdf"
+    pdf_viewers="mupdf zathura-pdf-mupdf"
 
-	video_tools="youtube-dl mpv pipe-viewer"
-						#"straw-viewer youtube-viewer"
+    video_tools="youtube-dl mpv pipe-viewer"
+    #"straw-viewer youtube-viewer"
 
-	photo_editing=""
-						#"gimp"
+    photo_editing=""
+    #"gimp"
 
-	photo_management=""
-						#"digikam darktable"
+    photo_management=""
+    #"digikam darktable"
 
-	vector_graphics_editing=""
-						#"inkscape"
+    vector_graphics_editing=""
+    #"inkscape"
 
-	office_tools=""
-						#"libreoffice-fresh"
+    office_tools=""
+    #"libreoffice-fresh"
 }
 
 
 mount_repo()
 {
-	repo_lbl='REPO'
-	repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
-	#local mountpoint=$(mount | grep $repo_dir)
+    repo_lbl='REPO'
+    repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
+    #local mountpoint=$(mount | grep $repo_dir)
 
-	[[ -d $repo_dir ]] || mkdir -p "$repo_dir"
+    [[ -d $repo_dir ]] || mkdir -p "$repo_dir"
 
-	sudo mount "$repo_dev" "$repo_dir"
-	#[[ -n $mountpoint ]] || sudo mount "$repo_dev" "$repo_dir"
+    sudo mount "$repo_dev" "$repo_dir"
+    #[[ -n $mountpoint ]] || sudo mount "$repo_dev" "$repo_dir"
 }
 
 
 get_offline_repo()
 {
-	case $offline in
-		1)
-			mount_repo
-			;;
-	esac
+    case $offline in
+	1)
+	    mount_repo
+	    ;;
+    esac
 }
 
 
 mount_code()
 {
-	code_lbl='CODE'
-	code_dev=$(lsblk -o label,path | grep "$code_lbl" | awk '{print $2}')
-	#local mountpoint=$(mount | grep $code_dir)
+    code_lbl='CODE'
+    code_dev=$(lsblk -o label,path | grep "$code_lbl" | awk '{print $2}')
+    #local mountpoint=$(mount | grep $code_dir)
 
-	[[ -d $code_dir ]] || mkdir -p "$code_dir"
+    [[ -d $code_dir ]] || mkdir -p "$code_dir"
 
-	sudo mount "$code_dev" "$code_dir"
-	#[[ -n $mountpoint ]] || sudo mount "$code_dev" "$code_dir"
+    sudo mount "$code_dev" "$code_dir"
+    #[[ -n $mountpoint ]] || sudo mount "$code_dev" "$code_dir"
 }
 
 
 get_offline_code()
 {
-	case $offline in
-		1)
-			mount_code
-			;;
-	esac
+    case $offline in
+	1)
+	    mount_code
+	    ;;
+    esac
 }
 
 
 aur_install()
 {
-	## install all aur packages
-	for package in $(ls $aur_dir); do
+    ## install all aur packages
+    for package in $(ls $aur_dir); do
 
-		cd $aur_dir/$package
-		makepkg -i --noconfirm --needed
-		cd ..
+	cd $aur_dir/$package
+	makepkg -i --noconfirm --needed
+	cd ..
 
-	done
+    done
 
-	## generate a development package database
-	yay -Y --gendb
+    ## generate a development package database
+    yay -Y --gendb
 
-	## update local repo
-	yay -Syy
+    ## update local repo
+    yay -Syy
 }
 
 
 create_core_applications_list()
 {
-	core_applications=(\
-		$wayland \
-		$dwm \
-		$shell \
-		$shell_additions \
-		$terminal \
-		$terminal_additions \
-		$manpages \
-		$password_security \
-		$encryption \
-		$secure_connections \
-		$filesystems \
-		$fonts \
-		$display \
-		$audio \
-		$images \
-		$bluetooth\
+    core_applications=(\
+		       $wayland \
+			   $dwm \
+			   $shell \
+			   $shell_additions \
+			   $terminal \
+			   $terminal_additions \
+			   $manpages \
+			   $password_security \
+			   $encryption \
+			   $secure_connections \
+			   $filesystems \
+			   $fonts \
+			   $display \
+			   $audio \
+			   $images \
+			   $bluetooth\
 	)
 }
 
 
 create_additional_tools_list()
 {
-	additional_tools=(\
-		$build_tools \
-		$terminal_text_tools \
-		$terminal_file_browser \
-		$file_tools \
-		$debugging \
-		$network_tools \
-		$python_additions \
-		$programming \
-		$internet_tools \
-		$feeds \
-		$email \
-		$time_management \
-		$arithmatic \
-		$mathematics \
-		$accounting \
-		$download_utilities \
-		$system_info \
-		$system_monitoring \
-		$virtualization \
-		$image_capturing \
-		$image_viewers \
-		$image_editors \
-		$pdf_viewers \
-		$video_tools \
-		$photo_editing \
-		$photo_management \
-		$vector_graphics_editing \
-		$office_tools\
+    additional_tools=(\
+		      $build_tools \
+			  $terminal_text_tools \
+			  $terminal_file_browser \
+			  $file_tools \
+			  $debugging \
+			  $network_tools \
+			  $python_additions \
+			  $programming \
+			  $internet_tools \
+			  $feeds \
+			  $email \
+			  $time_management \
+			  $arithmatic \
+			  $mathematics \
+			  $accounting \
+			  $download_utilities \
+			  $system_info \
+			  $system_monitoring \
+			  $virtualization \
+			  $image_capturing \
+			  $image_viewers \
+			  $image_editors \
+			  $pdf_viewers \
+			  $video_tools \
+			  $photo_editing \
+			  $photo_management \
+			  $vector_graphics_editing \
+			  $office_tools\
 	)
 }
 
 
 set_usr_rw()
 {
-	## set /usr writeable
-	sudo mount -o remount,rw  /usr
+    ## set /usr writeable
+    sudo mount -o remount,rw  /usr
 }
 
 
 set_usr_ro()
 {
-	# reset /usr read-only
-	sudo mount -o remount,ro  /usr
+    # reset /usr read-only
+    sudo mount -o remount,ro  /usr
 }
 
 
 install_core_applications()
 {
-	## loop through core app packages
-	## instead of one whole list entry in yay
-	## this prevents that on error only one package is skipped
-	#local packages=$(echo "${core_applications[*]}")
-	#sudo pacman -S --noconfirm --needed $packages
-	for pkg_ca in "${core_applications[@]}"; do
+    ## loop through core app packages
+    ## instead of one whole list entry in yay
+    ## this prevents that on error only one package is skipped
+    #local packages=$(echo "${core_applications[*]}")
+    #sudo pacman -S --noconfirm --needed $packages
+    for pkg_ca in "${core_applications[@]}"; do
 
-		yay -S --noconfirm --needed "$pkg_ca"
-		#sudo pacman -S --noconfirm --needed "$pkg_ca"
+	yay -S --noconfirm --needed "$pkg_ca"
+	#sudo pacman -S --noconfirm --needed "$pkg_ca"
 
-	done
+    done
 }
 
 
 
 install_additional_tools()
 {
-	## loop through core app packages
-	## instead of one whole list entry in yay
-	## this prevents that on error only one package is skipped
-	#local packages=$(echo "${additional_tools[*]}")
-	#sudo pacman -S --noconfirm --needed $packages
-	for pkg_at in "${additional_tools[@]}"; do
+    ## loop through core app packages
+    ## instead of one whole list entry in yay
+    ## this prevents that on error only one package is skipped
+    #local packages=$(echo "${additional_tools[*]}")
+    #sudo pacman -S --noconfirm --needed $packages
+    for pkg_at in "${additional_tools[@]}"; do
 
-		yay -S --noconfirm --needed "$pkg_at"
-		#sudo pacman -Sy --noconfirm --needed "$pkg_at"
+	yay -S --noconfirm --needed "$pkg_at"
+	#sudo pacman -Sy --noconfirm --needed "$pkg_at"
 
-	done
+    done
 }
 
 
 loose_ends()
 {
-	#[TODO]remove candidate
-	## tmux_plugin_manager
-	#tmux_plugin_dir="$HOME/.config/tmux/plugins"
-	#git clone https://github.com/tmux-plugins/tpm $tmux_plugin_dir/tpm
+    #[TODO]remove candidate
+    ## tmux_plugin_manager
+    #tmux_plugin_dir="$HOME/.config/tmux/plugins"
+    #git clone https://github.com/tmux-plugins/tpm $tmux_plugin_dir/tpm
 
-	#[TODO]remove candidate
-	## create w3mimgdisplay symlink
-	## w3mimgdisplay is not in /usr/bin by default as of 20210114
-	## alternative is to add /usr/lib/w3m to $PATH
-	#sudo ln -s /usr/lib/w3m/w3mimgdisplay /usr/bin/w3mimgdisplay
+    #[TODO]remove candidate
+    ## create w3mimgdisplay symlink
+    ## w3mimgdisplay is not in /usr/bin by default as of 20210114
+    ## alternative is to add /usr/lib/w3m to $PATH
+    #sudo ln -s /usr/lib/w3m/w3mimgdisplay /usr/bin/w3mimgdisplay
 
-	## recommend human to execute dotfiles install script
-	echo 'sh hajime/5dtcf.sh'
+    ## recommend human to execute dotfiles install script
+    echo 'sh hajime/5dtcf.sh'
 
-	## finishing
-	sudo touch $HOME/hajime/4apps.done
+    ## finishing
+    sudo touch $HOME/hajime/4apps.done
 }
 
 
