@@ -149,7 +149,7 @@ define_additional_tools()
     time_management=""
     #"calcurse task"
 
-    arithmatic="bc"
+    arithmatic="bc qalculate-qt"
 
     mathematics=""
     #"gnu-plot"
@@ -189,6 +189,8 @@ define_additional_tools()
 
     office_tools=""
     #"libreoffice-fresh"
+
+    cad=freecad"
 }
 
 
@@ -311,6 +313,7 @@ create_additional_tools_list()
 			  $photo_management \
 			  $vector_graphics_editing \
 			  $office_tools\
+			  $cad\
 	)
 }
 
