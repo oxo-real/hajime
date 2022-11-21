@@ -90,7 +90,7 @@ define_core_applications()
     terminal_additions="fzf fzf-tab-git mako"
     #"wofi rofi bemenu-wayland"
 
-    manpages="man-db man-pages"
+    manpages="man-db man-pages tldr"
 
     password_security="pass pass-otp yubikey-manager"
     #"pass-tomb bitwarden-cli pass-wl-clipboard"
@@ -126,7 +126,7 @@ define_additional_tools()
     #"vifm lf-git nnn"
 
     file_tools="rsync gdisk simple-mtpfs fd"
-    #"tmsu"
+    #"tmsu trash-cli"
 
     debugging="strace"
     #"gdb valgrind"
@@ -161,7 +161,7 @@ define_additional_tools()
 
     system_info="lshw"
 
-    system_monitoring="glances"
+    system_monitoring="glances viddy"
     # ccze
 
     virtualization="qemu qemu-arch-extra virt-manager bridge-utils dnsmasq vde2 openbsd-netcat"
