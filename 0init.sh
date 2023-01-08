@@ -14,7 +14,7 @@
 ###
 ### zeroth part of five scripts in total
 ### helper file to get lined up after archiso boot
-### copyright (c) 2020 - 2022  |  cytopyge
+### copyright (c) 2020 - 2023  |  oxo
 ###
 ### GNU GPLv3 GENERAL PUBLIC LICENSE
 ### This file is part of hajime.
@@ -33,7 +33,7 @@
 ### along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ### https://www.gnu.org/licenses/gpl-3.0.txt
 ###
-### y3l0b3b5z2u=:matrix.org @oxo@qoto.org
+### @oxo@qoto.org
 ###
 ##
 #
@@ -45,7 +45,10 @@
 #   sh hajime/0init.sh
 
 ## example
-#   none
+#   mkdir tmp
+#   lsblk
+#   mount /dev/sdX tmp
+#   sh tmp/code/hajime/0init.sh
 
 
 # initial definitions
@@ -57,7 +60,7 @@ license='gplv3'
 initial_release='2020'
 
 ## hardcoded variables
-#   none
+online_repo='https://codeberg.org/oxo/hajime'
 
 #--------------------------------
 
@@ -109,6 +112,7 @@ set_offline()
 
     esac
 
+    echo
     echo
 }
 
@@ -212,11 +216,13 @@ install()
 	    ;;
 
 	*)
-	    git clone https://gitlab.com/cytopyge/hajime
+	    git clone $online_repo
 	    pacman -Sy --noconfirm git
 	    ;;
 
     esac
+
+    touch /root/hajime/0init.done
 
     echo
     printf "sh hajime/1base.sh\n"

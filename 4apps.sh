@@ -5,7 +5,7 @@
 ### | |__   __ _ (_|_)_ __ ___   ___    __ _ _ __  _ __  ___
 ### | '_ \ / _` || | | '_ ` _ \ / _ \  / _` | '_ \| '_ \/ __|
 ### | | | | (_| || | | | | | | |  __/ | (_| | |_) | |_) \__ \
-    ### |_| |_|\__,_|/ |_|_| |_| |_|\___|  \__,_| .__/| .__/|___/4
+### |_| |_|\__,_|/ |_|_| |_| |_|\___|  \__,_| .__/| .__/|___/4
 ###            |__/                         |_|   |_|
 ###  _    _
 ### (_)><(_)
@@ -137,7 +137,7 @@ define_additional_tools()
     python_additions=""
     #"python-pip"
 
-    programming="go lisp perl python"
+    programming="go lisp lua perl python"
 
     internet_tools="firefox-developer-edition qutebrowser nyxt urlscan w3m"
     # lynx
@@ -190,7 +190,8 @@ define_additional_tools()
     office_tools=""
     #"libreoffice-fresh"
 
-    cad=freecad"
+    cad=""
+    #"freecad"
 }
 
 

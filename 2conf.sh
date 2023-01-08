@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+#set -Eeuo pipefail
 #
 ##
 ###  _            _ _                                   __
@@ -118,7 +119,9 @@ reply()
 mount_repo()
 {
 	repo_lbl='REPO'
-	repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
+	# 20230106 lsblk reports empty label names
+	#repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
+	repo_dev=$(blkid | grep "$repo_lbl" | awk -F : '{print $1}')
 	#local mountpoint=$(mount | grep $repo_dir)
 
 	[[ -d $repo_dir ]] || mkdir -p "$repo_dir"
@@ -163,14 +166,26 @@ get_offline_code()
 
 reconfigure_pacman_conf()
 {
-	case $offline in
-		1)
-			sed -i "/^\[offline\]/{n;s/.*/Server = file:\/\/$repo_re/}" $file_etc_pacman_conf
-			#sed -i "s|\/root\/tmp\/repo|\/repo|" $file_etc_pacman_conf
-			pacman -Syy
-			echo
-			;;
-	esac
+    case $offline in
+	1)
+	    #### DEV now done in 1base
+	    ## see also man pacman.conf
+
+	    ## change SigLevel by adding PackageTrustAll to pacman.conf
+	    ### this prevents errors on marginal trusted packages
+	    #sed -i 's/^SigLevel = Required DatabaseOptional/SigLevel = Required DatabaseOptional PackageTrustAll/' $file_etc_pacman_conf
+
+	    ## redirect offline 'server' (file) location
+	    ## define offline file location at the end of pacman.conf
+	    sed -i "/^\[offline\]/{n;s/.*/Server = file:\/\/$repo_re/}" $file_etc_pacman_conf
+
+	    ##sed -i "s|\/root\/tmp\/repo|\/repo|" $file_etc_pacman_conf
+	    #### DEV now done in 1base
+
+	    pacman -Syy
+	    echo
+	    ;;
+    esac
 }
 
 
