@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-#set -Eeuo pipefail
+set -o errexit
+set -o nounset
+set -o pipefail
 #
 ##
 ###  _            _ _                                   __
@@ -15,7 +17,7 @@
 ###
 ### second part of a series
 ### arch linux installation 'configuration'
-### copyright (c) 2017 - 2022  |  oxo
+### copyright (c) 2017 - 2023  |  oxo
 ###
 ### GNU GPLv3 GENERAL PUBLIC LICENSE
 ### This file is part of hajime.
@@ -34,7 +36,7 @@
 ### along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ### https://www.gnu.org/licenses/gpl-3.0.txt
 ###
-### y3l0b3b5z2u=:matrix.org @oxo@qoto.org
+### @oxo@qoto.org
 ###
 ##
 #

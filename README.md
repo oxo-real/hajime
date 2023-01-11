@@ -5,9 +5,8 @@
 | | | | (_| || | | | | | | |  __/
 |_| |_|\__,_|/ |_|_| |_| |_|\___|
            |__/
- _ _|_ _ ._    _  _
-(_\/|_(_)|_)\/(_|(/_
-  /      |  /  _|
+ _    _
+(_)><(_)
 
 ```
 
@@ -15,7 +14,7 @@
 --------------------------------
 
 # hajime
-2019 - 2022  |  cytopyge
+2019 - 2023  |  oxo
 
 When the right preparations are made this installation script installs an up-to-date Arch Linux system on an x64 architecture.
 
@@ -102,19 +101,19 @@ we need the archlinux installation image.
 ### OPTIONAL	isolatest
 Use isolatest to automatically download the iso image, verify signatures and prepare archiso.
 
-Download it from the internet via Codeberg (recommended) or Gitlab.
+Download it from the internet via codeberg.org/oxo (recommended) or gitlab.com/cytopyge.
 
-	* isolatest				https://codeberg.org/cytopyg3/isolatest
+	* isolatest				https://codeberg.org/oxo/isolatest
 						https://gitlab.com/cytopyge/isolatest
 
 
 ### REQUIRED	hajime
 The installer script itself.
 
-Download it from the internet via Codeberg (recommended) or Gitlab.
+Download it from the internet via codeberg.org/oxo (recommended) or gitlab.com/cytopyge.
 
-	* hajime					https://codeberg.org/cytopyg3/hajime
-								https://gitlab.com/cytopyge/hajime
+	* hajime				https://codeberg.org/oxo/hajime
+						https://gitlab.com/cytopyge/hajime
 
 ###	OPT / REQ	network
 For the preparation phase an internet connection is required.
@@ -140,7 +139,7 @@ install git if it is not already done so
 
 download isolatest via codeberg:
 ```
-% git clone https://codeberg.org/cytopyg3/isolatest
+% git clone https://codeberg.org/oxo/isolatest
 ```
 
 
@@ -209,12 +208,12 @@ Prepare the CODE partition
 
 download scripts from repository
 ```
-% git clone https://codeberg.org/cytopyg3/hajime	dock/3/code/hajime
-% git clone https://codeberg.org/cytopyg3/isolatest	dock/3/code/isolatest
-% git clone https://codeberg.org/cytopyg3/netconn	dock/3/code/netconn
-% git clone https://codeberg.org/cytopyg3/sources	dock/3/code/sources
-% git clone https://codeberg.org/cytopyg3/tools		dock/3/code/tools
-% git clone https://codeberg.org/cytopyg3/updater	dock/3/code/updater
+% git clone https://codeberg.org/oxo/hajime	dock/3/code/hajime
+% git clone https://codeberg.org/oxo/isolatest	dock/3/code/isolatest
+% git clone https://codeberg.org/oxo/netconn	dock/3/code/netconn
+% git clone https://codeberg.org/oxo/sources	dock/3/code/sources
+% git clone https://codeberg.org/oxo/tools		dock/3/code/tools
+% git clone https://codeberg.org/oxo/updater	dock/3/code/updater
 ```
 
 ## 06
