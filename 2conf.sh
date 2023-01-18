@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env base
 set -o errexit
 set -o nounset
 set -o pipefail
@@ -95,12 +95,11 @@ bootloader_editor="0"
 ## packages
 linux_kernel="linux-headers"	#linux 1base
 linux_lts_kernel="linux-lts linux-lts-headers"
+core_applications=''
 text_editor="emacs neovim"
-install_helpers="reflector"		#binutils 3post base-devel group
+install_helpers="reflector"	#binutils 3post base-devel group
 wireless="wpa_supplicant wireless_tools iw"
 secure_connections="openssh"
-#micro_code_intel="intel-ucode iucode-tool"
-#micro_code_amd="amd-ucode"
 system_security="arch-audit"
 
 #--------------------------------
@@ -421,7 +420,7 @@ initialize_pacman()
 
 install_helpers()
 {
-	case offline in
+	case $offline in
 
 		1)
 			;;
@@ -478,12 +477,12 @@ install_core()
 	pacman -S --needed --noconfirm \
 		$linux_kernel \
 		$linux_lts_kernel \
-		$core_applications \
 		$text_editor \
 		$wireless \
 		$secure_connections \
 		$pkg_ucode \
 		$system_security
+		#$core_applications \
 }
 
 

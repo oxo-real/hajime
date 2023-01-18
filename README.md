@@ -255,7 +255,15 @@ mount usb2 to tmp
 
 ```
 % mkdir tmp
+% lsblk -o LABEL,PATH
+```
+or
+```
 % lsblk -paf
+```
+or
+```
+% blkid
 ```
 
 CAUTION! DESIGNATE THE RIGHT DEVICE!
