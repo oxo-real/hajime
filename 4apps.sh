@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -o errexit
+#set -o errexit
 set -o nounset
 set -o pipefail
 #
@@ -137,10 +137,10 @@ define_additional_tools()
     network_tools="mtr iftop bind-tools whois"
     #"wireshark-cli wireshark-qt"
 
+    programming="go lisp lua perl python rustup"
+
     python_additions=""
     #"python-pip"
-
-    programming="go lisp lua perl python"
 
     internet_tools="firefox-developer-edition qutebrowser nyxt urlscan w3m"
     # lynx
@@ -202,12 +202,11 @@ mount_repo()
 {
     repo_lbl='REPO'
     repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
-    #local mountpoint=$(mount | grep $repo_dir)
 
     [[ -d $repo_dir ]] || mkdir -p "$repo_dir"
 
-    sudo mount "$repo_dev" "$repo_dir"
-    #[[ -n $mountpoint ]] || sudo mount "$repo_dev" "$repo_dir"
+    mountpoint -q $repo_dir
+    [[ $? -eq 0 ]] || sudo mount "$repo_dev" "$repo_dir"
 }
 
 
@@ -225,12 +224,11 @@ mount_code()
 {
     code_lbl='CODE'
     code_dev=$(lsblk -o label,path | grep "$code_lbl" | awk '{print $2}')
-    #local mountpoint=$(mount | grep $code_dir)
 
     [[ -d $code_dir ]] || mkdir -p "$code_dir"
 
-    sudo mount "$code_dev" "$code_dir"
-    #[[ -n $mountpoint ]] || sudo mount "$code_dev" "$code_dir"
+    mountpoint -q $code_dir
+    [[ $? -eq 0 ]] || sudo mount "$code_dev" "$code_dir"
 }
 
 
@@ -295,8 +293,8 @@ create_additional_tools_list()
 			  $file_tools \
 			  $debugging \
 			  $network_tools \
-			  $python_additions \
 			  $programming \
+			  $python_additions \
 			  $internet_tools \
 			  $feeds \
 			  $email \
@@ -390,17 +388,21 @@ loose_ends()
 }
 
 
-define_core_applications
-create_core_applications_list
+main() {
+    define_core_applications
+    create_core_applications_list
 
-define_additional_tools
-create_additional_tools_list
+    define_additional_tools
+    create_additional_tools_list
 
-set_usr_rw
-get_offline_repo
-get_offline_code
-aur_install
-install_core_applications
-install_additional_tools
-loose_ends
-set_usr_ro
+    set_usr_rw
+    get_offline_repo
+    get_offline_code
+    aur_install
+    install_core_applications
+    install_additional_tools
+    loose_ends
+    set_usr_ro
+}
+
+main
