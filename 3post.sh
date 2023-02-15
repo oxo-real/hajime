@@ -69,7 +69,7 @@ repo_dir="/home/$(id -un)/dock/2"
 repo_re="\/home\/$(id -un)\/dock\/2"
 file_etc_pacman_conf='/etc/pacman.conf'
 
-post_core_additions='lsof pacman-contrib mlocate neofetch wl-clipboard neovim archlinux-keyring'
+post_core_additions='archlinux-keyring lsof mlocate neofetch neovim pacman-contrib wl-clipboard'
 bloat_ware="" # there seems to be no more bloatware since kernel v536 (nano was removed)
 mirror_country='Sweden'
 mirror_amount='5'

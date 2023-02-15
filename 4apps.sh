@@ -101,6 +101,8 @@ define_core_applications()
     encryption="ssss gnupg"
     #"veracrypt tomb"
 
+    security='opendoas'
+
     secure_connections="wireguard-tools protonvpn-cli-ng sshfs"
 
     filesystems="dosfstools ntfs-3g"
@@ -273,6 +275,7 @@ create_core_applications_list()
 			   $manpages \
 			   $password_security \
 			   $encryption \
+			   $security \
 			   $secure_connections \
 			   $filesystems \
 			   $fonts \
