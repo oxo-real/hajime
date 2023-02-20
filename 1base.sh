@@ -78,21 +78,72 @@ mirror_amount="5"
 # base was a package group, but now is a package, while
 # base-devel is (still) a package group
 #
-# base (package):
+# base (core package):
 # --------------------------------
-# bash bzip2 coreutils file filesystem findutils gawk gcc-libs gettext glibc
-# grep gzip iproute2 iputils licenses pacman pciutils procps-ng psmisc sed shadow
-# systemd systemd-sysvcompat tar util-linux xz linux (optional)
-# https://github.com/archlinux/svntogit-packages/blob/master/base/repos/core-any/PKGBUILD
+# archlinux-keyring
+# bash
+# bzip2
+# coreutils
+# file
+# filesystem
+# findutils
+# gawk
+# gcc-libs
+# gettext
+# glibc
+# grep
+# gzip
+# iproute2
+# iputils
+# licenses
+# pacman
+# pciutils
+# procps-ng
+# psmisc
+# sed
+# shadow
+# systemd
+# systemd-sysvcompat
+# tar
+# util-linux
+# xz
+# linux (optional) - bare metal support
+# https://archlinux.org/packages/core/any/base/
 #
-# base-devel (package-group):
+# base-devel (core package):
 # --------------------------------
-# autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext
-# grep groff gzip libtool m4 make pacman patch pkgconf sed sudo texinfo which
-# https://archlinux.org/groups/x86_64/base-devel/
-pkg_help="reflector"
-pkg_core="base linux linux-firmware lvm2 dhcpcd git"
-pkg_base_devel="$(pacman -Qg base-devel | sed 's/base-devel //g' | tr '\n' ' ')"
+# archlinux-keyring
+# autoconf
+# automake
+# binutils
+# bison
+# debugedit
+# fakeroot
+# file
+# findutils
+# flex
+# gawk
+# gcc
+# gettext
+# grep
+# groff
+# gzip
+# libtool
+# m4
+# make
+# pacman
+# patch
+# pkgconf
+# sed
+# sudo
+# texinfo
+# which
+# https://archlinux.org/packages/core/any/base-devel/
+pkg_help='reflector'
+pkg_core='base linux linux-firmware lvm2 dhcpcd git'
+# 20230212 https://archlinux.org/news/switch-to-the-base-devel-meta-package-requires-manual-intervention/
+pkg_base_devel='base-devel'
+#pkg_base_devel="$(pacman -Qg base-devel | sed 's/base-devel //g' | tr '\n' ' ')"
 
 
 ## recommended percentages of $lvm_size_calc

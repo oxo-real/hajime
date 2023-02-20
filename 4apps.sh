@@ -75,12 +75,12 @@ aur_dir="$repo_dir/aur"
 
 define_core_applications()
 {
-    wayland="wlroots qt5-wayland wev xorg-xwayland"
+    wayland="qt5-wayland wlroots wev xorg-xwayland ydotool"
     ## qt5-wayland to prevent:
     ## WARNING: Could not find the Qt platform plugin "wayland" in
     ## i.e. when starting qutebrowser
 
-    dwm="sway swaybg swaylock swayidle swaynagmode i3blocks"
+    dwm="i3blocks sway swaybg swayidle swaylock swaynagmode"
     # waybar
 
     shell="zsh"
@@ -98,7 +98,7 @@ define_core_applications()
     password_security="pass pass-otp yubikey-manager"
     #"pass-tomb bitwarden-cli pass-wl-clipboard"
 
-    encryption="ssss gnupg"
+    encryption="gnupg ssss"
     #"veracrypt tomb"
 
     security='opendoas'
