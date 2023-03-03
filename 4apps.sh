@@ -112,7 +112,8 @@ define_core_applications()
 
     display="brightnessctl"
 
-    audio="sof-firmware pulseaudio pulseaudio-alsa pulsemixer alsa-utils"
+    audio='alsa-utils sof-firmware qpwgraph-qt5 pipewire pipewire-jack pipewire-pulse'
+    #'pulseaudio pulseaudio-alsa pulsemixer'
 
     images="sxiv"
     #"fim ueberzug geekie"
@@ -180,6 +181,8 @@ define_additional_tools()
 
     pdf_viewers="mupdf zathura-pdf-mupdf"
 
+    video_capturing='wf-recorder'
+
     video_tools="youtube-dl mpv pipe-viewer"
     #"straw-viewer youtube-viewer"
 
@@ -192,7 +195,7 @@ define_additional_tools()
     vector_graphics_editing=""
     #"inkscape"
 
-    office_tools=""
+    office_tools="mdp"
     #"libreoffice-fresh"
 
     cad=""
@@ -313,6 +316,7 @@ create_additional_tools_list()
 			  $image_viewers \
 			  $image_editors \
 			  $pdf_viewers \
+			  $video_capturing \
 			  $video_tools \
 			  $photo_editing \
 			  $photo_management \

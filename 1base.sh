@@ -140,7 +140,7 @@ mirror_amount="5"
 # which
 # https://archlinux.org/packages/core/any/base-devel/
 pkg_help='reflector'
-pkg_core='base linux linux-firmware lvm2 dhcpcd git'
+pkg_core='base linux linux-firmware'
 # 20230212 https://archlinux.org/news/switch-to-the-base-devel-meta-package-requires-manual-intervention/
 pkg_base_devel='base-devel'
 #pkg_base_devel="$(pacman -Qg base-devel | sed 's/base-devel //g' | tr '\n' ' ')"

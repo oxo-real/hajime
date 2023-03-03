@@ -97,7 +97,7 @@ linux_kernel="linux-headers"	#linux 1base
 linux_lts_kernel="linux-lts linux-lts-headers"
 core_applications=''
 text_editor="emacs neovim"
-install_helpers="reflector"	#binutils 3post base-devel group
+install_helpers="reflector git"	#binutils 3post base-devel group
 wireless="wpa_supplicant wireless_tools iw"
 secure_connections="openssh"
 system_security="arch-audit"
@@ -473,16 +473,18 @@ micro_code()
 
 install_core()
 {
-	# update repositories and install core applications
-	pacman -S --needed --noconfirm \
-		$linux_kernel \
-		$linux_lts_kernel \
-		$text_editor \
-		$wireless \
-		$secure_connections \
-		$pkg_ucode \
-		$system_security
-		#$core_applications \
+    # update repositories and install core applications
+    # [Installation guide - ArchWiki]
+    # (https://wiki.archlinux.org/title/Installation_guide#Install_essential_packages)
+    pacman -S --needed --noconfirm \
+	   $linux_kernel \
+	   $linux_lts_kernel \
+	   $text_editor \
+	   $wireless \
+	   $secure_connections \
+	   $pkg_ucode \
+	   $system_security \
+	   $core_applications
 }
 
 
