@@ -95,7 +95,10 @@ bootloader_editor="0"
 ## packages
 linux_kernel="linux-headers"	#linux 1base
 linux_lts_kernel="linux-lts linux-lts-headers"
-core_applications=''
+# [Install Arch Linux on LVM - ArchWiki]
+# (https://wiki.archlinux.org/title/Install_Arch_Linux_on_LVM#Adding_mkinitcpio_hooks)
+# lvm2 needed for lvm2 mkinitcpio hook
+core_applications='lvm2'
 text_editor="emacs neovim"
 install_helpers="reflector git"	#binutils 3post base-devel group
 wireless="wpa_supplicant wireless_tools iw"
