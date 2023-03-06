@@ -100,6 +100,12 @@ reply_single()
 }
 
 
+check_label_exist()
+{
+    lsblk -o label | grep $lbl 2>&1 /dev/null
+    [[ $? -ne 0 ]] && printf "$lbl source not found, exiting\n" && exit 10
+}
+
 dhcp_connect()
 {
     sh hajime/0init.sh
@@ -159,14 +165,17 @@ pacman_init()
 
 mount_repo()
 {
-    repo_lbl='REPO'
-    repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
-    #local mountpoint=$(mount | grep $repo_dir)
+    lbl='REPO'
+
+    check_label_exist
+
+    repo_dev=$(lsblk -o label,path | grep "$lbl" | awk '{print $2}')
 
     [[ -d $repo_dir ]] || mkdir -p "$repo_dir"
 
     sudo mount "$repo_dev" "$repo_dir"
-    #[[ -n $mountpoint ]] || sudo mount "$repo_dev" "$repo_dir"
+
+    unset lbl
 }
 
 
@@ -182,14 +191,17 @@ get_offline_repo()
 
 mount_code()
 {
-    code_lbl='CODE'
+    local lbl='CODE'
+
+    check_label_exist
+
     code_dev=$(lsblk -o label,path | grep "$code_lbl" | awk '{print $2}')
-    #local mountpoint=$(mount | grep $code_dir)
 
     [[ -d $code_dir ]] || mkdir -p "$code_dir"
 
     sudo mount "$code_dev" "$code_dir"
-    #[[ -n $mountpoint ]] || sudo mount "$code_dev" "$code_dir"
+
+    unset lbl
 }
 
 

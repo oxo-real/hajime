@@ -107,64 +107,69 @@ system_security="arch-audit"
 
 #--------------------------------
 
-clear
+temporary_maintenance()
+{
+    # libtinfo_so.5
+    # rewiring for libtinfo.so.5 missing shile 6 is installed
+    ln -s /usr/lib/libtinfo.so.6 /usr/lib/libtinfo.so.5
+}
 
 
 reply()
 {
-	# first silently entered character goes directly to $reply
-	stty_0=$(stty -g)
-	stty raw -echo
-	reply=$(head -c 1)
-	stty $stty_0
+    # first silently entered character goes directly to $reply
+    stty_0=$(stty -g)
+    stty raw -echo
+    reply=$(head -c 1)
+    stty $stty_0
 }
 
 
 mount_repo()
 {
-	repo_lbl='REPO'
-	# 20230106 lsblk reports empty label names
-	#repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
-	repo_dev=$(blkid | grep "$repo_lbl" | awk -F : '{print $1}')
-	#local mountpoint=$(mount | grep $repo_dir)
+    repo_lbl='REPO'
+    # 20230106 lsblk reports empty label names
+    #repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
+    repo_dev=$(blkid | grep "$repo_lbl" | awk -F : '{print $1}')
+    #local mountpoint=$(mount | grep $repo_dir)
 
-	[[ -d $repo_dir ]] || mkdir -p "$repo_dir"
+    [[ -d $repo_dir ]] || mkdir -p "$repo_dir"
 
-	sudo mount "$repo_dev" "$repo_dir"
-	#[[ -n $mountpoint ]] || sudo mount "$repo_dev" "$repo_dir"
+    sudo mount "$repo_dev" "$repo_dir"
+    #[[ -n $mountpoint ]] || sudo mount "$repo_dev" "$repo_dir"
 }
 
 
 get_offline_repo()
 {
-	case $offline in
-		1)
-			mount_repo
-			;;
-	esac
+    case $offline in
+	1)
+	    mount_repo
+	    ;;
+    esac
 }
 
 
 mount_code()
 {
-	code_lbl='CODE'
-	code_dev=$(lsblk -o label,path | grep "$code_lbl" | awk '{print $2}')
-	#local mountpoint=$(mount | grep $code_dir)
+    code_lbl='CODE'
+    code_dev=$(lsblk -o label,path | grep "$code_lbl" | awk '{print $2}')
+    #local mountpoint=$(mount | grep $code_dir)
 
-	[[ -d $code_dir ]] || mkdir -p "$code_dir"
+    [[ -d $code_dir ]] || mkdir -p "$code_dir"
 
-	sudo mount "$code_dev" "$code_dir"
-	#[[ -n $mountpoint ]] || sudo mount "$code_dev" "$code_dir"
+    sudo mount "$code_dev" "$code_dir"
+    #[[ -n $mountpoint ]] || sudo mount "$code_dev" "$code_dir"
 }
 
 
 get_offline_code()
 {
-	case $offline in
-		1)
-			mount_code
-			;;
-	esac
+    case $offline in
+	1)
+	    mount_code
+	    ;;
+    esac
 }
 
 
@@ -195,25 +200,25 @@ reconfigure_pacman_conf()
 
 time_settings()
 {
-	## set time zone
-	ln -sf /usr/share/zoneinfo/$time_zone /etc/localtime
-	## set hwclock
-	hwclock --systohc
+    ## set time zone
+    ln -sf /usr/share/zoneinfo/$time_zone /etc/localtime
+    ## set hwclock
+    hwclock --systohc
 }
 
 
 locale_settings()
 {
-	sed -i "/^#en_US.UTF-8 UTF-8/c\en_US.UTF-8 UTF-8" $file_etc_locale_gen
-	locale-gen
-	echo $locale_conf > $file_etc_locale_conf
+    sed -i "/^#en_US.UTF-8 UTF-8/c\en_US.UTF-8 UTF-8" $file_etc_locale_gen
+    locale-gen
+    echo $locale_conf > $file_etc_locale_conf
 }
 
 
 vconsole_settings()
 {
-	echo $vconsole_conf > $file_etc_vconsole_conf
-	echo
+    echo $vconsole_conf > $file_etc_vconsole_conf
+    echo
 }
 
 
@@ -221,80 +226,80 @@ vconsole_settings()
 
 set_hostname()
 {
-	clear
-	printf "hostname: '$hostname'\n"
-	printf "correct? (y/N) "
+    clear
+    printf "hostname: '$hostname'\n"
+    printf "correct? (y/N) "
+    reply
+
+    if printf "$reply" | grep -iq "^y" ; then
+
+	echo
+	printf "using '$hostname' as hostname\n"
+	printf "really sure? (Y/n) "
 	reply
 
-	if printf "$reply" | grep -iq "^y" ; then
+	if printf "$reply" | grep -iq "^n"; then
 
-		echo
-		printf "using '$hostname' as hostname\n"
-		printf "really sure? (Y/n) "
-		reply
-
-		if printf "$reply" | grep -iq "^n"; then
-
-			clear
-			set_hostname
-		else
-				echo
-				printf "using '$hostname' as hostname\n"
-
-		fi
-
+	    clear
+	    set_hostname
 	else
-
-		echo
-		read -p "enter hostname: " hostname
-		printf "hostname:	'$hostname', correct? (Y/n) "
-		reply
-
-		if printf "$reply" | grep -iq "^n"; then
-
-			clear
-			set_hostname
-		else
-				echo
-				printf "using '$hostname' as hostname\n"
-
-		fi
+	    echo
+	    printf "using '$hostname' as hostname\n"
 
 	fi
+
+    else
+
 	echo
+	read -p "enter hostname: " hostname
+	printf "hostname:	'$hostname', correct? (Y/n) "
+	reply
+
+	if printf "$reply" | grep -iq "^n"; then
+
+	    clear
+	    set_hostname
+	else
+	    echo
+	    printf "using '$hostname' as hostname\n"
+
+	fi
+
+    fi
+    echo
 }
 
 
 set_host_file()
 {
-	## create host file
-	printf "$hostname" > $file_etc_hostname
+    ## create host file
+    printf "$hostname" > $file_etc_hostname
 
-	## add matching entries to hosts file
-	printf "127.0.0.1	localhost.localdomain	localhost\n" >> $file_etc_hosts
-	printf "::1		localhost.localdomain	localhost\n" >> $file_etc_hosts
-	printf "127.0.1.1	$hostname.localdomain	$hostname\n" >> $file_etc_hosts
+    ## add matching entries to hosts file
+    printf "127.0.0.1	localhost.localdomain	localhost\n" >> $file_etc_hosts
+    printf "::1		localhost.localdomain	localhost\n" >> $file_etc_hosts
+    printf "127.0.1.1	$hostname.localdomain	$hostname\n" >> $file_etc_hosts
 
-	## enable systemd-resolved
-	#systemctl enable systemd-resolved.service
-	### symbolic link to the systemd stub, dns server will be set automaitcally
-	#ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
-	### check resolving status
-	#resolvectl status
+    ## enable systemd-resolved
+    #systemctl enable systemd-resolved.service
+    ### symbolic link to the systemd stub, dns server will be set automaitcally
+    #ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+    ### check resolving status
+    #resolvectl status
 
-	## DNS over TLS (DOT)
-	#mkdir /etc/systemd/resolve.conf.d
-	#printf "[Resolve]" > /etc/systemd/resolve.conf.d/dns_over_tls.conf
-	#printf "DNS=9.9.9.9#dns.quad9.net" >> /etc/systemd/resolve.conf.d/dns_over_tls.conf
-	#printf "DNSOverTLS=yes" >> /etc/systemd/resolve.conf.d/dns_over_tls.conf
+    ## DNS over TLS (DOT)
+    #mkdir /etc/systemd/resolve.conf.d
+    #printf "[Resolve]" > /etc/systemd/resolve.conf.d/dns_over_tls.conf
+    #printf "DNS=9.9.9.9#dns.quad9.net" >> /etc/systemd/resolve.conf.d/dns_over_tls.conf
+    #printf "DNSOverTLS=yes" >> /etc/systemd/resolve.conf.d/dns_over_tls.conf
 }
 
 
 # set root password
 pass_root()
 {
-	printf "$(whoami)@$hostname\n"
-	passwd
+    printf "$(whoami)@$hostname\n"
+    passwd
 }
 
 
@@ -302,175 +307,175 @@ pass_root()
 
 set_username()
 {
-	clear
-	printf "username: '$username'\n"
-	printf "correct? (y/N) "
+    clear
+    printf "username: '$username'\n"
+    printf "correct? (y/N) "
+    reply
+
+    if printf "$reply" | grep -iq "^y"; then
+
+	echo
+	printf "using '$username' as username\n"
+	printf "really sure? (Y/n) "
 	reply
 
-	if printf "$reply" | grep -iq "^y"; then
+	if printf "$reply" | grep -iq "^n"; then
 
-		echo
-		printf "using '$username' as username\n"
-		printf "really sure? (Y/n) "
-		reply
-
-		if printf "$reply" | grep -iq "^n"; then
-
-		    clear
-		    set_username
-
-		else
-
-		    echo
-		    printf "using '$username' as username\n"
-
-		fi
+	    clear
+	    set_username
 
 	else
 
-		echo
-		read -p "enter username: " username
-		test_username
-		printf "username: '$username', correct? (Y/n) "
-		reply
-
-		if printf "$reply" | grep -iq "^n"; then
-
-		    clear
-		    set_username
-
-		else
-
-		    echo
-		    printf "using '$username' as username\n"
-
-		fi
+	    echo
+	    printf "using '$username' as username\n"
 
 	fi
+
+    else
+
 	echo
+	read -p "enter username: " username
+	test_username
+	printf "username: '$username', correct? (Y/n) "
+	reply
+
+	if printf "$reply" | grep -iq "^n"; then
+
+	    clear
+	    set_username
+
+	else
+
+	    echo
+	    printf "using '$username' as username\n"
+
+	fi
+
+    fi
+    echo
 }
 
 
 test_username() {
-	username_length="$(printf "$username" | wc -c)"
-	if [[ $username_length -gt 32 ]]; then
+    username_length="$(printf "$username" | wc -c)"
+    if [[ $username_length -gt 32 ]]; then
 
-	    printf "${MAGENTA}$username${NOC} contains $username_length characters\n"
-	    printf "usernames may only be up to 32 characters long\n"
-	    sleep 5
-	    set_username
+	printf "${MAGENTA}$username${NOC} contains $username_length characters\n"
+	printf "usernames may only be up to 32 characters long\n"
+	sleep 5
+	set_username
 
-	fi
+    fi
 
-	if [[ ! "$username" =~ ^[a-z_][a-z0-9_-]*[$]? ]]; then
+    if [[ ! "$username" =~ ^[a-z_][a-z0-9_-]*[$]? ]]; then
 
-	    printf "${MAGENTA}$username${NOC} not matching useradd criteria\n"
-	    printf "see useradd(8)\n"
-	    sleep 5
-	    set_username
+	printf "${MAGENTA}$username${NOC} not matching useradd criteria\n"
+	printf "see useradd(8)\n"
+	sleep 5
+	set_username
 
-	fi
+    fi
 }
 
 
 add_username()
 {
-	useradd -m -g wheel $username
+    useradd -m -g wheel $username
 }
 
 
 add_groups()
 {
-	## add $username to video group (for brightnessctl)
-	usermod -a -G video $username
+    ## add $username to video group (for brightnessctl)
+    usermod -a -G video $username
 }
 
 
 set_passphrase()
 {
-	## set $username password
-	printf "$username@$hostname\n"
-	passwd $username
+    ## set $username password
+    printf "$username@$hostname\n"
+    passwd $username
 }
 
 
 set_privileges()
 {
-	## priviledge escalation for wheel group
-	sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' $file_etc_sudoers
+    ## priviledge escalation for wheel group
+    sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' $file_etc_sudoers
 
-	## keep environment variable with elevated priviledges
-	sed -i 's/# Defaults env_keep += "HOME"/Defaults env_keep += "HOME"\nDefaults !always_set_home, !set_home/' $file_etc_sudoers
+    ## keep environment variable with elevated priviledges
+    sed -i 's/# Defaults env_keep += "HOME"/Defaults env_keep += "HOME"\nDefaults !always_set_home, !set_home/' $file_etc_sudoers
 }
 
 
 # add user
 add_user()
 {
-	set_username
-	add_username
-	add_groups
-	set_passphrase
-	set_privileges
+    set_username
+    add_username
+    add_groups
+    set_passphrase
+    set_privileges
 }
 
 
 initialize_pacman()
 {
-	pacman -Syy
+    pacman -Syy
 }
 
 
 install_helpers()
 {
-	case $offline in
+    case $offline in
 
-		1)
-			;;
+	1)
+	;;
 
-		*)
+	*)
 
-			# install helpers
-			clear
-			pacman -S --noconfirm $install_helpers
+	    # install helpers
+	    clear
+	    pacman -S --noconfirm $install_helpers
 
 
-			# configuring the mirrorlist
+	    # configuring the mirrorlist
 
-			## backup old mirrorlist
-			cp $file_etc_pacmand_mirrorlist /etc/pacman.d/`date "+%Y%m%d%H%M%S"`_mirrorlist.backup
+	    ## backup old mirrorlist
+	    cp $file_etc_pacmand_mirrorlist /etc/pacman.d/`date "+%Y%m%d%H%M%S"`_mirrorlist.backup
 
-			## select fastest mirrors
-			reflector \
-				--verbose \
-				--country $mirror_country \
-				-l $mirror_amount \
-				--sort rate \
-				--save $file_etc_pacmand_mirrorlist
-			;;
+	    ## select fastest mirrors
+	    reflector \
+		--verbose \
+		--country $mirror_country \
+		-l $mirror_amount \
+		--sort rate \
+		--save $file_etc_pacmand_mirrorlist
+	    ;;
 
-	esac
+    esac
 }
 
 
 micro_code()
 {
-	cpu_name=$(lscpu | grep 'Model name:' | awk '{print $3}')
+    cpu_name=$(lscpu | grep 'Model name:' | awk '{print $3}')
 
-	if [[ $cpu_name == 'AMD' ]]; then
+    if [[ $cpu_name == 'AMD' ]]; then
 
-		cpu_type='amd'
-		pkg_ucode='amd-ucode'
+	cpu_type='amd'
+	pkg_ucode='amd-ucode'
 
-	else
+    else
 
-		cpu_type='intel'
-		pkg_ucode='intel-ucode iucode-tool'
+	cpu_type='intel'
+	pkg_ucode='intel-ucode iucode-tool'
 
-	fi
+    fi
 
-	#[TODO] check
-	ucode="$cpu_type-ucode"
+    #[TODO] check
+    ucode="$cpu_type-ucode"
 }
 
 
@@ -494,104 +499,106 @@ install_core()
 
 install_bootloader()
 {
-	# installing the EFI boot manager
+    # installing the EFI boot manager
 
-	## install boot files
-	bootctl install
+    ## install boot files
+    bootctl install
 
-	## boot loader configuration
+    ## boot loader configuration
 
-	printf "default arch\n" > $file_boot_loader_loader_conf
-	printf "timeout $bootloader_timeout\n" >> $file_boot_loader_loader_conf
-	printf "editor $bootloader_editor\n" >> $file_boot_loader_loader_conf
-	printf "console-mode max" >> $file_boot_loader_loader_conf
-
-
-	# create an initial ramdisk environment (initramfs)
-	## enable systemd hooks
-	sed -i "/^HOOKS/c\HOOKS=(base systemd autodetect keyboard sd-vconsole modconf block sd-encrypt lvm2 filesystems fsck)" /etc/mkinitcpio.conf
+    printf "default arch\n" > $file_boot_loader_loader_conf
+    printf "timeout $bootloader_timeout\n" >> $file_boot_loader_loader_conf
+    printf "editor $bootloader_editor\n" >> $file_boot_loader_loader_conf
+    printf "console-mode max" >> $file_boot_loader_loader_conf
 
 
-	# adding boot loader entries
-
-	## linux kernel
-
-	file_boot_loader_entries_arch_conf="/boot/loader/entries/arch.conf"
-	echo 'title arch' > $file_boot_loader_entries_arch_conf
-	echo 'linux /vmlinuz-linux' >> $file_boot_loader_entries_arch_conf
-	echo "initrd /$ucode.img" >> $file_boot_loader_entries_arch_conf
-	echo 'initrd /initramfs-linux.img' >> $file_boot_loader_entries_arch_conf
-	### if lv_swap does not exist
-	[ ! -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> $file_boot_loader_entries_arch_conf
-	### if lv_swap does exists
-	[ -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` rw resume=UUID=`blkid | grep lv_swap | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> $file_boot_loader_entries_arch_conf
-
-	## linux long term support kernel (LTS)
-
-	file_boot_loader_entries_arch_lts_conf="/boot/loader/entries/arch-lts.conf"
-	echo 'title arch-lts' > $file_boot_loader_entries_arch_lts_conf
-	echo 'linux /vmlinuz-linux-lts' >> $file_boot_loader_entries_arch_lts_conf
-	echo "initrd /$ucode.img" >> $file_boot_loader_entries_arch_conf
-	echo 'initrd /initramfs-linux-lts.img' >> $file_boot_loader_entries_arch_lts_conf
-	### if lv_swap does not exist
-	[ ! -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> $file_boot_loader_entries_arch_lts_conf
-	### if lv_swap does exist
-	[ -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` rw resume=UUID=`blkid | grep lv_swap | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> $file_boot_loader_entries_arch_lts_conf
+    # create an initial ramdisk environment (initramfs)
+    ## enable systemd hooks
+    sed -i "/^HOOKS/c\HOOKS=(base systemd autodetect keyboard sd-vconsole modconf block sd-encrypt lvm2 filesystems fsck)" /etc/mkinitcpio.conf
 
 
-	# generate initramfs with mkinitcpio
+    # adding boot loader entries
 
-	## for linux preset
-	mkinitcpio -p linux
+    ## linux kernel
 
-	## for linux-lts preset
-	mkinitcpio -p linux-lts
+    file_boot_loader_entries_arch_conf="/boot/loader/entries/arch.conf"
+    echo 'title arch' > $file_boot_loader_entries_arch_conf
+    echo 'linux /vmlinuz-linux' >> $file_boot_loader_entries_arch_conf
+    echo "initrd /$ucode.img" >> $file_boot_loader_entries_arch_conf
+    echo 'initrd /initramfs-linux.img' >> $file_boot_loader_entries_arch_conf
+    ### if lv_swap does not exist
+    [ ! -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> $file_boot_loader_entries_arch_conf
+    ### if lv_swap does exists
+    [ -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` rw resume=UUID=`blkid | grep lv_swap | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> $file_boot_loader_entries_arch_conf
+
+    ## linux long term support kernel (LTS)
+
+    file_boot_loader_entries_arch_lts_conf="/boot/loader/entries/arch-lts.conf"
+    echo 'title arch-lts' > $file_boot_loader_entries_arch_lts_conf
+    echo 'linux /vmlinuz-linux-lts' >> $file_boot_loader_entries_arch_lts_conf
+    echo "initrd /$ucode.img" >> $file_boot_loader_entries_arch_conf
+    echo 'initrd /initramfs-linux-lts.img' >> $file_boot_loader_entries_arch_lts_conf
+    ### if lv_swap does not exist
+    [ ! -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> $file_boot_loader_entries_arch_lts_conf
+    ### if lv_swap does exist
+    [ -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` rw resume=UUID=`blkid | grep lv_swap | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> $file_boot_loader_entries_arch_lts_conf
+
+
+    # generate initramfs with mkinitcpio
+
+    ## for linux preset
+    mkinitcpio -p linux
+
+    ## for linux-lts preset
+    mkinitcpio -p linux-lts
 }
 
 
 move_hajime()
 {
-	# move /hajime to $user home
-	cp -r /hajime /home/$username
-	sudo rm -rf /hajime
+    # move /hajime to $user home
+    cp -r /hajime /home/$username
+    sudo rm -rf /hajime
 }
 
 
 exit_arch_chroot_mnt()
 {
-	## return to archiso environment
-	echo
-	echo 'exit'
-	# reboot advice
-	echo 'umount -R /mnt'
-	echo 'reboot'
-	echo
-	echo 'sh hajime/3post.sh'
-	echo
+    ## return to archiso environment
+    echo
+    echo 'exit'
+    # reboot advice
+    echo 'umount -R /mnt'
+    echo 'reboot'
+    echo
+    echo 'sh hajime/3post.sh'
+    echo
 
-	# finishing
-	touch /home/$username/hajime/2conf.done
+    # finishing
+    touch /home/$username/hajime/2conf.done
 }
 
 
 main()
 {
-	get_offline_repo
-	reconfigure_pacman_conf
-	time_settings
-	locale_settings
-	vconsole_settings
-	set_hostname
-	set_host_file
-	pass_root
-	add_user
-	initialize_pacman
-	install_helpers
-	micro_code
-	install_core
-	install_bootloader
-	move_hajime
-	exit_arch_chroot_mnt
+    clear
+    temporary_maintenance
+    get_offline_repo
+    reconfigure_pacman_conf
+    time_settings
+    locale_settings
+    vconsole_settings
+    set_hostname
+    set_host_file
+    pass_root
+    add_user
+    initialize_pacman
+    install_helpers
+    micro_code
+    install_core
+    install_bootloader
+    move_hajime
+    exit_arch_chroot_mnt
 }
 
 main

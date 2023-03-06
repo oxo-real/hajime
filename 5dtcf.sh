@@ -82,182 +82,187 @@ git_remote_gl="https://gitlab.com/cytopyge"
 git_remote_cb="https://codeberg.org/cytopyge"
 git_remote=$git_remote_cb
 
+doas_conf='/etc/doas.conf'
+
 #--------------------------------
 
 
 git_clone_dotfile()
 {
-	local repo="dotfile"
-	local_dir="$git_local/$repo"
+    local repo="dotfile"
+    local_dir="$git_local/$repo"
 
-	[ -d $local_dir ] || mkdir -p $local_dir
+    [ -d $local_dir ] || mkdir -p $local_dir
 
-	git clone $git_remote/$repo $local_dir
+    git clone $git_remote/$repo $local_dir
 }
 
 
 git_clone_code()
 {
-	git_code="$git_local/code"
+    git_code="$git_local/code"
 
-	### sources
-	repo="source"
-	git clone $git_remote/$repo $git_code/source
+    ### sources
+    repo="source"
+    git clone $git_remote/$repo $git_code/source
 
-	### tools
-	repo="tool"
-	git clone $git_remote/$repo $git_code/tool
+    ### tools
+    repo="tool"
+    git clone $git_remote/$repo $git_code/tool
 
-	### hajime
-	repo="hajime"
-	git clone $git_remote/$repo $git_code/$repo
-	#### git/hajime becomes the git repo;
-	#### remove git repo from install directory
-	rm -rf $HOME/hajime
+    ### hajime
+    repo="hajime"
+    git clone $git_remote/$repo $git_code/$repo
+    #### git/hajime becomes the git repo;
+    #### remove git repo from install directory
+    rm -rf $HOME/hajime
 
-	### isolatest
-	repo="isolatest"
-	git clone $git_remote/$repo $git_code/$repo
+    ### isolatest
+    repo="isolatest"
+    git clone $git_remote/$repo $git_code/$repo
 
-	### metar
-	repo="metar"
-	git clone $git_remote/$repo $git_code/$repo
+    ### metar
+    repo="metar"
+    git clone $git_remote/$repo $git_code/$repo
 
-	### netconn
-	repo="netconn"
-	git clone $git_remote/$repo $git_code/$repo
+    ### netconn
+    repo="netconn"
+    git clone $git_remote/$repo $git_code/$repo
 
-	### updater
-	repo="updater"
-	git clone $git_remote/$repo $git_code/$repo
+    ### updater
+    repo="updater"
+    git clone $git_remote/$repo $git_code/$repo
 }
 
 
 git_clone_note()
 {
-	repo="note"
-	git clone $git_remote/$repo $git_local/note
+    repo="note"
+    git clone $git_remote/$repo $git_local/note
 }
 
 
 get_public_data()
 {
-	if [[ $offline -ne 1 ]]; then
+    if [[ $offline -ne 1 ]]; then
 
-		git_clone_dotfile
-		git_clone_code
-		git_clone_note
+	git_clone_dotfile
+	git_clone_code
+	git_clone_note
 
-	elif [[ $offline -eq 1 ]]; then
+    elif [[ $offline -eq 1 ]]; then
 
-		home_dir_dst="$HOME"
-		git_dir_dst="$XDG_DATA_HOME/c/git"
+	home_dir_dst="$HOME"
+	git_dir_dst="$XDG_DATA_HOME/c/git"
 
-		[[ -d $home_dir_dst/.config ]] || mkdir -p  $home_dir_dst/.config
-		[[ -d $git_dir_dst/code ]] || mkdir -p	    $git_dir_dst/code
-		[[ -d $git_dir_dst/note ]] || mkdir -p	    $git_dir_dst/note
+	[[ -d $home_dir_dst/.config ]] || mkdir -p  $home_dir_dst/.config
+	[[ -d $git_dir_dst/code ]] || mkdir -p	    $git_dir_dst/code
+	[[ -d $git_dir_dst/note ]] || mkdir -p	    $git_dir_dst/note
 
-		printf "copying system configuration files... "
-		cp -pr $code_dir/.config    $home_dir_dst
-		printf "done\n"
-		printf "copying code repository... "
-		cp -pr $code_dir/code	    $git_dir_dst
-		printf "done\n"
-		printf "copying note repository... "
-		cp -pr $code_dir/note	    $git_dir_dst
-		printf "done\n"
+	printf "copying system configuration files... "
+	cp -pr $code_dir/.config    $home_dir_dst
+	printf "done\n"
+	printf "copying code repository... "
+	cp -pr $code_dir/code	    $git_dir_dst
+	printf "done\n"
+	printf "copying note repository... "
+	cp -pr $code_dir/note	    $git_dir_dst
+	printf "done\n"
 
-	fi
+    fi
 }
 
 
 git_clone_prvt()
 {
-	#[TODO] check name
-	repo="private"
-	git clone $git_remote/$repo $git_local/prvt
+    #[TODO] check name
+    repo="private"
+    git clone $git_remote/$repo $git_local/prvt
 }
 
 
 get_private_data()
 {
-	if [[ $offline -ne 1 ]]; then
+    if [[ $offline -ne 1 ]]; then
 
-		git_clone_prvt
+	git_clone_prvt
 
-	elif [[ $offline -eq 1 ]]; then
+    elif [[ $offline -eq 1 ]]; then
 
-		home_dir_dst="$HOME"
-		git_dir_dst="$XDG_DATA_HOME/c/git"
+	home_dir_dst="$HOME"
+	git_dir_dst="$XDG_DATA_HOME/c/git"
 
-		[[ -d $git_dir_dst/prvt ]] || mkdir -p   $git_dir_dst/prvt
+	[[ -d $git_dir_dst/prvt ]] || mkdir -p   $git_dir_dst/prvt
 
-		printf "copying prvt repository... "
-		cp -pr $code_dir/prvt	$git_dir_dst
-		printf "done\n"
+	printf "copying prvt repository... "
+	cp -pr $code_dir/prvt	$git_dir_dst
+	printf "done\n"
 
-	fi
+    fi
 }
 
 
 run_dotbu()
 {
-	if [[ $offline -ne 1 ]]; then
+    if [[ $offline -ne 1 ]]; then
 
-		# restore .config from .dot
-		sh $XDG_DATA_HOME/c/git/code/tool/dotbu restore $XDG_DATA_HOME/c/git/dotf/ $XDG_CONFIG_HOME
+	# restore .config from .dot
+	sh $XDG_DATA_HOME/c/git/code/tool/dotbu restore $XDG_DATA_HOME/c/git/dotf/ $XDG_CONFIG_HOME
 
-	fi
+    fi
 }
 
 
 rewrite_symlinks()
 {
-	# rewrite symlinks in shln to current users home
+    # rewrite symlinks in shln to current users home
 
-	## create symlinks
-	### to pass_vault mountpoint (vlt_pass)
-	ln -s $HOME/dock/vlt/pass $HOME/.password-store
+    ## create symlinks
+    ### to pass_vault mountpoint (vlt_pass)
+    ln -s $HOME/dock/vlt/pass $HOME/.password-store
 
-	### to archive, backup and current
-	ln -s $HOME/a $HOME/.local/share/a
-	ln -s $HOME/b $HOME/.local/share/b
-	ln -s $HOME/c $HOME/.local/share/c
+    ### to archive, backup and current
+    ln -s $HOME/a $HOME/.local/share/a
+    ln -s $HOME/b $HOME/.local/share/b
+    ln -s $HOME/c $HOME/.local/share/c
 
-	## change $USER symlinks
-	### change config_shln (default)
-	sh $XDG_DATA_HOME/c/git/code/tool/chln
-	### change network_ua (non default)
-	sh $XDG_DATA_HOME/c/git/code/tool/chln $XDG_CONFIG_HOME/network/ua
-	### change code_blocklist (non default)
-	sh $XDG_DATA_HOME/c/git/code/tool/chln $XDG_CONFIG_HOME/code/blocklist
-	sh $XDG_DATA_HOME/c/git/code/tool/chln $XDG_DATA_HOME/c/git/code/blocklist
-	# TODO which one of the two to remove?
+    ## change $USER symlinks
+    ### change config_shln (default)
+    sh $XDG_DATA_HOME/c/git/code/tool/chln
+    ### change network_ua (non default)
+    sh $XDG_DATA_HOME/c/git/code/tool/chln $XDG_CONFIG_HOME/network/ua
+    ### change code_blocklist (non default)
+    sh $XDG_DATA_HOME/c/git/code/tool/chln $XDG_CONFIG_HOME/code/blocklist
+    sh $XDG_DATA_HOME/c/git/code/tool/chln $XDG_DATA_HOME/c/git/code/blocklist
+    # TODO which one of the two to remove?
 }
 
 
 set_permissions()
 {
-	# set right permissions for gnupg home
-	sh $XDG_DATA_HOME/c/git/note/crypto/gpg/gnupg_set_permissions
+    # configure doas
+    printf "permit persist :wheel\n" > $doas_conf
+
+    # set right permissions for gnupg home
+    sh $XDG_DATA_HOME/c/git/note/crypto/gpg/gnupg_set_permissions
 }
 
 
 z_shell_config()
 {
-	## symlink in etc_zsh to zshenv
-	sudo ln -s $XDG_CONFIG_HOME/zsh/etc_zsh_zshenv /etc/zsh/zshenv
+    ## symlink in etc_zsh to zshenv
+    sudo ln -s $XDG_CONFIG_HOME/zsh/etc_zsh_zshenv /etc/zsh/zshenv
 
-	## set zsh as default shell for current user
-	## re-login for changes to take effect
-	sudo usermod -s `whereis zsh | awk '{print $2}'` $(whoami)
+    ## set zsh as default shell for current user
+    ## re-login for changes to take effect
+    sudo usermod -s `whereis zsh | awk '{print $2}'` $(whoami)
 
-	## change shell
-	sudo chsh -s /bin/zsh
+    ## change shell
+    sudo chsh -s /bin/zsh
 
-	## enable command history
-	[[ -d "$XDG_LOGS_HOME/history" ]] || mkdir $XDG_LOGS_HOME/history
-	touch $XDG_LOGS_HOME/history/history
+    ## enable command history
+    [[ -d "$XDG_LOGS_HOME/history" ]] || mkdir $XDG_LOGS_HOME/history
+    touch $XDG_LOGS_HOME/history/history
 }
 
 
@@ -269,20 +274,20 @@ set_sway_hardware()
 
 base16()
 {
-	if [[ $offline -ne 1 ]]; then
+    if [[ $offline -ne 1 ]]; then
 
-		## shell decoration
-		## base16-shell
-		git clone https://github.com/chriskempson/base16-shell.git $XDG_CONFIG_HOME/base16-shell
+	## shell decoration
+	## base16-shell
+	git clone https://github.com/chriskempson/base16-shell.git $XDG_CONFIG_HOME/base16-shell
 
-	elif [[ $offline -eq 1 ]]; then
+    elif [[ $offline -eq 1 ]]; then
 
-		cp -pr $repo_dir/aur/base16-shell $XDG_CONFIG_HOME
+	cp -pr $repo_dir/aur/base16-shell $XDG_CONFIG_HOME
 
-	fi
+    fi
 
-	## set base16_irblack
-	export BASE16_THEME=irblack
+    ## set base16_irblack
+    export BASE16_THEME=irblack
 }
 
 
@@ -295,10 +300,10 @@ vim_plug()
 
 	## vim plug
 	curl -fLo "${XDG_CONFIG_HOME:-$HOME/.config}"/nvim/site/autoload/plug.vim \
-	    --create-dirs \
-	    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+	     --create-dirs \
+	     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 	# sh -c 'curl -fLo "${XDG_CONFIG_HOME:-$HOME/.config}"/nvim/site/autoload/plug.vim --create-dirs \
-	#       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+	    #       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 
     fi
 
@@ -322,84 +327,84 @@ vim_plug()
 
 mozilla_firefox()
 {
-	# mozilla firefox settings
-	[ -d $HOME/Downloads ] && rm -rf $HOME/Downloads
-	[ -d $HOME/.mozilla ] && rm -rf $HOME/.mozilla
+    # mozilla firefox settings
+    [ -d $HOME/Downloads ] && rm -rf $HOME/Downloads
+    [ -d $HOME/.mozilla ] && rm -rf $HOME/.mozilla
 }
 
 
 qutebrowser()
 {
-	# qutebrowser download directory
-	qb_dl_dir="$XDG_DATA_HOME/c/download"
-	[ -d $qb_dl_dir ] || mkdir -p $qb_dl_dir
+    # qutebrowser download directory
+    qb_dl_dir="$XDG_DATA_HOME/c/download"
+    [ -d $qb_dl_dir ] || mkdir -p $qb_dl_dir
 }
 
 
 wallpaper()
 {
-	# prepare wallpaper file
+    # prepare wallpaper file
 
-	[ -d $XDG_DATA_HOME/a/media/images/wallpaper ] || \
-		mkdir -p $XDG_DATA_HOME/a/media/images/wallpaper
-	## to be replaced with preferred image
-	#cp $XDG_DATA_HOME/media/images/wallpaper/image.png $XDG_DATA_HOME/media/images/wallpaper/active
+    [ -d $XDG_DATA_HOME/a/media/images/wallpaper ] || \
+	mkdir -p $XDG_DATA_HOME/a/media/images/wallpaper
+    ## to be replaced with preferred image
+    #cp $XDG_DATA_HOME/media/images/wallpaper/image.png $XDG_DATA_HOME/media/images/wallpaper/active
 }
 
 
 pacman_conf()
 {
-	# disbling offline repo
-	sudo sed -i '/^\[offline\]/ s/./#&/' $file_etc_pacman_conf
-	sudo sed -i '/^Server = file:\/\// s/./#&/' $file_etc_pacman_conf
+    # disbling offline repo
+    sudo sed -i '/^\[offline\]/ s/./#&/' $file_etc_pacman_conf
+    sudo sed -i '/^Server = file:\/\// s/./#&/' $file_etc_pacman_conf
 
-	# enabling original repositories
-	sudo sed -i 's/^#X--//' $file_etc_pacman_conf
+    # enabling original repositories
+    sudo sed -i 's/^#X--//' $file_etc_pacman_conf
 
-	# when internet is available do:
-	#sudo pacman -Syy
+    # when internet is available do:
+    #sudo pacman -Syy
 }
 
 
 finishing_up()
 {
-	# finishing
+    # finishing
 
-	## administration
-	sudo touch $HOME/hajime/5dtcf.done
+    ## administration
+    sudo touch $HOME/hajime/5dtcf.done
 
 
-	echo 'finished installation'
-	read -p "sudo reboot? (Y/n) " -n 1 -r reply
+    echo 'finished installation'
+    read -p "sudo reboot? (Y/n) " -n 1 -r reply
 
-	if [[ $reply =~ ^[Nn]$ ]] ; then
+    if [[ $reply =~ ^[Nn]$ ]] ; then
 
-	    exit
+	exit
 
-	else
+    else
 
-	    sudo reboot
+	sudo reboot
 
-	fi
+    fi
 }
 
 
 main()
 {
-	get_public_data
-	get_private_data
-	run_dotbu
-	rewrite_symlinks
-	set_permissions
-	z_shell_config
-	set_sway_hardware
-	base16
-	vim_plug
-	mozilla_firefox
-	qutebrowser
-	wallpaper
-	pacman_conf
-	finishing_up
+    get_public_data
+    get_private_data
+    run_dotbu
+    rewrite_symlinks
+    set_permissions
+    z_shell_config
+    set_sway_hardware
+    base16
+    vim_plug
+    mozilla_firefox
+    qutebrowser
+    wallpaper
+    pacman_conf
+    finishing_up
 }
 
 main
