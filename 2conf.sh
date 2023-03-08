@@ -104,9 +104,10 @@ linux_lts_kernel="linux-lts linux-lts-headers"
 core_applications='lvm2'
 text_editor="emacs neovim"
 install_helpers="reflector git"	#binutils 3post base-devel group
-wireless="wpa_supplicant wireless_tools iw"
+network='dhcpcd systemd-networkd systemd-resolved'
+network_wl="wpa_supplicant wireless_tools iw"
 secure_connections="openssh"
-system_security="arch-audit"
+system_security=""
 
 #--------------------------------
 
@@ -490,14 +491,15 @@ install_core()
     # [Installation guide - ArchWiki]
     # (https://wiki.archlinux.org/title/Installation_guide#Install_essential_packages)
     pacman -S --needed --noconfirm \
+	   $pkg_ucode \
 	   $linux_kernel \
 	   $linux_lts_kernel \
+	   $core_applications \
 	   $text_editor \
-	   $wireless \
+	   $network \
+	   $network_wl \
 	   $secure_connections \
-	   $pkg_ucode \
-	   $system_security \
-	   $core_applications
+	   $system_security
 }
 
 
@@ -510,7 +512,6 @@ install_bootloader()
     bootctl install
 
     ## boot loader configuration
-
     printf "default arch\n" > $file_boot_loader_loader_conf
     printf "timeout $bootloader_timeout\n" >> $file_boot_loader_loader_conf
     printf "editor $bootloader_editor\n" >> $file_boot_loader_loader_conf
@@ -525,7 +526,6 @@ install_bootloader()
     # adding boot loader entries
 
     ## linux kernel
-
     file_boot_loader_entries_arch_conf="/boot/loader/entries/arch.conf"
     echo 'title arch' > $file_boot_loader_entries_arch_conf
     echo 'linux /vmlinuz-linux' >> $file_boot_loader_entries_arch_conf
@@ -537,7 +537,6 @@ install_bootloader()
     [ -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` rw resume=UUID=`blkid | grep lv_swap | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> $file_boot_loader_entries_arch_conf
 
     ## linux long term support kernel (LTS)
-
     file_boot_loader_entries_arch_lts_conf="/boot/loader/entries/arch-lts.conf"
     echo 'title arch-lts' > $file_boot_loader_entries_arch_lts_conf
     echo 'linux /vmlinuz-linux-lts' >> $file_boot_loader_entries_arch_lts_conf
@@ -556,6 +555,9 @@ install_bootloader()
 
     ## for linux-lts preset
     mkinitcpio -p linux-lts
+
+    ## for all presets
+    #mkinitcpio -P
 }
 
 

@@ -101,7 +101,7 @@ define_core_applications()
     encryption="gnupg ssss"
     #"veracrypt tomb"
 
-    security='opendoas'
+    security='opendoas arch-audit'
 
     secure_connections="wireguard-tools protonvpn-cli-ng sshfs"
 
@@ -144,6 +144,8 @@ define_additional_tools()
 
     python_additions=""
     #"python-pip"
+
+    android_tools="android-tools adb-rootless-git"
 
     internet_tools="firefox-developer-edition qutebrowser nyxt urlscan w3m"
     # lynx
@@ -301,6 +303,7 @@ create_additional_tools_list()
 			  $network_tools \
 			  $programming \
 			  $python_additions \
+			  $android_tools \
 			  $internet_tools \
 			  $feeds \
 			  $email \
@@ -321,7 +324,7 @@ create_additional_tools_list()
 			  $photo_editing \
 			  $photo_management \
 			  $vector_graphics_editing \
-			  $office_tools\
+			  $office_tools \
 			  $cad\
 	)
 }
