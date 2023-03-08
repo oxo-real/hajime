@@ -102,8 +102,13 @@ reply_single()
 
 check_label_exist()
 {
-    lsblk -o label | grep $lbl 2>&1 /dev/null
-    [[ $? -ne 0 ]] && printf "$lbl source not found, exiting\n" && exit 10
+    lsblk -o label | grep $lbl #> /dev/null 2>&1
+    if [[ "$?" -ne "0" ]]; then
+
+	printf "$lbl source not found, exiting\n"
+	exit 10
+
+    fi
 }
 
 dhcp_connect()
@@ -195,7 +200,7 @@ mount_code()
 
     check_label_exist
 
-    code_dev=$(lsblk -o label,path | grep "$code_lbl" | awk '{print $2}')
+    code_dev=$(lsblk -o label,path | grep "$lbl" | awk '{print $2}')
 
     [[ -d $code_dir ]] || mkdir -p "$code_dir"
 

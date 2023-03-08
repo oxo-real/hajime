@@ -82,10 +82,10 @@ file_boot_loader_entries_arch_conf="/boot/loader/entries/arch.conf"
 file_boot_loader_entries_arch_lts_conf="/boot/loader/entries/arch-lts.conf"
 
 ## variable values
-time_zone="Europe/Stockholm"
+time_zone="Europe/CET"
 locale_conf="LANG=en_US.UTF-8"
-vconsole_conf="KEYMAP=us\nFONT=lat1-16"
-mirror_country="Sweden"
+vconsole_conf="KEYMAP=us"
+mirror_country="Germany"
 mirror_amount="5"
 hostname="host"
 username="user"
@@ -97,7 +97,10 @@ linux_kernel="linux-headers"	#linux 1base
 linux_lts_kernel="linux-lts linux-lts-headers"
 # [Install Arch Linux on LVM - ArchWiki]
 # (https://wiki.archlinux.org/title/Install_Arch_Linux_on_LVM#Adding_mkinitcpio_hooks)
-# lvm2 needed for lvm2 mkinitcpio hook
+# lvm2 is needed for lvm2 mkinitcpio hook
+## [Fix missing libtinfo.so.5 library in Arch Linux]
+## (https://jamezrin.name/fix-missing-libtinfo.so.5-library-in-arch-linux)
+## prevent error that library libtinfo.so.5 couldn’t be found
 core_applications='lvm2'
 text_editor="emacs neovim"
 install_helpers="reflector git"	#binutils 3post base-devel group
@@ -109,9 +112,11 @@ system_security="arch-audit"
 
 temporary_maintenance()
 {
+    # DEV
     # libtinfo_so.5
-    # rewiring for libtinfo.so.5 missing shile 6 is installed
-    ln -s /usr/lib/libtinfo.so.6 /usr/lib/libtinfo.so.5
+    # rewiring for libtinfo.so.5 missing while 6 is installed
+    ln -s /usr/lib/libcursesw.so.6 /usr/lib/libtinfo.so.5
+    #ln -s /usr/lib/libtinfo.so.6 /usr/lib/libtinfo.so.5
 }
 
 
@@ -582,7 +587,7 @@ exit_arch_chroot_mnt()
 main()
 {
     clear
-    temporary_maintenance
+    # DEV temporary_maintenance
     get_offline_repo
     reconfigure_pacman_conf
     time_settings

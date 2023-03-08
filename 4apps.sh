@@ -112,7 +112,7 @@ define_core_applications()
 
     display="brightnessctl"
 
-    audio='alsa-utils sof-firmware qpwgraph-qt5 pipewire pipewire-jack pipewire-pulse'
+    audio='alsa-utils pipewire pipewire-alsa pipewire-jack pipewire-pulse qpwgraph-qt5 sof-firmware'
     #'pulseaudio pulseaudio-alsa pulsemixer'
 
     images="sxiv"

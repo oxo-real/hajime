@@ -140,6 +140,7 @@ mirror_amount="5"
 # which
 # https://archlinux.org/packages/core/any/base-devel/
 pkg_help='reflector'
+# [Installation guide - ArchWiki](https://wiki.archlinux.org/title/Installation_guide#Install_essential_packages)
 pkg_core='base linux linux-firmware'
 # 20230212 https://archlinux.org/news/switch-to-the-base-devel-meta-package-requires-manual-intervention/
 pkg_base_devel='base-devel'
@@ -1025,7 +1026,10 @@ configure_mirrorlists()
 install_base_devel_package_groups()
 {
     packages="${pkg_core} ${pkg_base_devel}"
-    pacstrap /mnt $packages
+    # -K initialize an empty pacman keyring in the target (implies -G).
+    # see note/linux/arch/pacstrap or
+    # https://man.archlinux.org/man/pacstrap.8
+    pacstrap -K /mnt $packages
 }
 
 
