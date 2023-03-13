@@ -87,7 +87,7 @@ define_core_applications()
 
     shell_additions="zsh-completions zsh-syntax-highlighting"
 
-    terminal="alacritty tmux"
+    terminal="alacritty foot tmux"
     #"termite-nocsd urxvt"
 
     terminal_additions="fzf fzf-tab-git mako"
@@ -147,7 +147,7 @@ define_additional_tools()
 
     android_tools="android-tools adb-rootless-git"
 
-    internet_tools="firefox-developer-edition qutebrowser nyxt urlscan w3m"
+    internet_tools="firefox-developer-edition icecat qutebrowser nyxt urlscan w3m"
     # lynx
 
     feeds="newsboat"

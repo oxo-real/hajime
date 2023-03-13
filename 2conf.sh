@@ -107,7 +107,7 @@ install_helpers="reflector git"	#binutils 3post base-devel group
 network='dhcpcd systemd-networkd systemd-resolved'
 network_wl="wpa_supplicant wireless_tools iw"
 secure_connections="openssh"
-system_security=""
+system_security='' #nss-certs; comes with nss in core
 
 #--------------------------------
 
