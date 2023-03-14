@@ -147,8 +147,8 @@ define_additional_tools()
 
     android_tools="android-tools adb-rootless-git"
 
-    internet_tools="firefox-developer-edition icecat qutebrowser nyxt urlscan w3m"
-    # lynx
+    internet_tools="firefox-developer-edition qutebrowser nyxt urlscan w3m"
+    # icecat lynx
 
     feeds="newsboat"
 
