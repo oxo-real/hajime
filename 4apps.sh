@@ -172,7 +172,8 @@ define_additional_tools()
     system_monitoring="glances viddy"
     # ccze
 
-    virtualization="qemu qemu-arch-extra virt-manager bridge-utils dnsmasq vde2 openbsd-netcat"
+    virtualization="qemu-full virt-manager virt-viewer bridge-utils dnsmasq libquestfs"
+    #virtualization="qemu qemu-arch-extra virt-manager bridge-utils dnsmasq vde2 openbsd-netcat"
     #"ovmf ebtables virt-viewer virtualbox virtualbox-host-modules-arch docker"
 
     image_capturing="grim slurp"
