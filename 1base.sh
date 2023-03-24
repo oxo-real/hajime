@@ -66,12 +66,12 @@ initial_release='2017'
 offline=1
 # mountpoints set in 0init are unchanged
 
-timezone="Europe/Stockholm"
+timezone="Europe/CET"
 sync_system_clock_over_ntp="true"
 rtc_local_timezone="0"
 
 arch_mirrorlist="https://archlinux.org/mirrorlist/?country=SE&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on"
-mirror_country="Sweden"
+mirror_country="Germany,Netherlands,Sweden,USA"
 mirror_amount="5"
 
 # 20220201 in the arch repository;
