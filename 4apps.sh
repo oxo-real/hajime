@@ -201,8 +201,9 @@ define_additional_tools()
     office_tools="mdp"
     #"libreoffice-fresh"
 
-    cad=""
-    #"freecad"
+    cad="freecad"
+
+    navigation="qgis stellarium"
 }
 
 
@@ -327,6 +328,7 @@ create_additional_tools_list()
 			  $vector_graphics_editing \
 			  $office_tools \
 			  $cad\
+			  $navigation\
 	)
 }
 
