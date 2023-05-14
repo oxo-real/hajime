@@ -103,8 +103,9 @@ linux_lts_kernel="linux-lts linux-lts-headers"
 ## prevent error that library libtinfo.so.5 couldn’t be found
 core_applications='lvm2'
 text_editor="emacs neovim"
-install_helpers="reflector git"	#binutils 3post base-devel group
-network='dhcpcd systemd-networkd systemd-resolved'
+install_helpers="reflector base-devel git"	#binutils 3post base-devel group
+network='dhcpcd'
+#network='dhcpcd systemd-networkd systemd-resolved'
 network_wl="wpa_supplicant wireless_tools iw"
 secure_connections="openssh"
 system_security='' #nss-certs; comes with nss in core

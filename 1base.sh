@@ -66,7 +66,7 @@ initial_release='2017'
 offline=1
 # mountpoints set in 0init are unchanged
 
-timezone="Europe/CET"
+timezone="CET"
 sync_system_clock_over_ntp="true"
 rtc_local_timezone="0"
 
@@ -156,8 +156,16 @@ home_perc=0.75
 ## boot size (MB)
 boot_size=256
 
-## recommended SWAP size (GB)
-swap_size_recomm=4.00
+## recommended SWAP size (GB):
+## with hibernation:
+### swap_size_recomm => ram_size+sqrt(ram_size)
+## without hibernation:
+### ram_size  swap_size_recomm
+###           min             max
+###  <1GB     1*ram_size      2*ram_size
+###  >1GB     sqrt(ram_size)  2*ram_size
+
+swap_size_recomm=2.00
 
 ## files
 file_mnt_etc_fstab="/mnt/etc/fstab"

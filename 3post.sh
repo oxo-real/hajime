@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -o errexit
+#set -o errexit
 set -o nounset
 set -o pipefail
 #
@@ -64,7 +64,9 @@ initial_release='2018'
 
 ## offline installation
 offline=1
+code_lbl='CODE'
 code_dir="/home/$(id -un)/dock/3"
+repo_lbl='REPO'
 repo_dir="/home/$(id -un)/dock/2"
 repo_re="\/home\/$(id -un)\/dock\/2"
 file_etc_pacman_conf='/etc/pacman.conf'
@@ -102,7 +104,7 @@ reply_single()
 
 check_label_exist()
 {
-    lsblk -o label | grep $lbl #> /dev/null 2>&1
+    lsblk -o label | grep "$lbl" #> /dev/null 2>&1
     if [[ "$?" -ne "0" ]]; then
 
 	printf "$lbl source not found, exiting\n"
@@ -110,6 +112,22 @@ check_label_exist()
 
     fi
 }
+
+
+check_mountpoint()
+{
+    # check if device with label is already mounted
+
+    mount -l | grep "$lbl" #> /dev/null 2>&1
+
+    case "$?" in
+	0)
+	    local lblmountpoint="$(mount -l | grep "$lbl" | awk '{print $3}')"
+	    printf "device with label $lbl already mounted on $lblmountpoint\n"
+	    ;;
+    esac
+}
+
 
 dhcp_connect()
 {
@@ -170,9 +188,10 @@ pacman_init()
 
 mount_repo()
 {
-    lbl='REPO'
+    lbl="$repo_lbl"
 
     check_label_exist
+    check_mountpoint
 
     repo_dev=$(lsblk -o label,path | grep "$lbl" | awk '{print $2}')
 
@@ -180,6 +199,7 @@ mount_repo()
 
     sudo mount "$repo_dev" "$repo_dir"
 
+    lbl=''
     unset lbl
 }
 
@@ -196,9 +216,10 @@ get_offline_repo()
 
 mount_code()
 {
-    local lbl='CODE'
+    lbl="$code_lbl"
 
     check_label_exist
+    check_mountpoint
 
     code_dev=$(lsblk -o label,path | grep "$lbl" | awk '{print $2}')
 
@@ -206,6 +227,7 @@ mount_code()
 
     sudo mount "$code_dev" "$code_dir"
 
+    lbl=''
     unset lbl
 }
 
@@ -244,9 +266,6 @@ create_directories() {
 
 base_mutations()
 {
-    ## own home
-    #sudo chown -R $USER:wheel $HOME
-
     ## add post core addditions
     for package in $post_core_additions;
     do

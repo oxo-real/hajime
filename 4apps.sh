@@ -75,50 +75,50 @@ aur_dir="$repo_dir/aur"
 
 define_core_applications()
 {
-    wayland="qt5-wayland wlroots wev xorg-xwayland ydotool"
+    wayland='qt5-wayland wlroots wev xorg-xwayland ydotool'
     ## qt5-wayland to prevent:
-    ## WARNING: Could not find the Qt platform plugin "wayland" in
+    ## WARNING: Could not find the Qt platform plugin 'wayland' in
     ## i.e. when starting qutebrowser
 
-    dwm="i3blocks sway swaybg swayidle swaylock swaynagmode"
+    dwm='i3blocks sway swaybg swayidle swaylock swaynagmode'
     # waybar
 
-    shell="zsh"
+    shell='zsh'
 
-    shell_additions="zsh-completions zsh-syntax-highlighting"
+    shell_additions='zsh-completions zsh-syntax-highlighting'
 
-    terminal="alacritty foot tmux"
-    #"termite-nocsd urxvt"
+    terminal='alacritty foot tmux'
+    #'termite-nocsd urxvt'
 
-    terminal_additions="fzf fzf-tab-git mako"
-    #"wofi rofi bemenu-wayland"
+    terminal_additions='fzf fzf-tab-git mako'
+    #'wofi rofi bemenu-wayland'
 
-    manpages="man-db man-pages tldr"
+    manpages='man-db man-pages tldr'
 
-    password_security="pass pass-otp yubikey-manager"
-    #"pass-tomb bitwarden-cli pass-wl-clipboard"
+    password_security='pass pass-otp yubikey-manager'
+    #'pass-tomb bitwarden-cli pass-wl-clipboard'
 
-    encryption="gnupg ssss"
-    #"veracrypt tomb"
+    encryption='gnupg ssss'
+    #'veracrypt tomb'
 
     security='opendoas arch-audit'
 
-    secure_connections="wireguard-tools protonvpn-cli-ng sshfs"
+    secure_connections='wireguard-tools protonvpn-cli-ng sshfs'
 
-    filesystems="dosfstools ntfs-3g"
+    filesystems='dosfstools ntfs-3g'
 
-    fonts=""
-    #"terminus-font ttf-inconsolata"
+    fonts=''
+    #'terminus-font ttf-inconsolata'
 
-    display="brightnessctl"
+    display='brightnessctl'
 
     audio='alsa-utils pipewire pipewire-alsa pipewire-jack pipewire-pulse qpwgraph-qt5 sof-firmware'
     #'pulseaudio pulseaudio-alsa pulsemixer'
 
-    images="sxiv"
-    #"fim ueberzug geekie"
+    image_viewers='sxiv feh imv'
+    #'fim ueberzug geekie'
 
-    bluetooth="bluez bluez-utils pulseaudio-bluetooth"
+    bluetooth='bluez bluez-utils pulseaudio-bluetooth'
 }
 
 
@@ -126,84 +126,83 @@ define_additional_tools()
 {
     build_tools='make'
 
-    terminal_text_tools="emacs figlet qrencode zbar jq xxd-standalone vimball"
+    terminal_text_tools='emacs figlet qrencode zbar jq xxd-standalone vimball'
 
-    terminal_file_browser="lf"
-    #"vifm lf-git nnn"
+    terminal_file_browser='lf'
+    #'vifm lf-git nnn'
 
-    file_tools="rsync gdisk simple-mtpfs fd"
-    #"tmsu trash-cli"
+    file_tools='rsync gdisk simple-mtpfs fd'
+    #'tmsu trash-cli'
 
-    debugging="strace"
-    #"gdb valgrind"
+    debugging='strace'
+    #'gdb valgrind'
 
-    network_tools="mtr iftop bind-tools whois"
-    #"wireshark-cli wireshark-qt"
+    network_tools='mtr iftop bind-tools whois ufw'
+    #'wireshark-cli wireshark-qt'
 
-    programming="go lisp lua perl python rustup"
+    programming='go lisp lua perl python rustup'
 
-    python_additions=""
-    #"python-pip"
+    python_additions=''
+    #'python-pip'
 
-    android_tools="android-tools adb-rootless-git"
+    android_tools='android-tools adb-rootless-git'
 
-    internet_tools="firefox-developer-edition qutebrowser nyxt urlscan w3m"
-    # icecat lynx
+    internet_tools='firefox-developer-edition qutebrowser nyxt urlscan w3m'
+    #'icecat lynx'
 
-    feeds="newsboat"
+    feeds='newsboat'
 
-    email="neomutt msmtp isync notmuch protonmail-bridge"
+    email='neomutt msmtp isync notmuch protonmail-bridge'
 
-    time_management=""
-    #"calcurse task"
+    time_management=''
+    #'calcurse task'
 
-    arithmatic="bc qalculate-qt"
+    arithmatic='bc qalculate-qt'
 
-    mathematics=""
-    #"gnu-plot"
+    mathematics=''
+    #'gnu-plot'
 
-    accounting=""
-    #"ledger hledger"
+    accounting=''
+    #'ledger hledger'
 
-    download_utilities="aria2 transmission-cli transmission-remote-cli-git"
+    download_utilities='aria2 transmission-cli transmission-remote-cli-git'
 
-    system_info="lshw"
+    system_info='lshw'
 
-    system_monitoring="glances viddy"
-    # ccze
+    system_monitoring='glances viddy'
+    #'ccze'
 
-    virtualization="qemu-full virt-manager virt-viewer bridge-utils dnsmasq libquestfs"
-    #virtualization="qemu qemu-arch-extra virt-manager bridge-utils dnsmasq vde2 openbsd-netcat"
-    #"ovmf ebtables virt-viewer virtualbox virtualbox-host-modules-arch docker"
+    virtualization=''
+    #'qemu-full virt-manager virt-viewer bridge-utils dnsmasq libquestfs'
 
-    image_capturing="grim slurp"
+    image_capturing='grim slurp'
 
-    image_viewers="feh imv"
+    image_editors='imagemagick'
 
-    image_editors="imagemagick"
-
-    pdf_viewers="mupdf zathura-pdf-mupdf"
+    pdf_viewers='mupdf zathura-pdf-mupdf'
 
     video_capturing='wf-recorder'
 
-    video_tools="youtube-dl mpv pipe-viewer"
-    #"straw-viewer youtube-viewer"
+    video_tools='yt-dlp mpv pipe-viewer'
+    #'straw-viewer youtube-viewer youtube-dl'
 
-    photo_editing=""
-    #"gimp"
+    photo_editing=''
+    #'gimp'
 
-    photo_management=""
-    #"digikam darktable"
+    photo_management=''
+    #'digikam darktable'
 
-    vector_graphics_editing=""
-    #"inkscape"
+    vector_graphics_editing=''
+    #'inkscape'
 
-    office_tools="mdp"
-    #"libreoffice-fresh"
+    office_tools='mdp'
+    #'libreoffice-fresh'
 
-    cad="freecad"
+    cad=''
+    #'freecad'
 
-    navigation="qgis stellarium"
+    navigation=''
+    #'qgis grass stellarium'
 }
 
 
@@ -257,7 +256,7 @@ aur_install()
     for package in $(ls $aur_dir); do
 
 	cd $aur_dir/$package
-	makepkg -i --noconfirm --needed
+	makepkg --syncdeps --install --needed --noconfirm
 	cd ..
 
     done
@@ -288,7 +287,7 @@ create_core_applications_list()
 			   $fonts \
 			   $display \
 			   $audio \
-			   $images \
+			   $image_viewers \
 			   $bluetooth\
 	)
 }
@@ -318,7 +317,6 @@ create_additional_tools_list()
 			  $system_monitoring \
 			  $virtualization \
 			  $image_capturing \
-			  $image_viewers \
 			  $image_editors \
 			  $pdf_viewers \
 			  $video_capturing \
@@ -356,7 +354,7 @@ install_core_applications()
     #sudo pacman -S --noconfirm --needed $packages
     for pkg_ca in "${core_applications[@]}"; do
 
-	yay -S --noconfirm --needed "$pkg_ca"
+	yay -S --needed --noconfirm "$pkg_ca"
 	#sudo pacman -S --noconfirm --needed "$pkg_ca"
 
     done
@@ -373,7 +371,7 @@ install_additional_tools()
     #sudo pacman -S --noconfirm --needed $packages
     for pkg_at in "${additional_tools[@]}"; do
 
-	yay -S --noconfirm --needed "$pkg_at"
+	yay -S --needed --noconfirm "$pkg_at"
 	#sudo pacman -Sy --noconfirm --needed "$pkg_at"
 
     done
