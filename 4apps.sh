@@ -167,7 +167,7 @@ define_additional_tools()
 
     download_utilities='aria2 transmission-cli transmission-remote-cli-git'
 
-    system_info='lshw'
+    system_info='lshw usbutils'
 
     system_monitoring='glances viddy'
     #'ccze'
