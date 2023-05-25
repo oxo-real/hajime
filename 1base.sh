@@ -993,6 +993,9 @@ install_helpers()
     # update package database
     #pacman -Syy
 
+    # [TODO] CHECK if pacman.conf is correct after 202306
+    ## see: https://archlinux.org/news/git-migration-completed/
+
     # see also man pacman.conf
     ## configure pacman.conf for offline 'server'
     cp -prv /root/tmp/code/hajime/misc/ol_pacman.conf /etc/pacman.conf
