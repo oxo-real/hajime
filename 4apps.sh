@@ -201,7 +201,7 @@ define_additional_tools()
     cad=''
     #'freecad'
 
-    navigation=''
+    navigation='gpsbabel viking'
     #'qgis grass stellarium'
 }
 
