@@ -310,7 +310,7 @@ wrap_up()
     reply_single
     clear
     echo
-    neofetch --gtk3 off
+    neofetch --ascii_distro arch_small --gtk3 off --gtk2 off --colors 3 3 3 7 3 4 --separator '     \t'
     sudo touch hajime/3post.done
 }
 
