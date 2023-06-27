@@ -112,6 +112,8 @@ define_core_applications()
 
     display='brightnessctl'
 
+    input_devices='zsa-wally-cli'
+
     audio='alsa-utils pipewire pipewire-alsa pipewire-jack pipewire-pulse qpwgraph-qt5 sof-firmware'
     #'pulseaudio pulseaudio-alsa pulsemixer'
 
@@ -180,6 +182,7 @@ define_additional_tools()
     image_editors='imagemagick'
 
     pdf_viewers='mupdf zathura-pdf-mupdf'
+    #'calibre'
 
     video_capturing='wf-recorder'
 
@@ -286,6 +289,7 @@ create_core_applications_list()
 			   $filesystems \
 			   $fonts \
 			   $display \
+			   $input_devices \
 			   $audio \
 			   $image_viewers \
 			   $bluetooth\
