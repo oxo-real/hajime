@@ -206,6 +206,9 @@ define_additional_tools()
 
     navigation='gpsbabel viking'
     #'qgis grass stellarium'
+
+    weather='wttr'
+
 }
 
 
@@ -329,8 +332,9 @@ create_additional_tools_list()
 			  $photo_management \
 			  $vector_graphics_editing \
 			  $office_tools \
-			  $cad\
-			  $navigation\
+			  $cad \
+			  $navigation \
+			  $weather\
 	)
 }
 
