@@ -130,7 +130,7 @@ define_additional_tools()
 
     terminal_text_tools='emacs figlet qrencode zbar jq xxd-standalone vimball'
 
-    terminal_file_browser='lf'
+    terminal_file_manager='lf'
     #'vifm lf-git nnn'
 
     file_tools='rsync gdisk simple-mtpfs fd'
@@ -171,8 +171,8 @@ define_additional_tools()
 
     system_info='lshw usbutils'
 
-    system_monitoring='glances viddy'
-    #'ccze'
+    system_monitoring='btop glances viddy'
+    #'ccze htop'
 
     virtualization=''
     #'qemu-full virt-manager virt-viewer bridge-utils dnsmasq libquestfs'
@@ -305,7 +305,7 @@ create_additional_tools_list()
     additional_tools=(\
 		      $build_tools \
 			  $terminal_text_tools \
-			  $terminal_file_browser \
+			  $terminal_file_manager \
 			  $file_tools \
 			  $debugging \
 			  $network_tools \
