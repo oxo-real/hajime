@@ -90,7 +90,7 @@ define_core_applications()
     terminal='alacritty foot tmux'
     #'termite-nocsd urxvt'
 
-    terminal_additions='fzf fzf-tab-git mako'
+    terminal_additions='fzf fzf-tab-git mako bat delta'
     #'wofi rofi bemenu-wayland'
 
     manpages='man-db man-pages tldr'
