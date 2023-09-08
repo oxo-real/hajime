@@ -75,13 +75,15 @@ aur_dir="$repo_dir/aur"
 
 define_core_applications()
 {
-    wayland='qt5-wayland wlroots wev xorg-xwayland ydotool'
+    wayland='qt5-wayland wlroots wev xorg-xwayland dotool'
     ## qt5-wayland to prevent:
     ## WARNING: Could not find the Qt platform plugin 'wayland' in
     ## i.e. when starting qutebrowser
+    ## dotool for speech-to-text
+    #ydotool'
 
     dwm='i3blocks sway swaybg swayidle swaylock swaynagmode'
-    # waybar
+    #'waybar'
 
     shell='zsh'
 
