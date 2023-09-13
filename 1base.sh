@@ -360,7 +360,7 @@ set_boot_device()
     printf "the BOOT device will contain the systemd-boot bootloader and\n"
     printf "the init ramdisk environment (initramfs) for booting the linux kernel\n"
     echo
-    printf "enter full path of the BOOT device (i.e. /dev/sdB): "
+    printf "enter full path of the BOOT ${BOLD}device${NOC} (i.e. /dev/sdB): "
     reply_plain
     boot_dev=$reply
 
@@ -415,7 +415,7 @@ set_lvm_device()
     ## request lvm device path
     printf "on the LVM device the LVM partition will be created\n"
     echo
-    printf "enter full path of the LVM device (i.e. /dev/sdL): "
+    printf "enter full path of the LVM ${BOLD}device${NOC} (i.e. /dev/sdL): "
     reply_plain
     lvm_dev=$reply
 
@@ -513,7 +513,7 @@ set_boot_partition()
     lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint
     echo
 
-    printf "enter BOOT partition number: $boot_dev"
+    printf "enter BOOT ${BOLD}partition${NOC} number: $boot_dev"
     reply_plain
 
     # boot partition is compulsory
@@ -561,7 +561,7 @@ set_lvm_partition()
     echo
 
     printf "inside the LVM partition the LVM volumegroup will be created\n"
-    printf "enter LVM partition number: $lvm_dev"
+    printf "enter LVM ${BOLD}partition${NOC} number: $lvm_dev"
     reply_plain
     lvm_part_no=$reply
     lvm_part=$lvm_dev$lvm_part_no
@@ -1040,6 +1040,8 @@ install_base_devel_package_groups()
     # -K initialize an empty pacman keyring in the target (implies -G).
     # see note/linux/arch/pacstrap or
     # https://man.archlinux.org/man/pacstrap.8
+    # [FS#79619 : [systemd] 20-systemd-sysusers.hook fails to execute on a fresh system](https://bugs.archlinux.org/task/79619)
+    # [[SOLVED] bootctl install: Bad file descriptor / Installation / Arch Linux Forums](https://bbs.archlinux.org/viewtopic.php?id=288660)
     pacstrap -K /mnt $packages
 }
 

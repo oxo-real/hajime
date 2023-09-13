@@ -72,6 +72,16 @@ aur_dir="$repo_dir/aur"
 
 #--------------------------------
 
+install_yay()
+{
+    ## install yay
+    current_package_dir="$aur_dir/$package"
+    c_p_newest_version=$(ls $current_package_dir/*.pkg.tar.zst --reverse --sort=version | sed -n 1p)
+    package='yay'
+
+    pacman -U $c_p_newest_version
+}
+
 
 define_core_applications()
 {
@@ -258,14 +268,26 @@ get_offline_code()
 }
 
 
-aur_install()
+install_aur()
 {
-    ## install all aur packages
+    ## install aur packages
+    ## [Offline installation - ArchWiki]
+    ## (https://wiki.archlinux.org/title/Offline_installation#Install_from_file)
     for package in $(ls $aur_dir); do
 
-	cd $aur_dir/$package
-	makepkg --syncdeps --install --needed --noconfirm
-	cd ..
+	## yay is already installed
+	if [[ "$package" != "yay" ]]; then
+
+	    current_package_dir="$aur_dir/$package"
+	    c_p_newest_version=$(ls $current_package_dir/*.pkg.tar.zst --reverse --sort=version | sed -n 1p)
+
+	    yay -U $c_p_newest_version
+
+	else
+
+	    continue
+
+	fi
 
     done
 
@@ -419,9 +441,10 @@ main() {
     set_usr_rw
     get_offline_repo
     get_offline_code
-    aur_install
+    install_yay
     install_core_applications
     install_additional_tools
+    install_aur
     loose_ends
     set_usr_ro
 }
