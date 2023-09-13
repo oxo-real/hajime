@@ -72,17 +72,6 @@ aur_dir="$repo_dir/aur"
 
 #--------------------------------
 
-install_yay()
-{
-    ## install yay
-    package='yay'
-    current_package_dir="$aur_dir/$package"
-    c_p_newest_version=$(ls $current_package_dir/*.pkg.tar.zst --reverse --sort=version | sed -n 1p)
-
-    pacman -U $c_p_newest_version
-}
-
-
 define_core_applications()
 {
     wayland='qt5-wayland wlroots wev xorg-xwayland dotool'
@@ -265,6 +254,17 @@ get_offline_code()
 	    mount_code
 	    ;;
     esac
+}
+
+
+install_yay()
+{
+    ## install yay
+    package='yay'
+    current_package_dir="$aur_dir/$package"
+    c_p_newest_version=$(ls $current_package_dir/*.pkg.tar.zst --reverse --sort=version | sed -n 1p)
+
+    sudo pacman -U $c_p_newest_version
 }
 
 
