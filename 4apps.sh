@@ -108,8 +108,8 @@ define_core_applications()
 
     filesystems='dosfstools ntfs-3g'
 
-    fonts=''
-    #'terminus-font ttf-inconsolata'
+    fonts='otf-unifonts'
+    #'ttf-unifonts terminus-font ttf-inconsolata'
 
     display='brightnessctl'
 
@@ -391,7 +391,6 @@ install_core_applications()
 
     done
 }
-
 
 
 install_additional_tools()
