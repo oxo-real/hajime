@@ -74,71 +74,80 @@ export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_LOGS_HOME="$HOME/.logs"
-export XDG_CONFIG_DIRS="/etc/xdg"
+export XDG_CONFIG_DIRS='/etc/xdg'
 
 ## main git locations
 git_local="$XDG_DATA_HOME/c/git"
-git_remote_gl="https://gitlab.com/cytopyge"
-git_remote_cb="https://codeberg.org/cytopyge"
-git_remote=$git_remote_cb
+git_remote='https://codeberg.org/oxo'
 
 doas_conf='/etc/doas.conf'
 
 #--------------------------------
 
 
-git_clone_dotfile()
+git_clone_remote_local()
 {
-    local repo="dotfile"
-    local_dir="$git_local/$repo"
+    local remote_repo="$git_remote/$git_repo"
+    local local_dir="$git_local/$local_repo"
+    #[ -d $local_dir ] || mkdir -p $local_dir
 
-    [ -d $local_dir ] || mkdir -p $local_dir
+    git clone $remote_repo $local_dir
+}
 
-    git clone $git_remote/$repo $local_dir
+
+git_clone_dotf()
+{
+    git_repo='dotf'
+    local_repo='dotf'
+    git_clone_remote_local
 }
 
 
 git_clone_code()
 {
-    git_code="$git_local/code"
-
-    ### sources
-    repo="source"
-    git clone $git_remote/$repo $git_code/source
-
-    ### tools
-    repo="tool"
-    git clone $git_remote/$repo $git_code/tool
-
     ### hajime
-    repo="hajime"
-    git clone $git_remote/$repo $git_code/$repo
+    git_repo='hajime'
+    local_repo="code/$git_repo"
+    git_clone_remote_local
     #### git/hajime becomes the git repo;
     #### remove git repo from install directory
     rm -rf $HOME/hajime
 
     ### isolatest
-    repo="isolatest"
-    git clone $git_remote/$repo $git_code/$repo
+    git_repo='isolatest'
+    local_repo="code/$git_repo"
+    git_clone_remote_local
 
-    ### metar
-    repo="metar"
-    git clone $git_remote/$repo $git_code/$repo
+    ### source
+    git_repo='source'
+    local_repo="code/$git_repo"
+    git_clone_remote_local
+
+    ### tool
+    git_repo='tool'
+    local_repo="code/$git_repo"
+    git_clone_remote_local
 
     ### netconn
-    repo="netconn"
-    git clone $git_remote/$repo $git_code/$repo
-
-    ### updater
-    repo="updater"
-    git clone $git_remote/$repo $git_code/$repo
+    git_repo='netconn'
+    local_repo="code/$git_repo"
+    git_clone_remote_local
 }
 
 
 git_clone_note()
 {
-    repo="note"
-    git clone $git_remote/$repo $git_local/note
+    git_repo='note'
+    local_repo="$git_repo"
+    git_clone_remote_local
+}
+
+
+git_clone_prvt()
+{
+    git_repo='prvt'
+    local_repo="$git_repo"
+    git_clone_remote_local
 }
 
 
@@ -146,21 +155,26 @@ get_public_data()
 {
     if [[ $offline -ne 1 ]]; then
 
-	git_clone_dotfile
+	git_clone_dotf
 	git_clone_code
 	git_clone_note
 
     elif [[ $offline -eq 1 ]]; then
 
+	## define destinations
 	home_dir_dst="$HOME"
 	git_dir_dst="$XDG_DATA_HOME/c/git"
 
 	[[ -d $home_dir_dst/.config ]] || mkdir -p  $home_dir_dst/.config
+	[[ -d $git_dir_dst/dotf ]] || mkdir -p	    $git_dir_dst/dotf
 	[[ -d $git_dir_dst/code ]] || mkdir -p	    $git_dir_dst/code
 	[[ -d $git_dir_dst/note ]] || mkdir -p	    $git_dir_dst/note
 
-	printf "copying system configuration files... "
+	printf "copying configuration files... "
 	cp -pr $code_dir/.config    $home_dir_dst
+	printf "done\n"
+	printf "copying code repository... "
+	cp -pr $code_dir/dotf	    $git_dir_dst
 	printf "done\n"
 	printf "copying code repository... "
 	cp -pr $code_dir/code	    $git_dir_dst
@@ -170,14 +184,6 @@ get_public_data()
 	printf "done\n"
 
     fi
-}
-
-
-git_clone_prvt()
-{
-    #[TODO] check name
-    repo="private"
-    git clone $git_remote/$repo $git_local/prvt
 }
 
 
@@ -202,12 +208,12 @@ get_private_data()
 }
 
 
-run_dotbu()
+run_dotfbu()
 {
     if [[ $offline -ne 1 ]]; then
 
 	# restore .config from .dot
-	sh $XDG_DATA_HOME/c/git/code/tool/dotbu restore $XDG_DATA_HOME/c/git/dotf/ $XDG_CONFIG_HOME
+	sh $XDG_DATA_HOME/c/git/code/tool/dotfbu restore $XDG_DATA_HOME/c/git/dotf/ $XDG_CONFIG_HOME
 
     fi
 }
@@ -282,7 +288,7 @@ base16()
 
     elif [[ $offline -eq 1 ]]; then
 
-	cp -pr $repo_dir/aur/base16-shell $XDG_CONFIG_HOME
+	cp -p --recursive $repo_dir/aur/base16-shell $XDG_CONFIG_HOME
 
     fi
 
