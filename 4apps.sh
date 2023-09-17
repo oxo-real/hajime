@@ -264,7 +264,7 @@ install_yay()
     current_package_dir="$aur_dir/$package"
     c_p_newest_version=$(ls $current_package_dir/*.pkg.tar.zst --reverse --sort=version | sed -n 1p)
 
-    sudo pacman -U $c_p_newest_version
+    sudo pacman -U --noconfirm $c_p_newest_version
 }
 
 
@@ -281,7 +281,7 @@ install_aur()
 	    current_package_dir="$aur_dir/$package"
 	    c_p_newest_version=$(ls $current_package_dir/*.pkg.tar.zst --reverse --sort=version | sed -n 1p)
 
-	    yay -U $c_p_newest_version
+	    yay -U --noconfirm $c_p_newest_version
 
 	else
 
