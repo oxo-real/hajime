@@ -84,6 +84,29 @@ doas_conf='/etc/doas.conf'
 
 #--------------------------------
 
+mount_repo()
+{
+    repo_lbl='REPO'
+    repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
+
+    [[ -d $repo_dir ]] || mkdir -p "$repo_dir"
+
+    mountpoint -q $repo_dir
+    [[ $? -eq 0 ]] || sudo mount "$repo_dev" "$repo_dir"
+}
+
+
+mount_code()
+{
+    code_lbl='CODE'
+    code_dev=$(lsblk -o label,path | grep "$code_lbl" | awk '{print $2}')
+
+    [[ -d $code_dir ]] || mkdir -p "$code_dir"
+
+    mountpoint -q $code_dir
+    [[ $? -eq 0 ]] || sudo mount "$code_dev" "$code_dir"
+}
+
 
 git_clone_remote_local()
 {
@@ -170,17 +193,33 @@ get_public_data()
 	[[ -d $git_dir_dst/code ]] || mkdir -p	    $git_dir_dst/code
 	[[ -d $git_dir_dst/note ]] || mkdir -p	    $git_dir_dst/note
 
-	printf "copying configuration files... "
-	cp -pr $code_dir/.config    $home_dir_dst
+	printf "copying configuration files\n"
+	## TODO error for .git files
+	src="$code_dir/.config"
+	dst="$home_dir_dst"
+	rsync -aAXv $src $dst
+	#cp -pr $code_dir/.config    $home_dir_dst
 	printf "done\n"
-	printf "copying code repository... "
-	cp -pr $code_dir/dotf	    $git_dir_dst
+
+	printf "copying code repository\n"
+	src="$code_dir/dotf"
+	dst="$git_dir_dst"
+	rsync -aAXv $src $dst
+	#cp -pr $code_dir/dotf	    $git_dir_dst
 	printf "done\n"
-	printf "copying code repository... "
-	cp -pr $code_dir/code	    $git_dir_dst
+
+	printf "copying code repository\n"
+	src="$code_dir/code"
+	dst="$git_dir_dst"
+	rsync -aAXv $src $dst
+	#cp -pr $code_dir/code	    $git_dir_dst
 	printf "done\n"
-	printf "copying note repository... "
-	cp -pr $code_dir/note	    $git_dir_dst
+
+	printf "copying note repository\n"
+	src="$code_dir/note"
+	dst="$git_dir_dst"
+	rsync -aAXv $src $dst
+	#cp -pr $code_dir/note	    $git_dir_dst
 	printf "done\n"
 
     fi
@@ -200,8 +239,10 @@ get_private_data()
 
 	[[ -d $git_dir_dst/prvt ]] || mkdir -p   $git_dir_dst/prvt
 
-	printf "copying prvt repository... "
-	cp -pr $code_dir/prvt	$git_dir_dst
+	printf "copying prvt repository\n"
+	src="$code_dir/prvt"
+	dst="$git_dir_dst"
+	rsync -aAXv $src $dst
 	printf "done\n"
 
     fi
@@ -288,7 +329,10 @@ base16()
 
     elif [[ $offline -eq 1 ]]; then
 
-	cp -p --recursive $repo_dir/aur/base16-shell $XDG_CONFIG_HOME
+	src="$repo_dir/aur/base16-shell"
+	dst="$XDG_CONFIG_HOME"
+	rsync -aAXv $src $dst
+	#cp -p --recursive $repo_dir/aur/base16-shell $XDG_CONFIG_HOME
 
     fi
 
@@ -311,18 +355,18 @@ vim_plug()
 	# sh -c 'curl -fLo "${XDG_CONFIG_HOME:-$HOME/.config}"/nvim/site/autoload/plug.vim --create-dirs \
 	    #       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 
-    fi
+	## install plugins defined in: $XDG_CONFIG_HOME/nvim/plugins
+	if [[ -d $XDG_CONFIG_HOME/nvim/plugins ]]; then
 
-    ## install plugins defined in: $XDG_CONFIG_HOME/nvim/plugins
-    if [[ -d $XDG_CONFIG_HOME/nvim/plugins ]]; then
+	    for plugin in $(ls); do
 
-	for plugin in $(ls); do
+		cd $plugin
+		git pull
+		cd ..
 
-	    cd $plugin
-	    git pull
-	    cd ..
+	    done
 
-	done
+	fi
 
     fi
 
@@ -397,6 +441,8 @@ finishing_up()
 
 main()
 {
+    mount_repo
+    mount_code
     get_public_data
     get_private_data
     run_dotbu

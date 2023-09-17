@@ -234,6 +234,7 @@ vconsole_settings()
 set_hostname()
 {
     clear
+
     printf "hostname: '$hostname'\n"
     printf "correct? (y/N) "
     reply
