@@ -269,9 +269,9 @@ rewrite_symlinks()
     ln -s $HOME/dock/vlt/pass $HOME/.password-store
 
     ### to archive, backup and current
-    ln -s $HOME/a $HOME/.local/share/a
-    ln -s $HOME/b $HOME/.local/share/b
-    ln -s $HOME/c $HOME/.local/share/c
+    ln -s $HOME/.local/share/a $HOME/a
+    ln -s $HOME/.local/share/b $HOME/b
+    ln -s $HOME/.local/share/c $HOME/c
 
     ## change $USER symlinks
     ### change config_shln (default)
@@ -279,16 +279,14 @@ rewrite_symlinks()
     ### change network_ua (non default)
     sh $XDG_DATA_HOME/c/git/code/tool/chln $XDG_CONFIG_HOME/network/ua
     ### change code_blocklist (non default)
-    sh $XDG_DATA_HOME/c/git/code/tool/chln $XDG_CONFIG_HOME/code/blocklist
     sh $XDG_DATA_HOME/c/git/code/tool/chln $XDG_DATA_HOME/c/git/code/blocklist
-    # TODO which one of the two to remove?
 }
 
 
 set_permissions()
 {
     # configure doas
-    printf "permit persist :wheel\n" > $doas_conf
+    command sudo printf "permit persist :wheel\n" > $doas_conf
 
     # set right permissions for gnupg home
     sh $XDG_DATA_HOME/c/git/note/crypto/gpg/gnupg_set_permissions
@@ -321,20 +319,21 @@ set_sway_hardware()
 
 base16()
 {
-    if [[ $offline -ne 1 ]]; then
+    #if [[ $offline -ne 1 ]]; then
 
-	## shell decoration
-	## base16-shell
-	git clone https://github.com/chriskempson/base16-shell.git $XDG_CONFIG_HOME/base16-shell
+    #	## shell decoration
+    #	## base16-shell
+    #	git clone https://github.com/chriskempson/base16-shell.git $XDG_CONFIG_HOME/base16-shell
 
-    elif [[ $offline -eq 1 ]]; then
+    #elif [[ $offline -eq 1 ]]; then
 
-	src="$repo_dir/aur/base16-shell"
-	dst="$XDG_CONFIG_HOME"
-	rsync -aAXv $src $dst
-	#cp -p --recursive $repo_dir/aur/base16-shell $XDG_CONFIG_HOME
+    #	src="$repo_dir/aur/base16-shell"
+    #	#src="$repo_dir/aur/base16-shell"
+    #	dst="$XDG_CONFIG_HOME"
+    #	rsync -aAXv $src $dst
+    #	#cp -p --recursive $repo_dir/aur/base16-shell $XDG_CONFIG_HOME
 
-    fi
+    #fi
 
     ## set base16_irblack
     export BASE16_THEME=irblack
@@ -445,12 +444,12 @@ main()
     mount_code
     get_public_data
     get_private_data
-    run_dotbu
+    #run_dotfbu
     rewrite_symlinks
     set_permissions
     z_shell_config
     set_sway_hardware
-    base16
+    #base16
     vim_plug
     mozilla_firefox
     qutebrowser
