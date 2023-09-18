@@ -433,7 +433,7 @@ main()
     z_shell_config
     set_sway_hardware
     base16
-    vim_plug
+    #vim_plug
     mozilla_firefox
     qutebrowser
     wallpaper
