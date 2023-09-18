@@ -113,7 +113,7 @@ define_core_applications()
 
     display='brightnessctl'
 
-    input_devices='zsa-wally-cli'
+    input_devices='zsa-wally-cli wvkbd'
 
     audio='alsa-utils pipewire pipewire-alsa pipewire-jack pipewire-pulse qpwgraph-qt5 sof-firmware'
     #'pulseaudio pulseaudio-alsa pulsemixer'
