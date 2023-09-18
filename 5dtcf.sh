@@ -319,23 +319,6 @@ set_sway_hardware()
 
 base16()
 {
-    #if [[ $offline -ne 1 ]]; then
-
-    #	## shell decoration
-    #	## base16-shell
-    #	git clone https://github.com/chriskempson/base16-shell.git $XDG_CONFIG_HOME/base16-shell
-
-    #elif [[ $offline -eq 1 ]]; then
-
-    #	src="$repo_dir/aur/base16-shell"
-    #	#src="$repo_dir/aur/base16-shell"
-    #	dst="$XDG_CONFIG_HOME"
-    #	rsync -aAXv $src $dst
-    #	#cp -p --recursive $repo_dir/aur/base16-shell $XDG_CONFIG_HOME
-
-    #fi
-
-    ## set base16_irblack
     export BASE16_THEME=irblack
 }
 
@@ -449,7 +432,7 @@ main()
     set_permissions
     z_shell_config
     set_sway_hardware
-    #base16
+    base16
     vim_plug
     mozilla_firefox
     qutebrowser
