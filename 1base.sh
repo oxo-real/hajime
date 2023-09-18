@@ -291,7 +291,6 @@ clock()
 }
 
 
-
 set_key_device()
 {
     ## usb device where detached luks header and keyfile will be stored
