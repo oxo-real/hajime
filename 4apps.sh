@@ -91,7 +91,7 @@ define_core_applications()
     terminal='alacritty foot tmux'
     #'termite-nocsd urxvt'
 
-    terminal_additions='fzf fzf-tab-git mako bat delta'
+    terminal_additions='bat eza delt afzf fzf-tab-git mako'
     #'wofi rofi bemenu-wayland'
 
     manpages='man-db man-pages tldr'
@@ -443,7 +443,7 @@ main() {
     install_yay
     install_core_applications
     install_additional_tools
-    install_aur
+    #install_aur
     loose_ends
     set_usr_ro
 }
