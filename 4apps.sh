@@ -208,7 +208,8 @@ define_additional_tools()
     navigation='gpsbabel viking'
     #'qgis grass stellarium'
 
-    weather='wttr'
+    weather=''
+    #'wttr'
 
 }
 
