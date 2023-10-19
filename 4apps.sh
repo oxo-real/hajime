@@ -150,8 +150,12 @@ define_additional_tools()
 
     android_tools='android-tools adb-rootless-git'
 
-    internet_tools='firefox-developer-edition qutebrowser nyxt urlscan w3m'
+    internet_browser='firefox-developer-edition qutebrowser nyxt w3m'
     #'icecat lynx'
+
+    internet_search='googler ddgr surfraw'
+
+    internet_tool='urlscan'
 
     feeds='newsboat'
 
@@ -337,7 +341,9 @@ create_additional_tools_list()
 			  $programming \
 			  $python_additions \
 			  $android_tools \
-			  $internet_tools \
+			  $internet_browser \
+			  $internet_search \
+			  $internet_tool \
 			  $feeds \
 			  $email \
 			  $time_management \
