@@ -203,8 +203,8 @@ define_additional_tools()
     vector_graphics_editing=''
     #'inkscape'
 
-    office_tools='mdp'
-    #'libreoffice-fresh'
+    office_tools='presenterm'
+    #'libreoffice-fresh mdp'
 
     cad=''
     #'freecad'
