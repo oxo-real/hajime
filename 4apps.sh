@@ -191,6 +191,8 @@ define_additional_tools()
 
     video_capturing='wf-recorder'
 
+    video_editing='kdenlive breeze'
+
     video_tools='yt-dlp mpv pipe-viewer'
     #'straw-viewer youtube-viewer youtube-dl'
 
@@ -358,6 +360,7 @@ create_additional_tools_list()
 			  $image_editors \
 			  $pdf_viewers \
 			  $video_capturing \
+			  $video_editing \
 			  $video_tools \
 			  $photo_editing \
 			  $photo_management \
