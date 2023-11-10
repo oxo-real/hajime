@@ -189,7 +189,7 @@ define_additional_tools()
     pdf_viewers='mupdf zathura-pdf-mupdf'
     #'calibre'
 
-    video_capturing='wf-recorder obs xdg-desktop-portal-wlr'
+    video_capturing='wf-recorder obs xdg-desktop-portal-wlr qt6ct qt6-wayland wlrobs'
 
     video_editing='kdenlive breeze'
 
