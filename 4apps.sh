@@ -74,7 +74,7 @@ aur_dir="$repo_dir/aur"
 
 define_core_applications()
 {
-    wayland='qt5-wayland wlroots wev xorg-xwayland dotool'
+    wayland='qt5-wayland qt6-wayland wlroots wev xorg-xwayland dotool'
     ## qt5-wayland to prevent:
     ## WARNING: Could not find the Qt platform plugin 'wayland' in
     ## i.e. when starting qutebrowser
@@ -91,7 +91,7 @@ define_core_applications()
     terminal='alacritty foot tmux'
     #'termite-nocsd urxvt'
 
-    terminal_additions='bat eza delt afzf fzf-tab-git mako'
+    terminal_additions='bat eza delt afzf fzf-tab-git mako getoptions'
     #'wofi rofi bemenu-wayland'
 
     manpages='man-db man-pages tldr'
@@ -189,7 +189,7 @@ define_additional_tools()
     pdf_viewers='mupdf zathura-pdf-mupdf'
     #'calibre'
 
-    video_capturing='wf-recorder obs xdg-desktop-portal-wlr qt6ct qt6-wayland wlrobs'
+    video_capturing='wf-recorder obs xdg-desktop-portal-wlr qt6ct wlrobs'
 
     video_editing='kdenlive breeze'
 
