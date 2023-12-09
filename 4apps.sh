@@ -88,10 +88,10 @@ define_core_applications()
 
     shell_additions='zsh-completions zsh-syntax-highlighting'
 
-    terminal='alacritty foot tmux'
+    terminal='alacritty foot tmux pv'
     #'termite-nocsd urxvt'
 
-    terminal_additions='bat eza delt afzf fzf-tab-git mako getoptions'
+    terminal_additions='bat eza delta fzf fzf-tab-git mako getoptions'
     #'wofi rofi bemenu-wayland'
 
     manpages='man-db man-pages tldr'
@@ -143,7 +143,8 @@ define_additional_tools()
     network_tools='mtr iftop bind-tools whois ufw'
     #'wireshark-cli wireshark-qt'
 
-    programming='go lisp lua perl python rustup'
+    prog_langs='lisp perl rustup zig'
+    #'go lua perl python'
 
     python_additions=''
     #'python-pip'
@@ -340,7 +341,7 @@ create_additional_tools_list()
 			  $file_tools \
 			  $debugging \
 			  $network_tools \
-			  $programming \
+			  $prog_langs \
 			  $python_additions \
 			  $android_tools \
 			  $internet_browser \
