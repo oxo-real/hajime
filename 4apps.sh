@@ -1,4 +1,5 @@
 #! /usr/bin/env sh
+
 #set -o errexit
 set -o nounset
 set -o pipefail
@@ -218,6 +219,8 @@ define_additional_tools()
     weather=''
     #'wttr'
 
+    database='sqlitebrowser'
+
 }
 
 
@@ -339,6 +342,7 @@ create_additional_tools_list()
 			  $terminal_text_tools \
 			  $terminal_file_manager \
 			  $file_tools \
+			  $database\
 			  $debugging \
 			  $network_tools \
 			  $prog_langs \
