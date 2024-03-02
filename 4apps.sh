@@ -11,14 +11,16 @@ set -o pipefail
 ### | | | | (_| || | | | | | | |  __/ | (_| | |_) | |_) \__ \
 ### |_| |_|\__,_|/ |_|_| |_| |_|\___|  \__,_| .__/| .__/|___/4
 ###            |__/                         |_|   |_|
-###  _    _
-### (_)><(_)
+###
+### # # # # # #
+###      #
+### # # # # # #
 ###
 ### hajime_4apps
 ###
 ### fourth part of an intriguing series
 ### arch linux installation 'apps'
-### copyright (c) 2019 - 2023  |  oxo
+### copyright (c) 2019 - 2024  |  oxo
 ###
 ### GNU GPLv3 GENERAL PUBLIC LICENSE
 ### This file is part of hajime
@@ -90,7 +92,7 @@ define_core_applications()
     shell_additions='zsh-completions zsh-syntax-highlighting'
 
     terminal='alacritty foot tmux pv'
-    #'termite-nocsd urxvt'
+    #'zellij byobu termite-nocsd urxvt'
 
     terminal_additions='bat eza delta fzf fzf-tab-git mako getoptions'
     #'wofi rofi bemenu-wayland'
@@ -135,7 +137,7 @@ define_additional_tools()
     terminal_file_manager='lf'
     #'vifm lf-git nnn'
 
-    file_tools='rsync gdisk simple-mtpfs fd'
+    file_tools='rsync gdisk simple-mtpfs fd dust'
     #'tmsu trash-cli'
 
     debugging='strace'

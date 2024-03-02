@@ -10,14 +10,16 @@ set -o pipefail
 ### | | | | (_| || | | | | | | |  __/ | | | | | | |_
 ### |_| |_|\__,_|/ |_|_| |_| |_|\___| |_|_| |_|_|\__|0
 ###            |__/
-###  _    _
-### (_)><(_)
+###
+### # # # # # #
+###      #
+### # # # # # #
 ###
 ### hajime_0init
 ###
 ### zeroth part of five scripts in total
-### helper file to get lined up after archiso boot
-### copyright (c) 2020 - 2023  |  oxo
+### helper script to bootstrap hajime up after archiso boot
+### copyright (c) 2020 - 2024  |  oxo
 ###
 ### GNU GPLv3 GENERAL PUBLIC LICENSE
 ### This file is part of hajime.

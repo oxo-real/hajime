@@ -10,14 +10,16 @@ set -o pipefail
 ### | | | | (_| || | | | | | | |  __/ | (_| (_) | | | |  _|
 ### |_| |_|\__,_|/ |_|_| |_| |_|\___|  \___\___/|_| |_|_|  2
 ###            |__/
-###  _    _
-### (_)><(_)
+###
+### # # # # # #
+###      #
+### # # # # # #
 ###
 ### hajime_2conf
 ###
 ### second part of a series
 ### arch linux installation 'configuration'
-### copyright (c) 2017 - 2023  |  oxo
+### copyright (c) 2017 - 2024  |  oxo
 ###
 ### GNU GPLv3 GENERAL PUBLIC LICENSE
 ### This file is part of hajime.

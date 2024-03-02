@@ -10,14 +10,16 @@ set -o pipefail
 ### | | | | (_| || | | | | | | |  __/ | |_) | (_) \__ \ |_
 ### |_| |_|\__,_|/ |_|_| |_| |_|\___| | .__/ \___/|___/\__|3
 ###            |__/                   |_|
-###  _    _
-### (_)><(_)
+###
+### # # # # # #
+###      #
+### # # # # # #
 ###
 ### hajime_3post
 ###
 ### third part of a series
 ### arch linux installation 'post'
-### copyright (c) 2018 - 2023  |  oxo
+### copyright (c) 2018 - 2024  |  oxo
 ###
 ### GNU GPLv3 GENERAL PUBLIC LICENSE
 ### This file is part of hajime.

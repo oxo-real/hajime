@@ -10,14 +10,16 @@ set -o pipefail
 ### | | | | (_| || | | | | | | |  __/ | (_| | || (__|  _|
 ### |_| |_|\__,_|/ |_|_| |_| |_|\___|  \__,_|\__\___|_| 5
 ###            |__/
-###  _    _
-### (_)><(_)
+###
+### # # # # # #
+###      #
+### # # # # # #
 ###
 ### hajime_5dtcf
 ###
 ### grande finale: fifth and last part
 ### arch linux installation 'dotfile configuration'
-### copyright (c) 2019 - 2023  |  oxo
+### copyright (c) 2019 - 2024  |  oxo
 ###
 ### GNU GPLv3 GENERAL PUBLIC LICENSE
 ### This file is part of hajime.
