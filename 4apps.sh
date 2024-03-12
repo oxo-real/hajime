@@ -143,7 +143,7 @@ define_additional_tools()
     debugging='strace'
     #'gdb valgrind'
 
-    network_tools='mtr iftop bind-tools whois ufw'
+    network_tools='mtr iftop bind-tools whois ufw trippy'
     #'wireshark-cli wireshark-qt'
 
     prog_langs='lisp perl rustup zig'
