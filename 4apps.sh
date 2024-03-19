@@ -186,6 +186,9 @@ define_additional_tools()
     virtualization=''
     #'qemu-full virt-manager virt-viewer bridge-utils dnsmasq libquestfs'
 
+    #[7-kvm.sh · main · Stephan Raabe / archinstall · GitLab](https://gitlab.com/stephan-raabe/archinstall/-/blob/main/7-kvm.sh)
+    #virt-manager virt-viewer qemu vde2 ebtables iptables-nft nftables dnsmasq bridge-utils ovmf swtpm
+
     image_capturing='grim slurp'
 
     image_editors='imagemagick'
