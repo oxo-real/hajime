@@ -1,9 +1,5 @@
 #! /usr/bin/env sh
-#set -o errexit
-set -o nounset
-set -o pipefail
-#
-##
+
 ###  _            _ _                                  _
 ### | |__   __ _ (_|_)_ __ ___   ___   _ __   ___  ___| |_
 ### | '_ \ / _` || | | '_ ` _ \ / _ \ | '_ \ / _ \/ __| __|
@@ -11,47 +7,54 @@ set -o pipefail
 ### |_| |_|\__,_|/ |_|_| |_| |_|\___| | .__/ \___/|___/\__|3
 ###            |__/                   |_|
 ###
-### # # # # # #
-###      #
-### # # # # # #
+###  # # # # # #
+###       #
+###  # # # # # #
 ###
-### hajime_3post
-###
-### third part of a series
-### arch linux installation 'post'
-### copyright (c) 2018 - 2024  |  oxo
-###
-### GNU GPLv3 GENERAL PUBLIC LICENSE
-### This file is part of hajime.
-###
-### Hajime is free software: you can redistribute it and/or modify
-### it under the terms of the GNU General Public License as published by
-### the Free Software Foundation, either version 3 of the License, or
-### (at your option) any later version.
-###
-### This program is distributed in the hope that it will be useful,
-### but WITHOUT ANY WARRANTY; without even the implied warranty of
-### MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-### GNU General Public License for more details.
-###
-### You should have received a copy of the GNU General Public License
-### along with this program.  If not, see <https://www.gnu.org/licenses/>.
-### https://www.gnu.org/licenses/gpl-3.0.txt
-###
-### @oxo@qoto.org
-###
-##
+
+: '
+hajime_3post
+third part of linux installation
+copyright (c) 2018 - 2024  |  oxo
+
+GNU GPLv3 GENERAL PUBLIC LICENSE
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+https://www.gnu.org/licenses/gpl-3.0.txt
+
+@oxo@qoto.org
+
+
+# description
+  third part of a series
+  arch linux installation: post
+
+# dependencies
+  archiso, REPO, 0init.sh, 1base.sh, 2conf.sh
+
+# usage
+  sh hajime/3post.sh
+
+# example
+  n/a
+
+# '
+
+
+#set -o errexit
+set -o nounset
+set -o pipefail
 #
-
-## dependencies
-#	archiso, REPO, 0init.sh, 1base.sh, 2conf.sh
-
-## usage
-#	sh hajime/3post.sh
-
-## example
-#	none
-
 
 # initial definitions
 

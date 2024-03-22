@@ -1,9 +1,5 @@
 #! /usr/bin/env sh
-#set -o errexit
-set -o nounset
-set -o pipefail
-#
-##
+
 ###  _            _ _                      _ _        __
 ### | |__   __ _ (_|_)_ __ ___   ___    __| | |_ ___ / _|
 ### | '_ \ / _` || | | '_ ` _ \ / _ \  / _` | __/ __| |_
@@ -11,47 +7,54 @@ set -o pipefail
 ### |_| |_|\__,_|/ |_|_| |_| |_|\___|  \__,_|\__\___|_| 5
 ###            |__/
 ###
-### # # # # # #
-###      #
-### # # # # # #
+###  # # # # # #
+###       #
+###  # # # # # #
 ###
-### hajime_5dtcf
-###
-### grande finale: fifth and last part
-### arch linux installation 'dotfile configuration'
-### copyright (c) 2019 - 2024  |  oxo
-###
-### GNU GPLv3 GENERAL PUBLIC LICENSE
-### This file is part of hajime.
-###
-### Hajime is free software: you can redistribute it and/or modify
-### it under the terms of the GNU General Public License as published by
-### the Free Software Foundation, either version 3 of the License, or
-### (at your option) any later version.
-###
-### This program is distributed in the hope that it will be useful,
-### but WITHOUT ANY WARRANTY; without even the implied warranty of
-### MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-### GNU General Public License for more details.
-###
-### You should have received a copy of the GNU General Public License
-### along with this program.  If not, see <https://www.gnu.org/licenses/>.
-### https://www.gnu.org/licenses/gpl-3.0.txt
-###
-### @oxo@qoto.org
-###
-##
-#
 
-## dependencies
-#	arch installation
+: '
+hajime_5dtcf
+fifth part of linux installation
+copyright (c) 2019 - 2024  |  oxo
 
-## usage
-#	sh hajime/5dtcf.sh
+GNU GPLv3 GENERAL PUBLIC LICENSE
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-## example
-#	none
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+https://www.gnu.org/licenses/gpl-3.0.txt
+
+@oxo@qoto.org
+
+
+# description
+  grande finale: fifth and last part of a series
+  arch linux installation: dotfile configuration
+
+# dependencies
+  arch installation
+  archiso, REPO, 0init.sh, 1base.sh, 2conf.sh, 3post.sh, 4apps.sh
+
+# usage
+  sh hajime/5dtcf.sh
+
+# example
+  n/a
+
+# '
+
+
+#set -o errexit
+set -o nounset
+set -o pipefail
 
 # initial definitions
 
