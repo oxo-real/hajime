@@ -305,7 +305,7 @@ wrap_up()
     printf "or use an alternative desktop environment.\n"
     echo
     echo
-    printf "continue with this installation series"
+    printf "continue with this installation series\n"
     printf "by running 4apps.sh (recommended):\n"
     echo
     printf "sh hajime/4apps.sh\n"

@@ -1006,6 +1006,8 @@ install_helpers()
     ## change SigLevel by adding PackageTrustAll to pacman.conf
     ## this prevents errors on installing marginal trusted packages
     sed -i 's/^SigLevel = Required DatabaseOptional/SigLevel = Required DatabaseOptional PackageTrustAll/' /etc/pacman.conf
+    ## disable pacman signature check (not recommended)
+    #sed -i 's/^SigLevel = Required DatabaseOptional/SigLevel = Never/' /etc/pacman.conf
 
     if [[ $offline -ne 1 ]]; then
 
@@ -1063,6 +1065,9 @@ modify_fstab()
 
     ## fstab /boot mount as ro
     sed -i '/\/boot/s/rw,/ro,/' $file_mnt_etc_fstab
+    ## fstab /boot fmask and dmask 0077
+    sed -i '/\/boot/s/fmask=0022/fmask=0077/' $file_mnt_etc_fstab
+    sed -i '/\/boot/s/dmask=0022/dmask=0077/' $file_mnt_etc_fstab
 
     ## fstab /usr mount as ro
     sed -i '/\/usr/s/rw,/ro,/' $file_mnt_etc_fstab

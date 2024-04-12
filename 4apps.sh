@@ -280,7 +280,7 @@ install_yay()
     ## install yay
     package='yay'
     current_package_dir="$aur_dir/$package"
-    c_p_newest_version=$(ls $current_package_dir/*.pkg.tar.zst --reverse --sort=version | sed -n 1p)
+    c_p_newest_version=$(ls $current_package_dir/*.pkg.tar.zst --reverse --sort=version | grep -v 'debug' | sed -n 1p)
 
     sudo pacman -U --noconfirm $c_p_newest_version
 }
