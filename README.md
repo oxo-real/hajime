@@ -326,14 +326,15 @@ The log of the second script can be directly written in de arch-chroot environme
 sh hajime/2conf.sh | tee /mnt/hajime/2conf.log
 ```
 
-From the third script the installation process is running inside the operating system environment,
+From the third script on, the installation process is running inside the operating system environment,
 therefore logs can be written to the home folder of the current user:
 
 ```
 sh hajime/3post.sh | tee $HOME/hajime/3post.log
 ```
 
-Be aware of the fact that writing to debug logs can cause some troubles with proper execution of the installation scripts.
+NOTICE the fact that in specific occasions, writing to debug logs
+can cause some troubles with proper execution of the installation scripts.
 
 
 # resource reference
