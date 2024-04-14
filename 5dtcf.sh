@@ -291,7 +291,9 @@ rewrite_symlinks()
 set_permissions()
 {
     # configure doas
-    command sudo printf "permit persist :wheel\n" > $doas_conf
+    sudo printf "permit persist :wheel\n" > $doas_conf
+    sudo chown -c root:root $doas_conf
+    sudo chmod -c 0400 $doas_conf
 
     # set right permissions for gnupg home
     sh $XDG_DATA_HOME/c/git/note/crypto/gpg/gnupg_set_permissions
