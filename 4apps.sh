@@ -79,7 +79,7 @@ aur_dir="$repo_dir/aur"
 
 define_core_applications()
 {
-    wayland='qt5-wayland qt6-wayland wlroots wev xorg-xwayland dotool'
+    wayland='dotool qt5-wayland qt6-wayland wev wlroots xorg-xwayland'
     ## qt5-wayland to prevent:
     ## WARNING: Could not find the Qt platform plugin 'wayland' in
     ## i.e. when starting qutebrowser
@@ -93,10 +93,10 @@ define_core_applications()
 
     shell_additions='zsh-completions zsh-syntax-highlighting'
 
-    terminal='alacritty foot tmux pv'
+    terminal='alacritty foot tmux'
     #'zellij byobu termite-nocsd urxvt'
 
-    terminal_additions='bat eza delta fzf fzf-tab-git mako getoptions'
+    terminal_additions='bat eza delta fzf fzf-tab-git getoptions mako pv'
     #'wofi rofi bemenu-wayland'
 
     manpages='man-db man-pages tldr'
@@ -132,9 +132,12 @@ define_core_applications()
 
 define_additional_tools()
 {
-    build_tools='make'
+    archivers=''
+    #'vimball'
 
-    terminal_text_tools='emacs figlet qrencode zbar jq xxd-standalone vimball'
+    build_tools='make yay'
+
+    terminal_text_tools='emacs figlet qrencode zbar jq xxd-standalone'
 
     terminal_file_manager='lf'
     #'vifm lf-git nnn'
@@ -148,8 +151,8 @@ define_additional_tools()
     network_tools='mtr iftop bind-tools whois ufw trippy'
     #'wireshark-cli wireshark-qt'
 
-    prog_langs='lisp perl rustup zig'
-    #'go lua perl python'
+    prog_langs=#''
+    #'lisp perl rustup zig go lua python'
 
     python_additions=''
     #'python-pip'
@@ -159,7 +162,8 @@ define_additional_tools()
     internet_browser='firefox-developer-edition qutebrowser nyxt w3m'
     #'icecat lynx'
 
-    internet_search='googler ddgr surfraw'
+    internet_search=''
+    #'googler ddgr surfraw'
 
     internet_tool='urlscan'
 
@@ -347,6 +351,7 @@ create_additional_tools_list()
 {
     additional_tools=(\
 		      $build_tools \
+			  $archivers \
 			  $terminal_text_tools \
 			  $terminal_file_manager \
 			  $file_tools \
@@ -386,6 +391,42 @@ create_additional_tools_list()
 }
 
 
+create_aur_applications_list()
+{
+    ## create the list for aur_applications:
+    #for dir in $(fd . --max-depth 1 --type directory ~/.cache/yay | sed 's/\/$//'); do printf '%s \\\n' "$(basename "$dir")"; done | wl-copy
+    aur_applications=(\
+		      brave-bin \
+			  calcmysky \
+			  cava \
+			  dotool \
+			  fzf-tab-git \
+			  lisp \
+			  mbrola \
+			  md2pdf-git \
+			  ncurses5-compat-libs \
+			  nerd-dictation-git \
+			  obs-backgroundremoval \
+			  otf-unifont \
+			  presenterm-bin \
+			  qpwgraph-qt5 \
+			  qt5-webkit \
+			  simple-mtpfs \
+			  ssss \
+			  stellarium \
+			  swaynagmode \
+			  ttf-unifont \
+			  viddy \
+			  virtualbox-ext-oracle \
+			  vosk-api \
+			  wev \
+			  wlrobs \
+			  wttr \
+			  yay \
+	)
+}
+
+
 set_usr_rw()
 {
     ## set /usr writeable
@@ -409,7 +450,7 @@ install_core_applications()
     #sudo pacman -S --noconfirm --needed $packages
     for pkg_ca in "${core_applications[@]}"; do
 
-	yay -S --needed --noconfirm "$pkg_ca"
+	sudo pacman -S --needed --noconfirm "$pkg_ca"
 	#sudo pacman -S --noconfirm --needed "$pkg_ca"
 
     done
@@ -425,8 +466,24 @@ install_additional_tools()
     #sudo pacman -S --noconfirm --needed $packages
     for pkg_at in "${additional_tools[@]}"; do
 
-	yay -S --needed --noconfirm "$pkg_at"
+	sudo pacman -S --needed --noconfirm "$pkg_at"
 	#sudo pacman -Sy --noconfirm --needed "$pkg_at"
+
+    done
+}
+
+
+install_aur_applications()
+{
+    ## loop through core app packages
+    ## instead of one whole list entry in yay
+    ## this prevents that on error only one package is skipped
+    #local packages=$(echo "${additional_tools[*]}")
+    #sudo pacman -S --noconfirm --needed $packages
+    for pkg_aa in "${aur_applications_list[@]}"; do
+
+	yay -S --needed --noconfirm "$pkg_aa"
+	#sudo pacman -Sy --noconfirm --needed "$pkg_aa"
 
     done
 }
@@ -460,13 +517,16 @@ main() {
     define_additional_tools
     create_additional_tools_list
 
+    create_aur_applications_list
+
     set_usr_rw
     get_offline_repo
     get_offline_code
-    install_yay
+
     install_core_applications
     install_additional_tools
-    #install_aur
+    install_aur_applications
+
     loose_ends
     set_usr_ro
 }
