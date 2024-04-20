@@ -201,7 +201,7 @@ define_additional_tools()
     image_editors='imagemagick'
 
     pdf_viewers='mupdf zathura-pdf-mupdf'
-    #'calibre'
+    #'calibre okular'
 
     video_capturing='wf-recorder obs xdg-desktop-portal-wlr qt6ct wlrobs'
 

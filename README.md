@@ -256,7 +256,6 @@ after booting into archiso insert usb2
 mount usb2 to tmp
 
 ```
-% mkdir tmp
 % lsblk -o LABEL,PATH
 ```
 or
@@ -266,6 +265,11 @@ or
 or
 ```
 % blkid
+```
+
+then
+```
+% mkdir tmp
 ```
 
 CAUTION! DESIGNATE THE RIGHT DEVICE!
