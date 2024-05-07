@@ -994,7 +994,7 @@ install_helpers()
     pacman-key --populate
 
     # update package database
-    #pacman -Syy
+    pacman -Syy
 
     # [TODO] CHECK if pacman.conf is correct after 202306
     ## see: https://archlinux.org/news/git-migration-completed/
@@ -1128,18 +1128,18 @@ welcome()
 {
 	clear
 	printf " hajime\n"
-	printf " 2019 - 2023  |  oxo\n"
+	printf " 2019 - 2024  |  oxo\n"
 	echo
 	echo
-	printf " ${MAGENTA}CAUTION!${NOC}\n"
+	printf " ${fg_amber}CAUTION!${st_def}\n"
 	printf " Hajime will install an Arch Linux operating system on this machine.\n"
 	echo
 	printf " By entering 'y/Y' you consent fully to the following:\n"
 	printf " This software is provided 'as is' and without warranty of any kind.\n"
-	printf " Continuing execution and usage of this software is ${BOLD}at own risk!${NORMAL}\n"
+	printf " Continuing execution and usage of this software is ${st_bold}at own risk!${st_def}\n"
 	printf " Opting out by entering 'n/N' and cancel the installation.\n"
 	echo
-	printf " Continuing will ${BOLD}overwrite existing data${NORMAL} on designated devices.\n"
+	printf " Continuing will ${BOLD}overwrite existing data${st_def} on designated devices.\n"
 	printf " This software is subject to continuous development, carefully consider its beta state. \n"
 
 	printf " Be sure to have the most recent version of the arch installation media!\n"

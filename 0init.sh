@@ -220,11 +220,29 @@ install()
 	    ## update pacman.conf
 	    cp -pr /root/hajime/misc/ol_pacman.conf /etc/pacman.conf
 	    pacman -Sy
+
+	    ## set environment
+	    export OFFLINE=1
 	    ;;
 
 	*)
-	    git clone $online_repo
+	    pacman -Syy
 	    pacman -Sy --noconfirm git
+	    git clone $online_repo
+
+	    case $? in
+
+		0)
+		    :
+		    ;;
+
+		*)
+		    printf 'repo already exists\n'
+		    mv hajime hajime"$($date +'%s')"
+		    #cp -r hajime hajime"$($date +'%s')"
+		    ;;
+
+	    esac
 	    ;;
 
     esac
