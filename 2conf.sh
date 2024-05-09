@@ -556,6 +556,9 @@ install_bootloader()
 
     # generate initramfs with mkinitcpio
 
+    ## [Installation guide - ArchWiki]
+    ## (https://wiki.archlinux.org/title/Installation_guide#Initramfs)
+
     ## for linux preset
     mkinitcpio -p linux
 
