@@ -9,9 +9,10 @@
 ├── COPYING
 ├── misc
 │   ├── alt_dtp_env
+│   ├── arch-chroot
 │   └── ol_pacman.conf
 ├── README.md
 └── repo_tree.md
 
-2 directories, 11 files
+2 directories, 12 files
 ```

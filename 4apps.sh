@@ -231,7 +231,7 @@ define_additional_tools()
     weather=''
     #'wttr'
 
-    database='sqlitebrowser'
+    database='sqlitebrowser arch-wiki-docs arch-wiki-lite'
 
 }
 
