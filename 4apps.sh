@@ -137,7 +137,7 @@ define_additional_tools()
 
     build_tools='make yay'
 
-    terminal_text_tools='emacs figlet qrencode zbar jq xxd-standalone'
+    terminal_text_tools='emacs figlet qrencode zbar jq tinyxxd'
 
     terminal_file_manager='lf'
     #'vifm lf-git nnn'
@@ -157,7 +157,8 @@ define_additional_tools()
     python_additions=''
     #'python-pip'
 
-    android_tools='android-tools adb-rootless-git'
+    android_tools=''
+    #'android-tools adb-rootless-git'
 
     internet_browser='firefox-developer-edition qutebrowser nyxt w3m'
     #'icecat lynx'
