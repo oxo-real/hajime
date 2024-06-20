@@ -83,8 +83,7 @@ define_core_applications()
     ## qt5-wayland to prevent:
     ## WARNING: Could not find the Qt platform plugin 'wayland' in
     ## i.e. when starting qutebrowser
-    ## dotool for speech-to-text
-    #ydotool'
+    ## dotool for speech-to-text and yank-buffer
 
     dwm='i3blocks sway swaybg swayidle swaylock swaynagmode'
     #'waybar'
@@ -105,7 +104,7 @@ define_core_applications()
     #'pass-tomb bitwarden-cli pass-wl-clipboard'
 
     encryption='gnupg ssss'
-    #'veracrypt tomb'
+    #'haveged veracrypt tomb'
 
     security='opendoas arch-audit'
 
