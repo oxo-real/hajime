@@ -103,7 +103,7 @@ define_core_applications()
     password_security='pass pass-otp yubikey-manager'
     #'pass-tomb bitwarden-cli pass-wl-clipboard'
 
-    encryption='gnupg ssss'
+    encryption='gnupg ssss sha3sum'
     #'haveged veracrypt tomb'
 
     security='opendoas arch-audit'
