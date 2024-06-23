@@ -12,8 +12,7 @@
 │   ├── arch-chroot
 │   └── ol_pacman.conf
 ├── README.md
-├── repo-tree.md
-└── repo_tree.md
+└── repo-tree.md
 
-2 directories, 13 files
+2 directories, 12 files
 ```
