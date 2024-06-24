@@ -150,7 +150,7 @@ define_additional_tools()
     network_tools='mtr iftop bind-tools whois ufw trippy'
     #'wireshark-cli wireshark-qt'
 
-    prog_langs=#''
+    prog_langs=''
     #'lisp perl rustup zig go lua python'
 
     python_additions=''
@@ -397,31 +397,31 @@ create_aur_applications_list()
     #for dir in $(fd . --max-depth 1 --type directory ~/.cache/yay | sed 's/\/$//'); do printf '%s \\\n' "$(basename "$dir")"; done | wl-copy
     aur_applications=(\
 		      brave-bin \
-			  calcmysky \
-			  cava \
+			  #calcmysky \
+			  #cava \
 			  dotool \
 			  fzf-tab-git \
 			  lisp \
-			  mbrola \
-			  md2pdf-git \
+			  #mbrola \
+			  #md2pdf-git \
 			  ncurses5-compat-libs \
-			  nerd-dictation-git \
+			  #nerd-dictation-git \
 			  obs-backgroundremoval \
 			  otf-unifont \
-			  presenterm-bin \
-			  qpwgraph-qt5 \
-			  qt5-webkit \
+			  #presenterm-bin \
+			  #qpwgraph-qt5 \
+			  #qt5-webkit \
 			  simple-mtpfs \
 			  ssss \
 			  stellarium \
 			  swaynagmode \
 			  ttf-unifont \
 			  viddy \
-			  virtualbox-ext-oracle \
-			  vosk-api \
+			  #virtualbox-ext-oracle \
+			  #vosk-api \
 			  wev \
 			  wlrobs \
-			  wttr \
+			  #wttr \
 			  yay \
 	)
 }
