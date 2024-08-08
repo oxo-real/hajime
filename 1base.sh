@@ -1131,7 +1131,7 @@ welcome()
 	printf " 2019 - 2024  |  oxo\n"
 	echo
 	echo
-	printf " ${fg_amber}CAUTION!${st_def}\n"
+	printf " ${BOLD}CAUTION!${NORMAL}\n"
 	printf " Hajime will install an Arch Linux operating system on this machine.\n"
 	echo
 	printf " By entering 'y/Y' you consent fully to the following:\n"
