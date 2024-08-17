@@ -326,7 +326,7 @@ set_sway_hardware()
 
 base16()
 {
-    export BASE16_THEME=irblack
+    export BASE16_THEME=synth-midnight-dark
 }
 
 
