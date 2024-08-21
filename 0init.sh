@@ -55,7 +55,7 @@ helper script to bootstrap hajime up after archiso boot
 
 
 set -o errexit
-set -o nounset
+#set -o nounset
 set -o pipefail
 
 # initial definitions
@@ -126,7 +126,7 @@ set_offline()
 
 select_interface()
 {
-    if printf "$reply" | grep -iq "^y" ; then
+    #if printf "$reply" | grep -iq "^y" ; then
 
 	ip a
 	echo
@@ -144,7 +144,7 @@ select_interface()
 
 	printf "$interface connected to $wap\n"
 
-    fi
+    #fi
 }
 
 
@@ -173,6 +173,7 @@ setup_wap()
 connect()
 {
     sudo dhcpcd -w $interface
+    sleep 2
 }
 
 
@@ -227,6 +228,7 @@ install()
 
 	*)
 	    pacman -Syy
+	    pacman-key --init
 	    pacman -Sy --noconfirm git
 	    git clone $online_repo
 
