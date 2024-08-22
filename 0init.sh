@@ -230,7 +230,7 @@ install()
 	    pacman -Syy
 	    pacman-key --init
 	    pacman-key --populate
-	    pacman -Sy git
+	    pacman -Sy --noconfirm git
 	    git clone $online_repo
 
 	    case $? in
