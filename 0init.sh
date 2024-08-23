@@ -115,6 +115,8 @@ set_offline()
 
 	*)
 	    offline=1
+	    ## create file /mnt/offline to refer to later
+	    touch /mnt/offline
 	    ;;
 
     esac

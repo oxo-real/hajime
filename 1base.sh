@@ -66,8 +66,9 @@ initial_release='2017'
 ## hardcoded variables
 
 # user customizable variables
+
 ## offline installation
-offline=1
+[[ -f /mnt/offline ]] && offline=1
 # mountpoints set in 0init are unchanged
 
 timezone="CET"
@@ -77,6 +78,7 @@ rtc_local_timezone="0"
 arch_mirrorlist="https://archlinux.org/mirrorlist/?country=SE&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on"
 mirror_country="Germany,Netherlands,Sweden,USA"
 mirror_amount="5"
+
 
 # 20220201 in the arch repository;
 # base was a package group, but now is a package, while
@@ -999,9 +1001,13 @@ install_helpers()
     # [TODO] CHECK if pacman.conf is correct after 202306
     ## see: https://archlinux.org/news/git-migration-completed/
 
-    # see also man pacman.conf
-    ## configure pacman.conf for offline 'server'
-    cp -prv /root/tmp/code/hajime/misc/ol_pacman.conf /etc/pacman.conf
+    if [[ $offline -eq 1 ]]; then
+
+	# see also man pacman.conf
+	## configure pacman.conf for offline 'server'
+	cp -prv /root/tmp/code/hajime/misc/ol_pacman.conf /etc/pacman.conf
+
+    fi
 
     ## change SigLevel by adding PackageTrustAll to pacman.conf
     ## this prevents errors on installing marginal trusted packages

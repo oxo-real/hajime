@@ -67,10 +67,14 @@ initial_release='2017'
 # user customizable variables
 
 ## offline installation
-offline=1
-code_dir='/tmp'
-repo_dir='/repo'
-repo_re='\/repo'
+if [[ -f /offline ]]; then
+
+    offline=1
+    code_dir='/tmp'
+    repo_dir='/repo'
+    repo_re='\/repo'
+
+fi
 
 ## file locations
 file_etc_pacman_conf='/etc/pacman.conf'

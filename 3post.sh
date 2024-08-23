@@ -68,13 +68,17 @@ initial_release='2018'
 # user customizable variables
 
 ## offline installation
-offline=1
-code_lbl='CODE'
-code_dir="/home/$(id -un)/dock/3"
-repo_lbl='REPO'
-repo_dir="/home/$(id -un)/dock/2"
-repo_re="\/home\/$(id -un)\/dock\/2"
-file_etc_pacman_conf='/etc/pacman.conf'
+if [[ -f /offline ]]; then
+
+    offline=1
+    code_lbl='CODE'
+    code_dir="/home/$(id -un)/dock/3"
+    repo_lbl='REPO'
+    repo_dir="/home/$(id -un)/dock/2"
+    repo_re="\/home\/$(id -un)\/dock\/2"
+    file_etc_pacman_conf='/etc/pacman.conf'
+
+fi
 
 post_core_additions='archlinux-keyring lsof mlocate neofetch neovim pacman-contrib wl-clipboard'
 bloat_ware="" # there seems to be no more bloatware since kernel v536 (nano was removed)
