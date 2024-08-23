@@ -1089,19 +1089,20 @@ prepare_mnt_environment()
 	1)
 	    # copy hajime to root (/hajime in conf)
 	    cp -prv /root/tmp/code/hajime /mnt
-
-	    # copy pacman.conf to root
-	    cp -prv /etc/pacman.conf /mnt/etc/pacman.conf
 	    ;;
 
 	*)
 	    # chroot changes the apparent root directory
 	    # commands will run isolated inside their root jail
 	    # here: /mnt will become the future root
-	    arch-chroot /mnt git clone https://codeberg.org/oxo/hajime
+	    #arch-chroot /mnt git clone https://codeberg.org/oxo/hajime
+	    arch-chroot /mnt /usr/bin/git clone https://codeberg.org/oxo/hajime
 	    ;;
 
     esac
+
+    # copy pacman.conf to root
+    cp -prv /etc/pacman.conf /mnt/etc/pacman.conf
 
     echo
 }
