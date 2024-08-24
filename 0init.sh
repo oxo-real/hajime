@@ -248,6 +248,9 @@ install()
 		    ;;
 
 	    esac
+
+	    ## copy hajime to /root
+	    cp -pr hajime /root
 	    ;;
 
     esac

@@ -1094,9 +1094,13 @@ prepare_mnt_environment()
 	*)
 	    # chroot changes the apparent root directory
 	    # commands will run isolated inside their root jail
+	    #TODO check for proper workings
 	    # here: /mnt will become the future root
-	    #arch-chroot /mnt git clone https://codeberg.org/oxo/hajime
-	    arch-chroot /mnt /usr/bin/git clone https://codeberg.org/oxo/hajime
+	    #arch-chroot /mnt git clone https://codeberg.org/oxo/hajime.git
+	    #arch-chroot /mnt /usr/bin/git clone https://codeberg.org/oxo/hajime
+	    cd /mnt
+	    git clone https://codeberg.org/oxo/hajime
+	    cd
 	    ;;
 
     esac
