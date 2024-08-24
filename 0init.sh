@@ -250,7 +250,8 @@ install()
 	    esac
 
 	    ## copy hajime to /root
-	    cp -pr hajime /root
+	    #DEV they are the same file
+	    #cp -pr hajime /root
 	    ;;
 
     esac
