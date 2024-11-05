@@ -88,7 +88,7 @@ define_core_applications()
     dwm='i3blocks sway swaybg swayidle swaylock swaynagmode'
     #'waybar'
 
-    shell='zsh'
+    shell='zsh bash-language-server'
 
     shell_additions='zsh-completions zsh-syntax-highlighting'
 
@@ -150,7 +150,7 @@ define_additional_tools()
     network_tools='mtr iftop bind-tools whois ufw trippy'
     #'wireshark-cli wireshark-qt'
 
-    prog_langs=''
+    prog_langs='zig zls'
     #'lisp perl rustup zig go lua python'
 
     python_additions=''
