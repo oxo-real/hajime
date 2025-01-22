@@ -47,7 +47,7 @@ The script will setup the Sway tiling window manager, but it can easily be modif
 It also installs a variety of tools, among others for: video, text, file management, network management, internet, system monitoring, virtual environments.
 
 ### 5  dtcf
-'dtcf' installs the dotfile configuration, which contains settings for the apps and window manager to run smoothly.
+'dtcf' installs the dotfile configuration, which contains settings for the apps and compositor (window manager) to run smoothly.
 
 
 # requirements
