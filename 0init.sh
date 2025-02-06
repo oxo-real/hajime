@@ -40,7 +40,7 @@ zeroth part of five scripts in total
 helper script to bootstrap hajime up after archiso boot
 
 # dependencies
-  archiso, REPO
+  archinstal, !REPO
 
 # usage
   sh hajime/0init.sh
@@ -54,7 +54,7 @@ helper script to bootstrap hajime up after archiso boot
 # '
 
 
-set -o errexit
+#set -o errexit
 #set -o nounset
 set -o pipefail
 
@@ -77,7 +77,7 @@ online_repo='https://codeberg.org/oxo/hajime'
 #   see point_in_time (if pit=0)
 
 
-reply_single()
+reply_single ()
 {
     # reply_functions
 
@@ -89,7 +89,7 @@ reply_single()
 }
 
 
-header()
+header ()
 {
     current_year=$(date +%Y)
     clear
@@ -102,7 +102,7 @@ header()
 }
 
 
-set_offline()
+set_offline ()
 {
     printf "offline? (Y/n) "
     reply_single
@@ -126,7 +126,7 @@ set_offline()
 }
 
 
-select_interface()
+select_interface ()
 {
     #if printf "$reply" | grep -iq "^y" ; then
 
@@ -150,7 +150,7 @@ select_interface()
 }
 
 
-setup_wap()
+setup_wap ()
 {
     echo
     wap_list=$(sudo iw dev $interface scan | grep SSID: | sed 's/SSID: //' | \
@@ -172,16 +172,17 @@ setup_wap()
 }
 
 
-connect()
+connect ()
 {
     sudo dhcpcd -w $interface
     sleep 2
 }
 
 
-point_in_time()
+point_in_time ()
 {
     if [[ -f $HOME/hajime/1base.done ]]; then
+
 	# 1base.sh already ran
 	pit=1
 	#code_dir	comes from script that has called 0init
@@ -189,27 +190,33 @@ point_in_time()
 	#repo_re	comes from script that has called 0init
 
     else
+
 	# 1base.sh has not yet ran
 	pit=0
 	code_dir='/root/tmp'
 	repo_dir='/root/tmp/repo'
 	repo_re='\/root\/tmp\/repo'
+
     fi
 }
 
 
-install_or_exit()
+install_or_exit ()
 {
     if [[ "$pit" == "1" ]]; then
+
 	exit 0
+
     else
+
 	install
 	exit 0
+
     fi
 }
 
 
-install()
+install ()
 {
     case $offline in
 
@@ -264,7 +271,7 @@ install()
 }
 
 
-mount_repo()
+mount_repo ()
 {
     repo_lbl='REPO'
     repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
@@ -275,7 +282,7 @@ mount_repo()
 }
 
 
-get_offline_repo()
+get_offline_repo ()
 {
     case $offline in
 
@@ -287,7 +294,7 @@ get_offline_repo()
 }
 
 
-mount_code()
+mount_code ()
 {
     code_lbl='CODE'
     code_dev=$(lsblk -o label,path | grep "$code_lbl" | awk '{print $2}')
@@ -310,7 +317,7 @@ get_offline_code()
 }
 
 
-main()
+main ()
 {
     header
     set_offline
