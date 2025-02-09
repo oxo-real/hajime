@@ -79,7 +79,8 @@ aur_dir="$repo_dir/aur"
 
 define_core_applications()
 {
-    wayland='dotool qt5-wayland qt6-wayland wev wlroots xorg-xwayland'
+    wayland='dotool qt6-wayland wev wlroots xorg-xwayland'
+    #wayland='dotool qt5-wayland qt6-wayland wev wlroots xorg-xwayland'
     ## qt5-wayland to prevent:
     ## WARNING: Could not find the Qt platform plugin 'wayland' in
     ## i.e. when starting qutebrowser
@@ -194,7 +195,8 @@ define_additional_tools()
 
     system_info='lshw usbutils'
 
-    system_monitoring='btop glances viddy'
+    system_monitoring='btop glances'
+    #system_monitoring='btop glances viddy'
     #'ccze htop'
 
     virtualization=''
@@ -243,92 +245,6 @@ define_additional_tools()
 
     database='sqlitebrowser arch-wiki-docs arch-wiki-lite'
 
-}
-
-
-mount_repo()
-{
-    repo_lbl='REPO'
-    repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
-
-    [[ -d $repo_dir ]] || mkdir -p "$repo_dir"
-
-    mountpoint -q $repo_dir
-    [[ $? -eq 0 ]] || sudo mount "$repo_dev" "$repo_dir"
-}
-
-
-get_offline_repo()
-{
-    case $offline in
-	1)
-	    mount_repo
-	    ;;
-    esac
-}
-
-
-mount_code()
-{
-    code_lbl='CODE'
-    code_dev=$(lsblk -o label,path | grep "$code_lbl" | awk '{print $2}')
-
-    [[ -d $code_dir ]] || mkdir -p "$code_dir"
-
-    mountpoint -q $code_dir
-    [[ $? -eq 0 ]] || sudo mount "$code_dev" "$code_dir"
-}
-
-
-get_offline_code()
-{
-    case $offline in
-	1)
-	    mount_code
-	    ;;
-    esac
-}
-
-
-install_yay()
-{
-    ## install yay
-    package='yay'
-    current_package_dir="$aur_dir/$package"
-    c_p_newest_version=$(ls $current_package_dir/*.pkg.tar.zst --reverse --sort=version | grep -v 'debug' | sed -n 1p)
-
-    sudo pacman -U --noconfirm $c_p_newest_version
-}
-
-
-install_aur()
-{
-    ## install aur packages
-    ## [Offline installation - ArchWiki]
-    ## (https://wiki.archlinux.org/title/Offline_installation#Install_from_file)
-    for package in $(ls $aur_dir); do
-
-	## yay is already installed
-	if [[ "$package" != "yay" ]]; then
-
-	    current_package_dir="$aur_dir/$package"
-	    c_p_newest_version=$(ls $current_package_dir/*.pkg.tar.zst --reverse --sort=version | sed -n 1p)
-
-	    yay -U --noconfirm $c_p_newest_version
-
-	else
-
-	    continue
-
-	fi
-
-    done
-
-    ## generate a development package database
-    yay -Y --gendb
-
-    ## update local repo
-    yay -Syy
 }
 
 
@@ -437,111 +353,7 @@ create_aur_applications_list()
 }
 
 
-set_usr_rw()
-{
-    ## set /usr writeable
-    sudo mount -o remount,rw  /usr
-}
-
-
-set_usr_ro()
-{
-    # reset /usr read-only
-    sudo mount -o remount,ro  /usr
-}
-
-
-install_core_applications()
-{
-    ## loop through core app packages
-    ## instead of one whole list entry in yay
-    ## this prevents that on error only one package is skipped
-    #local packages=$(echo "${core_applications[*]}")
-    #sudo pacman -S --noconfirm --needed $packages
-    for pkg_ca in "${core_applications[@]}"; do
-
-	sudo pacman -S --needed --noconfirm "$pkg_ca"
-	#sudo pacman -S --noconfirm --needed "$pkg_ca"
-
-    done
-}
-
-
-install_additional_tools()
-{
-    ## loop through core app packages
-    ## instead of one whole list entry in yay
-    ## this prevents that on error only one package is skipped
-    #local packages=$(echo "${additional_tools[*]}")
-    #sudo pacman -S --noconfirm --needed $packages
-    for pkg_at in "${additional_tools[@]}"; do
-
-	sudo pacman -S --needed --noconfirm "$pkg_at"
-	#sudo pacman -Sy --noconfirm --needed "$pkg_at"
-
-    done
-}
-
-
-install_aur_applications()
-{
-    ## loop through core app packages
-    ## instead of one whole list entry in yay
-    ## this prevents that on error only one package is skipped
-    #local packages=$(echo "${additional_tools[*]}")
-    #sudo pacman -S --noconfirm --needed $packages
-    for pkg_aa in "${aur_applications_list[@]}"; do
-
-	yay -S --needed --noconfirm "$pkg_aa"
-	#sudo pacman -Sy --noconfirm --needed "$pkg_aa"
-
-    done
-}
-
-
-loose_ends()
-{
-    #[TODO]remove candidate
-    ## tmux_plugin_manager
-    #tmux_plugin_dir="$HOME/.config/tmux/plugins"
-    #git clone https://github.com/tmux-plugins/tpm $tmux_plugin_dir/tpm
-
-    #[TODO]remove candidate
-    ## create w3mimgdisplay symlink
-    ## w3mimgdisplay is not in /usr/bin by default as of 20210114
-    ## alternative is to add /usr/lib/w3m to $PATH
-    #sudo ln -s /usr/lib/w3m/w3mimgdisplay /usr/bin/w3mimgdisplay
-
-    ## recommend human to execute dotfiles install script
-    echo 'sh hajime/5dtcf.sh'
-
-    ## finishing
-    sudo touch $HOME/hajime/4apps.done
-}
-
-
-main() {
-    define_core_applications
-    create_core_applications_list
-
-    define_additional_tools
-    create_additional_tools_list
-
-    create_aur_applications_list
-
-    set_usr_rw
-    get_offline_repo
-    get_offline_code
-
-    install_core_applications
-    install_additional_tools
-    install_aur_applications
-
-    loose_ends
-    set_usr_ro
-}
-
-dev_main ()
+create_package_list ()
 {
     define_core_applications
     create_core_applications_list
@@ -553,33 +365,118 @@ dev_main ()
 
     full_package_list+=("${core_applications[@]}" "${additional_tools[@]}" "${aur_applications[@]}")
 
-    ## package space installed_version
+    ts=$(printf '%s_%X\n' "$(date $DT)" "$(date +'%s')")
+    ## core package list
+    ### packages mentioned in hajime_4apps
+    cpl="$HOME/c/git/code/hajime/${ts}-packages"
+    printf '%s\n' "${full_package_list[@]}" > "$cpl"
+}
+
+
+get_args()
+{
+    args=$@
+    ## TODO DEV TEMPO one arg; destination
+    dst=$args
+}
+
+
+copy_packages ()
+{
+    ## pacman_q package space installed_version
     pacman_q=$(pacman -Q | sort --version-sort)
+    core_pkg_list="$XDG_DATA_HOME/c/git/code/hajime/20250208_134925_67A752D5-packages"
+
     vcpp='/var/cache/pacman/pkg'
     cy="$XDG_CACHE_HOME/yay"
 
-    ## get latest package
-    for pkg_2_copy in "${full_package_list[@]}"; do
+    ## define vcpp_pkg_files
+    for file in "$vcpp/*"; do
 
-	ver_2_copy=$(grep $pkg_2_copy <<< $pacman_q | awk '{print $2}')
+	vcpp_pkg_files+=$file
+
+    done
+
+    ## define cy_pkg_files
+    for file in "$cy/*"; do
+
+	cy_pkg_files+=$file
+
+    done
+
+    ## get latest package
+    while read -r pkg_2_copy; do
+
+	ver_2_copy=$(grep --extended-regexp "^${pkg_2_copy}\s" <<< $pacman_q | awk '{print $2}')
+
+	case $(wc -l <<< $ver_2_copy) in
+
+	    1 )
+		:
+		;;
+
+	    * )
+		## more than one version
+		exit 12
+		;;
+
+	esac
 
 	## vcpp_pkg
-	vcpp_pkg=$(ls ${vcpp}/${pkg_2_copy}* | grep -v sig | grep -v debug | sort --version-sort | tail -n 1)
+	printf -v vcpp_p '%s-%s' "$pkg_2_copy" "$ver_2_copy"
 
-	if [[ -f $vcpp_pkg ]]; then
+	pkg_applicants=()
+	for file in "$vcpp"/"$pkg_2_copy"-"$ver_2_copy"*; do
+
+	    ## populate applicants whose file starts with vcpp/pkg_2_copy-ver_2_copy*
+	    pkg_applicants+=$(printf '%s\n' "$file")
+
+	done
+
+	if [[ "${#pkg_applicants[@]}" -eq 1 ]]; then
+
+	    vcpp_pkg="${pkg_applicants[0]}"
+
+	elif [[ "${#pkg_applicants[@]}" -gt 1 ]]; then
+
+	    pkg_applicants=()
+	    for applicant in "${pkg_applicants[@]}"; do
+
+		## rewrite pkg_applicants
+		pkg_applicants+=$(printf '%s\n' "$file")
+
+	    done
+
+printf "DEV$LINENO %s\n" "${pkg_applicants[@]}"
+exit 255
+
+	fi
+
+	## at this point we have the 'file' in the form of vcpp/pkg_2_copy-ver_2_copy
+
+ 	if [[ -f $vcpp_pkg ]]; then
 
 	    package=$vcpp_pkg
 
 	elif [[ ! -f $vcpp_pkg ]]; then
 
 	    ## cy_pkg
-	    cy_pkg=$(ls ${cy}/${pkg_2_copy}/${pkg_2_copy}* | grep -v sig | grep -v debug | sort --version-sort | tail -n 1)
+	    for file in ${cy}/${pkg_2_copy}*; do
+
+		cy_pkg=$(printf '%s' $file | grep -v sig | sort --version-sort | tail -n 1)
+
+	    done
+	    # cy_pkg=$(ls ${cy}/${pkg_2_copy}/${pkg_2_copy}* | grep -v sig | grep -v debug | sort --version-sort | tail -n 1)
 
 	    package=$cy_pkg
 
-	    ## remove vcpp ls error
-	    tput cuu1
-	    printf "\r"; tput el
+	    if [[ -f package ]]; then
+
+		## remove vcpp ls error
+		tput cuu1
+		printf "\r"; tput el
+
+	    fi
 
 	fi
 
@@ -587,12 +484,83 @@ dev_main ()
 
 	    printf '%s not found in cache (vcpp & cy)\n' $pkg_2_copy
 
+	elif [[ -f $package ]]; then
+
+	    ## copy package
+	    cp $package $dst
+
+
+	    # check for dependencies
+
+	    ## define dependencies
+	    pkg_deps=$(pactree --linear $core_pkg_list | sort -u)
+
+	    ## loop through package dependencies
+	    while read -r dep_2_copy; do
+
+		for file in ${vcpp}/${dep_2_copy}*; do
+
+		    vcpp_pkg=$(printf '%s' $file | grep -v sig | sort --version-sort | tail -n 1)
+
+		done
+		#vcpp_dep=$(ls ${vcpp}/${dep_2_copy}* | grep -v sig | grep -v debug | sort --version-sort | tail -n 1)
+
+		if [[ -f $vcpp_dep ]]; then
+
+		    package=$vcpp_dep
+
+		elif [[ ! -f $vcpp_dep ]]; then
+
+		    ## cy_dep
+		    for file in ${cy}/${dep_2_copy}*; do
+
+			cy_dep=$(printf '%s' $file | grep -v sig | sort --version-sort | tail -n 1)
+
+		    done
+		    #cy_dep=$(ls ${cy}/${dep_2_copy}/${dep_2_copy}* | grep -v sig | grep -v debug | sort --version-sort | tail -n 1)
+
+		    package=$cy_dep
+
+		    if [[ -f package ]]; then
+
+			## remove vcpp ls error
+			tput cuu1
+			printf "\r"; tput el
+
+		    fi
+
+		fi
+
+		if [[ ! -f $package ]]; then
+
+		    printf '%s not found in cache (vcpp & cy)\n' $dep_2_copy
+
+		elif [[ -f $package ]]; then
+
+		    ## check if dep already exists in repo
+		    if [[ ! -f $dst/$(basename $package) ]]; then
+
+			## copy package dependency
+			cp $package $dst
+
+		    fi
+
+		fi
+
+	    done <<< "$pkg_deps"
+
 	fi
+exit 255
+    done < "$core_pkg_list"
+}
 
-	cp $package $dst
 
-    done
-   }
+main ()
+{
+    get_args $@
+    #create_package_list
+    copy_packages
+    #main
+}
 
-dev_main
-#main
+main
