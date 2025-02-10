@@ -366,9 +366,11 @@ create_hajime_pkgs ()
     apps_pkgs+=("${core_applications[@]}" "${additional_tools[@]}" "${aur_applications[@]}")
 
     ## packages specified in hajime_4apps (sorted)
-    #TODO DEV add pacman -S packages from hajime/1,2,3
     pkgs_hajime="$HOME/c/git/code/hajime/pkgs-$(id -u $USER)"
+    pkgs_hajime_err="$HOME/c/git/code/hajime/pkgs-$(id -u $USER)-err"
+
     printf '%s\n' "${apps_pkgs[@]}" | sort > "$pkgs_hajime"
+    #TODO DEV add pacman -S packages from hajime/1,2,3
 }
 
 
@@ -387,12 +389,19 @@ add_pkg_cache_ls ()
 	    for file in $pkg_cache_dir/*; do
 
 		realpath $file | grep --invert-match '\.sig$' >> $pkgs_cache_ls
+		printf 'building cache %s\r' "$(basename $file)"
+
+	    tput el
 
 	    done
 	    ;;
 
 	yay )
+	    printf 'building temp pkgs-cache-ls adding yay cache\r'
 	    realpath $(fd --type file '.*\.pkg\.tar\.(xz|zst)$' $pkg_cache_dir) >> $pkgs_cache_ls
+
+	    tput el
+
 	    ;;
 
     esac
@@ -405,9 +414,9 @@ add_pkg_cache_ls ()
 
 get_args()
 {
-    args=$@
-    ## TODO DEV TEMPO one arg; package cache file destination
-    dst=$args
+    args="$@"
+    dst="$args"
+    # TODO DEV TEMPO one arg; package cache file destination
 }
 
 
@@ -420,8 +429,10 @@ get_latest_package ()
 }
 
 
-copy_packages ()
+define_pkgs_2_repo ()
 {
+    # define the packages that have to be copied to the repo
+
     ## package cache directories (pacman and yay)
     vcpp='/var/cache/pacman/pkg'
     cy="$XDG_CACHE_HOME/yay"
@@ -442,7 +453,9 @@ copy_packages ()
 loop_pkgs_cache_ls ()
 {
     pkgs_to_copy=()
-    pkgs_copy_err="$XDG_"
+
+    ## remove existing pkgs_hajime_err file
+    [[ -f $pkgs_hajime_err ]] && rm -rf $pkgs_hajime_err
 
     ## get latest package cache file for every pkg_hajime in pkgs_cache_ls
     while read -r pkg_hajime; do
@@ -453,26 +466,51 @@ loop_pkgs_cache_ls ()
 
 	if [[ -z "$pkg_ver_latest" ]]; then
 
+	    ## error message on empty pkg_ver_latest
 	    pkg_ver_latest="${pkg_hajime}"
-	    printf '\rERROR %s\n' "$pkg_hajime"
+	    printf 'ERROR %s\n' "$pkg_hajime"
+	    printf 'ERROR %s\n' "$pkg_hajime" >> $pkgs_hajime_err
+
+	elif [[ -n "$pkg_ver_latest" ]]; then
+
+	    pkgs_to_copy+=("$pkg_ver_latest")
+	    printf 'adding %s\r' "$pkg_ver_latest"
 
 	fi
 
-	pkgs_to_copy+=("$pkg_ver_latest")
-
-	printf '\r'
+	tput el
 
     done < "$pkgs_hajime"
+}
+
+copy_2_repo ()
+{
+    if [[ -d "$dst" ]]; then
+
+	for file in "${pkgs_to_copy[@]}"; do
+
+	    if [[ -f $file ]]; then
+
+	    printf 'copying %s\r'
+	    cp "$file" "$dst"
+
+	    tput el
+	    fi
+
+	done
+
+    fi
 }
 
 
 main ()
 {
-    get_args $@
+    get_args "$@"
     ts=$(printf '%s_%X\n' "$(date $DT)" "$(date +'%s')")
 
     create_hajime_pkgs
-    copy_packages
+    define_pkgs_2_repo
+    copy_2_repo
 }
 
-main
+main "$@"

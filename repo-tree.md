@@ -15,8 +15,9 @@
 │   ├── arch-chroot
 │   └── ol_pacman.conf
 ├── pkgs-1000
+├── pkgs-1000-err
 ├── README.md
 └── repo-tree.md
 
-3 directories, 15 files
+3 directories, 16 files
 ```
