@@ -1,11 +1,11 @@
 #! /usr/bin/env sh
 
-###  _            _ _
-### | |__   __ _ (_|_)_ __ ___   ___    __ _ _ __  _ __  ___
-### | '_ \ / _` || | | '_ ` _ \ / _ \  / _` | '_ \| '_ \/ __|
-### | | | | (_| || | | | | | | |  __/ | (_| | |_) | |_) \__ \
-### |_| |_|\__,_|/ |_|_| |_| |_|\___|  \__,_| .__/| .__/|___/4
-###            |__/                         |_|   |_|
+###
+###   ___ ___        _ __   __ _
+###  / __/ _ \ _____| '_ \ / _` |
+### | (_| (_) |_____| |_) | (_| |
+###  \___\___/      | .__/ \__,_|
+###                 |_|
 ###
 ###  # # # # # #
 ###       #
@@ -13,9 +13,9 @@
 ###
 
 : '
-hajime_4apps
-fourth part of linux installation
-copyright (c) 2019 - 2024  |  oxo
+copy-packages
+for offline installation
+copyright (c) 2019 - 2025  |  oxo
 
 GNU GPLv3 GENERAL PUBLIC LICENSE
 This program is free software: you can redistribute it and/or modify
@@ -365,32 +365,41 @@ create_hajime_pkgs ()
 
     apps_pkgs+=("${core_applications[@]}" "${additional_tools[@]}" "${aur_applications[@]}")
 
-    ## core package list
-    ### packages mentioned in hajime_4apps
-    ### #TODO DEV add pacman -S packages from hajime/1,2,3
+    ## packages specified in hajime_4apps (sorted)
+    #TODO DEV add pacman -S packages from hajime/1,2,3
     pkgs_hajime="$HOME/c/git/code/hajime/pkgs-$(id -u $USER)"
-    printf '%s\n' "${apps_pkgs[@]}" > "$pkgs_hajime"
+    printf '%s\n' "${apps_pkgs[@]}" | sort > "$pkgs_hajime"
 }
 
 
-create_pkg_cache_ls ()
+add_pkg_cache_ls ()
 {
-    cache_source="$1"
-    pkg_cache_dir="$2"
+    pkg_cache_dir="$1"
+    cache_source="$2"
 
-    pkgs_cache_ls="$XDG_CACHE_HOME/temp/pkgs-cache-ls-${cache_source}-$(id -u $USER)"
+    ## cache source specific pkgs-cache-ls file
+    #pkgs_cache_ls="$XDG_CACHE_HOME/temp/pkgs-cache-ls-${cache_source}-$(id -u $USER)"
+    pkgs_cache_ls="$XDG_CACHE_HOME/temp/pkgs-cache-ls-$(id -u $USER)"
 
     case $cache_source in
 
 	pacman )
-	    ls $pkg_cache_dir | grep --invert-match '\.sig$' > $pkgs_cache_ls
+	    for file in $pkg_cache_dir/*; do
+
+		realpath $file | grep --invert-match '\.sig$' >> $pkgs_cache_ls
+
+	    done
 	    ;;
 
 	yay )
-	    ls $pkg_cache_dir/$pkg_hajime | grep --invert-match '\.sig$' > $pkgs_cache_ls
+	    realpath $(fd --type file '.*\.pkg\.tar\.(xz|zst)$' $pkg_cache_dir) >> $pkgs_cache_ls
 	    ;;
 
     esac
+
+    ## version sort pkgs_cache_ls content
+    pkgs_cache_ls_sorted=$(sort --version-sort $pkgs_cache_ls)
+    printf '%s' "$pkgs_cache_ls_sorted" > $pkgs_cache_ls
 }
 
 
@@ -405,7 +414,7 @@ get_args()
 get_latest_package ()
 {
     pkg_ver_latest=$(cat "$pkgs_cache_ls" \
-			 | grep --extended-regexp "^${pkg_hajime}-[0-9].*\.pkg\.tar\.(xz|zst)$" \
+			 | grep --extended-regexp ".*${pkg_hajime}-[0-9].*\.pkg\.tar\.(xz|zst)$" \
 			 | sort --version-sort \
 			 | tail -n 1)
 }
@@ -413,48 +422,45 @@ get_latest_package ()
 
 copy_packages ()
 {
-    ## package caches (pacman and yay)
+    ## package cache directories (pacman and yay)
     vcpp='/var/cache/pacman/pkg'
     cy="$XDG_CACHE_HOME/yay"
 
-    pkgs_to_copy=()
+    ## remove existing pkgs_cache_ls file
+    [[ -f $pkgs_cache_ls ]] && rm -rf $pkgs_cache_ls
 
     ## vcpp
-    create_pkg_cache_ls pacman "$vcpp"
+    add_pkg_cache_ls "$vcpp" pacman
 
     ## cy
-    create_pkg_cache_ls yay "$cy"
+    add_pkg_cache_ls "$cy" yay
 
-    loop_pacman
-    printf "DEV$LINENO %s " "${pkg_hajime}"
-    printf "DEV$LINENO %s\n" "${pkg_ver_latest}"
+    loop_pkgs_cache_ls
 }
 
 
-loop_pacman ()
+loop_pkgs_cache_ls ()
 {
-    cache_source='yay'
-    ## get latest package cache file for every pkg_hajime in pkgs_hajime
+    pkgs_to_copy=()
+    pkgs_copy_err="$XDG_"
+
+    ## get latest package cache file for every pkg_hajime in pkgs_cache_ls
     while read -r pkg_hajime; do
 
-	get_latest_package
-	pkgs_to_copy+=("$pkg_ver_latest")
-
-    done < "$pkgs_hajime"
-
-    [[ -z $pkg_ver_latest ]] && loop_yay
-}
-
-
-loop_yay ()
-{
-    cache_source='pacman'
-    while read -r package; do
+	printf '%s' "$pkg_hajime"
 
 	get_latest_package
+
+	if [[ -z "$pkg_ver_latest" ]]; then
+
+	    pkg_ver_latest="${pkg_hajime}"
+	    printf '\rERROR %s\n' "$pkg_hajime"
+
+	fi
+
 	pkgs_to_copy+=("$pkg_ver_latest")
 
-    printf "DEV$LINENO %s\n" "${pkg_ver_latest}"
+	printf '\r'
 
     done < "$pkgs_hajime"
 }
@@ -467,184 +473,6 @@ main ()
 
     create_hajime_pkgs
     copy_packages
-    #main
 }
 
 main
-
-
-
-
-
-old_stuff ()
-{
- 	vcpp_pkgs=()
-	for file in "$vcpp/*"; do
-
-	    ## populate
-	    grep -v '\.sig$' <<< "$file"
-
-	done
-    ## define vcpp_pkg_files
-    for file in "$vcpp/*"; do
-
-	vcpp_pkg_files+=$file
-
-    done
-
-    ## define cy_pkg_files
-    for file in "$cy/*"; do
-
-	cy_pkg_files+=$file
-
-    done
-
-    ## get latest package
-    while read -r pkg_2_copy; do
-
-	ver_2_copy=$(grep --extended-regexp "^${pkg_2_copy}\s" <<< $pacman_q | awk '{print $2}')
-
-	case $(wc -l <<< $ver_2_copy) in
-
-	    1 )
-		:
-		;;
-
-	    * )
-		## more than one version
-		exit 12
-		;;
-
-	esac
-
-	## vcpp_pkg
-	printf -v vcpp_p '%s-%s' "$pkg_2_copy" "$ver_2_copy"
-
-	pkg_applicants=()
-	for file in "$vcpp"/"$pkg_2_copy"-"$ver_2_copy"*; do
-
-	    ## populate applicants whose file starts with vcpp/pkg_2_copy-ver_2_copy*
-	    pkg_applicants+=$(printf '%s\n' "$file")
-
-	done
-
-	if [[ "${#pkg_applicants[@]}" -eq 1 ]]; then
-
-	    vcpp_pkg="${pkg_applicants[0]}"
-
-	elif [[ "${#pkg_applicants[@]}" -gt 1 ]]; then
-
-	    pkg_applicants=()
-	    for applicant in "${pkg_applicants[@]}"; do
-
-		## rewrite pkg_applicants
-		pkg_applicants+=$(printf '%s\n' "$file")
-
-	    done
-
-printf "DEV$LINENO %s\n" "${pkg_applicants[@]}"
-exit 255
-
-	fi
-
-	## at this point we have the 'file' in the form of vcpp/pkg_2_copy-ver_2_copy
-
- 	if [[ -f $vcpp_pkg ]]; then
-
-	    package=$vcpp_pkg
-
-	elif [[ ! -f $vcpp_pkg ]]; then
-
-	    ## cy_pkg
-	    for file in ${cy}/${pkg_2_copy}*; do
-
-		cy_pkg=$(printf '%s' $file | grep -v sig | sort --version-sort | tail -n 1)
-
-	    done
-	    # cy_pkg=$(ls ${cy}/${pkg_2_copy}/${pkg_2_copy}* | grep -v sig | grep -v debug | sort --version-sort | tail -n 1)
-
-	    package=$cy_pkg
-
-	    if [[ -f package ]]; then
-
-		## remove vcpp ls error
-		tput cuu1
-		printf "\r"; tput el
-
-	    fi
-
-	fi
-
-	if [[ ! -f $package ]]; then
-
-	    printf '%s not found in cache (vcpp & cy)\n' $pkg_2_copy
-
-	elif [[ -f $package ]]; then
-
-	    ## copy package
-	    cp $package $dst
-
-
-	    # check for dependencies
-
-	    ## define dependencies
-	    pkg_deps=$(pactree --linear $core_pkg_list | sort -u)
-
-	    ## loop through package dependencies
-	    while read -r dep_2_copy; do
-
-		for file in ${vcpp}/${dep_2_copy}*; do
-
-		    vcpp_pkg=$(printf '%s' $file | grep -v sig | sort --version-sort | tail -n 1)
-
-		done
-		#vcpp_dep=$(ls ${vcpp}/${dep_2_copy}* | grep -v sig | grep -v debug | sort --version-sort | tail -n 1)
-
-		if [[ -f $vcpp_dep ]]; then
-
-		    package=$vcpp_dep
-
-		elif [[ ! -f $vcpp_dep ]]; then
-
-		    ## cy_dep
-		    for file in ${cy}/${dep_2_copy}*; do
-
-			cy_dep=$(printf '%s' $file | grep -v sig | sort --version-sort | tail -n 1)
-
-		    done
-		    #cy_dep=$(ls ${cy}/${dep_2_copy}/${dep_2_copy}* | grep -v sig | grep -v debug | sort --version-sort | tail -n 1)
-
-		    package=$cy_dep
-
-		    if [[ -f package ]]; then
-
-			## remove vcpp ls error
-			tput cuu1
-			printf "\r"; tput el
-
-		    fi
-
-		fi
-
-		if [[ ! -f $package ]]; then
-
-		    printf '%s not found in cache (vcpp & cy)\n' $dep_2_copy
-
-		elif [[ -f $package ]]; then
-
-		    ## check if dep already exists in repo
-		    if [[ ! -f $dst/$(basename $package) ]]; then
-
-			## copy package dependency
-			cp $package $dst
-
-		    fi
-
-		fi
-
-	    done <<< "$pkg_deps"
-
-	fi
-exit 255
-    done < "$core_pkg_list"
-}
