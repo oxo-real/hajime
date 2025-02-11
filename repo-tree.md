@@ -7,7 +7,7 @@
 ├── 4apps.sh
 ├── 5dtcf.sh
 ├── COPYING
-├── copy_packages.sh
+├── copy-packages.sh
 ├── dev
 │   └── copy_packages_old.sh
 ├── misc
