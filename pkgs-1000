@@ -4,6 +4,8 @@ arch-audit
 arch-wiki-docs
 arch-wiki-lite
 aria2
+base
+base-devel
 bash-language-server
 bat
 bc
@@ -39,6 +41,8 @@ isync
 jq
 kdenlive
 lf
+linux
+linux-firmware
 lshw
 make
 mako
@@ -73,6 +77,7 @@ qrencode
 qt6ct
 qt6-wayland
 qutebrowser
+reflector
 rsync
 sha3sum
 simple-mtpfs

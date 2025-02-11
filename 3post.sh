@@ -44,7 +44,7 @@ https://www.gnu.org/licenses/gpl-3.0.txt
   archinstall, !REPO, 0init.sh, 1base.sh, 2conf.sh
 
 # usage
-  sh hajime/3post.sh
+  sh hajime/3post.sh [--offline]
 
 # example
   n/a
@@ -69,6 +69,8 @@ initial_release='2018'
 # user customizable variables
 
 ## offline installation
+[[ "$args" =~ .*offline ]] && sudo touch /offline
+
 if [[ -f /offline ]]; then
 
     offline=1
@@ -331,8 +333,15 @@ wrap_up ()
 }
 
 
+get_args ()
+{
+    args="$@"
+}
+
+
 main()
 {
+    get_args
     dhcp_connect
     #set_read_write
     own_home
@@ -346,4 +355,4 @@ main()
     wrap_up
 }
 
-main
+main "$@"

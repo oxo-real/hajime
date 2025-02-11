@@ -75,6 +75,45 @@ aur_dir="$repo_dir/aur"
 
 #--------------------------------
 
+
+define_base_packages ()
+{
+    ## packages from 1base
+    pkg_help='reflector'
+    pkg_core='base linux linux-firmware'
+    pkg_base_devel='base-devel'
+}
+
+
+define_core_packages ()
+{
+    ## packages from 2conf
+    linux_kernel="linux-headers"	#linux 1base
+    linux_lts_kernel="linux-lts linux-lts-headers"
+    # [Install Arch Linux on LVM - ArchWiki]
+    # (https://wiki.archlinux.org/title/Install_Arch_Linux_on_LVM#Adding_mkinitcpio_hooks)
+    # lvm2 is needed for lvm2 mkinitcpio hook
+    ## [Fix missing libtinfo.so.5 library in Arch Linux]
+    ## (https://jamezrin.name/fix-missing-libtinfo.so.5-library-in-arch-linux)
+    ## prevent error that library libtinfo.so.5 couldn’t be found
+    core_applications='lvm2'
+    text_editor="emacs neovim"
+    install_helpers="reflector base-devel git"	#binutils 3post base-devel group
+    network='dhcpcd'
+    #network='dhcpcd systemd-networkd systemd-resolved'
+    network_wl="wpa_supplicant wireless_tools iw"
+    secure_connections="openssh"
+    system_security='' #nss-certs; comes with nss in core
+}
+
+
+define_post_packages ()
+{
+    ## packages from 3post
+    post_core_additions='archlinux-keyring lsof mlocate neofetch neovim pacman-contrib wl-clipboard'
+}
+
+
 define_core_applications()
 {
     wayland='dotool qt6-wayland wev wlroots xorg-xwayland'
@@ -242,11 +281,46 @@ define_additional_tools()
     #'wttr'
 
     database='sqlitebrowser arch-wiki-docs arch-wiki-lite'
-
 }
 
 
-create_core_applications_list()
+create_base_packages_list ()
+{
+    ## packages from 2core
+    base_packages=(\
+		   $pkg_help \
+		       $pkg_core \
+		       $pkg_base_devel\
+	)
+}
+
+
+create_core_packages_list ()
+{
+    ## packages from 2core
+    core_packages=(\
+		   $linux_kernel \
+		       $linux_lts_kernel \
+		       $core_applications \
+		       $text_editor \
+		       $install_helpers \
+		       $network \
+		       $network_wl \
+		       $secure_connections\
+	)
+}
+
+
+create_post_core_additions_list ()
+{
+    ## packages from 3post
+    post_packages=(\
+		   $post_core_additions\
+	)
+}
+
+
+create_core_applications_list ()
 {
     core_applications=(\
 		       $wayland \
@@ -271,7 +345,7 @@ create_core_applications_list()
 }
 
 
-create_additional_tools_list()
+create_additional_tools_list ()
 {
     additional_tools=(\
 		      $build_tools \
@@ -315,7 +389,7 @@ create_additional_tools_list()
 }
 
 
-create_aur_applications_list()
+create_aur_applications_list ()
 {
     ## create the list for aur_applications:
     #for dir in $(fd . --max-depth 1 --type directory ~/.cache/yay | sed 's/\/$//'); do printf '%s \\\n' "$(basename "$dir")"; done | wl-copy
@@ -346,29 +420,40 @@ create_aur_applications_list()
 			  wev \
 			  wlrobs \
 			  #wttr \
-			  yay \
+			  yay\
 	)
 }
 
 
 create_hajime_pkgs ()
 {
+    define_base_packages
+    create_base_packages_list
+    apps_pkgs+=("${base_packages[@]}")
+
+    define_conf_packages
+    create_conf_packages_list
+    apps_pkgs+=("${conf_packages[@]}")
+
+    define_post_packages
+    create_post_packages_list
+    apps_pkgs+=("${post_packages[@]}")
+
     define_core_applications
     create_core_applications_list
+    apps_pkgs+=("${core_applications[@]}")
 
     define_additional_tools
     create_additional_tools_list
+    apps_pkgs+=("${additional_tools[@]}")
 
     create_aur_applications_list
+    apps_pkgs+=("${aur_applications[@]}")
 
-    apps_pkgs+=("${core_applications[@]}" "${additional_tools[@]}" "${aur_applications[@]}")
-
-    ## packages specified in hajime_4apps (sorted)
     pkgs_hajime="$HOME/c/git/code/hajime/pkgs-$(id -u $USER)"
     pkgs_hajime_err="$HOME/c/git/code/hajime/pkgs-$(id -u $USER)-err"
 
     printf '%s\n' "${apps_pkgs[@]}" | sort > "$pkgs_hajime"
-    #TODO DEV add pacman -S packages from hajime/1,2,3
 }
 
 
@@ -382,10 +467,9 @@ add_pkg_cache_ls ()
 	pacman )
 	    for file in $pkg_cache_dir/*; do
 
+#TODO sig?
 		realpath $file | grep --invert-match '\.sig$' >> $pkgs_cache_ls
 		printf 'building cache %s\n' "$(basename $file)"
-
-	    #tput el
 
 	    done
 	    ;;
@@ -393,8 +477,6 @@ add_pkg_cache_ls ()
 	yay )
 	    printf 'building cache %s\n' "$(basename $file)"
 	    realpath $(fd --type file '.*(\.pkg)?\.tar\.(gz|xz|zst)$' $pkg_cache_dir) >> $pkgs_cache_ls
-
-	    #tput el
 
 	    ;;
 
@@ -513,7 +595,6 @@ pkg_get_deps ()
 
 get_dep_file ()
 {
-
     for pkg_dep in $pkg_main_deps; do
 
 	get_latest_dep
@@ -527,14 +608,15 @@ get_dep_file ()
 
 copy_2_repo ()
 {
-    if [[ -d "$dst" ]]; then
+    mountpoint -q "$dst"
+    if [[ $? -eq 0 ]]; then
 
-	for file in $(cat $pkgs_to_repo); do
+	for package in $(cat $pkgs_to_repo); do
 
-	    if [[ -f $file ]]; then
+	    if [[ -f $package ]]; then
 
-	    printf 'copying to %s %s\n' "$dst" "$file"
-	    cp "$file" "$dst"
+		printf 'copying to %s %s\n' "$dst" "$package"
+		cp "$package" "$dst"
 
 	    fi
 
@@ -546,7 +628,21 @@ copy_2_repo ()
 
 repo_add ()
 {
-    :
+    # build custom pacman package database
+    ## .zst and older .xz packages
+    ## not .sig files
+    db_name='offline'
+    echo
+
+    for package in $(cat $pkgs_to_repo); do
+	#TODO DEV read file directly
+
+	p_basename=$(basename $package)
+	printf '==> adding %s/%s\n' "$dst" "$p_basename"
+
+	repo-add --new --remove --include-sigs $dst/$db_name.db.tar.zst $dst/$p_basename
+
+    done
 }
 
 

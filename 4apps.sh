@@ -77,6 +77,12 @@ aur_dir="$repo_dir/aur"
 
 #--------------------------------
 
+define_post_core_additions ()
+{
+    post_core_additions='archlinux-keyring lsof mlocate neofetch neovim pacman-contrib wl-clipboard'
+}
+
+
 define_core_applications()
 {
     wayland='dotool qt5-wayland qt6-wayland wev wlroots xorg-xwayland'
