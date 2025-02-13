@@ -85,7 +85,7 @@ define_base_packages ()
 }
 
 
-define_core_packages ()
+define_conf_packages ()
 {
     ## packages from 2conf
     linux_kernel="linux-headers"	#linux 1base
@@ -284,6 +284,12 @@ define_additional_tools()
 }
 
 
+define_pkgs_manual_added ()
+{
+    linux='linux linux-headers'
+}
+
+
 create_base_packages_list ()
 {
     ## packages from 2core
@@ -295,10 +301,10 @@ create_base_packages_list ()
 }
 
 
-create_core_packages_list ()
+create_conf_packages_list ()
 {
     ## packages from 2core
-    core_packages=(\
+    conf_packages=(\
 		   $linux_kernel \
 		       $linux_lts_kernel \
 		       $core_applications \
@@ -311,7 +317,7 @@ create_core_packages_list ()
 }
 
 
-create_post_core_additions_list ()
+create_post_packages_list ()
 {
     ## packages from 3post
     post_packages=(\
@@ -468,7 +474,8 @@ add_pkg_cache_ls ()
 	    for file in $pkg_cache_dir/*; do
 
 #TODO sig?
-		realpath $file | grep --invert-match '\.sig$' >> $pkgs_cache_ls
+		realpath $file >> $pkgs_cache_ls
+		#realpath $file | grep --invert-match '\.sig$' >> $pkgs_cache_ls
 		printf 'building cache %s\n' "$(basename $file)"
 
 	    done
@@ -482,8 +489,8 @@ add_pkg_cache_ls ()
 
     esac
 
-    ## version sort pkgs_cache_ls content
-    pkgs_cache_ls_sorted=$(sort --version-sort $pkgs_cache_ls)
+    ## version sort and uniq pkgs_cache_ls content
+    pkgs_cache_ls_sorted=$(sort --version-sort $pkgs_cache_ls | uniq)
     printf '%s' "$pkgs_cache_ls_sorted" > $pkgs_cache_ls
 }
 
@@ -499,20 +506,26 @@ get_args()
 get_latest_package ()
 {
     # pkg_name_ver=$(pacman -Qo $pkg_hajime | cut -d ' ' -f 5-6 | tr ' ' '-')
-    pkg_ver_latest=$(cat "$pkgs_cache_ls" \
+    pkg_ver_ltst=$(cat "$pkgs_cache_ls" \
 			 | grep --extended-regexp ".*${pkg_hajime}-[0-9].*\.pkg\.tar\.(xz|zst)$" \
 			 | sort --version-sort \
 			 | tail -n 1)
+
+    ## correct to package baseneme
+    pkg_ver_latest=${pkg_ver_ltst##*/}
 }
 
 
 get_latest_dep ()
 {
     # pkg_name_ver=$(pacman -Qo $pkg_hajime | cut -d ' ' -f 5-6 | tr ' ' '-')
-    pkg_dep_latest=$(cat "$pkgs_cache_ls" \
+    pkg_dep_ltst=$(cat "$pkgs_cache_ls" \
 			 | grep --extended-regexp ".*${pkg_dep}-[0-9].*\.pkg\.tar\.(xz|zst)$" \
 			 | sort --version-sort \
 			 | tail -n 1)
+
+    ## correct to package baseneme
+    pkg_dep_latest=${pkg_dep_ltst##*/}
 }
 
 
@@ -581,7 +594,8 @@ optimize_pkgs_to_copy ()
 {
     pkgs_to_repo="$XDG_CACHE_HOME/temp/pkgs-to-repo-$(id -u $USER)"
 
-    pkgs_2_repo=$(sort $pkgs_to_copy | uniq)
+    ## sort and uniq
+    pkgs_2_repo=$(sed '/^\s*$/d' $pkgs_to_copy | sort | uniq)
     printf '%s' "$pkgs_2_repo" > $pkgs_to_repo
 }
 
@@ -589,7 +603,7 @@ optimize_pkgs_to_copy ()
 pkg_get_deps ()
 {
     pkg_main=$1
-    pkg_main_deps=$(pactree --linear --depth 1 $pkg_main | tail -n +2)
+    pkg_main_deps=$(pactree --linear --depth 1 $pkg_main | tail -n +2 | sort)
 }
 
 
@@ -608,6 +622,7 @@ get_dep_file ()
 
 copy_2_repo ()
 {
+    #TODO DEV linux is not getting into the repo, why?
     mountpoint -q "$dst"
     if [[ $? -eq 0 ]]; then
 
@@ -615,8 +630,17 @@ copy_2_repo ()
 
 	    if [[ -f $package ]]; then
 
-		printf 'copying to %s %s\n' "$dst" "$package"
+		## copy pkg
+		printf 'copy pkg to %s %s\n' "$dst" "$package"
 		cp "$package" "$dst"
+
+		## copy sig
+		if [[ -f "$package".sig ]]; then
+
+		    printf 'copy sig to %s %s\n' "$dst" "$package"
+		    cp "$package".sig "$dst"
+
+		fi
 
 	    fi
 
@@ -628,9 +652,7 @@ copy_2_repo ()
 
 repo_add ()
 {
-    # build custom pacman package database
-    ## .zst and older .xz packages
-    ## not .sig files
+    # build custom pacman offline package database
     db_name='offline'
     echo
 
