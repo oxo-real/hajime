@@ -57,23 +57,22 @@ set -o pipefail
 # initial definitions
 
 ## script
-script_name='4apps.sh'
+script_name='copy-packages.sh'
 developer='oxo'
 license='gplv3'
 initial_release='2019'
 
-## hardcoded variables
-# user customizable variables
-
-## offline installation
-offline=1
-code_dir="/home/$(id -un)/dock/3"
-repo_dir="/home/$(id -un)/dock/2"
-repo_re="\/home\/$(id -un)\/dock\/2"
-file_etc_pacman_conf='/etc/pacman.conf'
-aur_dir="$repo_dir/aur"
+ts=$(printf '%s_%X\n' "$(date $DT)" "$(date +'%s')")
 
 #--------------------------------
+
+
+get_args()
+{
+    args="$@"
+    dst="$args"
+    # TODO DEV TEMPO one arg; package cache file destination
+}
 
 
 define_base_packages ()
@@ -116,6 +115,7 @@ define_post_packages ()
 
 define_core_applications()
 {
+    ## packages from 4apps-core_applications
     wayland='dotool qt6-wayland wev wlroots xorg-xwayland'
     #wayland='dotool qt5-wayland qt6-wayland wev wlroots xorg-xwayland'
     ## qt5-wayland to prevent:
@@ -174,6 +174,7 @@ define_core_applications()
 
 define_additional_tools()
 {
+    ## packages from 4apps-additional_tools
     archivers=''
     #'vimball'
 
@@ -284,15 +285,16 @@ define_additional_tools()
 }
 
 
-define_pkgs_manual_added ()
+define_manual_added ()
 {
-    linux='linux linux-headers'
+    ## manually added packages (here)
+    linux_kernel='linux linux-headers'
 }
 
 
 create_base_packages_list ()
 {
-    ## packages from 2core
+    ## packages from 1base
     base_packages=(\
 		   $pkg_help \
 		       $pkg_core \
@@ -303,7 +305,7 @@ create_base_packages_list ()
 
 create_conf_packages_list ()
 {
-    ## packages from 2core
+    ## packages from 2conf
     conf_packages=(\
 		   $linux_kernel \
 		       $linux_lts_kernel \
@@ -328,6 +330,7 @@ create_post_packages_list ()
 
 create_core_applications_list ()
 {
+    ## packages from 4apps-core_applications
     core_applications=(\
 		       $wayland \
 			   $dwm \
@@ -353,6 +356,7 @@ create_core_applications_list ()
 
 create_additional_tools_list ()
 {
+    ## packages from 4apps-additional_tools
     additional_tools=(\
 		      $build_tools \
 			  $archivers \
@@ -431,6 +435,15 @@ create_aur_applications_list ()
 }
 
 
+create_manual_added_list ()
+{
+    ## packages from manual_added
+    manual_packages=(\
+		   $linux_kernel \
+	)
+}
+
+
 create_hajime_pkgs ()
 {
     define_base_packages
@@ -456,80 +469,18 @@ create_hajime_pkgs ()
     create_aur_applications_list
     apps_pkgs+=("${aur_applications[@]}")
 
-    pkgs_hajime="$HOME/c/git/code/hajime/pkgs-$(id -u $USER)"
-    pkgs_hajime_err="$HOME/c/git/code/hajime/pkgs-$(id -u $USER)-err"
+    define_manual_added
+    create_manual_added_list
+    apps_pkgs+=("${manual_packages[@]}")
 
+    pkgs_hajime="$HOME/c/git/code/hajime/pkgs-hajime-$(id -u $USER)"
+
+    ## write pkgs_hajime (pkgs-hajime-1000)
     printf '%s\n' "${apps_pkgs[@]}" | sort > "$pkgs_hajime"
 }
 
 
-add_pkg_cache_ls ()
-{
-    pkg_cache_dir="$1"
-    cache_source="$2"
-
-    case $cache_source in
-
-	pacman )
-	    for file in $pkg_cache_dir/*; do
-
-#TODO sig?
-		realpath $file >> $pkgs_cache_ls
-		#realpath $file | grep --invert-match '\.sig$' >> $pkgs_cache_ls
-		printf 'building cache %s\n' "$(basename $file)"
-
-	    done
-	    ;;
-
-	yay )
-	    printf 'building cache %s\n' "$(basename $file)"
-	    realpath $(fd --type file '.*(\.pkg)?\.tar\.(gz|xz|zst)$' $pkg_cache_dir) >> $pkgs_cache_ls
-
-	    ;;
-
-    esac
-
-    ## version sort and uniq pkgs_cache_ls content
-    pkgs_cache_ls_sorted=$(sort --version-sort $pkgs_cache_ls | uniq)
-    printf '%s' "$pkgs_cache_ls_sorted" > $pkgs_cache_ls
-}
-
-
-get_args()
-{
-    args="$@"
-    dst="$args"
-    # TODO DEV TEMPO one arg; package cache file destination
-}
-
-
-get_latest_package ()
-{
-    # pkg_name_ver=$(pacman -Qo $pkg_hajime | cut -d ' ' -f 5-6 | tr ' ' '-')
-    pkg_ver_ltst=$(cat "$pkgs_cache_ls" \
-			 | grep --extended-regexp ".*${pkg_hajime}-[0-9].*\.pkg\.tar\.(xz|zst)$" \
-			 | sort --version-sort \
-			 | tail -n 1)
-
-    ## correct to package baseneme
-    pkg_ver_latest=${pkg_ver_ltst##*/}
-}
-
-
-get_latest_dep ()
-{
-    # pkg_name_ver=$(pacman -Qo $pkg_hajime | cut -d ' ' -f 5-6 | tr ' ' '-')
-    pkg_dep_ltst=$(cat "$pkgs_cache_ls" \
-			 | grep --extended-regexp ".*${pkg_dep}-[0-9].*\.pkg\.tar\.(xz|zst)$" \
-			 | sort --version-sort \
-			 | tail -n 1)
-
-    ## correct to package baseneme
-    pkg_dep_latest=${pkg_dep_ltst##*/}
-}
-
-
-define_pkgs_2_repo ()
+define_pkgs_cache_ls ()
 {
     # define the packages that have to be copied to the repo
 
@@ -537,8 +488,7 @@ define_pkgs_2_repo ()
     vcpp='/var/cache/pacman/pkg'
     cy="$XDG_CACHE_HOME/yay"
 
-    ## cache source specific pkgs-cache-ls file
-    #pkgs_cache_ls="$XDG_CACHE_HOME/temp/pkgs-cache-ls-${cache_source}-$(id -u $USER)"
+    ## cache source file pkgs-cache-ls
     pkgs_cache_ls="$XDG_CACHE_HOME/temp/pkgs-cache-ls-$(id -u $USER)"
 
     ## remove existing pkgs_cache_ls file
@@ -549,18 +499,17 @@ define_pkgs_2_repo ()
 
     ## cy
     add_pkg_cache_ls "$cy" yay
-
-    loop_pkgs_cache_ls
 }
 
 
-loop_pkgs_cache_ls ()
+create_pkgs_to_copy ()
 {
     pkgs_to_copy="$XDG_CACHE_HOME/temp/pkgs-to-copy-$(id -u $USER)"
+    pkgs_to_copy_err="$XDG_CACHE_HOME/temp/pkgs-to-copy-$(id -u $USER)-err"
 
     ## remove existing pkgs_hajime_err file
-    [[ -f $pkgs_hajime_err ]] && rm -rf $pkgs_hajime_err
     [[ -f $pkgs_to_copy ]] && rm -rf $pkgs_to_copy
+    [[ -f $pkgs_to_copy_err ]] && rm -rf $pkgs_to_copy_err
 
     ## get latest package cache file for every pkg_hajime in pkgs_cache_ls
     while read -r pkg_hajime; do
@@ -571,7 +520,7 @@ loop_pkgs_cache_ls ()
 
 	    ## error message on empty pkg_ver_latest
 	    pkg_ver_latest='empty pkg_ver_latest'
-	    printf 'ERROR adding %s %s\n' "$pkg_hajime" "$pkg_ver_latest" >> $pkgs_hajime_err
+	    printf 'ERROR adding %s %s\n' "$pkg_hajime" "$pkg_ver_latest" >> $pkgs_to_copy_err
 	    printf 'ERROR adding %s %s\n' "$pkg_hajime" "$pkg_ver_latest"
 
 	elif [[ -n "$pkg_ver_latest" ]]; then
@@ -585,24 +534,65 @@ loop_pkgs_cache_ls ()
 	fi
 
     done < "$pkgs_hajime"
-
-    optimize_pkgs_to_copy
 }
 
 
-optimize_pkgs_to_copy ()
+add_pkg_cache_ls ()
 {
-    pkgs_to_repo="$XDG_CACHE_HOME/temp/pkgs-to-repo-$(id -u $USER)"
+    pkg_cache_dir="$1"
+    cache_source="$2"
 
-    ## sort and uniq
-    pkgs_2_repo=$(sed '/^\s*$/d' $pkgs_to_copy | sort | uniq)
-    printf '%s' "$pkgs_2_repo" > $pkgs_to_repo
+    case $cache_source in
+
+	pacman )
+	    for file in $pkg_cache_dir/*; do
+
+		realpath $file >> $pkgs_cache_ls
+
+		printf 'building pkgs_cache_ls %s\n' "$(basename $file)"
+
+	    done
+	    ;;
+
+	yay )
+	    realpath $(fd --type file '.*(\.pkg)?\.tar\.(gz|xz|zst)$' $pkg_cache_dir) >> $pkgs_cache_ls
+
+	    printf 'building pkgs_cache_ls %s\n' "$(basename $file)"
+	    ;;
+
+    esac
+
+    ## version sort and uniq pkgs_cache_ls content
+    pkgs_cache_ls_sorted=$(sort --version-sort $pkgs_cache_ls | uniq)
+    printf '%s' "$pkgs_cache_ls_sorted" > $pkgs_cache_ls
+}
+
+
+get_latest_package ()
+{
+    # pkg_name_ver=$(pacman -Qo $pkg_hajime | cut -d ' ' -f 5-6 | tr ' ' '-')
+    pkg_ver_latest=$(cat "$pkgs_cache_ls" \
+		       | grep --extended-regexp ".*/${pkg_hajime}-[0-9].*\.pkg\.tar\.(xz|zst)$" \
+		       | sort --version-sort \
+		       | tail -n 1)
+}
+
+
+get_latest_dep ()
+{
+    # pkg_name_ver=$(pacman -Qo $pkg_hajime | cut -d ' ' -f 5-6 | tr ' ' '-')
+    pkg_dep_latest=$(cat "$pkgs_cache_ls" \
+			 | grep --extended-regexp ".*/${pkg_dep}-[0-9].*\.pkg\.tar\.(xz|zst)$" \
+			 | sort --version-sort \
+			 | tail -n 1)
 }
 
 
 pkg_get_deps ()
 {
     pkg_main=$1
+
+    ## tail first line of pactree is queried package
     pkg_main_deps=$(pactree --linear --depth 1 $pkg_main | tail -n +2 | sort)
 }
 
@@ -620,10 +610,20 @@ get_dep_file ()
 }
 
 
-copy_2_repo ()
+optimize_pkgs_to_repo ()
 {
-    #TODO DEV linux is not getting into the repo, why?
+    pkgs_to_repo="$XDG_CACHE_HOME/temp/pkgs-to-repo-$(id -u $USER)"
+
+    ## sed removes empty lines, sort and uniq
+    pkgs_2_repo=$(sed '/^\s*$/d' $pkgs_to_copy | sort | uniq)
+    printf '%s' "$pkgs_2_repo" > $pkgs_to_repo
+}
+
+
+copy_pkgs_to_repo ()
+{
     mountpoint -q "$dst"
+
     if [[ $? -eq 0 ]]; then
 
 	for package in $(cat $pkgs_to_repo); do
@@ -650,7 +650,7 @@ copy_2_repo ()
 }
 
 
-repo_add ()
+build_database ()
 {
     # build custom pacman offline package database
     db_name='offline'
@@ -671,12 +671,12 @@ repo_add ()
 main ()
 {
     get_args "$@"
-    ts=$(printf '%s_%X\n' "$(date $DT)" "$(date +'%s')")
-
     create_hajime_pkgs
-    define_pkgs_2_repo
-    copy_2_repo
-    repo_add
+    define_pkgs_cache_ls
+    create_pkgs_to_copy
+    optimize_pkgs_to_repo
+    copy_pkgs_to_repo
+    build_database
 }
 
 main "$@"
