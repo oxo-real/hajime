@@ -62,7 +62,14 @@ developer='oxo'
 license='gplv3'
 initial_release='2019'
 
-ts=$(printf '%s_%X\n' "$(date $DT)" "$(date +'%s')")
+## hardcoded variables
+db_name='offline'
+cy="$XDG_CACHE_HOME/yay"
+vcpp='/var/cache/pacman/pkg'
+pkgs_to_repo="$XDG_CACHE_HOME/temp/pkgs-to-repo-$(id -u $USER)"
+pkgs_to_copy="$XDG_CACHE_HOME/temp/pkgs-to-copy-$(id -u $USER)"
+pkgs_hajime="$HOME/c/git/code/hajime/pkgs-hajime-$(id -u $USER)"
+pkgs_to_copy_err="$XDG_CACHE_HOME/temp/pkgs-to-copy-$(id -u $USER)-err"
 
 #--------------------------------
 
@@ -473,8 +480,6 @@ create_hajime_pkgs ()
     create_manual_added_list
     apps_pkgs+=("${manual_packages[@]}")
 
-    pkgs_hajime="$HOME/c/git/code/hajime/pkgs-hajime-$(id -u $USER)"
-
     ## write pkgs_hajime (pkgs-hajime-1000)
     printf '%s\n' "${apps_pkgs[@]}" | sort > "$pkgs_hajime"
 }
@@ -483,10 +488,6 @@ create_hajime_pkgs ()
 define_pkgs_cache_ls ()
 {
     # define the packages that have to be copied to the repo
-
-    ## package cache directories (pacman and yay)
-    vcpp='/var/cache/pacman/pkg'
-    cy="$XDG_CACHE_HOME/yay"
 
     ## cache source file pkgs-cache-ls
     pkgs_cache_ls="$XDG_CACHE_HOME/temp/pkgs-cache-ls-$(id -u $USER)"
@@ -504,9 +505,6 @@ define_pkgs_cache_ls ()
 
 create_pkgs_to_copy ()
 {
-    pkgs_to_copy="$XDG_CACHE_HOME/temp/pkgs-to-copy-$(id -u $USER)"
-    pkgs_to_copy_err="$XDG_CACHE_HOME/temp/pkgs-to-copy-$(id -u $USER)-err"
-
     ## remove existing pkgs_hajime_err file
     [[ -f $pkgs_to_copy ]] && rm -rf $pkgs_to_copy
     [[ -f $pkgs_to_copy_err ]] && rm -rf $pkgs_to_copy_err
@@ -612,8 +610,6 @@ get_dep_file ()
 
 optimize_pkgs_to_repo ()
 {
-    pkgs_to_repo="$XDG_CACHE_HOME/temp/pkgs-to-repo-$(id -u $USER)"
-
     ## sed removes empty lines, sort and uniq
     pkgs_2_repo=$(sed '/^\s*$/d' $pkgs_to_copy | sort | uniq)
     printf '%s' "$pkgs_2_repo" > $pkgs_to_repo
@@ -652,19 +648,24 @@ copy_pkgs_to_repo ()
 
 build_database ()
 {
-    # build custom pacman offline package database
-    db_name='offline'
-    echo
+    mountpoint -q "$dst"
 
-    for package in $(cat $pkgs_to_repo); do
-	#TODO DEV read file directly
+    if [[ $? -eq 0 ]]; then
 
-	p_basename=$(basename $package)
-	printf '==> adding %s/%s\n' "$dst" "$p_basename"
+	# build custom pacman offline package database
+	echo
 
-	repo-add --new --remove --include-sigs $dst/$db_name.db.tar.zst $dst/$p_basename
+	for package in $(cat $pkgs_to_repo); do
+	    #TODO DEV read file directly
 
-    done
+	    p_basename=$(basename $package)
+	    printf '==> adding %s/%s\n' "$dst" "$p_basename"
+
+	    repo-add --new --remove --include-sigs $dst/$db_name.db.tar.zst $dst/$p_basename
+
+	done
+
+    fi
 }
 
 
