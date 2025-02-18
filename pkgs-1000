@@ -42,7 +42,9 @@ i3blocks
 iftop
 imagemagick
 imv
+intel-ucode
 isync
+iucode-tool
 iw
 jq
 kdenlive
@@ -67,6 +69,7 @@ msmtp
 mtr
 mupdf
 ncurses5-compat-libs
+ncurses5-compat-libs
 neofetch
 neomutt
 neovim
@@ -76,9 +79,12 @@ notmuch
 ntfs-3g
 nyxt
 obs
+obs
+obs-backgroundremoval
 obs-backgroundremoval
 opendoas
 openssh
+otf-unifont
 otf-unifont
 pacman-contrib
 pass
@@ -89,8 +95,10 @@ pipewire-jack
 pipewire-pulse
 protonmail-bridge
 pulseaudio-bluetooth
+pulseaudio-bluetooth
 pv
 qalculate-qt
+qpwgraph-qt5
 qpwgraph-qt5
 qrencode
 qt6ct
@@ -106,6 +114,7 @@ slurp
 sof-firmware
 sqlitebrowser
 sshfs
+stellarium
 stellarium
 strace
 sway

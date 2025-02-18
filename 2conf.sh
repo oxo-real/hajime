@@ -67,7 +67,7 @@ initial_release='2017'
 # user customizable variables
 
 ## offline installation
-if [[ -f /offline ]]; then
+if [[ -f /offline || -f /mnt/offline ]]; then
 
     offline=1
     code_dir='/tmp'

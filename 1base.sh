@@ -25,7 +25,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+MERCHANTABILITY or FITNESS FOR A PARTICst_ulAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
@@ -154,10 +154,11 @@ pkg_base_devel='base-devel'
 
 
 ## recommended percentages of $lvm_size_calc
-root_perc=0.01	## recommended minimum 1G
-usr_perc=0.10	## recommended minimum 10G
-var_perc=0.10	## recommended minimum 10G
-home_perc=0.75
+root_perc=0.05	## recommended minimum 1G
+tmp_perc=0.02	## recommended minimum 1G
+usr_perc=0.15	## recommended minimum 10G
+var_perc=0.15	## recommended minimum 10G
+home_perc=0.60
 
 ## boot size (MB)
 boot_size=256
@@ -171,7 +172,7 @@ boot_size=256
 ###  <1GB     1*ram_size      2*ram_size
 ###  >1GB     sqrt(ram_size)  2*ram_size
 
-swap_size_recomm=2.00
+swap_size_recomm=4.00
 
 ## files
 file_mnt_etc_fstab="/mnt/etc/fstab"
@@ -180,16 +181,14 @@ file_mnt_etc_fstab="/mnt/etc/fstab"
 define_text_appearance()
 {
     ## text color
-    MAGENTA='\033[0;35m'	# magenta
-    GREEN='\033[0;32m'		# green
-    RED='\033[0;31m'		# red
-    NOC='\033[0m'			# no color
+    fg_magenta='\033[0;35m'	# magenta
+    fg_green='\033[0;32m'	# green
+    fg_red='\033[0;31m'		# red
 
     ## text style
-    UL=`tput smul`			# underline
-    NUL=`tput rmul`			# no underline
-    BOLD=`tput bold`		# bold
-    NORMAL=`tput sgr0`		# normal
+    st_def='\033[0m'		# default
+    st_ul=`tput smul`		# underline
+    st_bold=`tput bold`		# bold
 }
 
 #--------------------------------
@@ -197,14 +196,14 @@ define_text_appearance()
 
 # define reply functions
 
-reply_plain()
+reply_plain ()
 {
     # entry must be confirmed explicitly (by pushing enter)
     read reply
 }
 
 
-reply_single()
+reply_single ()
 {
     # first entered character goes directly to $reply
     stty_0=$(stty -g)
@@ -214,7 +213,7 @@ reply_single()
 }
 
 
-reply_single_hidden()
+reply_single_hidden ()
 {
     # first entered character goes silently to $reply
     stty_0=$(stty -g)
@@ -239,7 +238,7 @@ exit_hajime ()
 }
 
 
-get_bootmount()
+get_bootmount ()
 {
     # get current bootmount blockdevice name
     #bootmnt_dev=$(mount | grep bootmnt | awk '{print $1}')
@@ -249,7 +248,13 @@ get_bootmount()
 }
 
 
-network_setup()
+get_lsblk ()
+{
+    lsblk --ascii --tree -o name,uuid,fstype,path,size,fsuse%,fsused,label,mountpoint
+}
+
+
+network_setup ()
 {
     if [[ $offline -ne 1 ]]; then
 
@@ -266,7 +271,7 @@ network_setup()
 }
 
 
-console_font()
+console_font ()
 {
     ## especially useful for hiDPI screens on X
 
@@ -279,7 +284,7 @@ console_font()
 }
 
 
-clock()
+clock ()
 {
     ## hardware clock (rtc) coordinated universal time (UTC)
     timedatectl set-local-rtc $rtc_local_timezone
@@ -297,12 +302,12 @@ clock()
 }
 
 
-set_key_device()
+set_key_device ()
 {
     ## usb device where detached luks header and keyfile will be stored
 
     ## lsblk for human
-    lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint
+    get_lsblk
     echo
 
     ## request key device path
@@ -313,7 +318,9 @@ set_key_device()
     key_dev=$reply
 
     echo
-    printf '%s\n' "$(lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint | grep "$key_dev")"
+
+    printf '%s\n' "$(get_lsblk | grep "$key_dev")"
+    #printf '%s\n' "$(lsblk --ascii --tree -o name,uuid,fstype,path,size,fsuse%,fsused,label,mountpoint | grep "$key_dev")"
     echo
 
     if [ "$key_dev" == "$bootmnt_dev" ] ; then
@@ -326,7 +333,7 @@ set_key_device()
 	set_key_device
     fi
 
-    printf "KEY device: '$key_dev', correct? (Y/n) "
+    printf "KEY device: '$key_dev', correct? [Y/n] "
     reply_single_hidden
     if printf "$reply" | grep -iq "^n" ; then
 	clear
@@ -339,7 +346,7 @@ set_key_device()
 
     ## create key partition
     ## info for human
-    printf "add a new ${BOLD}8300${NORMAL} (Linux filesystem) partition\n"
+    printf "add a new ${st_bold}8300${st_def} (Linux filesystem) partition\n"
     echo
     printf "<o>	create a new empty GUID partition table (GPT)\n"
     printf "<n>	add a new partition\n"
@@ -351,13 +358,13 @@ set_key_device()
 }
 
 
-set_boot_device()
+set_boot_device ()
 {
     ## boot partition can be on its own separate device or
     ## on its own (first) partition on the system device
 
     ## lsblk for human
-    lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint
+    get_lsblk
     echo
 
 
@@ -365,12 +372,13 @@ set_boot_device()
     printf "the BOOT device will contain the systemd-boot bootloader and\n"
     printf "the init ramdisk environment (initramfs) for booting the linux kernel\n"
     echo
-    printf "enter full path of the BOOT ${BOLD}device${NOC} (i.e. /dev/sdB): "
+    printf "enter full path of the BOOT ${st_bold}device${st_def} (i.e. /dev/sdB): "
     reply_plain
     boot_dev=$reply
 
     echo
-    printf '%s\n' "$(lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint | grep "$boot_dev")"
+    printf '%s\n' "$(get_lsblk | grep "$boot_dev")"
+    #printf '%s\n' "$(lsblk --ascii --tree -o name,uuid,fstype,path,size,fsuse%,fsused,label,mountpoint | grep "$boot_dev")"
     echo
 
     if [ "$boot_dev" == "$bootmnt_dev" ] ; then
@@ -396,7 +404,7 @@ set_boot_device()
 
     ## create boot partition
     ## info for human
-    printf "add a new ${BOLD}ef00${NORMAL} (EFI System) partition\n"
+    printf "add a new ${st_bold}ef00${st_def} (EFI System) partition\n"
     echo
     printf "<o>	create a new empty GUID partition table (GPT)\n"
     printf "<n>	add a new partition\n"
@@ -408,19 +416,19 @@ set_boot_device()
 }
 
 
-set_lvm_device()
+set_lvm_device ()
 {
     ## LVM system partition installation target
 
     ## lsblk for human
-    lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint
+    get_lsblk
     echo
 
 
     ## request lvm device path
     printf "on the LVM device the LVM partition will be created\n"
     echo
-    printf "enter full path of the LVM ${BOLD}device${NOC} (i.e. /dev/sdL): "
+    printf "enter full path of the LVM ${st_bold}device${st_def} (i.e. /dev/sdL): "
     reply_plain
     lvm_dev=$reply
 
@@ -435,7 +443,8 @@ set_lvm_device()
     fi
 
     echo
-    printf '%s\n' "$(lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint | grep "$lvm_dev")"
+    printf '%s\n' "$(get_lsblk | grep "$lvm_dev")"
+    #printf '%s\n' "$(lsblk --ascii --tree -o name,uuid,fstype,path,size,fsuse%,fsused,label,mountpoint | grep "$lvm_dev")"
     echo
 
     printf "LVM device: '$lvm_dev', correct? (Y/n) "
@@ -451,7 +460,7 @@ set_lvm_device()
 
     ## create lvm partition
     ## info for human
-    printf "add a new ${BOLD}8e00${NORMAL} (Linux LVM) partition\n"
+    printf "add a new ${st_bold}8e00${st_def} (Linux LVM) partition\n"
     echo
     printf "<o>	create a new empty GUID partition table (GPT)\n"
     printf "<n>	add a new partition\n"
@@ -463,12 +472,12 @@ set_lvm_device()
 }
 
 
-set_key_partition()
+set_key_partition ()
 {
     ## dialog
     ## lsblk for human
     clear
-    lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint
+    get_lsblk
     echo
 
     printf "enter KEY partition number: $key_dev"
@@ -485,12 +494,13 @@ set_key_partition()
     key_part=$key_dev$key_part_no
 
     echo
-    printf '%s\n' "$(lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint | grep $key_dev)"
+    printf '%s\n' "$(get_lsblk | grep $key_dev)"
+    #printf '%s\n' "$(lsblk --ascii --tree -o name,uuid,fstype,path,size,fsuse%,fsused,label,mountpoint | grep $key_dev)"
     echo
 
     ## check partition exists in lsblk
     if [ -z "$(lsblk -paf | grep -w $key_part)" ]; then
-	printf "no valid partition, not found in lsblk\n"
+	printf "partition not found in lsblk\n"
 	printf "please retry\n"
 	sleep 1
 	set_key_partition
@@ -510,15 +520,15 @@ set_key_partition()
 }
 
 
-set_boot_partition()
+set_boot_partition ()
 {
     ## dialog
     ## lsblk for human
     clear
-    lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint
+    get_lsblk
     echo
 
-    printf "enter BOOT ${BOLD}partition${NOC} number: $boot_dev"
+    printf "enter BOOT ${st_bold}partition${st_def} number: $boot_dev"
     reply_plain
 
     # boot partition is compulsory
@@ -532,7 +542,8 @@ set_boot_partition()
     boot_part=$boot_dev$boot_part_no
 
     echo
-    printf '%s\n' "$(lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint | grep "$boot_dev")"
+    printf '%s\n' "$(get_lsblk | grep "$boot_dev")"
+    #printf '%s\n' "$(lsblk --ascii --tree -o name,uuid,fstype,path,size,fsuse%,fsused,label,mountpoint | grep "$boot_dev")"
     echo
 
     ## check partition exists in lsblk
@@ -557,27 +568,28 @@ set_boot_partition()
 }
 
 
-set_lvm_partition()
+set_lvm_partition ()
 {
     ## dialog
     ## lsblk for human
     clear
-    lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint
+    get_lsblk
     echo
 
     printf "inside the LVM partition the LVM volumegroup will be created\n"
-    printf "enter LVM ${BOLD}partition${NOC} number: $lvm_dev"
+    printf "enter LVM ${st_bold}partition${st_def} number: $lvm_dev"
     reply_plain
     lvm_part_no=$reply
     lvm_part=$lvm_dev$lvm_part_no
 
     echo
-    printf '%s\n' "$(lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint | grep "$lvm_dev")"
+    printf '%s\n' "$(get_lsblk | grep "$lvm_dev")"
+    #printf '%s\n' "$(lsblk --ascii --tree -o name,uuid,fstype,path,size,fsuse%,fsused,label,mountpoint | grep "$lvm_dev")"
     echo
 
     ## check partition exists in lsblk
     if [ -z "$(lsblk -paf | grep -w $lvm_part)" ]; then
-	printf "no valid partition, not found in lsblk\n"
+	printf "partition not found in lsblk\n"
 	printf "please retry\n"
 	sleep 1
 	set_lvm_partition
@@ -597,18 +609,18 @@ set_lvm_partition()
 }
 
 
-set_lvm_partition_sizes()
+set_lvm_partition_sizes ()
 {
     ## lsblk for human
     clear
-    lsblk -i --tree -o name,fstype,uuid,path,size,fsuse%,fsused,label,mountpoint
+    get_lsblk
     echo
 
     lvm_size_bytes=$(lsblk -o path,size -b | grep $lvm_part | awk '{print $2}')
     lvm_size_human=$(lsblk -o path,size | grep $lvm_part | awk '{print $2}')
     lvm_size_calc=$(lsblk -o path,size | grep $lvm_part | awk '{print $2+0}')
     printf "size of the encrypted LVM volumegroup '$lvm_part' is $lvm_size_human\n"
-    printf "logical volumes ROOT, USR, VAR & HOME are being created\n"
+    printf "logical volumes ROOT, TMP, USR, VAR & HOME are being created\n"
     echo
 
     ## optional swap partition
@@ -648,6 +660,7 @@ set_lvm_partition_sizes()
 
     ## calculate initial recommended sizes
     root_size_calc=`echo - | awk "{print $root_perc * $space_left}"`
+    tmp_size_calc=`echo - | awk  "{print $tmp_perc * $space_left}"`
     usr_size_calc=`echo - | awk  "{print $usr_perc * $space_left}"`
     var_size_calc=`echo - | awk  "{print $var_perc * $space_left}"`
     home_size_calc=`echo - | awk "{print $home_perc * $space_left}"`
@@ -674,6 +687,43 @@ set_lvm_partition_sizes()
     space_left=`echo - | awk "{print $space_left - $root_size}"`
 
     ### percentages
+    tot_perc=`echo - | awk "{print $tmp_perc + $usr_perc + $var_perc + $home_perc}"`
+
+    usr_perc=`echo - | awk "{print $tmp_perc / $tot_perc}"`
+    usr_perc=`echo - | awk "{print $usr_perc / $tot_perc}"`
+    var_perc=`echo - | awk "{print $var_perc / $tot_perc}"`
+    home_perc=`echo - | awk "{print $home_perc / $tot_perc}"`
+
+    ### sizes
+    tmp_size_calc=`echo - | awk  "{print $tmp_perc * $space_left}"`
+    usr_size_calc=`echo - | awk  "{print $usr_perc * $space_left}"`
+    var_size_calc=`echo - | awk  "{print $var_perc * $space_left}"`
+    home_size_calc=`echo - | awk "{print $home_perc * $space_left}"`
+
+    printf "						ROOT set to "$root_size"GB ("$space_left"GB space left on "$lvm_part")\n"
+
+    ## TMP  partition
+    printf "TMP  partition size {>=1G} (GB)? [$usr_size_calc] "
+    reply_plain
+
+    if [ -n "$reply" ]; then
+
+	tmp_size_calc=`echo - | awk "{print $reply * 1}"`
+	### remove decimals
+	tmp_size="${tmp_size_calc%%.*}"
+
+    else
+
+	### remove decimals
+	tmp_size="${tmp_size_calc%%.*}"
+
+    fi
+
+    ## recalculate
+    ### space left after tmp size chosen
+    space_left=`echo - | awk "{print $space_left - $tmp_size}"`
+
+    ### percentages
     tot_perc=`echo - | awk "{print $usr_perc + $var_perc + $home_perc}"`
 
     usr_perc=`echo - | awk "{print $usr_perc / $tot_perc}"`
@@ -685,7 +735,7 @@ set_lvm_partition_sizes()
     var_size_calc=`echo - | awk  "{print $var_perc * $space_left}"`
     home_size_calc=`echo - | awk "{print $home_perc * $space_left}"`
 
-    printf "						ROOT set to "$root_size"GB ("$space_left"GB space left on "$lvm_part")\n"
+    printf "						TMP  set to "$tmp_size"GB ("$space_left"GB space left on "$lvm_part")\n"
 
     ## USR  partition
     printf "USR  partition size {>=10G} (GB)? [$usr_size_calc] "
@@ -776,7 +826,7 @@ set_lvm_partition_sizes()
     printf "						HOME set to "$home_size"GB ("$space_left"GB space left on "$lvm_part")\n"
 
     ## total
-    total_size_calc=`echo - | awk "{print $swap_size + $root_size + $usr_size + $var_size + $home_size}"`
+    total_size_calc=`echo - | awk "{print $swap_size + $root_size + $tmp_size + $usr_size + $var_size + $home_size}"`
     diff_total_lvm_calc=`echo - | awk "{print $total_size_calc - $lvm_size_calc}"`
     diff_t="$(echo $diff_total_lvm_calc | awk -F . '{print $1}')"
     echo
@@ -800,7 +850,7 @@ set_lvm_partition_sizes()
 }
 
 
-legacy_cryptsetup()
+legacy_cryptsetup ()
 {
     #cryptsetup on designated partition
 
@@ -809,13 +859,13 @@ legacy_cryptsetup()
 }
 
 
-cryptboot()
+cryptboot ()
 {
     ## parameters
     cryptboot_hash="sha512"
     cryptboot_cipher="twofish-xts-plain64"
     cryptboot_keysize=512
-    cryptboot_iter_msecs=6000	# secure minimum = 6000ms
+    cryptboot_iter_msecs=6000  ## secure minimum = 6000ms
 
     ## create
     sudo cryptsetup \
@@ -842,7 +892,7 @@ cryptboot()
 }
 
 
-cryptkey()
+cryptkey ()
 {
     ## create key file inside cryptboot (on key_device mounted on /mnt)
     # create crytpkey.img on key device for cryptkey
@@ -891,7 +941,7 @@ cryptkey()
 }
 
 
-cryptlvm()
+cryptlvm ()
 {
     ## parameters
     header_hash="sha512"
@@ -929,7 +979,7 @@ cryptlvm()
 }
 
 
-create_lvm_volumes()
+create_lvm_volumes ()
 {
     ## create physical volume with lvm
     pvcreate /dev/mapper/cryptlvm
@@ -940,35 +990,39 @@ create_lvm_volumes()
     ## create logical volumes
     lvcreate -L "$root_size"G vg0 -n lv_root
     lvcreate -L "$home_size"G vg0 -n lv_home
+    lvcreate -L "$tmp_size"G vg0 -n lv_tmp
     lvcreate -L "$usr_size"G vg0 -n lv_var
     lvcreate -L "$var_size"G vg0 -n lv_usr
 }
 
 
-make_filesystems()
+make_filesystems ()
 {
     mkfs.vfat -F 32 -n BOOT "$boot_part"
     mkfs.ext4 -L ROOT /dev/mapper/vg0-lv_root
     mkfs.ext4 -L HOME /dev/mapper/vg0-lv_home
+    mkfs.ext4 -L TMP /dev/mapper/vg0-lv_tmp
     mkfs.ext4 -L USR /dev/mapper/vg0-lv_usr
     mkfs.ext4 -L VAR /dev/mapper/vg0-lv_var
 }
 
 
-create_mountpoints()
+create_mountpoints ()
 {
     mount /dev/mapper/vg0-lv_root /mnt
     mkdir /mnt/boot
     mkdir /mnt/home
+    mkdir /mnt/tmp
     mkdir /mnt/usr
     mkdir /mnt/var
 }
 
 
-mount_partitions()
+mount_partitions ()
 {
     mount "$boot_part" /mnt/boot
     mount /dev/mapper/vg0-lv_home /mnt/home
+    mount /dev/mapper/vg0-lv_tmp /mnt/tmp
     mount /dev/mapper/vg0-lv_usr /mnt/usr
     mount /dev/mapper/vg0-lv_var /mnt/var
 }
@@ -977,14 +1031,19 @@ mount_partitions()
 create_swap_partition()
 {
     if [[ $swap_bool == "Y" || $swap_bool == "y" ]]; then
+
 	lvcreate -L "$swap_size"G vg0 -n lv_swap
 	mkswap -L SWAP /dev/mapper/vg0-lv_swap
+
 	swapon /dev/mapper/vg0-lv_swap
+
+	echo
+
     fi
 }
 
 
-install_helpers()
+install_helpers ()
 {
     # clear cache
     #pacman -Scc
@@ -1025,7 +1084,7 @@ install_helpers()
 }
 
 
-configure_mirrorlists()
+configure_mirrorlists ()
 {
     if [[ $offline -ne 1 ]]; then
 
@@ -1045,7 +1104,7 @@ configure_mirrorlists()
 }
 
 
-install_base_devel_package_groups()
+install_base_devel_package_groups ()
 {
     packages="${pkg_core} ${pkg_base_devel}"
     # -K initialize an empty pacman keyring in the target (implies -G).
@@ -1057,14 +1116,14 @@ install_base_devel_package_groups()
 }
 
 
-generate_fstab()
+generate_fstab ()
 {
     # file system table
     genfstab -U -p /mnt >> $file_mnt_etc_fstab
 }
 
 
-modify_fstab()
+modify_fstab ()
 {
     ## fstab /usr entry with nopass 0
     sed -i '/\/usr/s/.$/0/' $file_mnt_etc_fstab
@@ -1080,7 +1139,7 @@ modify_fstab()
 }
 
 
-prepare_mnt_environment()
+prepare_mnt_environment ()
 {
     echo 'copying hajime and pacman configuration into the new environment'
 
@@ -1112,7 +1171,7 @@ prepare_mnt_environment()
 }
 
 
-user_advice()
+user_advice ()
 {
 	echo 'now changing root'
 	echo 'to continue execute:'
@@ -1122,27 +1181,27 @@ user_advice()
 }
 
 
-finishing()
+finishing ()
 {
 	arch-chroot /mnt touch hajime/1base.done
 }
 
 
-switch_to_installation_environment()
+switch_to_installation_environment ()
 {
 	# default bash will be ran inside the root jail
 	arch-chroot /mnt
 }
 
 
-welcome()
+welcome ()
 {
 	clear
 	printf " hajime\n"
 	printf " 2019 - 2024  |  oxo\n"
 	echo
 	echo
-	printf " ${BOLD}CAUTION!${NORMAL}\n"
+	printf " ${st_bold}CAUTION!${st_def}\n"
 	printf " Hajime will install an Arch Linux operating system on this machine.\n"
 	echo
 	printf " By entering 'y/Y' you consent fully to the following:\n"
@@ -1150,13 +1209,13 @@ welcome()
 	printf " Continuing execution and usage of this software is ${st_bold}at own risk!${st_def}\n"
 	printf " Opting out by entering 'n/N' and cancel the installation.\n"
 	echo
-	printf " Continuing will ${BOLD}overwrite existing data${st_def} on designated devices.\n"
+	printf " Continuing will ${st_bold}overwrite existing data${st_def} on designated devices.\n"
 	printf " This software is subject to continuous development, carefully consider its beta state. \n"
 
 	printf " Be sure to have the most recent version of the arch installation media!\n"
 	printf " Use the 'isolatest' package to get the most recent authentic iso image.\n"
-	printf " You can download your copy via: ${UL}https://codeberg.org/oxo/isolatest${NUL}\n"
-	printf " Or retrieve an installation image via: ${UL}https://www/archlinux.org/download/${NUL}\n"
+	printf " You can download your copy via: ${st_ul}https://codeberg.org/oxo/isolatest${st_def}\n"
+	printf " Or retrieve an installation image via: ${st_ul}https://www/archlinux.org/download/${Nst_ul}\n"
 	echo
 	echo
 	printf " Continue installation? (y/N) "
@@ -1192,7 +1251,13 @@ welcome()
 }
 
 
-main()
+arch_install ()
+{
+    archinstall
+}
+
+
+main ()
 {
 	define_text_appearance
 	welcome
@@ -1216,6 +1281,9 @@ main()
 	create_mountpoints
 	mount_partitions
 	create_swap_partition
+
+	#arch_install
+
 	install_helpers
 	configure_mirrorlists
 	install_base_devel_package_groups
