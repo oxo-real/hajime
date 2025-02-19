@@ -43,7 +43,7 @@ https://www.gnu.org/licenses/gpl-3.0.txt
   archiso, REPO, 0init.sh
 
 # usage
-  sh hajime/1base.sh
+  sh hajime/1base.sh [--offline]
 
 # example
   n/a
@@ -66,10 +66,6 @@ initial_release='2017'
 ## hardcoded variables
 
 # user customizable variables
-
-## offline installation
-[[ -f /mnt/offline ]] && offline=1
-# mountpoints set in 0init are unchanged
 
 timezone="CET"
 sync_system_clock_over_ntp="true"
@@ -235,6 +231,13 @@ exit_hajime ()
     sleep 1
     clear
     exit
+}
+
+
+args="$@"
+getargs ()
+{
+    [[ "$1" =~ offline$ ]] && offline=1
 }
 
 
@@ -1173,81 +1176,81 @@ prepare_mnt_environment ()
 
 user_advice ()
 {
-	echo 'now changing root'
-	echo 'to continue execute:'
-	echo
-	echo 'sh hajime/2conf.sh'
-	echo
+    echo 'now changing root'
+    echo 'to continue execute:'
+    echo
+    echo 'sh hajime/2conf.sh [--offline]'
+    echo
 }
 
 
 finishing ()
 {
-	arch-chroot /mnt touch hajime/1base.done
+    arch-chroot /mnt touch hajime/1base.done
 }
 
 
 switch_to_installation_environment ()
 {
-	# default bash will be ran inside the root jail
-	arch-chroot /mnt
+    # default bash will be ran inside the root jail
+    arch-chroot /mnt
 }
 
 
 welcome ()
 {
+    clear
+    printf " hajime\n"
+    printf " 2019 - 2024  |  oxo\n"
+    echo
+    echo
+    printf " ${st_bold}CAUTION!${st_def}\n"
+    printf " Hajime will install an Arch Linux operating system on this machine.\n"
+    echo
+    printf " By entering 'y/Y' you consent fully to the following:\n"
+    printf " This software is provided 'as is' and without warranty of any kind.\n"
+    printf " Continuing execution and usage of this software is ${st_bold}at own risk!${st_def}\n"
+    printf " Opting out by entering 'n/N' and cancel the installation.\n"
+    echo
+    printf " Continuing will ${st_bold}overwrite existing data${st_def} on designated devices.\n"
+    printf " This software is subject to continuous development, carefully consider its beta state. \n"
+
+    printf " Be sure to have the most recent version of the arch installation media!\n"
+    printf " Use the 'isolatest' package to get the most recent authentic iso image.\n"
+    printf " You can download your copy via: ${st_ul}https://codeberg.org/oxo/isolatest${st_def}\n"
+    printf " Or retrieve an installation image via: ${st_ul}https://www/archlinux.org/download/${Nst_ul}\n"
+    echo
+    echo
+    printf " Continue installation? (y/N) "
+
+    reply_single
+
+    if printf "$reply" | grep -iq "^y" ; then
+
+	echo
+	echo
+	echo
+	printf " Kamaete "
+	sleep 0.5
+	printf "."
+	sleep 0.4
+	printf "."
+	sleep 0.3
+	printf "."
+	sleep 0.2
+	printf " HAJIME! "
+	sleep 1
 	clear
-	printf " hajime\n"
-	printf " 2019 - 2024  |  oxo\n"
+
+    else
+
 	echo
 	echo
-	printf " ${st_bold}CAUTION!${st_def}\n"
-	printf " Hajime will install an Arch Linux operating system on this machine.\n"
 	echo
-	printf " By entering 'y/Y' you consent fully to the following:\n"
-	printf " This software is provided 'as is' and without warranty of any kind.\n"
-	printf " Continuing execution and usage of this software is ${st_bold}at own risk!${st_def}\n"
-	printf " Opting out by entering 'n/N' and cancel the installation.\n"
-	echo
-	printf " Continuing will ${st_bold}overwrite existing data${st_def} on designated devices.\n"
-	printf " This software is subject to continuous development, carefully consider its beta state. \n"
+	printf " YAME! "
+	exit_hajime
 
-	printf " Be sure to have the most recent version of the arch installation media!\n"
-	printf " Use the 'isolatest' package to get the most recent authentic iso image.\n"
-	printf " You can download your copy via: ${st_ul}https://codeberg.org/oxo/isolatest${st_def}\n"
-	printf " Or retrieve an installation image via: ${st_ul}https://www/archlinux.org/download/${Nst_ul}\n"
-	echo
-	echo
-	printf " Continue installation? (y/N) "
-
-	reply_single
-
-	if printf "$reply" | grep -iq "^y" ; then
-
-		echo
-		echo
-		echo
-		printf " Kamaete "
-		sleep 0.5
-		printf "."
-		sleep 0.4
-		printf "."
-		sleep 0.3
-		printf "."
-		sleep 0.2
-		printf " HAJIME! "
-		sleep 1
-		clear
-
-	else
-
-		echo
-	    echo
-	    echo
-	    printf " YAME! "
-		exit_hajime
-
-	fi
+    fi
 }
 
 
@@ -1259,40 +1262,41 @@ arch_install ()
 
 main ()
 {
-	define_text_appearance
-	welcome
-	get_bootmount
-	network_setup
-	#console_font
-	clock
-	## ##set_key_device
-	set_boot_device
-	set_lvm_device
-	## ##set_key_partition
-	set_boot_partition
-	set_lvm_partition
-	set_lvm_partition_sizes
-	## ##cryptboot
-	## ##cryptkey
-	## ##cryptlvm
-	legacy_cryptsetup
-	create_lvm_volumes
-	make_filesystems
-	create_mountpoints
-	mount_partitions
-	create_swap_partition
+    getargs $args
+    define_text_appearance
+    welcome
+    get_bootmount
+    network_setup
+    #console_font
+    clock
+    ## ##set_key_device
+    set_boot_device
+    set_lvm_device
+    ## ##set_key_partition
+    set_boot_partition
+    set_lvm_partition
+    set_lvm_partition_sizes
+    ## ##cryptboot
+    ## ##cryptkey
+    ## ##cryptlvm
+    legacy_cryptsetup
+    create_lvm_volumes
+    make_filesystems
+    create_mountpoints
+    mount_partitions
+    create_swap_partition
 
-	#arch_install
+    #arch_install
 
-	install_helpers
-	configure_mirrorlists
-	install_base_devel_package_groups
-	generate_fstab
-	modify_fstab
-	prepare_mnt_environment
-	user_advice
-	finishing
-	switch_to_installation_environment
+    install_helpers
+    configure_mirrorlists
+    install_base_devel_package_groups
+    generate_fstab
+    modify_fstab
+    prepare_mnt_environment
+    user_advice
+    finishing
+    switch_to_installation_environment
 }
 
 main

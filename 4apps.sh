@@ -15,7 +15,7 @@
 : '
 hajime_4apps
 fourth part of linux installation
-copyright (c) 2019 - 2024  |  oxo
+copyright (c) 2019 - 2025  |  oxo
 
 GNU GPLv3 GENERAL PUBLIC LICENSE
 This program is free software: you can redistribute it and/or modify
@@ -44,7 +44,7 @@ https://www.gnu.org/licenses/gpl-3.0.txt
   archiso, REPO, 0init.sh, 1base.sh, 2conf.sh, 3post.sh
 
 # usage
-  sh hajime/4apps.sh
+  sh hajime/4apps.sh [--offline]
 
 # example
   n/a
@@ -67,15 +67,25 @@ initial_release='2019'
 ## hardcoded variables
 # user customizable variables
 
-## offline installation
-offline=1
-code_dir="/home/$(id -un)/dock/3"
-repo_dir="/home/$(id -un)/dock/2"
-repo_re="\/home\/$(id -un)\/dock\/2"
-file_etc_pacman_conf='/etc/pacman.conf'
-aur_dir="$repo_dir/aur"
-
 #--------------------------------
+
+args="$@"
+getargs ()
+{
+    [[ "$1" =~ offline$ ]] && offline=1
+}
+
+
+offline_installation ()
+{
+    code_dir="/home/$(id -un)/dock/3"
+    repo_dir="/repo"
+    #repo_dir="/home/$(id -un)/dock/2"
+    repo_re="\/repo"
+    #repo_re="\/home\/$(id -un)\/dock\/2"
+    file_etc_pacman_conf='/etc/pacman.conf'
+}
+
 
 define_post_core_additions ()
 {
@@ -83,7 +93,7 @@ define_post_core_additions ()
 }
 
 
-define_core_applications()
+define_core_applications ()
 {
     wayland='dotool qt5-wayland qt6-wayland wev wlroots xorg-xwayland'
     ## qt5-wayland to prevent:
@@ -140,7 +150,7 @@ define_core_applications()
 }
 
 
-define_additional_tools()
+define_additional_tools ()
 {
     archivers=''
     #'vimball'
@@ -252,93 +262,7 @@ define_additional_tools()
 }
 
 
-mount_repo()
-{
-    repo_lbl='REPO'
-    repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
-
-    [[ -d $repo_dir ]] || mkdir -p "$repo_dir"
-
-    mountpoint -q $repo_dir
-    [[ $? -eq 0 ]] || sudo mount "$repo_dev" "$repo_dir"
-}
-
-
-get_offline_repo()
-{
-    case $offline in
-	1)
-	    mount_repo
-	    ;;
-    esac
-}
-
-
-mount_code()
-{
-    code_lbl='CODE'
-    code_dev=$(lsblk -o label,path | grep "$code_lbl" | awk '{print $2}')
-
-    [[ -d $code_dir ]] || mkdir -p "$code_dir"
-
-    mountpoint -q $code_dir
-    [[ $? -eq 0 ]] || sudo mount "$code_dev" "$code_dir"
-}
-
-
-get_offline_code()
-{
-    case $offline in
-	1)
-	    mount_code
-	    ;;
-    esac
-}
-
-
-install_yay()
-{
-    ## install yay
-    package='yay'
-    current_package_dir="$aur_dir/$package"
-    c_p_newest_version=$(ls $current_package_dir/*.pkg.tar.zst --reverse --sort=version | grep -v 'debug' | sed -n 1p)
-
-    sudo pacman -U --noconfirm $c_p_newest_version
-}
-
-
-install_aur()
-{
-    ## install aur packages
-    ## [Offline installation - ArchWiki]
-    ## (https://wiki.archlinux.org/title/Offline_installation#Install_from_file)
-    for package in $(ls $aur_dir); do
-
-	## yay is already installed
-	if [[ "$package" != "yay" ]]; then
-
-	    current_package_dir="$aur_dir/$package"
-	    c_p_newest_version=$(ls $current_package_dir/*.pkg.tar.zst --reverse --sort=version | sed -n 1p)
-
-	    yay -U --noconfirm $c_p_newest_version
-
-	else
-
-	    continue
-
-	fi
-
-    done
-
-    ## generate a development package database
-    yay -Y --gendb
-
-    ## update local repo
-    yay -Syy
-}
-
-
-create_core_applications_list()
+create_core_applications_list ()
 {
     core_applications=(\
 		       $wayland \
@@ -407,7 +331,7 @@ create_additional_tools_list()
 }
 
 
-create_aur_applications_list()
+create_aur_applications_list ()
 {
     ## create the list for aur_applications:
     #for dir in $(fd . --max-depth 1 --type directory ~/.cache/yay | sed 's/\/$//'); do printf '%s \\\n' "$(basename "$dir")"; done | wl-copy
@@ -443,21 +367,57 @@ create_aur_applications_list()
 }
 
 
-set_usr_rw()
+mount_repo ()
+{
+    repo_lbl='REPO'
+    repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
+
+    [[ -d $repo_dir ]] || mkdir -p "$repo_dir"
+
+    mountpoint -q $repo_dir
+    [[ $? -eq 0 ]] || sudo mount "$repo_dev" "$repo_dir"
+}
+
+
+get_offline_repo ()
+{
+    [[ $offline -eq 1 ]] && mount_repo
+}
+
+
+mount_code ()
+{
+    code_lbl='CODE'
+    code_dev=$(lsblk -o label,path | grep "$code_lbl" | awk '{print $2}')
+
+    [[ -d $code_dir ]] || mkdir -p "$code_dir"
+
+    mountpoint -q $code_dir
+    [[ $? -eq 0 ]] || sudo mount "$code_dev" "$code_dir"
+}
+
+
+get_offline_code ()
+{
+    [[ $offline -eq 1 ]] && mount_code
+}
+
+
+set_usr_rw ()
 {
     ## set /usr writeable
     sudo mount -o remount,rw  /usr
 }
 
 
-set_usr_ro()
+set_usr_ro ()
 {
     # reset /usr read-only
     sudo mount -o remount,ro  /usr
 }
 
 
-install_core_applications()
+install_core_applications ()
 {
     ## loop through core app packages
     ## instead of one whole list entry in yay
@@ -473,7 +433,7 @@ install_core_applications()
 }
 
 
-install_additional_tools()
+install_additional_tools ()
 {
     ## loop through core app packages
     ## instead of one whole list entry in yay
@@ -489,7 +449,7 @@ install_additional_tools()
 }
 
 
-install_aur_applications()
+install_aur_applications ()
 {
     ## loop through core app packages
     ## instead of one whole list entry in yay
@@ -505,7 +465,7 @@ install_aur_applications()
 }
 
 
-loose_ends()
+loose_ends ()
 {
     #[TODO]remove candidate
     ## tmux_plugin_manager
@@ -519,14 +479,18 @@ loose_ends()
     #sudo ln -s /usr/lib/w3m/w3mimgdisplay /usr/bin/w3mimgdisplay
 
     ## recommend human to execute dotfiles install script
-    echo 'sh hajime/5dtcf.sh'
+    echo 'sh hajime/5dtcf.sh [--offline]'
 
     ## finishing
     sudo touch $HOME/hajime/4apps.done
 }
 
 
-main() {
+main ()
+{
+    getargs $args
+    offline_installation
+
     define_core_applications
     create_core_applications_list
 
@@ -547,58 +511,4 @@ main() {
     set_usr_ro
 }
 
-dev_main ()
-{
-    define_core_applications
-    create_core_applications_list
-
-    define_additional_tools
-    create_additional_tools_list
-
-    create_aur_applications_list
-
-    full_package_list+=("${core_applications[@]}" "${additional_tools[@]}" "${aur_applications[@]}")
-
-    ## package space installed_version
-    pacman_q=$(pacman -Q | sort --version-sort)
-    vcpp='/var/cache/pacman/pkg'
-    cy="$XDG_CACHE_HOME/yay"
-
-    ## get latest package
-    for pkg_2_copy in "${full_package_list[@]}"; do
-
-	ver_2_copy=$(grep $pkg_2_copy <<< $pacman_q | awk '{print $2}')
-
-	## vcpp_pkg
-	vcpp_pkg=$(ls ${vcpp}/${pkg_2_copy}* | grep -v sig | grep -v debug | sort --version-sort | tail -n 1)
-
-	if [[ -f $vcpp_pkg ]]; then
-
-	    package=$vcpp_pkg
-
-	elif [[ ! -f $vcpp_pkg ]]; then
-
-	    ## cy_pkg
-	    cy_pkg=$(ls ${cy}/${pkg_2_copy}/${pkg_2_copy}* | grep -v sig | grep -v debug | sort --version-sort | tail -n 1)
-
-	    package=$cy_pkg
-
-	    ## remove vcpp ls error
-	    tput cuu1
-	    printf "\r"; tput el
-
-	fi
-
-	if [[ ! -f $package ]]; then
-
-	    printf '%s not found in cache (vcpp & cy)\n' $pkg_2_copy
-
-	fi
-
-	cp $package $dst
-
-    done
-   }
-
-dev_main
-#main
+main

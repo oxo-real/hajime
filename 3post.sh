@@ -68,21 +68,6 @@ initial_release='2018'
 ## hardcoded variables
 # user customizable variables
 
-## offline installation
-[[ "$args" =~ .*offline ]] && sudo touch /offline
-
-if [[ -f /offline ]]; then
-
-    offline=1
-    code_lbl='CODE'
-    code_dir="/home/$(id -un)/dock/3"
-    repo_lbl='REPO'
-    repo_dir="/home/$(id -un)/dock/2"
-    repo_re="\/home\/$(id -un)\/dock\/2"
-    file_etc_pacman_conf='/etc/pacman.conf'
-
-fi
-
 post_core_additions='archlinux-keyring lsof mlocate neofetch neovim pacman-contrib wl-clipboard'
 bloat_ware="" # there seems to be no more bloatware since kernel v536 (nano was removed)
 mirror_country='Sweden'
@@ -92,6 +77,28 @@ mirror_amount='5'
 
 
 # functions
+
+
+args="$@"
+getargs ()
+{
+    [[ "$1" =~ offline$ ]] && offline=1
+}
+
+
+offline_installation ()
+{
+    if [[ $offline -eq 1 ]]; then
+
+	code_lbl='CODE'
+	code_dir="/home/$(id -un)/dock/3"
+	repo_lbl='REPO'
+	repo_dir="/home/$(id -un)/dock/2"
+	repo_re="\/home\/$(id -un)\/dock\/2"
+	file_etc_pacman_conf='/etc/pacman.conf'
+
+    fi
+}
 
 
 reply ()
@@ -149,7 +156,7 @@ dhcp_connect ()
 }
 
 
-set_read_write()
+set_read_write ()
 {
     # set /usr and /boot read-write
     sudo mount -o remount,rw  /usr
@@ -297,7 +304,7 @@ base_mutations ()
 }
 
 
-set_read_only()
+set_read_only ()
 {
     # set /usr and /boot read-only
     sudo mount -o remount,ro  /usr
@@ -321,7 +328,7 @@ wrap_up ()
     printf "continue with this installation series\n"
     printf "by running 4apps.sh (recommended):\n"
     echo
-    printf "sh hajime/4apps.sh\n"
+    printf "sh hajime/4apps.sh [--offline]\n"
     echo
     echo
     printf "press any key to continue... "
@@ -333,17 +340,12 @@ wrap_up ()
 }
 
 
-get_args ()
+main ()
 {
-    args="$@"
-}
-
-
-main()
-{
-    get_args
+    getargs $args
+    offline_installation
     dhcp_connect
-    #set_read_write
+    set_read_write
     own_home
     modify_pacman_conf
     pacman_init
@@ -351,8 +353,8 @@ main()
     get_offline_repo
     get_offline_code
     base_mutations
-    #set_read_only
+    set_read_only
     wrap_up
 }
 
-main "$@"
+main
