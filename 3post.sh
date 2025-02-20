@@ -38,12 +38,13 @@ https://www.gnu.org/licenses/gpl-3.0.txt
 # description
   third part of a series
   arch linux installation: post
+  branch archinst: after default archinstall
 
 # dependencies
-  archiso, REPO, 0init.sh, 1base.sh, 2conf.sh
+  archinstall, !REPO, 0init.sh, 1base.sh, 2conf.sh
 
 # usage
-  sh hajime/3post.sh
+  sh hajime/3post.sh [--offline]
 
 # example
   n/a
@@ -52,9 +53,9 @@ https://www.gnu.org/licenses/gpl-3.0.txt
 
 
 #set -o errexit
-set -o nounset
+#set -o nounset
 set -o pipefail
-#
+
 
 # initial definitions
 
@@ -67,19 +68,6 @@ initial_release='2018'
 ## hardcoded variables
 # user customizable variables
 
-## offline installation
-if [[ -f /offline ]]; then
-
-    offline=1
-    code_lbl='CODE'
-    code_dir="/home/$(id -un)/dock/3"
-    repo_lbl='REPO'
-    repo_dir="/home/$(id -un)/dock/2"
-    repo_re="\/home\/$(id -un)\/dock\/2"
-    file_etc_pacman_conf='/etc/pacman.conf'
-
-fi
-
 post_core_additions='archlinux-keyring lsof mlocate neofetch neovim pacman-contrib wl-clipboard'
 bloat_ware="" # there seems to be no more bloatware since kernel v536 (nano was removed)
 mirror_country='Sweden'
@@ -91,7 +79,29 @@ mirror_amount='5'
 # functions
 
 
-reply()
+args="$@"
+getargs ()
+{
+    [[ "$1" =~ offline$ ]] && offline=1
+}
+
+
+offline_installation ()
+{
+    if [[ $offline -eq 1 ]]; then
+
+	code_lbl='CODE'
+	code_dir="/home/$(id -un)/dock/3"
+	repo_lbl='REPO'
+	repo_dir="/home/$(id -un)/dock/2"
+	repo_re="\/home\/$(id -un)\/dock\/2"
+	file_etc_pacman_conf='/etc/pacman.conf'
+
+    fi
+}
+
+
+reply ()
 {
     # first silently entered character goes directly to $reply
     stty_0=$(stty -g)
@@ -101,7 +111,7 @@ reply()
 }
 
 
-reply_single()
+reply_single ()
 {
     # first entered character goes directly to $reply
     stty_0=$(stty -g)
@@ -111,7 +121,7 @@ reply_single()
 }
 
 
-check_label_exist()
+check_label_exist ()
 {
     lsblk -o label | grep "$lbl" #> /dev/null 2>&1
     if [[ "$?" -ne "0" ]]; then
@@ -123,28 +133,30 @@ check_label_exist()
 }
 
 
-check_mountpoint()
+check_mountpoint ()
 {
     # check if device with label is already mounted
 
     mount -l | grep "$lbl" #> /dev/null 2>&1
 
     case "$?" in
+
 	0)
 	    local lblmountpoint="$(mount -l | grep "$lbl" | awk '{print $3}')"
 	    printf "device with label $lbl already mounted on $lblmountpoint\n"
 	    ;;
+
     esac
 }
 
 
-dhcp_connect()
+dhcp_connect ()
 {
     sh hajime/0init.sh
 }
 
 
-set_read_write()
+set_read_write ()
 {
     # set /usr and /boot read-write
     sudo mount -o remount,rw  /usr
@@ -152,13 +164,13 @@ set_read_write()
 }
 
 
-own_home()
+own_home ()
 {
     sudo chown -R $(id -un):$(id -gn) /home/$(id -un)
 }
 
 
-modify_pacman_conf()
+modify_pacman_conf ()
 {
     case $offline in
 
@@ -188,14 +200,14 @@ modify_pacman_conf()
 }
 
 
-pacman_init()
+pacman_init ()
 {
     sudo pacman-key --init
     sudo pacman-key --populate archlinux
 }
 
 
-mount_repo()
+mount_repo ()
 {
     lbl="$repo_lbl"
 
@@ -213,17 +225,19 @@ mount_repo()
 }
 
 
-get_offline_repo()
+get_offline_repo ()
 {
     case $offline in
+
 	1)
 	    mount_repo
 	    ;;
+
     esac
 }
 
 
-mount_code()
+mount_code ()
 {
     lbl="$code_lbl"
 
@@ -241,17 +255,20 @@ mount_code()
 }
 
 
-get_offline_code()
+get_offline_code ()
 {
     case $offline in
+
 	1)
 	    mount_code
 	    ;;
+
     esac
 }
 
 
-create_directories() {
+create_directories ()
+{
     # create mountpoint docking bays
 
     mkdir -p $HOME/dock/1
@@ -273,11 +290,10 @@ create_directories() {
 }
 
 
-base_mutations()
+base_mutations ()
 {
     ## add post core addditions
-    for package in $post_core_additions;
-    do
+    for package in $post_core_additions; do
 
 	sudo pacman -S --needed --noconfirm $package
 
@@ -288,7 +304,7 @@ base_mutations()
 }
 
 
-set_read_only()
+set_read_only ()
 {
     # set /usr and /boot read-only
     sudo mount -o remount,ro  /usr
@@ -296,7 +312,7 @@ set_read_only()
 }
 
 
-wrap_up()
+wrap_up ()
 {
     # human info
     clear
@@ -312,7 +328,7 @@ wrap_up()
     printf "continue with this installation series\n"
     printf "by running 4apps.sh (recommended):\n"
     echo
-    printf "sh hajime/4apps.sh\n"
+    printf "sh hajime/4apps.sh [--offline]\n"
     echo
     echo
     printf "press any key to continue... "
@@ -324,8 +340,10 @@ wrap_up()
 }
 
 
-main()
+main ()
 {
+    getargs $args
+    offline_installation
     dhcp_connect
     set_read_write
     own_home

@@ -14,8 +14,8 @@
 
 : '
 hajime_2conf
-first part of linux installation
-copyright (c) 2017 - 2024  |  oxo
+second part of linux installation
+copyright (c) 2017 - 2025  |  oxo
 
 GNU GPLv3 GENERAL PUBLIC LICENSE
 This program is free software: you can redistribute it and/or modify
@@ -43,7 +43,7 @@ https://www.gnu.org/licenses/gpl-3.0.txt
   archiso, REPO, 0init.sh, 1base.sh
 
 # usage
-  sh hajime/2conf.sh
+  sh hajime/2conf.sh [--offline]
 
 # example
   n/a
@@ -65,16 +65,6 @@ initial_release='2017'
 
 ## hardcoded variables
 # user customizable variables
-
-## offline installation
-if [[ -f /offline ]]; then
-
-    offline=1
-    code_dir='/tmp'
-    repo_dir='/repo'
-    repo_re='\/repo'
-
-fi
 
 ## file locations
 file_etc_pacman_conf='/etc/pacman.conf'
@@ -120,7 +110,26 @@ system_security='' #nss-certs; comes with nss in core
 
 #--------------------------------
 
-temporary_maintenance()
+args="$@"
+getargs ()
+{
+    [[ "$1" =~ offline$ ]] && offline=1
+}
+
+
+offline_installation ()
+{
+    if [[ offline -eq 1 ]]; then
+
+	code_dir='/tmp'
+	repo_dir='/repo'
+	repo_re='\/repo'
+
+    fi
+}
+
+
+temporary_maintenance ()
 {
     # DEV
     # libtinfo_so.5
@@ -130,7 +139,7 @@ temporary_maintenance()
 }
 
 
-reply()
+reply ()
 {
     # first silently entered character goes directly to $reply
     stty_0=$(stty -g)
@@ -140,7 +149,7 @@ reply()
 }
 
 
-mount_repo()
+mount_repo ()
 {
     repo_lbl='REPO'
     # 20230106 lsblk reports empty label names
@@ -155,17 +164,13 @@ mount_repo()
 }
 
 
-get_offline_repo()
+get_offline_repo ()
 {
-    case $offline in
-	1)
-	    mount_repo
-	    ;;
-    esac
+    [[ $offline -eq 1 ]] && mount_repo
 }
 
 
-mount_code()
+mount_code ()
 {
     code_lbl='CODE'
     code_dev=$(lsblk -o label,path | grep "$code_lbl" | awk '{print $2}')
@@ -178,17 +183,13 @@ mount_code()
 }
 
 
-get_offline_code()
+get_offline_code ()
 {
-    case $offline in
-	1)
-	    mount_code
-	    ;;
-    esac
+    [[ $offline -eq 1 ]] && mount_code
 }
 
 
-reconfigure_pacman_conf()
+reconfigure_pacman_conf ()
 {
     case $offline in
 	1)
@@ -213,7 +214,7 @@ reconfigure_pacman_conf()
 }
 
 
-time_settings()
+time_settings ()
 {
     ## set time zone
     ln -sf /usr/share/zoneinfo/$time_zone /etc/localtime
@@ -222,7 +223,7 @@ time_settings()
 }
 
 
-locale_settings()
+locale_settings ()
 {
     sed -i "/^#en_US.UTF-8 UTF-8/c\en_US.UTF-8 UTF-8" $file_etc_locale_gen
     locale-gen
@@ -230,7 +231,7 @@ locale_settings()
 }
 
 
-vconsole_settings()
+vconsole_settings ()
 {
     echo $vconsole_conf > $file_etc_vconsole_conf
     echo
@@ -239,7 +240,7 @@ vconsole_settings()
 
 # network configuration
 
-set_hostname()
+set_hostname ()
 {
     clear
 
@@ -286,7 +287,7 @@ set_hostname()
 }
 
 
-set_host_file()
+set_host_file ()
 {
     ## create host file
     printf "$hostname" > $file_etc_hostname
@@ -312,7 +313,7 @@ set_host_file()
 
 
 # set root password
-pass_root()
+pass_root ()
 {
     printf "$(whoami)@$hostname\n"
     passwd
@@ -321,7 +322,7 @@ pass_root()
 
 ## set username
 
-set_username()
+set_username ()
 {
     clear
     printf "username: '$username'\n"
@@ -372,7 +373,8 @@ set_username()
 }
 
 
-test_username() {
+test_username ()
+{
     username_length="$(printf "$username" | wc -c)"
     if [[ $username_length -gt 32 ]]; then
 
@@ -394,20 +396,20 @@ test_username() {
 }
 
 
-add_username()
+add_username ()
 {
     useradd -m -g wheel $username
 }
 
 
-add_groups()
+add_groups ()
 {
     ## add $username to video group (for brightnessctl)
     usermod -a -G video $username
 }
 
 
-set_passphrase()
+set_passphrase ()
 {
     ## set $username password
     printf "$username@$hostname\n"
@@ -415,7 +417,7 @@ set_passphrase()
 }
 
 
-set_privileges()
+set_privileges ()
 {
     ## priviledge escalation for wheel group
     sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' $file_etc_sudoers
@@ -426,7 +428,7 @@ set_privileges()
 
 
 # add user
-add_user()
+add_user ()
 {
     set_username
     add_username
@@ -436,13 +438,13 @@ add_user()
 }
 
 
-initialize_pacman()
+initialize_pacman ()
 {
     pacman -Syy
 }
 
 
-install_helpers()
+install_helpers ()
 {
     case $offline in
 
@@ -474,7 +476,7 @@ install_helpers()
 }
 
 
-micro_code()
+micro_code ()
 {
     cpu_name=$(lscpu | grep 'Model name:' | awk '{print $3}')
 
@@ -495,7 +497,7 @@ micro_code()
 }
 
 
-install_core()
+install_core ()
 {
     # update repositories and install core applications
     # [Installation guide - ArchWiki]
@@ -514,7 +516,7 @@ install_core()
 
 
 
-install_bootloader()
+install_bootloader ()
 {
     # installing the EFI boot manager
 
@@ -574,7 +576,7 @@ install_bootloader()
 }
 
 
-move_hajime()
+move_hajime ()
 {
     # move /hajime to $user home
     cp -r /hajime /home/$username
@@ -582,7 +584,7 @@ move_hajime()
 }
 
 
-exit_arch_chroot_mnt()
+exit_arch_chroot_mnt ()
 {
     ## return to archiso environment
     echo
@@ -591,7 +593,7 @@ exit_arch_chroot_mnt()
     echo 'umount -R /mnt'
     echo 'reboot'
     echo
-    echo 'sh hajime/3post.sh'
+    echo 'sh hajime/3post.sh [--offline]'
     echo
 
     # finishing
@@ -599,8 +601,10 @@ exit_arch_chroot_mnt()
 }
 
 
-main()
+main ()
 {
+    getargs $args
+    offline_installation
     clear
     # DEV temporary_maintenance
     get_offline_repo
