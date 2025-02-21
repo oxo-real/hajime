@@ -43,7 +43,7 @@ helper script to bootstrap hajime up after archiso boot
   REPO
 
 # usage
-  sh hajime/0init.sh [--online]
+  sh hajime/0init.sh
 
 # example
   mkdir tmp
@@ -73,7 +73,7 @@ online_repo='https://codeberg.org/oxo/hajime'
 
 
 ## offline installationm mode by default
-## --online has to be given explicitly
+## --online option has to be given explicitly
 
 
 args="$@"

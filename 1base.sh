@@ -75,6 +75,8 @@ arch_mirrorlist="https://archlinux.org/mirrorlist/?country=SE&protocol=https&ip_
 mirror_country="Germany,Netherlands,Sweden,USA"
 mirror_amount="5"
 
+file_configuration='/root/tmp/code/hajime/install-config.sh'
+file_luks_pass='/root/tmp/code/hajime/luks_pass'
 
 # 20220201 in the arch repository;
 # base was a package group, but now is a package, while
@@ -234,6 +236,13 @@ exit_hajime ()
 }
 
 
+sourcing ()
+{
+    ## configuration file
+    [[ -f $file_configuration ]] && source $file_configuration
+}
+
+
 args="$@"
 getargs ()
 {
@@ -367,56 +376,84 @@ set_boot_device ()
     ## boot partition can be on its own separate device or
     ## on its own (first) partition on the system device
 
-    ## lsblk for human
-    get_lsblk
-    echo
+    case $dev_boot in
+	# dev_boot is used in configuration
+	# boot_dev is for manual config
 
+	'' )
+	    ## manual config
 
-    ## request boot device path
-    printf "the BOOT device will contain the systemd-boot bootloader and\n"
-    printf "the init ramdisk environment (initramfs) for booting the linux kernel\n"
-    echo
-    printf "enter full path of the BOOT ${st_bold}device${st_def} (i.e. /dev/sdB): "
-    reply_plain
-    boot_dev=$reply
+	    ## lsblk for human
+	    get_lsblk
+	    echo
 
-    echo
-    printf '%s\n' "$(get_lsblk | grep "$boot_dev")"
-    #printf '%s\n' "$(lsblk --ascii --tree -o name,uuid,fstype,path,size,fsuse%,fsused,label,mountpoint | grep "$boot_dev")"
-    echo
+	    ## request boot device path
+	    printf "the BOOT device will contain the systemd-boot bootloader and\n"
+	    printf "the init ramdisk environment (initramfs) for booting the linux kernel\n"
+	    echo
+	    printf "enter full path of the BOOT ${st_bold}device${st_def} (i.e. /dev/sdB): "
+	    reply_plain
+	    boot_dev=$reply
 
-    if [ "$boot_dev" == "$bootmnt_dev" ] ; then
-	echo
-	printf "invalid device path!\n"
-	printf "'$boot_dev' is current bootmnt\n"
-	printf "please try again"
-	sleep 3
-	clear
-	set_boot_device
-    fi
+	    echo
+	    printf '%s\n' "$(get_lsblk | grep "$boot_dev")"
+	    #printf '%s\n' "$(lsblk --ascii --tree -o name,uuid,fstype,path,size,fsuse%,fsused,label,mountpoint | grep "$boot_dev")"
+	    echo
 
-    printf "BOOT device: '$boot_dev', correct? (Y/n) "
-    reply_single_hidden
-    if printf "$reply" | grep -iq "^n" ; then
-	clear
-	set_boot_device
-    else
-	echo
-	echo
-	printf "configure '$boot_dev' as BOOT device\n"
-    fi
+	    if [ "$boot_dev" == "$bootmnt_dev" ] ; then
 
-    ## create boot partition
-    ## info for human
-    printf "add a new ${st_bold}ef00${st_def} (EFI System) partition\n"
-    echo
-    printf "<o>	create a new empty GUID partition table (GPT)\n"
-    printf "<n>	add a new partition\n"
-    printf "<w>	write table to disk and exit\n"
-    printf "<q>	quit without saving changes\n"
-    echo
-    gdisk "$boot_dev"
-    clear
+		echo
+		printf "invalid device path!\n"
+		printf "'$boot_dev' is current bootmnt\n"
+		printf "please try again"
+		sleep 3
+		clear
+		set_boot_device
+
+	    fi
+
+	    printf "BOOT device: '$boot_dev', correct? (Y/n) "
+	    reply_single_hidden
+
+	    if printf "$reply" | grep -iq "^n" ; then
+
+		clear
+		set_boot_device
+
+	    else
+
+		echo
+		echo
+		printf "configure '$boot_dev' as BOOT device\n"
+
+	    fi
+
+	    ## create boot partition
+	    ## info for human
+	    printf "add a new ${st_bold}ef00${st_def} (EFI System) partition\n"
+	    echo
+	    printf "<o>	create a new empty GUID partition table (GPT)\n"
+	    printf "<n>	add a new partition\n"
+	    printf "<w>	write table to disk and exit\n"
+	    printf "<q>	quit without saving changes\n"
+	    echo
+	    gdisk "$boot_dev"
+	    clear
+	    ;;
+
+	* )
+	    ## using configuration file
+	    if [[ -n $dev_boot_clear ]]; then
+
+		sgdisk --clear $dev_boot
+		sgdisk --new $part_boot:0:${size_boot} --typecode $part_boot:$type_boot $dev_boot
+
+	    fi
+
+	    ;;
+
+    esac
+
 }
 
 
@@ -424,55 +461,78 @@ set_lvm_device ()
 {
     ## LVM system partition installation target
 
-    ## lsblk for human
-    get_lsblk
-    echo
+    case $dev_lvm in
+	# dev_lvm is used in configuration
+	# lvm_dev is for manual config
+
+	'' )
+
+	    ## lsblk for human
+	    get_lsblk
+	    echo
 
 
-    ## request lvm device path
-    printf "on the LVM device the LVM partition will be created\n"
-    echo
-    printf "enter full path of the LVM ${st_bold}device${st_def} (i.e. /dev/sdL): "
-    reply_plain
-    lvm_dev=$reply
+	    ## request lvm device path
+	    printf "on the LVM device the LVM partition will be created\n"
+	    echo
+	    printf "enter full path of the LVM ${st_bold}device${st_def} (i.e. /dev/sdL): "
+	    reply_plain
+	    lvm_dev=$reply
 
-    if [ "$lvm_dev" == "$bootmnt_dev" ] ; then
-	echo
-	printf "invalid device path!\n"
-	printf "'$lvm_dev' is current bootmnt\n"
-	printf "please try again"
-	sleep 3
-	clear
-	set_boot_device
-    fi
+	    if [ "$lvm_dev" == "$bootmnt_dev" ] ; then
 
-    echo
-    printf '%s\n' "$(get_lsblk | grep "$lvm_dev")"
-    #printf '%s\n' "$(lsblk --ascii --tree -o name,uuid,fstype,path,size,fsuse%,fsused,label,mountpoint | grep "$lvm_dev")"
-    echo
+		echo
+		printf "invalid device path!\n"
+		printf "'$lvm_dev' is current bootmnt\n"
+		printf "please try again"
+		sleep 3
+		clear
+		set_boot_device
 
-    printf "LVM device: '$lvm_dev', correct? (Y/n) "
-    reply_single_hidden
-    if printf "$reply" | grep -iq "^n" ; then
-	clear
-	set_lvm_device
-    else
-	echo
-	echo
-	printf "configure '$lvm_dev' as LVM device\n"
-    fi
+	    fi
 
-    ## create lvm partition
-    ## info for human
-    printf "add a new ${st_bold}8e00${st_def} (Linux LVM) partition\n"
-    echo
-    printf "<o>	create a new empty GUID partition table (GPT)\n"
-    printf "<n>	add a new partition\n"
-    printf "<w>	write table to disk and exit\n"
-    printf "<q>	quit without saving changes\n"
-    echo
-    gdisk "$lvm_dev"
-    clear
+	    echo
+	    printf '%s\n' "$(get_lsblk | grep "$lvm_dev")"
+	    #printf '%s\n' "$(lsblk --ascii --tree -o name,uuid,fstype,path,size,fsuse%,fsused,label,mountpoint | grep "$lvm_dev")"
+	    echo
+
+	    printf "LVM device: '$lvm_dev', correct? (Y/n) "
+	    reply_single_hidden
+
+	    if printf "$reply" | grep -iq "^n" ; then
+
+		clear
+		set_lvm_device
+	    else
+		echo
+		echo
+		printf "configure '$lvm_dev' as LVM device\n"
+
+	    fi
+
+	    ## create lvm partition
+	    ## info for human
+	    printf "add a new ${st_bold}8e00${st_def} (Linux LVM) partition\n"
+	    echo
+	    printf "<o>	create a new empty GUID partition table (GPT)\n"
+	    printf "<n>	add a new partition\n"
+	    printf "<w>	write table to disk and exit\n"
+	    printf "<q>	quit without saving changes\n"
+	    echo
+	    gdisk "$lvm_dev"
+	    clear
+	    ;;
+
+	* )
+	    if [[ -n $dev_lvm_clear ]]; then
+
+		sgdisk --clear $dev_lvm
+		sgdisk --new $part_lvm:0:$size_lvm --typecode $part_lvm:$type_lvm $dev_lvm
+
+	    fi
+	    ;;
+
+    esac
 }
 
 
@@ -526,330 +586,358 @@ set_key_partition ()
 
 set_boot_partition ()
 {
-    ## dialog
-    ## lsblk for human
-    clear
-    get_lsblk
-    echo
+    if [[ -z $dev_boot ]]; then
 
-    printf "enter BOOT ${st_bold}partition${st_def} number: $boot_dev"
-    reply_plain
-
-    # boot partition is compulsory
-    if [ -z "$reply" ]; then
-	printf "invalid partition number\n"
-	sleep 1
-	set_boot_partition
-    fi
-
-    boot_part_no=$reply
-    boot_part=$boot_dev$boot_part_no
-
-    echo
-    printf '%s\n' "$(get_lsblk | grep "$boot_dev")"
-    #printf '%s\n' "$(lsblk --ascii --tree -o name,uuid,fstype,path,size,fsuse%,fsused,label,mountpoint | grep "$boot_dev")"
-    echo
-
-    ## check partition exists in lsblk
-    if [ -z "$(lsblk -paf | grep -w $boot_part)" ]; then
-	printf "no valid partition, not found in lsblk\n"
-	printf "please retry\n"
-	sleep 1
-	set_boot_partition
-    fi
-
-    printf "the full BOOT partition is: '$boot_part', correct? (Y/n) "
-    reply_single_hidden
-    if printf "$reply" | grep -iq "^n" ; then
+	## dialog
+	## lsblk for human
 	clear
-	set_boot_partition
-    else
+	get_lsblk
 	echo
-	printf "using '$boot_part' as BOOT partition\n"
-    fi
 
-    echo
+	printf "enter BOOT ${st_bold}partition${st_def} number: $boot_dev"
+	reply_plain
+
+	# boot partition is compulsory
+	if [ -z "$reply" ]; then
+	    printf "invalid partition number\n"
+	    sleep 1
+	    set_boot_partition
+	fi
+
+	boot_part_no=$reply
+	boot_part=$boot_dev$boot_part_no
+
+	echo
+	printf '%s\n' "$(get_lsblk | grep "$boot_dev")"
+	#printf '%s\n' "$(lsblk --ascii --tree -o name,uuid,fstype,path,size,fsuse%,fsused,label,mountpoint | grep "$boot_dev")"
+	echo
+
+	## check partition exists in lsblk
+	if [ -z "$(lsblk -paf | grep -w $boot_part)" ]; then
+	    printf "no valid partition, not found in lsblk\n"
+	    printf "please retry\n"
+	    sleep 1
+	    set_boot_partition
+	fi
+
+	printf "the full BOOT partition is: '$boot_part', correct? (Y/n) "
+	reply_single_hidden
+	if printf "$reply" | grep -iq "^n" ; then
+	    clear
+	    set_boot_partition
+	else
+	    echo
+	    printf "using '$boot_part' as BOOT partition\n"
+	fi
+
+	echo
+
+    elif [[ -n $dev_boot ]]; then
+
+	boot_part=$dev_boot$part_boot
+
+    fi
 }
 
 
 set_lvm_partition ()
 {
-    ## dialog
-    ## lsblk for human
-    clear
-    get_lsblk
-    echo
+    if [[ -z $dev_lvm ]]; then
 
-    printf "inside the LVM partition the LVM volumegroup will be created\n"
-    printf "enter LVM ${st_bold}partition${st_def} number: $lvm_dev"
-    reply_plain
-    lvm_part_no=$reply
-    lvm_part=$lvm_dev$lvm_part_no
-
-    echo
-    printf '%s\n' "$(get_lsblk | grep "$lvm_dev")"
-    #printf '%s\n' "$(lsblk --ascii --tree -o name,uuid,fstype,path,size,fsuse%,fsused,label,mountpoint | grep "$lvm_dev")"
-    echo
-
-    ## check partition exists in lsblk
-    if [ -z "$(lsblk -paf | grep -w $lvm_part)" ]; then
-	printf "partition not found in lsblk\n"
-	printf "please retry\n"
-	sleep 1
-	set_lvm_partition
-    fi
-
-    printf "the full LVM partition is: '$lvm_part', correct? (Y/n) "
-    reply_single_hidden
-    if printf "$reply" | grep -iq "^n" ; then
+	## dialog
+	## lsblk for human
 	clear
-	set_lvm_partition
-    else
+	get_lsblk
 	echo
-	printf "using '$lvm_part' as LVM partition\n"
-    fi
 
-    echo
+	printf "inside the LVM partition the LVM volumegroup will be created\n"
+	printf "enter LVM ${st_bold}partition${st_def} number: $lvm_dev"
+	reply_plain
+	lvm_part_no=$reply
+	lvm_part=$lvm_dev$lvm_part_no
+
+	echo
+	printf '%s\n' "$(get_lsblk | grep "$lvm_dev")"
+	#printf '%s\n' "$(lsblk --ascii --tree -o name,uuid,fstype,path,size,fsuse%,fsused,label,mountpoint | grep "$lvm_dev")"
+	echo
+
+	## check partition exists in lsblk
+	if [ -z "$(lsblk -paf | grep -w $lvm_part)" ]; then
+	    printf "partition not found in lsblk\n"
+	    printf "please retry\n"
+	    sleep 1
+	    set_lvm_partition
+	fi
+
+	printf "the full LVM partition is: '$lvm_part', correct? (Y/n) "
+	reply_single_hidden
+	if printf "$reply" | grep -iq "^n" ; then
+	    clear
+	    set_lvm_partition
+	else
+	    echo
+	    printf "using '$lvm_part' as LVM partition\n"
+	fi
+
+	echo
+
+    elif [[ -n $dev_lvm ]]; then
+
+	lvm_part=$dev_lvm$part_lvm
+
+    fi
 }
 
 
 set_lvm_partition_sizes ()
 {
-    ## lsblk for human
-    clear
-    get_lsblk
-    echo
+    if [[ -z $dev_lvm ]]; then
 
-    lvm_size_bytes=$(lsblk -o path,size -b | grep $lvm_part | awk '{print $2}')
-    lvm_size_human=$(lsblk -o path,size | grep $lvm_part | awk '{print $2}')
-    lvm_size_calc=$(lsblk -o path,size | grep $lvm_part | awk '{print $2+0}')
-    printf "size of the encrypted LVM volumegroup '$lvm_part' is $lvm_size_human\n"
-    printf "logical volumes ROOT, TMP, USR, VAR & HOME are being created\n"
-    echo
+	## lsblk for human
+	clear
+	get_lsblk
+	echo
 
-    ## optional swap partition
+	lvm_size_bytes=$(lsblk -o path,size -b | grep $lvm_part | awk '{print $2}')
+	lvm_size_human=$(lsblk -o path,size | grep $lvm_part | awk '{print $2}')
+	lvm_size_calc=$(lsblk -o path,size | grep $lvm_part | awk '{print $2+0}')
+	printf "size of the encrypted LVM volumegroup '$lvm_part' is $lvm_size_human\n"
+	printf "logical volumes ROOT, TMP, USR, VAR & HOME are being created\n"
+	echo
 
-    ## starting dialog
-    printf "create SWAP partition (Y/n)? "
-    reply_single_hidden
-    swap_bool=$reply
-    echo
+	## optional swap partition
 
-    if printf "$reply" | grep -iq "^n" ; then
+	## starting dialog
+	printf "create SWAP partition (Y/n)? "
+	reply_single_hidden
+	swap_bool=$reply
+	echo
 
-	swap_size=0
-	printf "SWAP partition will NOT be created\n"
+	if printf "$reply" | grep -iq "^n" ; then
 
-    else
+	    swap_size=0
+	    printf "SWAP partition will NOT be created\n"
 
-	printf "SWAP partition size (GB)? [$swap_size_recomm] "
-	reply_plain
-	swap_size_calc=$reply
+	else
 
-	if [ -z "$swap_size_calc" ]; then
+	    printf "SWAP partition size (GB)? [$swap_size_recomm] "
+	    reply_plain
+	    swap_size_calc=$reply
 
-	    swap_size_calc=$swap_size_recomm
+	    if [ -z "$swap_size_calc" ]; then
+
+		swap_size_calc=$swap_size_recomm
+
+	    fi
+
+	    ### remove decimals
+	    swap_size="${swap_size_calc%%.*}"
 
 	fi
 
-	### remove decimals
-	swap_size="${swap_size_calc%%.*}"
+	# space_left is a running number
+	# it decreases with every partition size chosen
+	# space left after swap size chosen
+	space_left=`echo - | awk "{print $lvm_size_calc - $swap_size}"`
 
-    fi
+	## calculate initial recommended sizes
+	root_size_calc=`echo - | awk "{print $root_perc * $space_left}"`
+	tmp_size_calc=`echo - | awk  "{print $tmp_perc * $space_left}"`
+	usr_size_calc=`echo - | awk  "{print $usr_perc * $space_left}"`
+	var_size_calc=`echo - | awk  "{print $var_perc * $space_left}"`
+	home_size_calc=`echo - | awk "{print $home_perc * $space_left}"`
 
-    # space_left is a running number
-    # it decreases with every partition size chosen
-    # space left after swap size chosen
-    space_left=`echo - | awk "{print $lvm_size_calc - $swap_size}"`
+	## ROOT partition
+	printf "ROOT partition size {>=1G} (GB)? [$root_size_calc] "
+	reply_plain
 
-    ## calculate initial recommended sizes
-    root_size_calc=`echo - | awk "{print $root_perc * $space_left}"`
-    tmp_size_calc=`echo - | awk  "{print $tmp_perc * $space_left}"`
-    usr_size_calc=`echo - | awk  "{print $usr_perc * $space_left}"`
-    var_size_calc=`echo - | awk  "{print $var_perc * $space_left}"`
-    home_size_calc=`echo - | awk "{print $home_perc * $space_left}"`
+	if [ -n "$reply" ]; then
 
-    ## ROOT partition
-    printf "ROOT partition size {>=1G} (GB)? [$root_size_calc] "
-    reply_plain
+	    root_size_calc=`echo - | awk "{print $reply * 1}"`
+	    ### remove decimals
+	    root_size="${root_size_calc%%.*}"
 
-    if [ -n "$reply" ]; then
+	else
 
-	root_size_calc=`echo - | awk "{print $reply * 1}"`
-	### remove decimals
-	root_size="${root_size_calc%%.*}"
+	    ### remove decimals
+	    root_size="${root_size_calc%%.*}"
 
-    else
+	fi
 
-	### remove decimals
-	root_size="${root_size_calc%%.*}"
+	## recalculate
+	### space left after root size chosen
+	space_left=`echo - | awk "{print $space_left - $root_size}"`
 
-    fi
+	### percentages
+	tot_perc=`echo - | awk "{print $tmp_perc + $usr_perc + $var_perc + $home_perc}"`
 
-    ## recalculate
-    ### space left after root size chosen
-    space_left=`echo - | awk "{print $space_left - $root_size}"`
+	tmp_perc=`echo - | awk "{print $tmp_perc / $tot_perc}"`
+	usr_perc=`echo - | awk "{print $usr_perc / $tot_perc}"`
+	var_perc=`echo - | awk "{print $var_perc / $tot_perc}"`
+	home_perc=`echo - | awk "{print $home_perc / $tot_perc}"`
 
-    ### percentages
-    tot_perc=`echo - | awk "{print $tmp_perc + $usr_perc + $var_perc + $home_perc}"`
+	### sizes
+	tmp_size_calc=`echo - | awk  "{print $tmp_perc * $space_left}"`
+	usr_size_calc=`echo - | awk  "{print $usr_perc * $space_left}"`
+	var_size_calc=`echo - | awk  "{print $var_perc * $space_left}"`
+	home_size_calc=`echo - | awk "{print $home_perc * $space_left}"`
 
-    tmp_perc=`echo - | awk "{print $tmp_perc / $tot_perc}"`
-    usr_perc=`echo - | awk "{print $usr_perc / $tot_perc}"`
-    var_perc=`echo - | awk "{print $var_perc / $tot_perc}"`
-    home_perc=`echo - | awk "{print $home_perc / $tot_perc}"`
+	printf "						ROOT set to "$root_size"GB ("$space_left"GB space left on "$lvm_part")\n"
 
-    ### sizes
-    tmp_size_calc=`echo - | awk  "{print $tmp_perc * $space_left}"`
-    usr_size_calc=`echo - | awk  "{print $usr_perc * $space_left}"`
-    var_size_calc=`echo - | awk  "{print $var_perc * $space_left}"`
-    home_size_calc=`echo - | awk "{print $home_perc * $space_left}"`
+	## TMP  partition
+	printf "TMP  partition size {>=1G} (GB)? [$usr_size_calc] "
+	reply_plain
 
-    printf "						ROOT set to "$root_size"GB ("$space_left"GB space left on "$lvm_part")\n"
+	if [ -n "$reply" ]; then
 
-    ## TMP  partition
-    printf "TMP  partition size {>=1G} (GB)? [$usr_size_calc] "
-    reply_plain
+	    tmp_size_calc=`echo - | awk "{print $reply * 1}"`
+	    ### remove decimals
+	    tmp_size="${tmp_size_calc%%.*}"
 
-    if [ -n "$reply" ]; then
+	else
 
-	tmp_size_calc=`echo - | awk "{print $reply * 1}"`
-	### remove decimals
-	tmp_size="${tmp_size_calc%%.*}"
+	    ### remove decimals
+	    tmp_size="${tmp_size_calc%%.*}"
 
-    else
+	fi
 
-	### remove decimals
-	tmp_size="${tmp_size_calc%%.*}"
+	## recalculate
+	### space left after tmp size chosen
+	space_left=`echo - | awk "{print $space_left - $tmp_size}"`
 
-    fi
+	### percentages
+	tot_perc=`echo - | awk "{print $usr_perc + $var_perc + $home_perc}"`
 
-    ## recalculate
-    ### space left after tmp size chosen
-    space_left=`echo - | awk "{print $space_left - $tmp_size}"`
+	usr_perc=`echo - | awk "{print $usr_perc / $tot_perc}"`
+	var_perc=`echo - | awk "{print $var_perc / $tot_perc}"`
+	home_perc=`echo - | awk "{print $home_perc / $tot_perc}"`
 
-    ### percentages
-    tot_perc=`echo - | awk "{print $usr_perc + $var_perc + $home_perc}"`
+	### sizes
+	usr_size_calc=`echo - | awk  "{print $usr_perc * $space_left}"`
+	var_size_calc=`echo - | awk  "{print $var_perc * $space_left}"`
+	home_size_calc=`echo - | awk "{print $home_perc * $space_left}"`
 
-    usr_perc=`echo - | awk "{print $usr_perc / $tot_perc}"`
-    var_perc=`echo - | awk "{print $var_perc / $tot_perc}"`
-    home_perc=`echo - | awk "{print $home_perc / $tot_perc}"`
+	printf "						TMP  set to "$tmp_size"GB ("$space_left"GB space left on "$lvm_part")\n"
 
-    ### sizes
-    usr_size_calc=`echo - | awk  "{print $usr_perc * $space_left}"`
-    var_size_calc=`echo - | awk  "{print $var_perc * $space_left}"`
-    home_size_calc=`echo - | awk "{print $home_perc * $space_left}"`
+	## USR  partition
+	printf "USR  partition size {>=10G} (GB)? [$usr_size_calc] "
+	reply_plain
 
-    printf "						TMP  set to "$tmp_size"GB ("$space_left"GB space left on "$lvm_part")\n"
+	if [ -n "$reply" ]; then
 
-    ## USR  partition
-    printf "USR  partition size {>=10G} (GB)? [$usr_size_calc] "
-    reply_plain
+	    usr_size_calc=`echo - | awk "{print $reply * 1}"`
+	    ### remove decimals
+	    usr_size="${usr_size_calc%%.*}"
 
-    if [ -n "$reply" ]; then
+	else
 
-	usr_size_calc=`echo - | awk "{print $reply * 1}"`
-	### remove decimals
-	usr_size="${usr_size_calc%%.*}"
+	    ### remove decimals
+	    usr_size="${usr_size_calc%%.*}"
 
-    else
+	fi
 
-	### remove decimals
-	usr_size="${usr_size_calc%%.*}"
+	## recalculate
+	### space left after usr size chosen
+	space_left=`echo - | awk "{print $space_left - $usr_size}"`
 
-    fi
+	### percentages
+	tot_perc=`echo - | awk "{print $var_perc + $home_perc}"`
 
-    ## recalculate
-    ### space left after usr size chosen
-    space_left=`echo - | awk "{print $space_left - $usr_size}"`
+	var_perc=`echo - | awk "{print $var_perc / $tot_perc}"`
+	home_perc=`echo - | awk "{print $home_perc / $tot_perc}"`
 
-    ### percentages
-    tot_perc=`echo - | awk "{print $var_perc + $home_perc}"`
+	### sizes
+	var_size_calc=`echo - | awk  "{print $var_perc * $space_left}"`
+	home_size_calc=`echo - | awk "{print $home_perc * $space_left}"`
 
-    var_perc=`echo - | awk "{print $var_perc / $tot_perc}"`
-    home_perc=`echo - | awk "{print $home_perc / $tot_perc}"`
+	printf "						USR  set to "$usr_size"GB ("$space_left"GB space left on "$lvm_part")\n"
 
-    ### sizes
-    var_size_calc=`echo - | awk  "{print $var_perc * $space_left}"`
-    home_size_calc=`echo - | awk "{print $home_perc * $space_left}"`
+	## VAR  partition
+	printf "VAR  partition size {>=10G} (GB)? [$var_size_calc] "
+	#var_size_calc=0
+	reply_plain
 
-    printf "						USR  set to "$usr_size"GB ("$space_left"GB space left on "$lvm_part")\n"
+	if [ -n "$reply" ]; then
 
-    ## VAR  partition
-    printf "VAR  partition size {>=10G} (GB)? [$var_size_calc] "
-    #var_size_calc=0
-    reply_plain
+	    var_size_calc=`echo - | awk "{print $reply * 1}"`
+	    ### remove decimals
+	    var_size="${var_size_calc%%.*}"
 
-    if [ -n "$reply" ]; then
+	else
 
-	var_size_calc=`echo - | awk "{print $reply * 1}"`
-	### remove decimals
-	var_size="${var_size_calc%%.*}"
+	    ### remove decimals
+	    var_size="${var_size_calc%%.*}"
 
-    else
+	fi
 
-	### remove decimals
-	var_size="${var_size_calc%%.*}"
+	## recalculate
+	### space left after var size chosen
+	space_left=`echo - | awk "{print $space_left - $var_size}"`
 
-    fi
+	### percentage
+	tot_perc=`echo - | awk "{print $home_perc}"`
 
-    ## recalculate
-    ### space left after var size chosen
-    space_left=`echo - | awk "{print $space_left - $var_size}"`
+	home_perc=`echo - | awk "{print $home_perc / $tot_perc}"`
 
-    ### percentage
-    tot_perc=`echo - | awk "{print $home_perc}"`
+	### new size
+	home_size_calc=`echo - | awk "{print $home_perc * $space_left}"`
 
-    home_perc=`echo - | awk "{print $home_perc / $tot_perc}"`
+	printf "						VAR  set to "$var_size"GB ("$space_left"GB space left on "$lvm_part")\n"
 
-    ### new size
-    home_size_calc=`echo - | awk "{print $home_perc * $space_left}"`
+	## HOME partition
+	printf "HOME partition size (GB)? [$home_size_calc] "
+	reply_plain
 
-    printf "						VAR  set to "$var_size"GB ("$space_left"GB space left on "$lvm_part")\n"
+	if [ -n "$reply" ]; then
 
-    ## HOME partition
-    printf "HOME partition size (GB)? [$home_size_calc] "
-    reply_plain
+            home_size_calc=`echo - | awk "{print $reply * 1}"`
+	    ### remove decimals
+	    home_size="${home_size_calc%%.*}"
 
-    if [ -n "$reply" ]; then
+	else
 
-        home_size_calc=`echo - | awk "{print $reply * 1}"`
-	### remove decimals
-	home_size="${home_size_calc%%.*}"
+	    ### remove decimals
+	    home_size="${home_size_calc%%.*}"
 
-    else
+	fi
 
-	### remove decimals
-	home_size="${home_size_calc%%.*}"
+	## recalculate
+	### space left after home size chosen
+	space_left=`echo - | awk "{print $space_left - $home_size}"`
 
-    fi
+	printf "						HOME set to "$home_size"GB ("$space_left"GB space left on "$lvm_part")\n"
 
-    ## recalculate
-    ### space left after home size chosen
-    space_left=`echo - | awk "{print $space_left - $home_size}"`
-
-    printf "						HOME set to "$home_size"GB ("$space_left"GB space left on "$lvm_part")\n"
-
-    ## total
-    total_size_calc=`echo - | awk "{print $swap_size + $root_size + $tmp_size + $usr_size + $var_size + $home_size}"`
-    diff_total_lvm_calc=`echo - | awk "{print $total_size_calc - $lvm_size_calc}"`
-    diff_t="$(echo $diff_total_lvm_calc | awk -F . '{print $1}')"
-    echo
-
-    if [[ "$diff_t" -gt 0 ]]; then
-	printf "disk size ("$lvm_size_human"GB) is insufficient for allocated space\n"
-	printf "please shrink allocated space and try again\n"
-	sleep 5
-	clear
-	set_lvm_partition_sizes
-    fi
-
-    printf "continue? (Y/n) "
-    reply_single
-    if printf "$reply" | grep -iq "^n" ; then
-	exit_hajime
-    else
+	## total
+	total_size_calc=`echo - | awk "{print $swap_size + $root_size + $tmp_size + $usr_size + $var_size + $home_size}"`
+	diff_total_lvm_calc=`echo - | awk "{print $total_size_calc - $lvm_size_calc}"`
+	diff_t="$(echo $diff_total_lvm_calc | awk -F . '{print $1}')"
 	echo
-	printf "encrypt partition and create lvm volumes\n"
+
+	if [[ "$diff_t" -gt 0 ]]; then
+	    printf "disk size ("$lvm_size_human"GB) is insufficient for allocated space\n"
+	    printf "please shrink allocated space and try again\n"
+	    sleep 5
+	    clear
+	    set_lvm_partition_sizes
+	fi
+
+	printf "continue? (Y/n) "
+	reply_single
+	if printf "$reply" | grep -iq "^n" ; then
+	    exit_hajime
+	else
+	    echo
+	    printf "encrypt partition and create lvm volumes\n"
+	fi
+
+    elif [[ -n $dev_lvm ]]; then
+
+	root_size=$size_root
+	home_size=$size_home
+	tmp_size=$size_tmp
+	usr_size=$size_usr
+	var_size=$size_var
+
     fi
 }
 
@@ -858,8 +946,24 @@ legacy_cryptsetup ()
 {
     #cryptsetup on designated partition
 
-    cryptsetup luksFormat --type luks2 "$lvm_part"
-    cryptsetup open "$lvm_part" cryptlvm
+    if [[ -n $luks_pass ]]; then
+	## via configuration
+
+	## write key-file
+	echo "$luks_pass" > $file_luks_pass
+
+	cryptsetup luksFormat --type luks2 --key-file $file_luks_pass "$lvm_part"
+
+	## remove key-file
+	rm -rf $file_luks_pass
+
+    elif [[ -z $luks_pass ]]; then
+	## user interactive
+
+	cryptsetup luksFormat --type luks2 "$lvm_part"
+	cryptsetup open "$lvm_part" cryptlvm
+
+    fi
 }
 
 
@@ -1034,7 +1138,8 @@ mount_partitions ()
 
 create_swap_partition()
 {
-    if [[ $swap_bool == "Y" || $swap_bool == "y" ]]; then
+    ## yes from configuration
+    if [[ $swap_bool == "Y" || $swap_bool == "y" || $swap_bool == "yes" ]]; then
 
 	lvcreate -L "$swap_size"G vg0 -n lv_swap
 	mkswap -L SWAP /dev/mapper/vg0-lv_swap

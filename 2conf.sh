@@ -67,6 +67,7 @@ initial_release='2017'
 # user customizable variables
 
 ## file locations
+file_configuration='/tmp/code/hajime/install-config.sh'
 file_etc_pacman_conf='/etc/pacman.conf'
 file_etc_locale_gen="/etc/locale.gen"
 file_etc_locale_conf="/etc/locale.conf"
@@ -110,6 +111,13 @@ system_security='' #nss-certs; comes with nss in core
 
 #--------------------------------
 
+sourcing ()
+{
+    ## configuration file
+    [[ -f $file_configuration ]] && source $file_configuration
+}
+
+
 args="$@"
 getargs ()
 {
@@ -127,16 +135,6 @@ offline_installation ()
 	repo_re='\/repo'
 
     fi
-}
-
-
-temporary_maintenance ()
-{
-    # DEV
-    # libtinfo_so.5
-    # rewiring for libtinfo.so.5 missing while 6 is installed
-    ln -s /usr/lib/libcursesw.so.6 /usr/lib/libtinfo.so.5
-    #ln -s /usr/lib/libtinfo.so.6 /usr/lib/libtinfo.so.5
 }
 
 
@@ -317,7 +315,7 @@ set_host_file ()
 pass_root ()
 {
     printf "$(whoami)@$hostname\n"
-    passwd
+    printf '%s' "$root_pw" | passwd --stdin
 }
 
 
@@ -414,7 +412,7 @@ set_passphrase ()
 {
     ## set $username password
     printf "$username@$hostname\n"
-    passwd $username
+    printf '%s' "$username_pw" | passwd --stdin $username
 }
 
 
@@ -598,9 +596,9 @@ exit_arch_chroot_mnt ()
 main ()
 {
     getargs $args
+    sourcing
     offline_installation
     clear
-    # DEV temporary_maintenance
     get_offline_repo
     reconfigure_pacman_conf
     time_settings
