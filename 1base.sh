@@ -12,7 +12,7 @@
 ###  # # # # # #
 ###
 
-:'
+: '
 hajime_1base
 first part of linux installation
 copyright (c) 2017 - 2025  |  oxo
@@ -51,7 +51,7 @@ https://www.gnu.org/licenses/gpl-3.0.txt
 # '
 
 
-set -o errexit
+#set -o errexit
 #set -o nounset
 set -o pipefail
 
@@ -75,7 +75,8 @@ arch_mirrorlist="https://archlinux.org/mirrorlist/?country=SE&protocol=https&ip_
 mirror_country="Germany,Netherlands,Sweden,USA"
 mirror_amount="5"
 
-file_configuration='/root/tmp/code/hajime/install-config.sh'
+file_configuration='/root/hajime/install-config.sh'
+file_configuration_1='/hajime/install-config.sh'
 file_luks_pass='/root/tmp/code/hajime/luks_pass'
 
 # 20220201 in the arch repository;
@@ -446,10 +447,12 @@ set_boot_device ()
 	    if [[ -n $dev_boot_clear ]]; then
 
 		sgdisk --clear $dev_boot
-		sgdisk --new $part_boot:0:${size_boot} --typecode $part_boot:$type_boot $dev_boot
 
 	    fi
 
+	    sgdisk --new $part_boot:0:${size_boot} --typecode $part_boot:$type_boot $dev_boot
+
+	    boot_part=$dev_boot$part_boot
 	    ;;
 
     esac
@@ -527,9 +530,12 @@ set_lvm_device ()
 	    if [[ -n $dev_lvm_clear ]]; then
 
 		sgdisk --clear $dev_lvm
-		sgdisk --new $part_lvm:0:$size_lvm --typecode $part_lvm:$type_lvm $dev_lvm
 
 	    fi
+
+	    sgdisk --new $part_lvm:0:$size_lvm --typecode $part_lvm:$type_lvm $dev_lvm
+
+	    lvm_part=$dev_lvm$part_lvm
 	    ;;
 
     esac
@@ -952,7 +958,8 @@ legacy_cryptsetup ()
 	## write key-file
 	echo "$luks_pass" > $file_luks_pass
 
-	cryptsetup luksFormat --type luks2 --key-file $file_luks_pass "$lvm_part"
+	cryptsetup luksFormat --batch-mode --type luks2 --key-file $file_luks_pass "$lvm_part"
+	cryptsetup --key-file $file_luks_pass open "$lvm_part" cryptlvm
 
 	## remove key-file
 	rm -rf $file_luks_pass
@@ -1303,6 +1310,13 @@ switch_to_installation_environment ()
 }
 
 
+autostart_next ()
+{
+    ## triggered with configuration file
+    [[ -n $after_1base ]] && sh hajime/2conf.sh
+}
+
+
 welcome ()
 {
     clear
@@ -1371,6 +1385,7 @@ main ()
     getargs $args
     define_text_appearance
     welcome
+    sourcing
     get_bootmount
     network_setup
     #console_font
@@ -1401,6 +1416,7 @@ main ()
     user_advice
     finishing
     switch_to_installation_environment
+    autostart_next
 }
 
 main

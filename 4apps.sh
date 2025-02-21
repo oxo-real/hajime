@@ -66,8 +66,16 @@ initial_release='2019'
 
 ## hardcoded variables
 # user customizable variables
+file_configuration='$HOME/hajime/install-config.sh'
 
 #--------------------------------
+
+sourcing ()
+{
+    ## configuration file
+    [[ -f $file_configuration ]] && source $file_configuration
+}
+
 
 args="$@"
 getargs ()
@@ -487,6 +495,13 @@ loose_ends ()
 }
 
 
+autostart_next ()
+{
+    ## triggered with configuration file
+    [[ -n $after_4apps ]] && sh hajime/5dtcf.sh
+}
+
+
 main ()
 {
     getargs $args
@@ -510,6 +525,8 @@ main ()
 
     loose_ends
     set_usr_ro
+
+    autostart_next
 }
 
 main

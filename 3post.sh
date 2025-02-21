@@ -72,11 +72,18 @@ post_core_additions='archlinux-keyring lsof mlocate neofetch neovim pacman-contr
 bloat_ware="" # there seems to be no more bloatware since kernel v536 (nano was removed)
 mirror_country='Sweden'
 mirror_amount='5'
+file_configuration='$HOME/hajime/install-config.sh'
 
 #--------------------------------
 
 
 # functions
+
+sourcing ()
+{
+    ## configuration file
+    [[ -f $file_configuration ]] && source $file_configuration
+}
 
 
 args="$@"
@@ -337,6 +344,13 @@ wrap_up ()
 }
 
 
+autostart_next ()
+{
+    ## triggered with configuration file
+    [[ -n $after_3post ]] && sh hajime/4apps.sh
+}
+
+
 main ()
 {
     getargs $args
@@ -352,6 +366,7 @@ main ()
     base_mutations
     set_read_only
     wrap_up
+    autostart_next
 }
 
 main

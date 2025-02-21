@@ -43,7 +43,7 @@ helper script to bootstrap hajime up after archiso boot
   REPO
 
 # usage
-  sh hajime/0init.sh
+  sh hajime/0init.sh [--online]
 
 # example
   mkdir tmp
@@ -66,14 +66,22 @@ developer='oxo'
 license='gplv3'
 initial_release='2020'
 
-## hardcoded variables
+# hardcoded variables
 online_repo='https://codeberg.org/oxo/hajime'
+file_configuration='/root/hajime/install-config.sh'
 
 #--------------------------------
 
 
 ## offline installationm mode by default
 ## --online option has to be given explicitly
+
+
+sourcing ()
+{
+    ## configuration file
+    [[ -f $file_configuration ]] && source $file_configuration
+}
 
 
 args="$@"
@@ -199,7 +207,7 @@ install_or_exit ()
     else
 
 	install
-	exit 0
+	autostart_next
 
     fi
 }
@@ -207,52 +215,46 @@ install_or_exit ()
 
 install ()
 {
-    case $online in
+    if [[ $online -ne 1 ]]; then
 
-	1 )
-	    pacman -Syy
-	    pacman-key --init
-	    pacman-key --populate
-	    pacman -Sy --noconfirm git
-	    git clone $online_repo
+	## mount repo
+	mount_repo
 
-	    case $? in
+	## copy hajime to /root
+	cp --preserve --recursive /root/tmp/code/hajime /root
 
-		0)
-		    :
-		    ;;
+	## update pacman.conf
+	cp --preserve --recursive /root/hajime/misc/ol_pacman.conf /etc/pacman.conf
+	pacman -Sy
 
-		*)
-		    printf 'repo already exists\n'
-		    mv hajime hajime"$($date +'%s')"
-		    #cp -r hajime hajime"$($date +'%s')"
-		    ;;
+    elif [[ $online -eq 1 ]]; then
 
-	* )
-	    ## mount repo
-	    mount_repo
+	pacman -Syy
+	pacman-key --init
+	pacman-key --populate
+	pacman -Sy --noconfirm git
+	git clone $online_repo
 
-	    ## copy hajime to /root
-	    cp -pr /root/tmp/code/hajime /root
+	case $? in
 
-	    ## update pacman.conf
-	    cp -pr /root/hajime/misc/ol_pacman.conf /etc/pacman.conf
-	    pacman -Sy
-	    ;;
+	    0)
+		:
+		;;
 
-	    esac
+	    *)
+		printf 'repo already exists\n'
+		mv hajime hajime"$($date +'%s')"
+		#cp -r hajime hajime"$($date +'%s')"
+		;;
 
-	    ## copy hajime to /root
-	    #DEV they are the same file
-	    #cp -pr hajime /root
-	    ;;
+	esac
 
-    esac
+    fi
 
     touch /root/hajime/0init.done
 
     echo
-    printf "sh hajime/1base.sh [--offline]\n"
+    printf 'sh hajime/1base.sh\n'
     echo
 }
 
@@ -291,8 +293,16 @@ get_offline_code ()
 }
 
 
+autostart_next ()
+{
+    ## triggered with configuration file
+    [[ -n $after_0init ]] && sh hajime/1base.sh
+}
+
+
 main ()
 {
+    sourcing
     getargs $args
     header
     set_online
