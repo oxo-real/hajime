@@ -16,7 +16,7 @@
 --------------------------------
 
 # hajime
-copyright (c) 2019 - 2024  |  oxo
+copyright (c) 2019 - 2025  |  oxo
 
 When the right preparations are made this installation script installs an up-to-date Arch Linux system on an x64 architecture.
 
