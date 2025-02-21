@@ -15,7 +15,7 @@
 :'
 hajime_1base
 first part of linux installation
-copyright (c) 2017 - 2024  |  oxo
+copyright (c) 2017 - 2025  |  oxo
 
 GNU GPLv3 GENERAL PUBLIC LICENSE
 This program is free software: you can redistribute it and/or modify
@@ -43,7 +43,7 @@ https://www.gnu.org/licenses/gpl-3.0.txt
   archiso, REPO, 0init.sh
 
 # usage
-  sh hajime/1base.sh [--offline]
+  sh hajime/1base.sh [--online]
 
 # example
   n/a
@@ -237,7 +237,8 @@ exit_hajime ()
 args="$@"
 getargs ()
 {
-    [[ "$1" =~ offline$ ]] && offline=1
+    ## online installation
+    [[ "$1" =~ online$ ]] && online=1
 }
 
 
@@ -259,7 +260,7 @@ get_lsblk ()
 
 network_setup ()
 {
-    if [[ $offline -ne 1 ]]; then
+    if [[ $online -eq 1 ]]; then
 
 	# network setup
 
@@ -692,7 +693,7 @@ set_lvm_partition_sizes ()
     ### percentages
     tot_perc=`echo - | awk "{print $tmp_perc + $usr_perc + $var_perc + $home_perc}"`
 
-    usr_perc=`echo - | awk "{print $tmp_perc / $tot_perc}"`
+    tmp_perc=`echo - | awk "{print $tmp_perc / $tot_perc}"`
     usr_perc=`echo - | awk "{print $usr_perc / $tot_perc}"`
     var_perc=`echo - | awk "{print $var_perc / $tot_perc}"`
     home_perc=`echo - | awk "{print $home_perc / $tot_perc}"`
@@ -1063,7 +1064,7 @@ install_helpers ()
     # [TODO] CHECK if pacman.conf is correct after 202306
     ## see: https://archlinux.org/news/git-migration-completed/
 
-    if [[ $offline -eq 1 ]]; then
+    if [[ $online -ne 1 ]]; then
 
 	# see also man pacman.conf
 	## configure pacman.conf for offline 'server'
@@ -1077,7 +1078,7 @@ install_helpers ()
     ## disable pacman signature check (not recommended)
     #sed -i 's/^SigLevel = Required DatabaseOptional/SigLevel = Never/' /etc/pacman.conf
 
-    if [[ $offline -ne 1 ]]; then
+    if [[ $online -eq 1 ]]; then
 
 	## refresh package keys & install helpers
 	#pacman-key --refresh-keys
@@ -1089,7 +1090,7 @@ install_helpers ()
 
 configure_mirrorlists ()
 {
-    if [[ $offline -ne 1 ]]; then
+    if [[ $online -eq 1 ]]; then
 
 	## backup old mirrorlist
 	file_etc_pacmand_mirrorlist="/etc/pacman.d/mirrorlist"
@@ -1146,14 +1147,9 @@ prepare_mnt_environment ()
 {
     echo 'copying hajime and pacman configuration into the new environment'
 
-    case $offline in
+    case $online in
 
-	1)
-	    # copy hajime to root (/hajime in conf)
-	    cp -prv /root/tmp/code/hajime /mnt
-	    ;;
-
-	*)
+	1 )
 	    # chroot changes the apparent root directory
 	    # commands will run isolated inside their root jail
 	    #TODO check for proper workings
@@ -1163,6 +1159,11 @@ prepare_mnt_environment ()
 	    cd /mnt
 	    git clone https://codeberg.org/oxo/hajime
 	    cd
+	    ;;
+
+	* )
+	    # copy hajime to root (/hajime in conf)
+	    cp -prv /root/tmp/code/hajime /mnt
 	    ;;
 
     esac
@@ -1179,7 +1180,7 @@ user_advice ()
     echo 'now changing root'
     echo 'to continue execute:'
     echo
-    echo 'sh hajime/2conf.sh [--offline]'
+    echo 'sh hajime/2conf.sh'
     echo
 }
 
@@ -1285,9 +1286,7 @@ main ()
     create_mountpoints
     mount_partitions
     create_swap_partition
-
     #arch_install
-
     install_helpers
     configure_mirrorlists
     install_base_devel_package_groups

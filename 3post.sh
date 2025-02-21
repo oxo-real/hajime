@@ -44,7 +44,7 @@ https://www.gnu.org/licenses/gpl-3.0.txt
   archinstall, !REPO, 0init.sh, 1base.sh, 2conf.sh
 
 # usage
-  sh hajime/3post.sh [--offline]
+  sh hajime/3post.sh [--online]
 
 # example
   n/a
@@ -82,13 +82,14 @@ mirror_amount='5'
 args="$@"
 getargs ()
 {
-    [[ "$1" =~ offline$ ]] && offline=1
+    ## online installation
+    [[ "$1" =~ online$ ]] && online=1
 }
 
 
 offline_installation ()
 {
-    if [[ $offline -eq 1 ]]; then
+    if [[ $online -ne 1 ]]; then
 
 	code_lbl='CODE'
 	code_dir="/home/$(id -un)/dock/3"
@@ -172,15 +173,9 @@ own_home ()
 
 modify_pacman_conf ()
 {
-    case $offline in
+    case $online in
 
-	1)
-	    ## set offline repo
-	    sudo sed -i "/^\[offline\]/{n;s/.*/Server = file:\/\/$repo_re/}" $file_etc_pacman_conf
-	    #sudo sed -i "s|\/repo|$HOME\/repo|" $file_etc_pacman_conf
-	    ;;
-
-	*)
+	1 )
 	    ## activate color
 	    sudo sed -i 's/#Color/Color/' $file_etc_pacman_conf
 
@@ -194,6 +189,12 @@ modify_pacman_conf ()
 
 	    ## activate multilib repository
 	    sudo sed -i 's/\#\[multilib\]/\[multilib\]\nInclude \= \/etc\/pacman.d\/mirrorlist/' $file_etc_pacman_conf
+	    ;;
+
+	* )
+	    ## set offline repo
+	    sudo sed -i "/^\[offline\]/{n;s/.*/Server = file:\/\/$repo_re/}" $file_etc_pacman_conf
+	    #sudo sed -i "s|\/repo|$HOME\/repo|" $file_etc_pacman_conf
 	    ;;
 
     esac
@@ -227,13 +228,11 @@ mount_repo ()
 
 get_offline_repo ()
 {
-    case $offline in
+    if [[ $online -ne 1 ]]; then
 
-	1)
-	    mount_repo
-	    ;;
+	mount_repo
 
-    esac
+    fi
 }
 
 
@@ -257,13 +256,11 @@ mount_code ()
 
 get_offline_code ()
 {
-    case $offline in
+    if [[ $online -ne 1 ]]; then
 
-	1)
-	    mount_code
-	    ;;
+	mount_code
 
-    esac
+    fi
 }
 
 
@@ -328,7 +325,7 @@ wrap_up ()
     printf "continue with this installation series\n"
     printf "by running 4apps.sh (recommended):\n"
     echo
-    printf "sh hajime/4apps.sh [--offline]\n"
+    printf "sh hajime/4apps.sh\n"
     echo
     echo
     printf "press any key to continue... "

@@ -43,7 +43,7 @@ helper script to bootstrap hajime up after archiso boot
   REPO
 
 # usage
-  sh hajime/0init.sh [--offline]
+  sh hajime/0init.sh [--online]
 
 # example
   mkdir tmp
@@ -72,16 +72,16 @@ online_repo='https://codeberg.org/oxo/hajime'
 #--------------------------------
 
 
-
-## offline installation
-#   see point_in_time (if pit=0)
+## offline installationm mode by default
+## --online has to be given explicitly
 
 
 args="$@"
 getargs ()
 {
     args="$@"
-    [[ "$1" =~ offline$ ]] && offline=1
+    ## online installation
+    [[ "$1" =~ online$ ]] && online=1
 }
 
 
@@ -111,7 +111,7 @@ header ()
 
 set_online ()
 {
-    [[ $offline -ne 1 ]] && select_interface
+    [[ $online -eq 1 ]] && select_interface
 }
 
 
@@ -122,7 +122,7 @@ select_interface ()
 	ip a
 	echo
 
-	printf "please enter interface number: "
+	printf "please enter network interface number: "
 	read interface_number
 
 	# translate number to interface name
@@ -207,21 +207,9 @@ install_or_exit ()
 
 install ()
 {
-    case $offline in
+    case $online in
 
-	1)
-	    ## mount repo
-	    mount_repo
-
-	    ## copy hajime to /root
-	    cp -pr /root/tmp/code/hajime /root
-
-	    ## update pacman.conf
-	    cp -pr /root/hajime/misc/ol_pacman.conf /etc/pacman.conf
-	    pacman -Sy
-	    ;;
-
-	*)
+	1 )
 	    pacman -Syy
 	    pacman-key --init
 	    pacman-key --populate
@@ -239,6 +227,18 @@ install ()
 		    mv hajime hajime"$($date +'%s')"
 		    #cp -r hajime hajime"$($date +'%s')"
 		    ;;
+
+	* )
+	    ## mount repo
+	    mount_repo
+
+	    ## copy hajime to /root
+	    cp -pr /root/tmp/code/hajime /root
+
+	    ## update pacman.conf
+	    cp -pr /root/hajime/misc/ol_pacman.conf /etc/pacman.conf
+	    pacman -Sy
+	    ;;
 
 	    esac
 

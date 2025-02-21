@@ -43,7 +43,7 @@ https://www.gnu.org/licenses/gpl-3.0.txt
   archiso, REPO, 0init.sh, 1base.sh
 
 # usage
-  sh hajime/2conf.sh [--offline]
+  sh hajime/2conf.sh [--online]
 
 # example
   n/a
@@ -113,13 +113,14 @@ system_security='' #nss-certs; comes with nss in core
 args="$@"
 getargs ()
 {
-    [[ "$1" =~ offline$ ]] && offline=1
+    ## online installation
+    [[ "$1" =~ online$ ]] && online=1
 }
 
 
 offline_installation ()
 {
-    if [[ offline -eq 1 ]]; then
+    if [[ $online -ne 1 ]]; then
 
 	code_dir='/tmp'
 	repo_dir='/repo'
@@ -166,7 +167,7 @@ mount_repo ()
 
 get_offline_repo ()
 {
-    [[ $offline -eq 1 ]] && mount_repo
+    [[ $online -ne 1 ]] && mount_repo
 }
 
 
@@ -185,32 +186,32 @@ mount_code ()
 
 get_offline_code ()
 {
-    [[ $offline -eq 1 ]] && mount_code
+    [[ $online -ne 1 ]] && mount_code
 }
 
 
 reconfigure_pacman_conf ()
 {
-    case $offline in
-	1)
-	    #### DEV now done in 1base
-	    ## see also man pacman.conf
+    if [[ $online -ne 1 ]]; then
 
-	    ## change SigLevel by adding PackageTrustAll to pacman.conf
-	    ### this prevents errors on marginal trusted packages
-	    #sed -i 's/^SigLevel = Required DatabaseOptional/SigLevel = Required DatabaseOptional PackageTrustAll/' $file_etc_pacman_conf
+	#### DEV now done in 1base
+	## see also man pacman.conf
 
-	    ## redirect offline 'server' (file) location
-	    ## define offline file location at the end of pacman.conf
-	    sed -i "/^\[offline\]/{n;s/.*/Server = file:\/\/$repo_re/}" $file_etc_pacman_conf
+	## change SigLevel by adding PackageTrustAll to pacman.conf
+	### this prevents errors on marginal trusted packages
+	#sed -i 's/^SigLevel = Required DatabaseOptional/SigLevel = Required DatabaseOptional PackageTrustAll/' $file_etc_pacman_conf
 
-	    ##sed -i "s|\/root\/tmp\/repo|\/repo|" $file_etc_pacman_conf
-	    #### DEV now done in 1base
+	## redirect offline 'server' (file) location
+	## define offline file location at the end of pacman.conf
+	sed -i "/^\[offline\]/{n;s/.*/Server = file:\/\/$repo_re/}" $file_etc_pacman_conf
 
-	    pacman -Syy
-	    echo
-	    ;;
-    esac
+	##sed -i "s|\/root\/tmp\/repo|\/repo|" $file_etc_pacman_conf
+	#### DEV now done in 1base
+
+	pacman -Syy
+	echo
+
+    fi
 }
 
 
@@ -446,33 +447,26 @@ initialize_pacman ()
 
 install_helpers ()
 {
-    case $offline in
+    if [[ $online -eq 1 ]]; then
 
-	1)
-	;;
-
-	*)
-
-	    # install helpers
-	    clear
-	    pacman -S --noconfirm $install_helpers
+	# install helpers
+	clear
+	pacman -S --noconfirm $install_helpers
 
 
-	    # configuring the mirrorlist
+	# configuring the mirrorlist
 
-	    ## backup old mirrorlist
-	    cp $file_etc_pacmand_mirrorlist /etc/pacman.d/`date "+%Y%m%d%H%M%S"`_mirrorlist.backup
+	## backup old mirrorlist
+	cp $file_etc_pacmand_mirrorlist /etc/pacman.d/`date "+%Y%m%d%H%M%S"`_mirrorlist.backup
 
-	    ## select fastest mirrors
-	    reflector \
-		--verbose \
-		--country $mirror_country \
-		-l $mirror_amount \
-		--sort rate \
-		--save $file_etc_pacmand_mirrorlist
-	    ;;
-
-    esac
+	## select fastest mirrors
+	reflector \
+	    --verbose \
+	    --country $mirror_country \
+	    -l $mirror_amount \
+	    --sort rate \
+	    --save $file_etc_pacmand_mirrorlist
+    fi
 }
 
 
@@ -593,7 +587,7 @@ exit_arch_chroot_mnt ()
     echo 'umount -R /mnt'
     echo 'reboot'
     echo
-    echo 'sh hajime/3post.sh [--offline]'
+    echo 'sh hajime/3post.sh'
     echo
 
     # finishing

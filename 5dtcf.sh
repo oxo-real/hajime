@@ -15,7 +15,7 @@
 : '
 hajime_5dtcf
 fifth part of linux installation
-copyright (c) 2019 - 2024  |  oxo
+copyright (c) 2019 - 2025  |  oxo
 
 GNU GPLv3 GENERAL PUBLIC LICENSE
 This program is free software: you can redistribute it and/or modify
@@ -67,13 +67,6 @@ initial_release='2019'
 ## hardcoded variables
 # user customizable variables
 
-## offline installation
-offline=1
-code_dir="/home/$(id -un)/dock/3"
-repo_dir="/home/$(id -un)/dock/2"
-repo_re="\/home\/$(id -un)\/dock\/2"
-file_etc_pacman_conf='/etc/pacman.conf'
-
 ## main xdg locations
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_CONFIG_HOME="$HOME/.config"
@@ -87,9 +80,25 @@ git_remote='https://codeberg.org/oxo'
 
 doas_conf='/etc/doas.conf'
 
+## offline installation
+code_dir="/home/$(id -un)/dock/3"
+repo_dir="/home/$(id -un)/dock/2"
+repo_re="\/home\/$(id -un)\/dock\/2"
+file_etc_pacman_conf='/etc/pacman.conf'
+
+
 #--------------------------------
 
-mount_repo()
+
+args="$@"
+getargs ()
+{
+    ## online installation
+    [[ "$1" =~ online$ ]] && online=1
+}
+
+
+mount_repo ()
 {
     repo_lbl='REPO'
     repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
@@ -101,7 +110,7 @@ mount_repo()
 }
 
 
-mount_code()
+mount_code ()
 {
     code_lbl='CODE'
     code_dev=$(lsblk -o label,path | grep "$code_lbl" | awk '{print $2}')
@@ -113,7 +122,7 @@ mount_code()
 }
 
 
-git_clone_remote_local()
+git_clone_remote_local ()
 {
     local remote_repo="$git_remote/$git_repo"
     local local_dir="$git_local/$local_repo"
@@ -123,7 +132,7 @@ git_clone_remote_local()
 }
 
 
-git_clone_dotf()
+git_clone_dotf ()
 {
     git_repo='dotf'
     local_repo='dotf'
@@ -131,7 +140,7 @@ git_clone_dotf()
 }
 
 
-git_clone_code()
+git_clone_code ()
 {
     ### hajime
     git_repo='hajime'
@@ -163,7 +172,7 @@ git_clone_code()
 }
 
 
-git_clone_note()
+git_clone_note ()
 {
     git_repo='note'
     local_repo="$git_repo"
@@ -171,7 +180,7 @@ git_clone_note()
 }
 
 
-git_clone_prvt()
+git_clone_prvt ()
 {
     git_repo='prvt'
     local_repo="$git_repo"
@@ -179,15 +188,15 @@ git_clone_prvt()
 }
 
 
-get_public_data()
+get_git_repo ()
 {
-    if [[ $offline -ne 1 ]]; then
+    if [[ $online -eq 1 ]]; then
 
 	git_clone_dotf
 	git_clone_code
 	git_clone_note
 
-    elif [[ $offline -eq 1 ]]; then
+    elif [[ $online -ne 1 ]]; then
 
 	## define destinations
 	home_dir_dst="$HOME"
@@ -231,41 +240,18 @@ get_public_data()
 }
 
 
-get_private_data()
+dotfbu_restore ()
 {
-    if [[ $offline -ne 1 ]]; then
+    if [[ $online -eq 1 ]]; then
 
-	git_clone_prvt
-
-    elif [[ $offline -eq 1 ]]; then
-
-	home_dir_dst="$HOME"
-	git_dir_dst="$XDG_DATA_HOME/c/git"
-
-	[[ -d $git_dir_dst/prvt ]] || mkdir -p   $git_dir_dst/prvt
-
-	printf "copying prvt repository\n"
-	src="$code_dir/prvt"
-	dst="$git_dir_dst"
-	rsync -aAXv $src $dst
-	printf "done\n"
-
-    fi
-}
-
-
-run_dotfbu()
-{
-    if [[ $offline -ne 1 ]]; then
-
-	# restore .config from .dot
+	# restore .config from dotf
 	sh $XDG_DATA_HOME/c/git/code/tool/dotfbu restore $XDG_DATA_HOME/c/git/dotf/ $XDG_CONFIG_HOME
 
     fi
 }
 
 
-rewrite_symlinks()
+rewrite_symlinks ()
 {
     # rewrite symlinks in shln to current users home
 
@@ -273,10 +259,11 @@ rewrite_symlinks()
     ### to pass_vault mountpoint (vlt_pass)
     ln -s $HOME/dock/vlt/pass $HOME/.password-store
 
-    ### to archive, backup and current
+    ### to archive, backup, current and device
     ln -s $HOME/.local/share/a $HOME/a
     ln -s $HOME/.local/share/b $HOME/b
     ln -s $HOME/.local/share/c $HOME/c
+    ln -s $HOME/.local/share/d $HOME/d
 
     ## change $USER symlinks
     ### change config_shln (default)
@@ -288,7 +275,7 @@ rewrite_symlinks()
 }
 
 
-set_permissions()
+set_permissions ()
 {
     # configure doas
     sudo printf "permit persist :wheel\n" > $doas_conf
@@ -300,13 +287,14 @@ set_permissions()
 }
 
 
-z_shell_config()
+z_shell_config ()
 {
+    ## reset or re-login for changes to take effect
+
     ## symlink in etc_zsh to zshenv
     sudo ln -s $XDG_CONFIG_HOME/zsh/etc_zsh_zshenv /etc/zsh/zshenv
 
     ## set zsh as default shell for current user
-    ## re-login for changes to take effect
     sudo usermod -s `whereis zsh | awk '{print $2}'` $(whoami)
 
     ## change shell
@@ -318,61 +306,20 @@ z_shell_config()
 }
 
 
-set_sway_hardware()
+set_sway_hardware ()
 {
     sh $XDG_CONFIG_HOME/sway/hw/select_current_machine
 }
 
 
-base16()
+base16 ()
 {
-    export BASE16_THEME=synth-midnight-dark
+    export BASE16_THEME=ir-black
+    #export BASE16_THEME=synth-midnight-dark
 }
 
 
-vim_plug()
-{
-    #TODO for vim-autoswap-git
-    #yay -S wmctrl
-
-    if [[ $offline -ne 1 ]]; then
-
-	## vim plug
-	curl -fLo "${XDG_CONFIG_HOME:-$HOME/.config}"/nvim/site/autoload/plug.vim \
-	     --create-dirs \
-	     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-	# sh -c 'curl -fLo "${XDG_CONFIG_HOME:-$HOME/.config}"/nvim/site/autoload/plug.vim --create-dirs \
-	    #       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-
-	## install plugins defined in: $XDG_CONFIG_HOME/nvim/plugins
-	if [[ -d $XDG_CONFIG_HOME/nvim/plugins ]]; then
-
-	    for plugin in $(ls); do
-
-		cd $plugin
-		git pull
-		cd ..
-
-	    done
-
-	fi
-
-    fi
-
-    echo
-
-}
-
-
-mozilla_firefox()
-{
-    # mozilla firefox settings
-    [ -d $HOME/Downloads ] && rm -rf $HOME/Downloads
-    [ -d $HOME/.mozilla ] && rm -rf $HOME/.mozilla
-}
-
-
-qutebrowser()
+qutebrowser ()
 {
     # qutebrowser download directory
     qb_dl_dir="$XDG_DATA_HOME/c/download"
@@ -380,32 +327,32 @@ qutebrowser()
 }
 
 
-wallpaper()
+wallpaper ()
 {
     # prepare wallpaper file
 
     [ -d $XDG_DATA_HOME/a/media/images/wallpaper ] || \
 	mkdir -p $XDG_DATA_HOME/a/media/images/wallpaper
-    ## to be replaced with preferred image
-    #cp $XDG_DATA_HOME/media/images/wallpaper/image.png $XDG_DATA_HOME/media/images/wallpaper/active
+
+    #cp $XDG_DATA_HOME/media/images/wallpaper/preferred-image.png $XDG_DATA_HOME/media/images/wallpaper/active
 }
 
 
-pacman_conf()
+pacman_conf ()
 {
-    # disbling offline repo
+    # disabling offline repo
     sudo sed -i '/^\[offline\]/ s/./#&/' $file_etc_pacman_conf
     sudo sed -i '/^Server = file:\/\// s/./#&/' $file_etc_pacman_conf
 
     # enabling original repositories
     sudo sed -i 's/^#X--//' $file_etc_pacman_conf
 
-    # when internet is available do:
+    # whenever network is available do:
     #sudo pacman -Syy
 }
 
 
-finishing_up()
+finishing_up ()
 {
     # finishing
 
@@ -428,22 +375,20 @@ finishing_up()
 }
 
 
-main()
+main ()
 {
+    getargs $args
     mount_repo
     mount_code
-    get_public_data
-    get_private_data
-    #run_dotfbu
+    get_git_repo
+    #dotfbu_restore
     rewrite_symlinks
     set_permissions
     z_shell_config
     set_sway_hardware
     base16
-    #vim_plug
-    mozilla_firefox
     qutebrowser
-    wallpaper
+    #wallpaper
     pacman_conf
     finishing_up
 }

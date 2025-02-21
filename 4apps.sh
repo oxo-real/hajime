@@ -44,7 +44,7 @@ https://www.gnu.org/licenses/gpl-3.0.txt
   archiso, REPO, 0init.sh, 1base.sh, 2conf.sh, 3post.sh
 
 # usage
-  sh hajime/4apps.sh [--offline]
+  sh hajime/4apps.sh [--online]
 
 # example
   n/a
@@ -72,7 +72,8 @@ initial_release='2019'
 args="$@"
 getargs ()
 {
-    [[ "$1" =~ offline$ ]] && offline=1
+    ## online installation
+    [[ "$1" =~ online$ ]] && online=1
 }
 
 
@@ -381,7 +382,7 @@ mount_repo ()
 
 get_offline_repo ()
 {
-    [[ $offline -eq 1 ]] && mount_repo
+    [[ $online -ne 1 ]] && mount_repo
 }
 
 
@@ -399,7 +400,7 @@ mount_code ()
 
 get_offline_code ()
 {
-    [[ $offline -eq 1 ]] && mount_code
+    [[ $online -ne 1 ]] && mount_code
 }
 
 
@@ -479,7 +480,7 @@ loose_ends ()
     #sudo ln -s /usr/lib/w3m/w3mimgdisplay /usr/bin/w3mimgdisplay
 
     ## recommend human to execute dotfiles install script
-    echo 'sh hajime/5dtcf.sh [--offline]'
+    echo 'sh hajime/5dtcf.sh'
 
     ## finishing
     sudo touch $HOME/hajime/4apps.done

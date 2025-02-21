@@ -7,12 +7,14 @@
 ├── 4apps.sh
 ├── 5dtcf.sh
 ├── COPYING
+├── install-config.sh
 ├── misc
 │   ├── alt_dtp_env
 │   ├── arch-chroot
 │   └── ol_pacman.conf
+├── pkgs-1000
 ├── README.md
 └── repo-tree.md
 
-2 directories, 12 files
+2 directories, 14 files
 ```
