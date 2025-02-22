@@ -1329,6 +1329,7 @@ autostart_next ()
     # 	arch-chroot /mnt sh /hajime/2conf.sh
 
     # fi
+    :
 }
 
 
