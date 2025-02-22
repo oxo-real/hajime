@@ -241,48 +241,53 @@ vconsole_settings ()
 
 set_hostname ()
 {
-    clear
+    if [[ -z $hostname ]]; then
 
-    printf "hostname: '$hostname_default'\n"
-    printf "correct? (y/N) "
-    reply
+	clear
 
-    if printf "$reply" | grep -iq "^y" ; then
-
-	echo
-	printf "using '$hostname_default' as hostname\n"
-	printf "really sure? (Y/n) "
+	printf "hostname: '$hostname_default'\n"
+	printf "correct? (y/N) "
 	reply
 
-	if printf "$reply" | grep -iq "^n"; then
+	if printf "$reply" | grep -iq "^y" ; then
 
-	    clear
-	    set_hostname
-	else
 	    echo
 	    printf "using '$hostname_default' as hostname\n"
+	    printf "really sure? (Y/n) "
+	    reply
+
+	    if printf "$reply" | grep -iq "^n"; then
+
+		clear
+		set_hostname
+	    else
+		echo
+		printf "using '$hostname_default' as hostname\n"
+
+	    fi
+
+	else
+
+	    echo
+	    read -p "enter hostname: " hostname
+	    printf "hostname:	'$hostname', correct? (Y/n) "
+	    reply
+
+	    if printf "$reply" | grep -iq "^n"; then
+
+		clear
+		set_hostname
+	    else
+		echo
+		printf "using '$hostname' as hostname\n"
+
+	    fi
 
 	fi
-
-    else
 
 	echo
-	read -p "enter hostname: " hostname
-	printf "hostname:	'$hostname', correct? (Y/n) "
-	reply
-
-	if printf "$reply" | grep -iq "^n"; then
-
-	    clear
-	    set_hostname
-	else
-	    echo
-	    printf "using '$hostname' as hostname\n"
-
-	fi
 
     fi
-    echo
 }
 
 
@@ -323,52 +328,57 @@ pass_root ()
 
 set_username ()
 {
-    clear
-    printf "username: '$username_default'\n"
-    printf "correct? (y/N) "
-    reply
+    if [[ -z $username ]]; then
 
-    if printf "$reply" | grep -iq "^y"; then
-
-	echo
-	printf "using '$username_default' as username\n"
-	printf "really sure? (Y/n) "
+	clear
+	printf "username: '$username_default'\n"
+	printf "correct? (y/N) "
 	reply
 
-	if printf "$reply" | grep -iq "^n"; then
-
-	    clear
-	    set_username
-
-	else
+	if printf "$reply" | grep -iq "^y"; then
 
 	    echo
 	    printf "using '$username_default' as username\n"
+	    printf "really sure? (Y/n) "
+	    reply
 
-	fi
+	    if printf "$reply" | grep -iq "^n"; then
 
-    else
+		clear
+		set_username
 
-	echo
-	read -p "enter username: " username
-	test_username
-	printf "username: '$username', correct? (Y/n) "
-	reply
+	    else
 
-	if printf "$reply" | grep -iq "^n"; then
+		echo
+		printf "using '$username_default' as username\n"
 
-	    clear
-	    set_username
+	    fi
 
 	else
 
 	    echo
-	    printf "using '$username' as username\n"
+	    read -p "enter username: " username
+	    test_username
+	    printf "username: '$username', correct? (Y/n) "
+	    reply
+
+	    if printf "$reply" | grep -iq "^n"; then
+
+		clear
+		set_username
+
+	    else
+
+		echo
+		printf "using '$username' as username\n"
+
+	    fi
 
 	fi
 
+	echo
+
     fi
-    echo
 }
 
 
