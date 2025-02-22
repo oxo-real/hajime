@@ -240,7 +240,15 @@ exit_hajime ()
 sourcing ()
 {
     ## configuration file
-    [[ -f $file_configuration ]] && source $file_configuration
+    if [[ -f $file_configuration ]]; then
+
+	source $file_configuration
+
+    else
+
+	source $file_configuration_1
+
+    fi
 }
 
 
@@ -1305,15 +1313,22 @@ finishing ()
 
 switch_to_installation_environment ()
 {
-    # default bash will be ran inside the root jail
+    # default bash will be ran inside the chroot jail
     arch-chroot /mnt
 }
 
 
 autostart_next ()
 {
+    #TODO DEV because arch-chroot there is a problem executing
+    # commands after arch-chroot
+    # below did not work
     ## triggered with configuration file
-    [[ -n $after_1base ]] && sh hajime/2conf.sh
+    # if [[ -n $after_1base ]]; then
+
+    # 	arch-chroot /mnt sh /hajime/2conf.sh
+
+    # fi
 }
 
 
@@ -1321,7 +1336,7 @@ welcome ()
 {
     clear
     printf " hajime\n"
-    printf " 2019 - 2024  |  oxo\n"
+    printf " copyright (c) 2017 - 2025  |  oxo\n"
     echo
     echo
     printf " ${st_bold}CAUTION!${st_def}\n"
@@ -1333,6 +1348,8 @@ welcome ()
     printf " Opting out by entering 'n/N' and cancel the installation.\n"
     echo
     printf " Continuing will ${st_bold}overwrite existing data${st_def} on designated devices.\n"
+    printf " When using a configuration file, be sure all variables are 100% correct.\n"
+
     printf " This software is subject to continuous development, carefully consider its beta state. \n"
 
     printf " Be sure to have the most recent version of the arch installation media!\n"
@@ -1416,7 +1433,7 @@ main ()
     user_advice
     finishing
     switch_to_installation_environment
-    autostart_next
+    #autostart_next
 }
 
 main

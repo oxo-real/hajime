@@ -2,7 +2,7 @@
 
 # system specific hajime installation configuration file
 
-# WARNING be sure all variables are 100% correct
+# CAUTION be sure all variables are 100% correct
 
 
 # 0init

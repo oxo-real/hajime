@@ -498,7 +498,7 @@ loose_ends ()
 autostart_next ()
 {
     ## triggered with configuration file
-    [[ -n $after_4apps ]] && sh hajime/5dtcf.sh
+    [[ -n $after_4apps ]] && sh $HOME/hajime/5dtcf.sh
 }
 
 

@@ -68,7 +68,7 @@ initial_release='2020'
 
 # hardcoded variables
 online_repo='https://codeberg.org/oxo/hajime'
-file_configuration='/root/hajime/install-config.sh'
+file_configuration='/root/tmp/code/hajime/install-config.sh'
 
 #--------------------------------
 
@@ -296,7 +296,7 @@ get_offline_code ()
 autostart_next ()
 {
     ## triggered with configuration file
-    [[ -n $after_0init ]] && sh hajime/1base.sh
+    [[ -n $after_0init ]] && sh /root/hajime/1base.sh
 }
 
 

@@ -347,7 +347,7 @@ wrap_up ()
 autostart_next ()
 {
     ## triggered with configuration file
-    [[ -n $after_3post ]] && sh hajime/4apps.sh
+    [[ -n $after_3post ]] && sh $HOME/hajime/4apps.sh
 }
 
 

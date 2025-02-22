@@ -51,7 +51,7 @@ https://www.gnu.org/licenses/gpl-3.0.txt
 # '
 
 
-set -o errexit
+#set -o errexit
 #set -o nounset
 set -o pipefail
 
@@ -86,8 +86,8 @@ locale_conf="LANG=en_US.UTF-8"
 vconsole_conf="KEYMAP=us"
 mirror_country="Germany"
 mirror_amount="5"
-hostname="host"
-username="user"
+hostname_default="host"
+username_default="user"
 bootloader_timeout="2"
 bootloader_editor="0"
 
@@ -243,14 +243,14 @@ set_hostname ()
 {
     clear
 
-    printf "hostname: '$hostname'\n"
+    printf "hostname: '$hostname_default'\n"
     printf "correct? (y/N) "
     reply
 
     if printf "$reply" | grep -iq "^y" ; then
 
 	echo
-	printf "using '$hostname' as hostname\n"
+	printf "using '$hostname_default' as hostname\n"
 	printf "really sure? (Y/n) "
 	reply
 
@@ -260,7 +260,7 @@ set_hostname ()
 	    set_hostname
 	else
 	    echo
-	    printf "using '$hostname' as hostname\n"
+	    printf "using '$hostname_default' as hostname\n"
 
 	fi
 
@@ -289,12 +289,12 @@ set_hostname ()
 set_host_file ()
 {
     ## create host file
-    printf "$hostname" > $file_etc_hostname
+    printf "$hostname_default" > $file_etc_hostname
 
     ## add matching entries to hosts file
     printf "127.0.0.1	localhost.localdomain	localhost\n" >> $file_etc_hosts
     printf "::1		localhost.localdomain	localhost\n" >> $file_etc_hosts
-    printf "127.0.1.1	$hostname.localdomain	$hostname\n" >> $file_etc_hosts
+    printf "127.0.1.1	$hostname_default.localdomain	$hostname_default\n" >> $file_etc_hosts
 
     ## enable systemd-resolved
     #systemctl enable systemd-resolved.service
@@ -314,7 +314,7 @@ set_host_file ()
 # set root password
 pass_root ()
 {
-    printf "$(whoami)@$hostname\n"
+    printf "$(whoami)@$hostname_default\n"
     printf '%s' "$root_pw" | passwd --stdin
 }
 
@@ -324,14 +324,14 @@ pass_root ()
 set_username ()
 {
     clear
-    printf "username: '$username'\n"
+    printf "username: '$username_default'\n"
     printf "correct? (y/N) "
     reply
 
     if printf "$reply" | grep -iq "^y"; then
 
 	echo
-	printf "using '$username' as username\n"
+	printf "using '$username_default' as username\n"
 	printf "really sure? (Y/n) "
 	reply
 
@@ -343,7 +343,7 @@ set_username ()
 	else
 
 	    echo
-	    printf "using '$username' as username\n"
+	    printf "using '$username_default' as username\n"
 
 	fi
 
@@ -579,18 +579,20 @@ move_hajime ()
 exit_arch_chroot_mnt ()
 {
     ## return to archiso environment
+    echo '# return to the archiso environment with:'
     echo
     echo 'exit'
     ## reboot advice
+    echo
+    echo '# to continue execute:'
+    echo
     echo 'umount -R /mnt'
     echo 'reboot'
     echo
+    echo '# after reboot continue with:'
+    echo
     echo 'sh hajime/3post.sh'
     echo
-
-    ## auto reboot
-    ## triggered with configuration file
-    [[ -n $after_2conf ]] && exit && umount -R /mnt && reboot
 
     # finishing
     touch /home/$username/hajime/2conf.done
