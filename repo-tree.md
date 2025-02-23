@@ -11,10 +11,11 @@
 ├── misc
 │   ├── alt_dtp_env
 │   ├── arch-chroot
+│   ├── etc_doas.conf
 │   └── ol_pacman.conf
 ├── pkgs-1000
 ├── README.md
 └── repo-tree.md
 
-2 directories, 14 files
+2 directories, 15 files
 ```

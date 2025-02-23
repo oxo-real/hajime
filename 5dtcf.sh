@@ -78,13 +78,15 @@ export XDG_CONFIG_DIRS='/etc/xdg'
 git_local="$XDG_DATA_HOME/c/git"
 git_remote='https://codeberg.org/oxo'
 
-doas_conf='/etc/doas.conf'
-
 ## offline installation
 code_dir="/home/$(id -un)/dock/3"
 repo_dir="/home/$(id -un)/dock/2"
 repo_re="\/home\/$(id -un)\/dock\/2"
 file_etc_pacman_conf='/etc/pacman.conf'
+
+## doas configuration file
+etc_doas_conf='/etc/doas.conf'
+misc_doas_conf="$HOME/hajime/misc/etc_doas.conf"
 
 
 #--------------------------------
@@ -278,9 +280,17 @@ rewrite_symlinks ()
 set_permissions ()
 {
     # configure doas
-    sudo printf "permit persist :wheel\n" > $doas_conf
-    sudo chown -c root:root $doas_conf
-    sudo chmod -c 0400 $doas_conf
+    # sudo printf 'permit persist :wheel\n' > $etc_doas_conf
+    # sudo chown -c root:root $etc_doas_conf
+    # sudo chmod -c 0400 $etc_doas_conf
+    sudo cp $misc_doas_conf $etc_doas_conf
+
+    ## test for errors
+    if ! sudo doas -C $etc_doas_conf; then
+
+	printf 'ERROR doas config\n'
+
+    fi
 
     # set right permissions for gnupg home
     sh $XDG_DATA_HOME/c/git/note/crypto/gpg/gnupg_set_permissions
@@ -294,11 +304,24 @@ z_shell_config ()
     ## symlink in etc_zsh to zshenv
     sudo ln -s $XDG_CONFIG_HOME/zsh/etc_zsh_zshenv /etc/zsh/zshenv
 
-    ## set zsh as default shell for current user
-    sudo usermod -s `whereis zsh | awk '{print $2}'` $(whoami)
+    ## zsh default shell
+    #sudo chsh -s $(which zsh)
 
-    ## change shell
-    sudo chsh -s /bin/zsh
+    ## alt1: zsh default shell for $USER
+    #sudo usermod -s $(which zsh) $USER
+
+    ## alt2: zsh default shell by changing /etc/passwd directly
+    sudo awk -F ':' -v user="$USER" \
+	 'BEGIN {OFS=":"} \
+	 $1 == user { $NF="/usr/bin/zsh"; print } \
+	 $1 != user { print }' \
+	 /etc/passwd > /tmp/passwd && sudo mv /tmp/passwd /etc/passwd
+    # Run awk with ':' as the field separator and set the variable 'user' to the current username
+    # Set the output field separator to ':'
+    # If the first field (username) matches 'user', change the last field (shell) to '/bin/zsh' and print the line
+    # If the first field does not match 'user', print the line as is
+    # Read from /etc/passwd and redirect output to a temporary file &&
+    # Move the temporary file back to overwrite the original /etc/passwd
 
     ## enable command history
     [[ -d "$XDG_LOGS_HOME/history" ]] || mkdir $XDG_LOGS_HOME/history

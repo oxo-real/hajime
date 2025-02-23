@@ -73,6 +73,7 @@ bloat_ware="" # there seems to be no more bloatware since kernel v536 (nano was 
 mirror_country='Sweden'
 mirror_amount='5'
 file_configuration='$HOME/hajime/install-config.sh'
+file_etc_motd="/etc/motd"
 
 #--------------------------------
 
@@ -91,6 +92,12 @@ getargs ()
 {
     ## online installation
     [[ "$1" =~ online$ ]] && online=1
+}
+
+
+motd_remove ()
+{
+    sudo rm -rf $file_etc_motd
 }
 
 
@@ -354,6 +361,7 @@ autostart_next ()
 main ()
 {
     getargs $args
+    motd_remove
     offline_installation
     dhcp_connect
     set_read_write

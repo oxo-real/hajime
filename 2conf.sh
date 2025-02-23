@@ -74,6 +74,7 @@ file_etc_locale_conf="/etc/locale.conf"
 file_etc_vconsole_conf="/etc/vconsole.conf"
 file_etc_hosts="/etc/hosts"
 file_etc_hostname="/etc/hostname"
+file_etc_motd="/etc/motd"
 file_etc_sudoers="/etc/sudoers"
 file_etc_pacmand_mirrorlist="/etc/pacman.d/mirrorlist"
 file_boot_loader_loader_conf="/boot/loader/loader.conf"
@@ -586,6 +587,15 @@ move_hajime ()
 }
 
 
+motd_3post ()
+{
+    echo
+    echo '# continue hajime installation with:' > $file_etc_motd
+    echo >> $file_etc_motd
+    echo 'sh hajime/3post.sh' >> $file_etc_motd
+    echo >> $file_etc_motd
+}
+
 exit_arch_chroot_mnt ()
 {
     ## return to archiso environment
@@ -630,6 +640,7 @@ main ()
     install_core
     install_bootloader
     move_hajime
+    motd_3post
     exit_arch_chroot_mnt
 }
 
