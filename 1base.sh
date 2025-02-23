@@ -964,7 +964,7 @@ legacy_cryptsetup ()
 	## via configuration
 
 	## write key-file
-	echo "$luks_pass" > $file_luks_pass
+	printf '%s' "$luks_pass" > $file_luks_pass
 
 	cryptsetup luksFormat --batch-mode --type luks2 --key-file $file_luks_pass "$lvm_part"
 	cryptsetup --key-file $file_luks_pass open "$lvm_part" cryptlvm
@@ -1336,34 +1336,41 @@ autostart_next ()
 welcome ()
 {
     clear
-    printf " hajime\n"
-    printf " copyright (c) 2017 - 2025  |  oxo\n"
+    printf 'hajime\n'
+    printf 'copyright (c) 2017 - 2025  |  oxo\n'
     echo
     echo
-    printf " ${st_bold}CAUTION!${st_def}\n"
-    printf " Hajime will install an Arch Linux operating system on this machine.\n"
+    printf "${st_bold}CAUTION!${st_def}\n"
+    printf 'Hajime is about to install an Arch Linux operating system on this machine.\n'
+    printf "${fg_magenta}Read the following carefully before you proceed!${st_def}\n"
     echo
-    printf " By entering 'y/Y' you consent fully to the following:\n"
-    printf " This software is provided 'as is' and without warranty of any kind.\n"
-    printf " Continuing execution and usage of this software is ${st_bold}at own risk!${st_def}\n"
-    printf " Opting out by entering 'n/N' and cancel the installation.\n"
+    printf "This software is provided 'as is' and without warranty of any kind.\n"
+    printf "Further execution and usage of this software is ${st_bold}at own risk!${st_def}\n"
     echo
-    printf " Continuing will ${st_bold}overwrite existing data${st_def} on designated devices.\n"
-    printf " When using a configuration file, be sure all variables are 100% correct.\n"
-
-    printf " This software is subject to continuous development, carefully consider its beta state. \n"
-
-    printf " Be sure to have the most recent version of the arch installation media!\n"
-    printf " Use the 'isolatest' package to get the most recent authentic iso image.\n"
-    printf " You can download your copy via: ${st_ul}https://codeberg.org/oxo/isolatest${st_def}\n"
-    printf " Or retrieve an installation image via: ${st_ul}https://www/archlinux.org/download/${Nst_ul}\n"
+    printf "Continuing will ${st_bold}erase all data${st_def} on designated devices.\n"
+    printf 'Before proceeding, have restorable, up-to-date backups of all data.\n'
+    echo
+    printf 'This software is subject to continuous development.\n'
+    printf 'Study and understand the code, while carefully consider its beta state.\n'
+    printf 'When using a configuration file, verify the parameters are 100%% correct.\n'
+    echo
+    printf 'Be sure to have the most recent version of the arch installation media.\n'
+    printf "Use the 'isolatest' package to get the most recent authentic iso image.\n"
+    printf "You can download your copy via: ${st_ul}https://codeberg.org/oxo/isolatest${st_def}\n"
+    printf "Or retrieve an installation image via: ${st_ul}https://www/archlinux.org/download/${st_def}\n"
     echo
     echo
-    printf " Continue installation? (y/N) "
+    printf "Cancel the execution of this installation script by pressing 'N'.\n"
+    echo
+    printf "By pressing 'Y' you ${st_bold}fully consent${st_def} to all considerations\n"
+    printf 'above and manifest the intent to continue.\n'
+    echo
+    echo
+    printf "${fg_magenta}Continue installation?${st_def} [y/N] "
 
     reply_single
 
-    if printf "$reply" | grep -iq "^y" ; then
+    if printf "$reply" | grep -iq "^y"; then
 
 	echo
 	echo

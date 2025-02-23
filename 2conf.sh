@@ -67,7 +67,7 @@ initial_release='2017'
 # user customizable variables
 
 ## file locations
-file_configuration='/root/hajime/install-config.sh'
+file_configuration='/hajime/install-config.sh'
 file_etc_pacman_conf='/etc/pacman.conf'
 file_etc_locale_gen="/etc/locale.gen"
 file_etc_locale_conf="/etc/locale.conf"

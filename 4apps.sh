@@ -53,7 +53,7 @@ https://www.gnu.org/licenses/gpl-3.0.txt
 
 
 #set -o errexit
-set -o nounset
+#set -o nounset
 set -o pipefail
 
 # initial definitions
