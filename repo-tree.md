@@ -8,6 +8,7 @@
 ├── 5dtcf.sh
 ├── COPYING
 ├── install-config.sh
+├── install-packages.sh
 ├── misc
 │   ├── alt_dtp_env
 │   ├── arch-chroot
@@ -17,5 +18,5 @@
 ├── README.md
 └── repo-tree.md
 
-2 directories, 15 files
+2 directories, 16 files
 ```

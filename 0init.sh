@@ -110,9 +110,9 @@ header ()
     current_year=$(date +%Y)
     #clear
     printf "$script_name\n"
-    printf "$initial_release"
-    [[ $initial_release -ne $current_year ]] && printf " - $current_year"
-    printf "  |  $developer\n"
+    printf 'copyright (c) %s' "$initial_release"
+    [[ $initial_release -ne $current_year ]] && printf ' - %s' "$current_year"
+    printf '  |  %s\n' "$developer"
     echo
 }
 

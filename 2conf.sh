@@ -127,6 +127,20 @@ getargs ()
 }
 
 
+define_text_appearance()
+{
+    ## text color
+    fg_magenta='\033[0;35m'	# magenta
+    fg_green='\033[0;32m'	# green
+    fg_red='\033[0;31m'		# red
+
+    ## text style
+    st_def='\033[0m'		# default
+    st_ul=`tput smul`		# underline
+    st_bold=`tput bold`		# bold
+}
+
+
 offline_installation ()
 {
     if [[ $online -ne 1 ]]; then
@@ -589,25 +603,27 @@ move_hajime ()
 
 motd_3post ()
 {
-    echo
-    echo '# continue hajime installation with:' > $file_etc_motd
+    echo > $file_etc_motd
+    echo '# reinsert CODE and REPO media, then' >> $file_etc_motd
+    echo '# continue hajime installation with:' >> $file_etc_motd
     echo >> $file_etc_motd
-    echo 'sh hajime/3post.sh' >> $file_etc_motd
+    printf "${st_bold}sh hajime/3post.sh${st_def}" >> $file_etc_motd
     echo >> $file_etc_motd
 }
 
 exit_arch_chroot_mnt ()
 {
     ## return to archiso environment
+    echo
     echo '# return to the archiso environment with:'
     echo
-    echo 'exit'
-    ## reboot advice
+    printf "${st_bold}exit${st_def}\n"
     echo
+    echo '# remove archiso, CODE and REPO media, then'
     echo '# to continue execute:'
     echo
-    echo 'umount -R /mnt'
-    echo 'reboot'
+    printf "${st_bold}umount -R /mnt${st_def}\n"
+    printf "${st_bold}reboot${st_def}\n"
     echo
     echo '# after reboot continue with:'
     echo
@@ -623,6 +639,7 @@ main ()
 {
     getargs $args
     sourcing
+    define_text_appearance
     offline_installation
     clear
     get_offline_repo

@@ -1362,8 +1362,8 @@ welcome ()
     echo
     printf "Cancel the execution of this installation script by pressing 'N'.\n"
     echo
-    printf "By pressing 'Y' you ${st_bold}fully consent${st_def} to all considerations\n"
-    printf 'above and manifest the intent to continue.\n'
+    printf "Pressing 'Y' manifest the intent to continue, while\n"
+    printf "${st_bold}fully consent${st_def} to the considerations above.\n"
     echo
     echo
     printf "${fg_magenta}Continue installation?${st_def} [y/N] "
