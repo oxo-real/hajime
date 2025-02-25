@@ -67,7 +67,10 @@ initial_release='2017'
 # user customizable variables
 
 ## file locations
-file_configuration='/hajime/install-config.sh'
+file_boot_loader_loader_conf="/boot/loader/loader.conf"
+file_boot_loader_entries_arch_conf="/boot/loader/entries/arch.conf"
+file_boot_loader_entries_arch_lts_conf="/boot/loader/entries/arch-lts.conf"
+
 file_etc_pacman_conf='/etc/pacman.conf'
 file_etc_locale_gen="/etc/locale.gen"
 file_etc_locale_conf="/etc/locale.conf"
@@ -77,9 +80,9 @@ file_etc_hostname="/etc/hostname"
 file_etc_motd="/etc/motd"
 file_etc_sudoers="/etc/sudoers"
 file_etc_pacmand_mirrorlist="/etc/pacman.d/mirrorlist"
-file_boot_loader_loader_conf="/boot/loader/loader.conf"
-file_boot_loader_entries_arch_conf="/boot/loader/entries/arch.conf"
-file_boot_loader_entries_arch_lts_conf="/boot/loader/entries/arch-lts.conf"
+
+file_hi_config='/hajime/install-config.sh'
+file_hi_packages='/hajime/install-packages.sh'
 
 ## variable values
 time_zone="Europe/CET"
@@ -92,30 +95,15 @@ username_default="user"
 bootloader_timeout="2"
 bootloader_editor="0"
 
-## packages
-linux_kernel="linux-headers"	#linux 1base
-linux_lts_kernel="linux-lts linux-lts-headers"
-# [Install Arch Linux on LVM - ArchWiki]
-# (https://wiki.archlinux.org/title/Install_Arch_Linux_on_LVM#Adding_mkinitcpio_hooks)
-# lvm2 is needed for lvm2 mkinitcpio hook
-## [Fix missing libtinfo.so.5 library in Arch Linux]
-## (https://jamezrin.name/fix-missing-libtinfo.so.5-library-in-arch-linux)
-## prevent error that library libtinfo.so.5 couldn’t be found
-core_applications='lvm2'
-text_editor="emacs neovim"
-install_helpers="reflector base-devel git"	#binutils 3post base-devel group
-network='dhcpcd'
-#network='dhcpcd systemd-networkd systemd-resolved'
-network_wl="wpa_supplicant wireless_tools iw"
-secure_connections="openssh"
-system_security='' #nss-certs; comes with nss in core
-
 #--------------------------------
 
 sourcing ()
 {
     ## configuration file
-    [[ -f $file_configuration ]] && source $file_configuration
+    [[ -f $file_hi_config ]] && source $file_hi_config
+
+    ## sourcing conf_pkgs
+    [[ -f $file_hi_packages ]] && source $file_hi_packages
 }
 
 
@@ -145,7 +133,9 @@ offline_installation ()
 {
     if [[ $online -ne 1 ]]; then
 
+	code_lbl='CODE'
 	code_dir='/tmp'
+	repo_lbl='REPO'
 	repo_dir='/repo'
 	repo_re='\/repo'
 
@@ -165,16 +155,12 @@ reply ()
 
 mount_repo ()
 {
-    repo_lbl='REPO'
-    # 20230106 lsblk reports empty label names
-    #repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
     repo_dev=$(blkid | grep "$repo_lbl" | awk -F : '{print $1}')
-    #local mountpoint=$(mount | grep $repo_dir)
 
     [[ -d $repo_dir ]] || mkdir -p "$repo_dir"
 
-    sudo mount "$repo_dev" "$repo_dir"
-    #[[ -n $mountpoint ]] || sudo mount "$repo_dev" "$repo_dir"
+    mountpoint -q "$repo_dir"
+    [[ $? -ne 0 ]] && sudo mount "$repo_dev" "$repo_dir"
 }
 
 
@@ -186,14 +172,12 @@ get_offline_repo ()
 
 mount_code ()
 {
-    code_lbl='CODE'
     code_dev=$(lsblk -o label,path | grep "$code_lbl" | awk '{print $2}')
-    #local mountpoint=$(mount | grep $code_dir)
 
     [[ -d $code_dir ]] || mkdir -p "$code_dir"
 
-    sudo mount "$code_dev" "$code_dir"
-    #[[ -n $mountpoint ]] || sudo mount "$code_dev" "$code_dir"
+    mountpoint -q "$code_dir"
+    [[ $? -ne 0 ]] && sudo mount "$code_dev" "$code_dir"
 }
 
 
@@ -221,7 +205,7 @@ reconfigure_pacman_conf ()
 	##sed -i "s|\/root\/tmp\/repo|\/repo|" $file_etc_pacman_conf
 	#### DEV now done in 1base
 
-	pacman -Syy
+	initialize_pacman
 	echo
 
     fi
@@ -473,8 +457,8 @@ install_helpers ()
     if [[ $online -eq 1 ]]; then
 
 	# install helpers
-	clear
-	pacman -S --noconfirm $install_helpers
+	# clear
+	# pacman -S --noconfirm $install_helpers
 
 
 	# configuring the mirrorlist
@@ -519,16 +503,16 @@ install_core ()
     # update repositories and install core applications
     # [Installation guide - ArchWiki]
     # (https://wiki.archlinux.org/title/Installation_guide#Install_essential_packages)
-    pacman -S --needed --noconfirm \
-	   $pkg_ucode \
-	   $linux_kernel \
-	   $linux_lts_kernel \
-	   $core_applications \
-	   $text_editor \
-	   $network \
-	   $network_wl \
-	   $secure_connections \
-	   $system_security
+    pacman -S --needed --noconfirm "${conf_pkgs[@]}"
+	   # $pkg_ucode \
+	   # $linux_kernel \
+	   # $linux_lts_kernel \
+	   # $core_applications \
+	   # $text_editor \
+	   # $network \
+	   # $network_wl \
+	   # $secure_connections \
+	   # $system_security
 }
 
 
@@ -609,6 +593,7 @@ motd_3post ()
     echo >> $file_etc_motd
     printf "${st_bold}sh hajime/3post.sh${st_def}" >> $file_etc_motd
     echo >> $file_etc_motd
+    echo >> $file_etc_motd
 }
 
 exit_arch_chroot_mnt ()
@@ -618,11 +603,11 @@ exit_arch_chroot_mnt ()
     echo '# return to the archiso environment with:'
     echo
     printf "${st_bold}exit${st_def}\n"
+    printf "${st_bold}umount -R /mnt${st_def}\n"
     echo
-    echo '# remove archiso, CODE and REPO media, then'
+    echo '# remove archiso, CODE and REPO media'
     echo '# to continue execute:'
     echo
-    printf "${st_bold}umount -R /mnt${st_def}\n"
     printf "${st_bold}reboot${st_def}\n"
     echo
     echo '# after reboot continue with:'

@@ -75,82 +75,16 @@ arch_mirrorlist="https://archlinux.org/mirrorlist/?country=SE&protocol=https&ip_
 mirror_country="Germany,Netherlands,Sweden,USA"
 mirror_amount="5"
 
-file_configuration='/root/hajime/install-config.sh'
-file_configuration_1='/hajime/install-config.sh'
+file_hi_config='/root/hajime/install-config.sh'
+file_hi_config_1='/hajime/install-config.sh'
+file_hi_packages='/root/hajime/install-packages.sh'
 file_luks_pass='/root/tmp/code/hajime/luks_pass'
 
-# 20220201 in the arch repository;
-# base was a package group, but now is a package, while
-# base-devel is (still) a package group
-#
-# base (core package):
-# --------------------------------
-# archlinux-keyring
-# bash
-# bzip2
-# coreutils
-# file
-# filesystem
-# findutils
-# gawk
-# gcc-libs
-# gettext
-# glibc
-# grep
-# gzip
-# iproute2
-# iputils
-# licenses
-# pacman
-# pciutils
-# procps-ng
-# psmisc
-# sed
-# shadow
-# systemd
-# systemd-sysvcompat
-# tar
-# util-linux
-# xz
-# linux (optional) - bare metal support
-# https://archlinux.org/packages/core/any/base/
-#
-# base-devel (core package):
-# --------------------------------
-# archlinux-keyring
-# autoconf
-# automake
-# binutils
-# bison
-# debugedit
-# fakeroot
-# file
-# findutils
-# flex
-# gawk
-# gcc
-# gettext
-# grep
-# groff
-# gzip
-# libtool
-# m4
-# make
-# pacman
-# patch
-# pkgconf
-# sed
-# sudo
-# texinfo
-# which
-# https://archlinux.org/packages/core/any/base-devel/
-pkg_help='reflector'
+pkg_help='reflector'  ## keeping base_packages clean
 # [Installation guide - ArchWiki](https://wiki.archlinux.org/title/Installation_guide#Install_essential_packages)
-pkg_core='base linux linux-firmware'
 # 20230212 https://archlinux.org/news/switch-to-the-base-devel-meta-package-requires-manual-intervention/
-pkg_base_devel='base-devel'
-#pkg_base_devel="$(pacman -Qg base-devel | sed 's/base-devel //g' | tr '\n' ' ')"
-
+#pkg_core='base linux linux-firmware' (via install-packages)
+#pkg_base_devel='base-devel' (via install-packages)
 
 ## recommended percentages of $lvm_size_calc
 root_perc=0.05	## recommended minimum 1G
@@ -240,15 +174,18 @@ exit_hajime ()
 sourcing ()
 {
     ## configuration file
-    if [[ -f $file_configuration ]]; then
+    if [[ -f $file_hi_config ]]; then
 
-	source $file_configuration
+	source $file_hi_config
 
     else
 
-	source $file_configuration_1
+	source $file_hi_config_1
 
     fi
+
+    ## sourcing base_pkgs
+    [[ -f $file_hi_packages ]] && source $file_hi_packages
 }
 
 
@@ -1230,13 +1167,12 @@ configure_mirrorlists ()
 
 install_base_devel_package_groups ()
 {
-    packages="${pkg_core} ${pkg_base_devel}"
     # -K initialize an empty pacman keyring in the target (implies -G).
     # see note/linux/arch/pacstrap or
     # https://man.archlinux.org/man/pacstrap.8
     # [FS#79619 : [systemd] 20-systemd-sysusers.hook fails to execute on a fresh system](https://bugs.archlinux.org/task/79619)
     # [[SOLVED] bootctl install: Bad file descriptor / Installation / Arch Linux Forums](https://bbs.archlinux.org/viewtopic.php?id=288660)
-    pacstrap -K /mnt $packages
+    pacstrap -K /mnt "${base_pkgs[@]}"
 }
 
 
@@ -1249,9 +1185,6 @@ generate_fstab ()
 
 modify_fstab ()
 {
-    ## fstab /usr entry with nopass 0
-    sed -i '/\/usr/s/.$/0/' $file_mnt_etc_fstab
-
     ## fstab /boot mount as ro
     sed -i '/\/boot/s/rw,/ro,/' $file_mnt_etc_fstab
     ## fstab /boot fmask and dmask 0077
@@ -1260,6 +1193,8 @@ modify_fstab ()
 
     ## fstab /usr mount as ro
     sed -i '/\/usr/s/rw,/ro,/' $file_mnt_etc_fstab
+    ## fstab /usr entry with nopass 0
+    sed -i '/\/usr/s/.$/0/' $file_mnt_etc_fstab
 }
 
 

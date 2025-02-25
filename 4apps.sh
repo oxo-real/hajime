@@ -66,17 +66,18 @@ initial_release='2019'
 
 ## hardcoded variables
 # user customizable variables
-file_configuration="$HOME/hajime/install-config.sh"
-file_packages="$HOME/hajime/install-packages.sh"
+file_hi_config="$HOME/hajime/install-config.sh"
+file_hi_packages="$HOME/hajime/install-packages.sh"
 
 #--------------------------------
 
 sourcing ()
 {
     ## configuration file
-    [[ -f $file_configuration ]] && source $file_configuration
-    ## custom packages
-    [[ -f $file_packages ]] && source $file_packages
+    [[ -f $file_hi_config ]] && source $file_hi_config
+
+    ## sourcing apps_pkgs
+    [[ -f $file_hi_packages ]] && source $file_hi_packages
 }
 
 
@@ -90,7 +91,9 @@ getargs ()
 
 offline_installation ()
 {
+    code_lbl='CODE'
     code_dir="/home/$(id -un)/dock/3"
+    repo_lbl='REPO'
     repo_dir="/repo"
     #repo_dir="/home/$(id -un)/dock/2"
     repo_re="\/repo"
@@ -99,15 +102,8 @@ offline_installation ()
 }
 
 
-define_post_core_additions ()
-{
-    post_core_additions='archlinux-keyring lsof mlocate neofetch neovim pacman-contrib wl-clipboard'
-}
-
-
 mount_repo ()
 {
-    repo_lbl='REPO'
     repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
 
     [[ -d $repo_dir ]] || mkdir -p "$repo_dir"
@@ -125,7 +121,6 @@ get_offline_repo ()
 
 mount_code ()
 {
-    code_lbl='CODE'
     code_dev=$(lsblk -o label,path | grep "$code_lbl" | awk '{print $2}')
 
     [[ -d $code_dir ]] || mkdir -p "$code_dir"
@@ -169,63 +164,18 @@ set_usr_ro ()
 }
 
 
-install_post_core_applications ()
+install_apps_packages ()
 {
     ## loop through core app packages
     ## instead of one whole list entry in yay
     ## this prevents that on error only one package is skipped
     #local packages=$(echo "${core_applications[*]}")
     #sudo pacman -S --noconfirm --needed $packages
-    for pkg_pca in "${post_core_applications[@]}"; do
+    # for pkg_pca in "${post_core_applications[@]}"; do
 
-	sudo pacman -S --needed --noconfirm "$pkg_pca"
+    sudo pacman -S --needed --noconfirm "${apps_pkgs[@]}"
 
-    done
-}
-
-
-install_core_applications ()
-{
-    ## loop through core app packages
-    ## instead of one whole list entry in yay
-    ## this prevents that on error only one package is skipped
-    #local packages=$(echo "${core_applications[*]}")
-    #sudo pacman -S --noconfirm --needed $packages
-    for pkg_ca in "${core_applications[@]}"; do
-
-	sudo pacman -S --needed --noconfirm "$pkg_ca"
-
-    done
-}
-
-
-install_additional_tools ()
-{
-    ## loop through core app packages
-    ## instead of one whole list entry in yay
-    ## this prevents that on error only one package is skipped
-    #local packages=$(echo "${additional_tools[*]}")
-    #sudo pacman -S --noconfirm --needed $packages
-    for pkg_at in "${additional_tools[@]}"; do
-
-	sudo pacman -S --needed --noconfirm "$pkg_at"
-
-    done
-}
-
-
-install_aur_applications ()
-{
-    ## loop through core app packages
-    ## instead of one whole list entry in yay
-    ## this prevents that on error only one package is skipped
-    #local packages=$(echo "${additional_tools[*]}")
-    #sudo pacman -S --noconfirm --needed $packages
-    for pkg_aa in "${aur_applications_list[@]}"; do
-
-	yay -S --needed --noconfirm "$pkg_aa"
-
-    done
+    # done
 }
 
 
@@ -268,10 +218,7 @@ main ()
     get_offline_repo
     get_offline_code
 
-    install_post_core_applications
-    install_core_applications
-    install_additional_tools
-    install_aur_applications
+    install_apps_packages
 
     loose_ends
     set_boot_ro

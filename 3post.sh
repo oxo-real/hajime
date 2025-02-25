@@ -72,8 +72,10 @@ post_core_additions='archlinux-keyring lsof mlocate neofetch neovim pacman-contr
 bloat_ware="" # there seems to be no more bloatware since kernel v536 (nano was removed)
 mirror_country='Sweden'
 mirror_amount='5'
-file_configuration='$HOME/hajime/install-config.sh'
+
 file_etc_motd="/etc/motd"
+file_hi_config="$HOME/hajime/install-config.sh"
+file_hi_packages="$HOME/hajime/install-packages.sh"
 
 #--------------------------------
 
@@ -83,7 +85,10 @@ file_etc_motd="/etc/motd"
 sourcing ()
 {
     ## configuration file
-    [[ -f $file_configuration ]] && source $file_configuration
+    [[ -f $file_hi_config ]] && source $file_hi_config
+
+    ## sourcing conf_pkgs
+    [[ -f $file_hi_packages ]] && source $file_hi_packages
 }
 
 
@@ -136,7 +141,7 @@ reply_single ()
 }
 
 
-check_label_exist ()
+Xcheck_label_exist ()
 {
     lsblk -o label | grep "$lbl" #> /dev/null 2>&1
     if [[ "$?" -ne "0" ]]; then
@@ -148,7 +153,7 @@ check_label_exist ()
 }
 
 
-check_mountpoint ()
+Xcheck_mountpoint ()
 {
     # check if device with label is already mounted
 
@@ -224,57 +229,35 @@ pacman_init ()
 
 mount_repo ()
 {
-    lbl="$repo_lbl"
-
-    check_label_exist
-    check_mountpoint
-
-    repo_dev=$(lsblk -o label,path | grep "$lbl" | awk '{print $2}')
+    repo_dev=$(blkid | grep "$repo_lbl" | awk -F : '{print $1}')
 
     [[ -d $repo_dir ]] || mkdir -p "$repo_dir"
 
-    sudo mount "$repo_dev" "$repo_dir"
-
-    lbl=''
-    unset lbl
+    mountpoint -q "$repo_dir"
+    [[ $? -ne 0 ]] && sudo mount "$repo_dev" "$repo_dir"
 }
 
 
 get_offline_repo ()
 {
-    if [[ $online -ne 1 ]]; then
-
-	mount_repo
-
-    fi
+    [[ $online -ne 1 ]] && mount_repo
 }
 
 
 mount_code ()
 {
-    lbl="$code_lbl"
-
-    check_label_exist
-    check_mountpoint
-
-    code_dev=$(lsblk -o label,path | grep "$lbl" | awk '{print $2}')
+    code_dev=$(lsblk -o label,path | grep "$code_lbl" | awk '{print $2}')
 
     [[ -d $code_dir ]] || mkdir -p "$code_dir"
 
-    sudo mount "$code_dev" "$code_dir"
-
-    lbl=''
-    unset lbl
+    mountpoint -q "$code_dir"
+    [[ $? -ne 0 ]] && sudo mount "$code_dev" "$code_dir"
 }
 
 
 get_offline_code ()
 {
-    if [[ $online -ne 1 ]]; then
-
-	mount_code
-
-    fi
+    [[ $online -ne 1 ]] && mount_code
 }
 
 
@@ -304,11 +287,11 @@ create_directories ()
 base_mutations ()
 {
     ## add post core addditions
-    for package in $post_core_additions; do
+    # for package in $post_core_additions; do
 
-	sudo pacman -S --needed --noconfirm $package
+    sudo pacman -S --needed --noconfirm "${post_pkgs[@]}"
 
-    done
+    # done
 
     ## remove base system bloat
     #pacman -Rns --noconfirm $bloat_ware
@@ -360,6 +343,7 @@ autostart_next ()
 
 main ()
 {
+    sourcing
     getargs $args
     motd_remove
     offline_installation

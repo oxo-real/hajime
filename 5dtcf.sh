@@ -79,7 +79,9 @@ git_local="$XDG_DATA_HOME/c/git"
 git_remote='https://codeberg.org/oxo'
 
 ## offline installation
+code_lbl='CODE'
 code_dir="/home/$(id -un)/dock/3"
+repo_lbl='REPO'
 repo_dir="/home/$(id -un)/dock/2"
 repo_re="\/home\/$(id -un)\/dock\/2"
 file_etc_pacman_conf='/etc/pacman.conf'
@@ -88,8 +90,19 @@ file_etc_pacman_conf='/etc/pacman.conf'
 etc_doas_conf='/etc/doas.conf'
 misc_doas_conf="$HOME/hajime/misc/etc_doas.conf"
 
+file_hi_config="$HOME/hajime/install-config.sh"
+file_hi_packages="$HOME/hajime/install-packages.sh"
 
 #--------------------------------
+
+sourcing ()
+{
+    ## configuration file
+    [[ -f $file_hi_config ]] && source $file_hi_config
+
+    ## sourcing apps_pkgs
+    [[ -f $file_hi_packages ]] && source $file_hi_packages
+}
 
 
 args="$@"
@@ -102,7 +115,6 @@ getargs ()
 
 mount_repo ()
 {
-    repo_lbl='REPO'
     repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
 
     [[ -d $repo_dir ]] || mkdir -p "$repo_dir"
@@ -112,15 +124,26 @@ mount_repo ()
 }
 
 
+get_offline_repo ()
+{
+    [[ $online -ne 1 ]] && mount_repo
+}
+
+
 mount_code ()
 {
-    code_lbl='CODE'
     code_dev=$(lsblk -o label,path | grep "$code_lbl" | awk '{print $2}')
 
     [[ -d $code_dir ]] || mkdir -p "$code_dir"
 
     mountpoint -q $code_dir
     [[ $? -eq 0 ]] || sudo mount "$code_dev" "$code_dir"
+}
+
+
+get_offline_code ()
+{
+    [[ $online -ne 1 ]] && mount_code
 }
 
 
@@ -400,9 +423,10 @@ finishing_up ()
 
 main ()
 {
+    sourcing
     getargs $args
-    mount_repo
-    mount_code
+    get_offline_repo
+    get_offline_code
     get_git_repo
     #dotfbu_restore
     rewrite_symlinks

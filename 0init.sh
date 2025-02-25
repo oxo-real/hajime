@@ -68,7 +68,7 @@ initial_release='2020'
 
 # hardcoded variables
 online_repo='https://codeberg.org/oxo/hajime'
-file_configuration='/root/tmp/code/hajime/install-config.sh'
+file_hi_config='/root/tmp/code/hajime/install-config.sh'
 
 #--------------------------------
 
@@ -80,7 +80,7 @@ file_configuration='/root/tmp/code/hajime/install-config.sh'
 sourcing ()
 {
     ## configuration file
-    [[ -f $file_configuration ]] && source $file_configuration
+    [[ -f $file_hi_config ]] && source $file_hi_config
 }
 
 
@@ -266,7 +266,8 @@ mount_repo ()
 
     [[ -d $repo_dir ]] || mkdir -p "$repo_dir"
 
-    mount "$repo_dev" "$repo_dir"
+    mountpoint -q "$repo_dir"
+    [[ $? -ne 0 ]] && sudo mount "$repo_dev" "$repo_dir"
 }
 
 
@@ -283,7 +284,8 @@ mount_code ()
 
     [[ -d $code_dir ]] || mkdir -p "$code_dir"
 
-    mount "$code_dev" "$code_dir"
+    mountpoint -q "$code_dir"
+    [[ $? -ne 0 ]] && sudo mount "$code_dev" "$code_dir"
 }
 
 
