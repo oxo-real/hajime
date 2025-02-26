@@ -16,16 +16,17 @@
 --------------------------------
 
 # hajime
-copyright (c) 2019 - 2025  |  oxo
+copyright (c) 2017 - 2025  |  oxo
 
-When the right preparations are made this installation script installs an up-to-date Arch Linux system on an x64 architecture.
+This installation script installs an up-to-date Arch Linux system on an x64 architecture.
+For installation a network connection is optional.
 
 ## a five part arch linux installation series
 
 ### 1  base
 The 'base' script creates a Globally Unique Identifiers (GUID) partition table (GPT) and Unified Extensible Firmware Interface (UEFI) system partition with systemd boot to bootstrap the user space for latest stable release (LSR) and long term support (LTS) arch linux kernel.
 
-BOOT (ro) can and is recommended to be a separate device partition and physical separate storage medium. Logical volume manager (LVM) is fully encrypted with Linux Unified Key Setup (LUKS2) and contains the separate volume partitions ROOT, USR (ro), VAR (ro), HOME and SWAP (optional).
+BOOT (ro) can and is recommended to be a separate device partition and physical separate storage medium. Logical volume manager (LVM) is fully encrypted with Linux Unified Key Setup (LUKS2) and contains the separate volume partitions ROOT, TMP, USR (ro), VAR (ro), HOME and SWAP (optional).
 
 ### 2  conf
 The 'conf' script configures settings for time, network, mirrorlists, bootloader entries for both latest stable release (LSR) and long term support (LTS) kernel, ramdisk and creates an user environment.
@@ -87,7 +88,7 @@ packages are copied from the host machine.
 	*	usb2				>=	20G
 
 ### OPTIONAL	usb3 boot
-Optional, but a privacy recommendation, is a separate boot device. It does not to be big.
+Optional, but a privacy recommendation, is a separate boot device. It does not have to be big.
 
 	*	usb3				>=	256M
 
@@ -175,7 +176,7 @@ execute isolatest
 ## 04
 insert usb2
 
-create an ext4 partition labeled REPO
+create ext4 partitions labeled REPO, CODE and KEYS
 
 CAUTION! DESIGNATE THE RIGHT DEVICE!
 
@@ -191,6 +192,8 @@ enter:	o	to rewrite GPT table
 
 		n	create a 10G 8300 partition (CODE)
 
+		n	create a  1G 8300 partition (KEYS)
+
 		w	write changes to device
 
 		q	quit gdisk
@@ -198,40 +201,22 @@ enter:	o	to rewrite GPT table
 ```
 % sudo mkfs.ext4 -L REPO /dev/sd{RC2}
 % sudo mkfs.ext4 -L CODE /dev/sd{RC3}
-% mkdir dock/{2,3,3/code}
+% sudo mkfs.ext4 -L KEYS /dev/sd{RC4}
+% mkdir -p $HOME/dock/{2,3,3/code,4}
 ```
 
 ## 05
-Prepare the CODE partition
+Prepare the REPO, CODE and KEYS partition
 
 ```
-% sudo mount /dev/sdR3 dock/3
-```
-
-download scripts from repository
-```
-% git clone https://codeberg.org/oxo/hajime	dock/3/code/hajime
-% git clone https://codeberg.org/oxo/isolatest	dock/3/code/isolatest
-% git clone https://codeberg.org/oxo/netconn	dock/3/code/netconn
-% git clone https://codeberg.org/oxo/sources	dock/3/code/sources
-% git clone https://codeberg.org/oxo/tools		dock/3/code/tools
-% git clone https://codeberg.org/oxo/updater	dock/3/code/updater
-```
-
-## 06
-Prepare the REPO partition
-
-```
-% sudo mount /dev/sdR2 dock/2
-
-% sh dock/3/code/tools/make_offl_repo dock/2
+% make-recov
 ```
 
 Preparation is now finished. We now have:
 
 usb1	with archiso
 
-usb2	with REPO and CODE partitions
+usb2	with REPO, CODE and KEYS
 
 usb3	optional boot stick
 

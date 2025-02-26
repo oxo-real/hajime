@@ -9,6 +9,8 @@
 ├── COPYING
 ├── install-config.sh
 ├── install-packages.sh
+├── make-offl-repo
+├── make-recov
 ├── misc
 │   ├── alt_dtp_env
 │   ├── arch-chroot
@@ -18,5 +20,5 @@
 ├── README.md
 └── repo-tree.md
 
-2 directories, 16 files
+2 directories, 18 files
 ```

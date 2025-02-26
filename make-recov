@@ -1,0 +1,315 @@
+#! /usr/bin/env sh
+
+###                  _
+###  _ __ ___   __ _| | _____       _ __ ___  ___ _____   __
+### | '_ ` _ \ / _` | |/ / _ \_____| '__/ _ \/ __/ _ \ \ / /
+### | | | | | | (_| |   <  __/_____| | |  __/ (_| (_) \ V /
+### |_| |_| |_|\__,_|_|\_\___|     |_|  \___|\___\___/ \_/
+###
+###
+###  # # # # # #
+###       #
+###  # # # # # #
+###
+
+: '
+make-recov
+create system recovery device
+copyright (c) 2021 - 2025  |  oxo
+----------------------------------------------------------------------
+GNU GPLv3 GENERAL PUBLIC LICENSE
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+https://www.gnu.org/licenses/gpl-3.0.txt
+
+@oxo@qoto.org
+======================================================================
+
+# requirements
+connected recovery device with partitions: REPO, CODE and KEYS
+
+# dependencies
+source functions
+make-offl-repo
+
+# usage
+make_recov
+
+# options
+options are rsync options
+-a	is equivalent to -rlptgoD (archive)
+--dirs	will create directories specified in the list on the destination
+--links	prevent rsync error: skipping non-regular file
+
+' #
+
+
+# initialize
+
+## partition labels
+repo_lbl='REPO'
+code_lbl='CODE'
+keys_lbl='KEYS'
+
+## mountpoints
+repo_mount="$HOME/dock/2"
+code_mount="$HOME/dock/3"
+keys_mount="$HOME/dock/4"
+
+
+# sourcing
+source_dir="$XDG_DATA_HOME/c/git/code/source/function"
+source $source_dir/get_sudo
+source $source_dir/reply_functions
+source $source_dir/text_appearance
+
+make_offl_repo="$XDG_DATA_HOME/c/git/code/hajime/make-offl-repo"
+
+
+repo ()
+{
+    # synchronize offline repo		(repo)
+
+
+    ## mount repo
+    repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
+
+    mountpoint -q $repo_mount >& /dev/null
+    [[ $? -eq 0 ]] || sudo mount "$repo_dev" "$repo_mount"
+
+    ## dock/2 is mountpoint
+    [[ $(mount | grep $repo_mount) ]] && repo_mounted=1
+
+    case $repo_mounted in
+
+	1 )
+	    # permissions
+	    sudo chown -R $USER:$GROUP $repo_mount
+
+	    $make_offl_repo "$repo_mount"
+
+	    # NOTICE options = rsync options
+	    # $make_offl_repo "$repo_mount" "$options"
+	    ;;
+
+	* )
+	    printf "\n${fg_yellow}$repo_mount${st_def} not mounted\n"
+	    exit 22
+	    ;;
+
+    esac
+}
+
+
+code ()
+{
+    # synchronize offline code		(code)
+
+
+    ## mount code
+    code_dev=$(lsblk -o label,path | grep "$code_lbl" | awk '{print $2}')
+
+    mountpoint -q $code_mount >& /dev/null
+    [[ $? -eq 0 ]] || sudo mount "$code_dev" "$code_mount"
+
+    ## dock/3 is mountpoint
+    [[ $(mount | grep $code_mount) ]] && code_mounted=1
+
+    # permissions
+    sudo chown -R $USER:$GROUP $code_mount
+
+    ## code source array (dictionary)
+    declare -A code_source=( \
+	[.config]="$XDG_CONFIG_HOME" \
+	[code]="$XDG_DATA_HOME/c/git/code" \
+        [note]="$XDG_DATA_HOME/c/git/note" \
+    )
+
+
+    case $code_mounted in
+
+    	1 )
+	    printf "\n${fg_blue}%s${st_def}\n" "synching offline recovery code"
+
+	    for src_key in "${!code_source[@]}"; do
+
+		local src=$(printf "${code_source[$src_key]}")
+		local dst=$(printf "$code_mount")
+
+		if [[ ! -d $dst ]]; then
+
+		    printf "\n${fg_yellow}$dst${st_def} not a directory\n"
+		    exit 31
+
+		fi
+
+		case $src in
+
+		    $XDG_CONFIG_HOME)
+			local dst=$(printf "$code_mount/.config")
+			# code from dotbu:
+			# rsync files in fpcl_file
+			## fpcl contains only files to be copied
+			## those also to be crypted are prepended with a c
+			fpcl_file="$XDG_CONFIG_HOME/.fpcl"
+			## temporary file list
+			all_files_list="$src/.alll"
+
+
+			# create tempo file list
+
+			while IFS= read -r fpcl_location; do
+
+			    ## empty lines; skip
+			    if [[ -z "$fpcl_location" ]]; then
+
+			        continue
+
+			    ## outcommented lines; skip
+			    elif [[ "$(printf "$fpcl_location" | head -c 1)" == "#" ]]; then
+
+			        continue
+
+			    ## lines starting with c; to all
+			    elif [[ "$(printf "$fpcl_location" | head -c 2)" == "c " ]]; then
+
+			        printf "$fpcl_location\n" | cut -c 3- | tee -a $all_files_list
+
+			    ## all other lines; to all
+			    else
+
+			        printf "$fpcl_location\n" | tee -a $all_files_list
+
+			    fi
+
+			done < $fpcl_file
+
+
+			# rsync tempo file list
+
+			rsync -aAXv \
+			    --info=ALL \
+			    --files-from=$all_files_list \
+			    --recursive \
+			    $options \
+			    $src/ $dst
+
+			# remove tempo file list
+
+			rm -rf $all_files_list
+			;;
+
+		    *)
+			rsync -aAXv \
+			    --info=ALL \
+			    $options \
+			    $src $dst
+			;;
+
+		esac
+
+	    done
+	    ;;
+
+    	* )
+	    printf "\n${fg_yellow}$code_mount${st_def} not mounted\n"
+	    exit 32
+	    ;;
+
+    esac
+}
+
+
+keys ()
+{
+    # synchronize keys			(keys)
+
+
+    ## mount keys
+    keys_dev=$(lsblk -o label,path | grep "$keys_lbl" | awk '{print $2}')
+
+    mountpoint -q $keys_mount >& /dev/null
+    [[ $? -eq 0 ]] || sudo mount "$keys_dev" "$keys_mount"
+
+    # dock/4 is mountpoint
+    [[ $(mount | grep $keys_mount) ]] && keys_mounted=1
+
+    # permissions
+    sudo chown -R $USER:$GROUP $keys_mount
+
+    # keys source array (dictionary)
+    declare -A keys_source=( \
+	[keys]="$XDG_DATA_HOME/c/keys" \
+	[pass]="$(readlink $HOME/.password-store)" \
+    )
+
+
+    case $keys_mounted in
+
+    	1 )
+	    printf "\n${fg_blue}%s${st_def}\n" "synching offline recovery keys"
+
+	    for src_key in "${!keys_source[@]}"; do
+
+		local src=$(printf "${keys_source[$src_key]}")
+		local dst=$(printf "$keys_mount")
+		#local dst=$(printf "$keys_mount/$(printf "$src_key" | \
+		#    awk -F / '{printf $NF}')")
+
+		if [[ ! -d $dst ]]; then
+
+		    printf "\n${fg_yellow}$dst${st_def} not a directory\n"
+		    exit 41
+
+		fi
+
+	        rsync -aAXv \
+		    --info=ALL \
+		    $options \
+		    $src $dst
+
+	    done
+	    ;;
+
+    	* )
+	    printf "\n${fg_yellow}$keys_mount${st_def} not mounted\n"
+	    exit 42
+	    ;;
+
+    esac
+}
+
+
+umount_rck ()
+{
+    [[ $repo_mounted == 1 ]] && sudo umount $repo_mount
+    [[ $code_mounted == 1 ]] && sudo umount $code_mount
+    [[ $keys_mounted == 1 ]] && sudo umount $keys_mount
+}
+
+
+make_recovery ()
+{
+    # repo
+    code
+    # keys
+}
+
+
+main ()
+{
+    make_recovery
+    umount_rck
+}
+
+main

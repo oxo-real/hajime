@@ -74,28 +74,20 @@ rtc_local_timezone="0"
 arch_mirrorlist="https://archlinux.org/mirrorlist/?country=SE&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on"
 mirror_country="Germany,Netherlands,Sweden,USA"
 mirror_amount="5"
-
-file_hi_config='/root/hajime/install-config.sh'
-file_hi_config_1='/hajime/install-config.sh'
-file_hi_packages='/root/hajime/install-packages.sh'
-file_luks_pass='/root/tmp/code/hajime/luks_pass'
-
 pkg_help='reflector'  ## keeping base_packages clean
 # [Installation guide - ArchWiki](https://wiki.archlinux.org/title/Installation_guide#Install_essential_packages)
 # 20230212 https://archlinux.org/news/switch-to-the-base-devel-meta-package-requires-manual-intervention/
 #pkg_core='base linux linux-firmware' (via install-packages)
 #pkg_base_devel='base-devel' (via install-packages)
 
+## boot size (MB)
+boot_size=256
 ## recommended percentages of $lvm_size_calc
 root_perc=0.05	## recommended minimum 1G
 tmp_perc=0.02	## recommended minimum 1G
 usr_perc=0.15	## recommended minimum 10G
 var_perc=0.15	## recommended minimum 10G
 home_perc=0.60
-
-## boot size (MB)
-boot_size=256
-
 ## recommended SWAP size (GB):
 ## with hibernation:
 ### swap_size_recomm => ram_size+sqrt(ram_size)
@@ -104,10 +96,13 @@ boot_size=256
 ###           min             max
 ###  <1GB     1*ram_size      2*ram_size
 ###  >1GB     sqrt(ram_size)  2*ram_size
-
 swap_size_recomm=4.00
 
 ## files
+file_hi_config='/root/hajime/install-config.sh'
+file_hi_config_1='/hajime/install-config.sh'
+file_hi_packages='/root/hajime/install-packages.sh'
+file_luks_pass='/root/tmp/code/hajime/luks_pass'
 file_mnt_etc_fstab="/mnt/etc/fstab"
 
 
