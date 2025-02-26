@@ -14,7 +14,7 @@
 
 : '
 make-offl-repo
-make offline package repository off hajime packages
+make offline package repository for hajime packages
 copyright (c) 2021 - 2025  |  oxo
 
 GNU GPLv3 GENERAL PUBLIC LICENSE
@@ -76,6 +76,13 @@ file_packages="$HOME/c/git/code/hajime/install-packages.sh"
 #--------------------------------
 
 
+sourcing ()
+{
+    ## custom packages
+    [[ -f $file_packages ]] && source $file_packages
+}
+
+
 args="$@"
 getargs ()
 {
@@ -94,38 +101,12 @@ getargs ()
 }
 
 
-sourcing ()
-{
-    ## custom packages
-    [[ -f $file_packages ]] && source $file_packages
-}
-
-
-define_manual_added ()
-{
-    ## manually added packages (here)
-    intel='intel-ucode iucode-tool'
-    earlier_errs=$(cat "$pkgs_to_repo_err")
-}
-
-
-create_manual_added_list ()
-{
-    ## packages from manual_added
-    manual_packages=(\
-		   $intel \
-		   $linux_kernel \
-		   $earlier_errs \
-	)
-}
-
-
 create_hajime_pkgs ()
 {
     hajime_pkgs=(
-	# "${base_pkgs[@]}"
-	# "${conf_pkgs[@]}"
-	# "${post_pkgs[@]}"
+	"${base_pkgs[@]}"
+	"${conf_pkgs[@]}"
+	"${post_pkgs[@]}"
 	"${apps_pkgs[@]}"
     )
 

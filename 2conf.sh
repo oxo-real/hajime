@@ -58,42 +58,42 @@ set -o pipefail
 # initial definitions
 
 ## script
-script_name='2conf.sh'
-developer='oxo'
-license='gplv3'
-initial_release='2017'
+script_name=2conf.sh
+developer=oxo
+license=gplv3
+initial_release=2017
 
 ## hardcoded variables
 # user customizable variables
 
 ## file locations
-file_boot_loader_loader_conf="/boot/loader/loader.conf"
-file_boot_loader_entries_arch_conf="/boot/loader/entries/arch.conf"
-file_boot_loader_entries_arch_lts_conf="/boot/loader/entries/arch-lts.conf"
+file_boot_loader_loader_conf=/boot/loader/loader.conf
+file_boot_loader_entries_arch_conf=/boot/loader/entries/arch.conf
+file_boot_loader_entries_arch_lts_conf=/boot/loader/entries/arch-lts.conf
 
-file_etc_pacman_conf='/etc/pacman.conf'
-file_etc_locale_gen="/etc/locale.gen"
-file_etc_locale_conf="/etc/locale.conf"
-file_etc_vconsole_conf="/etc/vconsole.conf"
-file_etc_hosts="/etc/hosts"
-file_etc_hostname="/etc/hostname"
-file_etc_motd="/etc/motd"
-file_etc_sudoers="/etc/sudoers"
-file_etc_pacmand_mirrorlist="/etc/pacman.d/mirrorlist"
+file_etc_pacman_conf=/etc/pacman.conf
+file_etc_locale_gen=/etc/locale.gen
+file_etc_locale_conf=/etc/locale.conf
+file_etc_vconsole_conf=/etc/vconsole.conf
+file_etc_hosts=/etc/hosts
+file_etc_hostname=/etc/hostname
+file_etc_motd=/etc/motd
+file_etc_sudoers=/etc/sudoers
+file_etc_pacmand_mirrorlist=/etc/pacman.d/mirrorlist
 
-file_hi_config='/hajime/install-config.sh'
-file_hi_packages='/hajime/install-packages.sh'
+file_hi_config=/hajime/install-config.sh
+file_hi_packages=/hajime/install-packages.sh
 
 ## variable values
-time_zone="Europe/CET"
-locale_conf="LANG=en_US.UTF-8"
-vconsole_conf="KEYMAP=us"
-mirror_country="Germany"
-mirror_amount="5"
-hostname_default="host"
-username_default="user"
-bootloader_timeout="2"
-bootloader_editor="0"
+time_zone=Europe/CET
+locale_conf=LANG=en_US.UTF-8
+vconsole_conf=KEYMAP=us
+mirror_country=Germany
+mirror_amount=5
+hostname_default=host
+username_default=user
+bootloader_timeout=2
+bootloader_editor=0
 
 #--------------------------------
 
@@ -259,7 +259,9 @@ set_hostname ()
 
 		clear
 		set_hostname
+
 	    else
+
 		echo
 		printf "using '$hostname_default' as hostname\n"
 
@@ -276,7 +278,9 @@ set_hostname ()
 
 		clear
 		set_hostname
+
 	    else
+
 		echo
 		printf "using '$hostname' as hostname\n"
 
@@ -293,12 +297,12 @@ set_hostname ()
 set_host_file ()
 {
     ## create host file
-    printf "$hostname_default" > $file_etc_hostname
+    printf "$hostname" > $file_etc_hostname
 
     ## add matching entries to hosts file
     printf "127.0.0.1	localhost.localdomain	localhost\n" >> $file_etc_hosts
     printf "::1		localhost.localdomain	localhost\n" >> $file_etc_hosts
-    printf "127.0.1.1	$hostname_default.localdomain	$hostname_default\n" >> $file_etc_hosts
+    printf "127.0.1.1	$hostname.localdomain	$hostname\n" >> $file_etc_hosts
 
     ## enable systemd-resolved
     #systemctl enable systemd-resolved.service
@@ -318,7 +322,7 @@ set_host_file ()
 # set root password
 pass_root ()
 {
-    printf "$(whoami)@$hostname_default\n"
+    printf "$(whoami)@$hostname\n"
     printf '%s' "$root_pw" | passwd --stdin
 }
 
