@@ -59,10 +59,10 @@ set -o pipefail
 # initial definitions
 
 ## script
-script_name='5dtcf.sh'
-developer='oxo'
-license='gplv3'
-initial_release='2019'
+script_name=5dtcf.sh
+developer=oxo
+license=gplv3
+initial_release=2019
 
 ## hardcoded variables
 # user customizable variables
@@ -72,22 +72,22 @@ export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_LOGS_HOME="$HOME/.logs"
-export XDG_CONFIG_DIRS='/etc/xdg'
+export XDG_CONFIG_DIRS=/etc/xdg
 
 ## main git locations
 git_local="$XDG_DATA_HOME/c/git"
-git_remote='https://codeberg.org/oxo'
+git_remote=https://codeberg.org/oxo
 
 ## offline installation
-code_lbl='CODE'
+code_lbl=CODE
 code_dir="/home/$(id -un)/dock/3"
-repo_lbl='REPO'
+repo_lbl=REPO
 repo_dir="/home/$(id -un)/dock/2"
 repo_re="\/home\/$(id -un)\/dock\/2"
-file_etc_pacman_conf='/etc/pacman.conf'
+file_etc_pacman_conf=/etc/pacman.conf
 
 ## doas configuration file
-etc_doas_conf='/etc/doas.conf'
+etc_doas_conf=/etc/doas.conf
 misc_doas_conf="$HOME/hajime/misc/etc_doas.conf"
 
 file_hi_config="$HOME/hajime/install-config.sh"

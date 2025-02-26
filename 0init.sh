@@ -43,7 +43,7 @@ helper script to bootstrap hajime up after archiso boot
   REPO
 
 # usage
-  sh hajime/0init.sh [--online]
+  sh hajime/0init.sh [--config $custom_conf_file] [--online]
 
 # example
   mkdir tmp
@@ -61,21 +61,16 @@ set -o pipefail
 # initial definitions
 
 ## script
-script_name='0init.sh'
-developer='oxo'
-license='gplv3'
-initial_release='2020'
+script_name=0init.sh
+developer=oxo
+license=gplv3
+initial_release=2020
 
 # hardcoded variables
-online_repo='https://codeberg.org/oxo/hajime'
-file_hi_config='/root/tmp/code/hajime/install-config.sh'
+online_repo=https://codeberg.org/oxo/hajime
+file_hi_config=/root/tmp/code/hajime/install-config.sh
 
 #--------------------------------
-
-
-## offline installationm mode by default
-## --online option has to be given explicitly
-
 
 sourcing ()
 {
@@ -87,9 +82,36 @@ sourcing ()
 args="$@"
 getargs ()
 {
-    args="$@"
-    ## online installation
-    [[ "$1" =~ online$ ]] && online=1
+    while :; do
+
+	case "$1" in
+
+	    -c | --config )
+		shift
+		## override default configuration file
+		[[ -f "$1" ]] && file_hi_config="$1"
+		shift
+		;;
+
+	    --online )
+		online=1
+		shift
+		;;
+
+	    -- )
+		shift
+		## override default configuration file
+		[[ -f "$1" ]] && file_hi_config="$1"
+		break
+		;;
+
+            * )
+		break
+		;;
+
+	esac
+
+    done
 }
 
 
@@ -108,12 +130,44 @@ reply_single ()
 header ()
 {
     current_year=$(date +%Y)
-    #clear
     printf "$script_name\n"
     printf 'copyright (c) %s' "$initial_release"
     [[ $initial_release -ne $current_year ]] && printf ' - %s' "$current_year"
     printf '  |  %s\n' "$developer"
     echo
+}
+
+
+config_file_warning ()
+{
+    if [[ -n "$file_hi_config" ]]; then
+
+	printf 'WARNING config-file detected: %s\n' "$(realpath "$file_hi_config")"
+	echo
+	printf 'move this file if a interactive installation is preferred\n'
+	printf 'else this file WILL be used for automatic installation\n'
+	echo
+	printf 'make 100%% sure that:\n'
+	printf "<> the filename is correct\n"
+	printf "<> all the parameters in the file are correct\n"
+	echo
+	printf 'continue with automatic installation? [y/N] '
+
+	reply_single
+	echo
+
+	if printf "$reply" | grep -iq "^y"; then
+
+	    :
+
+	else
+
+	    printf 'installation aborted\n'
+	    exit 1
+
+	fi
+
+    fi
 }
 
 
@@ -190,9 +244,9 @@ point_in_time ()
 
 	# 1base.sh has not yet ran
 	pit=0
-	code_dir='/root/tmp'
-	repo_dir='/root/tmp/repo'
-	repo_re='\/root\/tmp\/repo'
+	code_dir=/root/tmp
+	repo_dir=/root/tmp/repo
+	repo_re=\/root\/tmp\/repo
 
     fi
 }
@@ -307,6 +361,7 @@ main ()
     sourcing
     getargs $args
     header
+    config_file_warning
     set_online
     point_in_time
     install_or_exit

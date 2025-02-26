@@ -59,10 +59,10 @@ set -o pipefail
 # initial definitions
 
 ## script
-script_name='4apps.sh'
-developer='oxo'
-license='gplv3'
-initial_release='2019'
+script_name=4apps.sh
+developer=oxo
+license=gplv3
+initial_release=2019
 
 ## hardcoded variables
 # user customizable variables
@@ -91,13 +91,11 @@ getargs ()
 
 offline_installation ()
 {
-    code_lbl='CODE'
+    code_lbl=CODE
     code_dir="/home/$(id -un)/dock/3"
-    repo_lbl='REPO'
-    repo_dir="/repo"
-    #repo_dir="/home/$(id -un)/dock/2"
-    repo_re="\/repo"
-    #repo_re="\/home\/$(id -un)\/dock\/2"
+    repo_lbl=REPO
+    repo_dir="/home/$(id -un)/dock/2"
+    repo_re="\/home\/$(id -un)\/dock\/2"
     file_etc_pacman_conf='/etc/pacman.conf'
 }
 

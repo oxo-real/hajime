@@ -60,18 +60,16 @@ set -o pipefail
 # initial definitions
 
 ## script
-script_name='3post.sh'
-developer='oxo'
-license='gplv3'
-initial_release='2018'
+script_name=3post.sh
+developer=oxo
+license=gplv3
+initial_release=2018
 
 ## hardcoded variables
 # user customizable variables
 
-post_core_additions='archlinux-keyring lsof mlocate neofetch neovim pacman-contrib wl-clipboard'
-bloat_ware="" # there seems to be no more bloatware since kernel v536 (nano was removed)
-mirror_country='Sweden'
-mirror_amount='5'
+mirror_country=USA
+mirror_amount=5
 
 file_etc_motd="/etc/motd"
 file_hi_config="$HOME/hajime/install-config.sh"
@@ -110,12 +108,12 @@ offline_installation ()
 {
     if [[ $online -ne 1 ]]; then
 
-	code_lbl='CODE'
+	code_lbl=CODE
 	code_dir="/home/$(id -un)/dock/3"
-	repo_lbl='REPO'
+	repo_lbl=REPO
 	repo_dir="/home/$(id -un)/dock/2"
 	repo_re="\/home\/$(id -un)\/dock\/2"
-	file_etc_pacman_conf='/etc/pacman.conf'
+	file_etc_pacman_conf=/etc/pacman.conf
 
     fi
 }
@@ -287,14 +285,7 @@ create_directories ()
 base_mutations ()
 {
     ## add post core addditions
-    # for package in $post_core_additions; do
-
     sudo pacman -S --needed --noconfirm "${post_pkgs[@]}"
-
-    # done
-
-    ## remove base system bloat
-    #pacman -Rns --noconfirm $bloat_ware
 }
 
 
