@@ -115,6 +115,20 @@ getargs ()
 }
 
 
+define_text_appearance()
+{
+    ## text color
+    fg_magenta='\033[0;35m'	# magenta
+    fg_green='\033[0;32m'	# green
+    fg_red='\033[0;31m'		# red
+
+    ## text style
+    st_def='\033[0m'		# default
+    st_ul=`tput smul`		# underline
+    st_bold=`tput bold`		# bold
+}
+
+
 reply_single ()
 {
     # reply_functions
@@ -129,6 +143,7 @@ reply_single ()
 
 header ()
 {
+    [[ "$pit" -eq 0 ]] && clear
     current_year="$(date +%Y)"
     printf 'hajime - %s\n' "$script_name"
     printf 'copyright (c) %s' "$initial_release"
@@ -269,14 +284,14 @@ install_or_exit ()
 
     else
 
-	install
+	prepare_install
 	autostart_next
 
     fi
 }
 
 
-install ()
+prepare_install ()
 {
     if [[ $online -ne 1 ]]; then
 	## offline
@@ -292,26 +307,30 @@ install ()
 	## from here hajime will be ran
 	cp --preserve --recursive "$code_dir"/hajime /root
 
-	## copy hajime/misc/ol_pacman.conf
-	cp --preserve --recursive "$file_misc_pacman_conf" "$file_etc_pacman_conf"
 
-	## inject repo_dir in etc/pacman.conf
-	sed -i "s#0init_repo_here#$repo_dir#" "$file_etc_pacman_conf"
-
+	## copy pacman.conf
+	# cp --preserve --recursive "$file_misc_pacman_conf" "$file_etc_pacman_conf"
+	#
+	## update pacman.conf
+	# sed -i "s#0init_repo_here#$repo_dir#" "$file_etc_pacman_conf"
+	#
 	## force a refresh of the package database
 	#pacman -Syy
+
 
     elif [[ $online -eq 1 ]]; then
 	## online
 
 	set_online
 
-	## necesarry to install git here?
-	## why not in 1base?
-	pacman -Syy
+	##must be similar to 1base configure_pacman
 	pacman-key --init
 	pacman-key --populate
+
+	pacman -Syy
+
 	pacman -Sy --noconfirm git
+
 	git clone $online_repo
 
 	case $? in
@@ -367,8 +386,9 @@ main ()
 {
     sourcing
     getargs $args
-    header
+    define_text_appearance
     point_in_time
+    header
     config_file_warning
     install_or_exit
 }

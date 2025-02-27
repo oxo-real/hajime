@@ -13,9 +13,9 @@
 ├── make-recov
 ├── misc
 │   ├── alt_dtp_env
-│   ├── arch-chroot
 │   ├── etc_doas.conf
-│   └── ol_pacman.conf
+│   ├── ol_pacman.conf
+│   └── rescue.sh
 ├── pkgs-1000
 ├── README.md
 └── repo-tree.md

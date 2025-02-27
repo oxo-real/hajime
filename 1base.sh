@@ -161,7 +161,6 @@ exit_hajime ()
     sleep 1
     printf " Bye!\n"
     sleep 1
-    clear
     exit
 }
 
@@ -205,7 +204,7 @@ offline_installation ()
 	repo_re=\/root\/tmp\/repo
 
 	file_etc_pacman_conf=/etc/pacman.conf
-	file_misc_pacman_conf=/root/hajime/misc/ol_pacman.conf
+	file_misc_pacman_conf="$code_dir"/hajime/misc/ol_pacman.conf
 
     fi
 }
@@ -271,7 +270,6 @@ clock ()
     timedatectl status
     echo
     sleep 3
-    clear
 }
 
 
@@ -1118,10 +1116,27 @@ create_swap_partition()
 }
 
 
-install_helpers ()
+configure_pacman ()
 {
-    # clear cache
-    #pacman -Scc
+    # [TODO] CHECK if pacman.conf is correct after 202306
+    ## see: https://archlinux.org/news/git-migration-completed/
+
+    if [[ $online -ne 1 ]]; then
+	## configure pacman.conf for offline repository
+
+	## copy pacman.conf
+	cp --preserve --recursive --verbose "$file_misc_pacman_conf" "$file_etc_pacman_conf"
+
+	## update pacman.conf
+	sed -i "s#0init_repo_here#${repo_dir}#" "$file_etc_pacman_conf"
+
+    fi
+
+    ## change SigLevel by adding PackageTrustAll to pacman.conf
+    ## this prevents errors on installing marginal trusted packages
+    sed -i 's/^SigLevel = Required DatabaseOptional/SigLevel = Required DatabaseOptional PackageTrustAll/'  "$file_etc_pacman_conf"
+    ## disable pacman signature check (not recommended)
+    #sed -i 's/^SigLevel = Required DatabaseOptional/SigLevel = Never/' /etc/pacman.conf
 
     # init package keys
     pacman-key --init
@@ -1130,25 +1145,12 @@ install_helpers ()
     pacman-key --populate
 
     # update package database
-    pacman -Syy
+    # pacman -Syy
+}
 
-    # [TODO] CHECK if pacman.conf is correct after 202306
-    ## see: https://archlinux.org/news/git-migration-completed/
 
-    if [[ $online -ne 1 ]]; then
-
-	# see also man pacman.conf
-	## configure pacman.conf for offline 'server'
-	cp -prv /root/tmp/code/hajime/misc/ol_pacman.conf /etc/pacman.conf
-
-    fi
-
-    ## change SigLevel by adding PackageTrustAll to pacman.conf
-    ## this prevents errors on installing marginal trusted packages
-    sed -i 's/^SigLevel = Required DatabaseOptional/SigLevel = Required DatabaseOptional PackageTrustAll/' /etc/pacman.conf
-    ## disable pacman signature check (not recommended)
-    #sed -i 's/^SigLevel = Required DatabaseOptional/SigLevel = Never/' /etc/pacman.conf
-
+install_helpers ()
+{
     if [[ $online -eq 1 ]]; then
 
 	## refresh package keys & install helpers
@@ -1290,7 +1292,7 @@ autostart_next ()
 welcome ()
 {
     clear
-    printf 'hajime\n'
+    printf 'hajime - %s\n' "$script_name"
     printf 'copyright (c) 2017 - 2025  |  oxo\n'
     echo
     echo
@@ -1387,6 +1389,7 @@ main ()
     mount_partitions
     create_swap_partition
     #arch_install
+    configure_pacman
     install_helpers
     configure_mirrorlists
     install_base_devel_package_groups
