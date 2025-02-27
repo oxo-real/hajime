@@ -129,8 +129,8 @@ reply_single ()
 
 header ()
 {
-    current_year=$(date +%Y)
-    printf "$script_name\n"
+    current_year="$(date +%Y)"
+    printf 'hajime - %s\n' "$script_name"
     printf 'copyright (c) %s' "$initial_release"
     [[ $initial_release -ne $current_year ]] && printf ' - %s' "$current_year"
     printf '  |  %s\n' "$developer"
@@ -138,9 +138,39 @@ header ()
 }
 
 
+point_in_time ()
+{
+    if [[ -f $HOME/hajime/1base.done ]]; then
+
+	# 1base.sh already ran
+	## later in time
+	pit=1
+	# further data comes from calling script (3post)
+
+    else
+
+	# 1base.sh has not yet ran
+	## beginning of times
+	pit=0
+
+	## we have no ~/dock/2,3 yet
+	## therefore we use /root/tmp for the mountpoints
+	code_lbl=CODE
+	code_dir=/root/tmp/code
+	repo_lbl=REPO
+	repo_dir=/root/tmp/repo
+	repo_re=\/root\/tmp\/repo
+
+	file_etc_pacman_conf=/etc/pacman.conf
+	file_misc_pacman_conf=/root/hajime/misc/ol_pacman.conf
+
+    fi
+}
+
+
 config_file_warning ()
 {
-    if [[ -n "$file_hi_config" ]]; then
+    if [[ "$pit" -eq 0 && -n "$file_hi_config" ]]; then
 
 	printf 'WARNING config-file detected: %s\n' "$(realpath "$file_hi_config")"
 	echo
@@ -148,8 +178,8 @@ config_file_warning ()
 	printf 'else this file WILL be used for automatic installation\n'
 	echo
 	printf 'make 100%% sure that:\n'
-	printf "<> the filename is correct\n"
-	printf "<> all the parameters in the file are correct\n"
+	printf "1 the filename is correct\n"
+	printf "2 all the parameters in the file are correct\n"
 	echo
 	printf 'continue with automatic installation? [y/N] '
 
@@ -230,32 +260,11 @@ connect ()
 }
 
 
-point_in_time ()
-{
-    if [[ -f $HOME/hajime/1base.done ]]; then
-
-	# 1base.sh already ran
-	pit=1
-	#code_dir	comes from script that has called 0init
-	#repo_dir	comes from script that has called 0init
-	#repo_re	comes from script that has called 0init
-
-    else
-
-	# 1base.sh has not yet ran
-	pit=0
-	code_dir=/root/tmp
-	repo_dir=/root/tmp/repo
-	repo_re=\/root\/tmp\/repo
-
-    fi
-}
-
-
 install_or_exit ()
 {
     if [[ $pit -eq 1 ]]; then
 
+	set_online
 	exit 0
 
     else
@@ -270,19 +279,35 @@ install_or_exit ()
 install ()
 {
     if [[ $online -ne 1 ]]; then
+	## offline
 
 	## mount repo
-	mount_repo
+	get_offline_repo
+
+	## mount code
+	## code is already mounted manually
+	## it is the very reason this script runs :)
 
 	## copy hajime to /root
-	cp --preserve --recursive /root/tmp/code/hajime /root
+	## from here hajime will be ran
+	cp --preserve --recursive "$code_dir"/hajime /root
 
-	## update pacman.conf
-	cp --preserve --recursive /root/hajime/misc/ol_pacman.conf /etc/pacman.conf
-	pacman -Sy
+	## copy hajime/misc/ol_pacman.conf
+	cp --preserve --recursive "$file_misc_pacman_conf" "$file_etc_pacman_conf"
+
+	## inject repo_dir in etc/pacman.conf
+	sed -i "s#0init_repo_here#$repo_dir#" "$file_etc_pacman_conf"
+
+	## force a refresh of the package database
+	#pacman -Syy
 
     elif [[ $online -eq 1 ]]; then
+	## online
 
+	set_online
+
+	## necesarry to install git here?
+	## why not in 1base?
 	pacman -Syy
 	pacman-key --init
 	pacman-key --populate
@@ -315,7 +340,7 @@ install ()
 
 mount_repo ()
 {
-    repo_lbl='REPO'
+    # repo_lbl='REPO'
     repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
 
     [[ -d $repo_dir ]] || mkdir -p "$repo_dir"
@@ -327,25 +352,7 @@ mount_repo ()
 
 get_offline_repo ()
 {
-    [[ $offline -eq 1 ]] && mount_repo
-}
-
-
-mount_code ()
-{
-    code_lbl='CODE'
-    code_dev=$(lsblk -o label,path | grep "$code_lbl" | awk '{print $2}')
-
-    [[ -d $code_dir ]] || mkdir -p "$code_dir"
-
-    mountpoint -q "$code_dir"
-    [[ $? -ne 0 ]] && sudo mount "$code_dev" "$code_dir"
-}
-
-
-get_offline_code ()
-{
-    [[ $offline -eq 1 ]] && mount_code
+    [[ $online -ne 1 ]] && mount_repo
 }
 
 
@@ -361,9 +368,8 @@ main ()
     sourcing
     getargs $args
     header
-    config_file_warning
-    set_online
     point_in_time
+    config_file_warning
     install_or_exit
 }
 

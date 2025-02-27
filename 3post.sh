@@ -71,7 +71,7 @@ initial_release=2018
 mirror_country=USA
 mirror_amount=5
 
-file_etc_motd="/etc/motd"
+file_etc_motd=/etc/motd
 file_hi_config="$HOME/hajime/install-config.sh"
 file_hi_packages="$HOME/hajime/install-packages.sh"
 
@@ -136,35 +136,6 @@ reply_single ()
     stty raw #-echo
     reply=$(head -c 1)
     stty $stty_0
-}
-
-
-Xcheck_label_exist ()
-{
-    lsblk -o label | grep "$lbl" #> /dev/null 2>&1
-    if [[ "$?" -ne "0" ]]; then
-
-	printf "$lbl source not found, exiting\n"
-	exit 10
-
-    fi
-}
-
-
-Xcheck_mountpoint ()
-{
-    # check if device with label is already mounted
-
-    mount -l | grep "$lbl" #> /dev/null 2>&1
-
-    case "$?" in
-
-	0)
-	    local lblmountpoint="$(mount -l | grep "$lbl" | awk '{print $3}')"
-	    printf "device with label $lbl already mounted on $lblmountpoint\n"
-	    ;;
-
-    esac
 }
 
 

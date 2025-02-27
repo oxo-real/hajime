@@ -58,23 +58,23 @@ set -o pipefail
 # initial definitions
 
 ## script
-script_name='1base.sh'
-developer='oxo'
-license='gplv3'
-initial_release='2017'
+script_name=1base.sh
+developer=oxo
+license=gplv3
+initial_release=2017
 
 ## hardcoded variables
 
 # user customizable variables
 
-timezone="CET"
-sync_system_clock_over_ntp="true"
-rtc_local_timezone="0"
+timezone=CET
+sync_system_clock_over_ntp=true
+rtc_local_timezone=0
 
-arch_mirrorlist="https://archlinux.org/mirrorlist/?country=SE&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on"
-mirror_country="Germany,Netherlands,Sweden,USA"
-mirror_amount="5"
-pkg_help='reflector'  ## keeping base_packages clean
+arch_mirrorlist=https://archlinux.org/mirrorlist/?country=SE&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on
+mirror_country=Germany,Netherlands,Sweden,USA
+mirror_amount=5
+pkg_help=reflector  ## keeping base_packages clean
 # [Installation guide - ArchWiki](https://wiki.archlinux.org/title/Installation_guide#Install_essential_packages)
 # 20230212 https://archlinux.org/news/switch-to-the-base-devel-meta-package-requires-manual-intervention/
 #pkg_core='base linux linux-firmware' (via install-packages)
@@ -99,11 +99,11 @@ home_perc=0.60
 swap_size_recomm=4.00
 
 ## files
-file_hi_config='/root/hajime/install-config.sh'
-file_hi_config_1='/hajime/install-config.sh'
-file_hi_packages='/root/hajime/install-packages.sh'
-file_luks_pass='/root/tmp/code/hajime/luks_pass'
-file_mnt_etc_fstab="/mnt/etc/fstab"
+file_hi_config=/root/hajime/install-config.sh
+file_hi_config_1=/hajime/install-config.sh
+file_hi_packages=/root/hajime/install-packages.sh
+file_luks_pass=/root/tmp/code/hajime/luks_pass
+file_mnt_etc_fstab=/mnt/etc/fstab
 
 
 define_text_appearance()
@@ -189,6 +189,25 @@ getargs ()
 {
     ## online installation
     [[ "$1" =~ online$ ]] && online=1
+}
+
+
+offline_installation ()
+{
+    if [[ $online -ne 1 ]]; then
+
+	## we have no ~/dock/2,3 yet
+	## therefore we use /root/tmp for the mountpoints
+	code_lbl=CODE
+	code_dir=/root/tmp/code
+	repo_lbl=REPO
+	repo_dir=/root/tmp/repo
+	repo_re=\/root\/tmp\/repo
+
+	file_etc_pacman_conf=/etc/pacman.conf
+	file_misc_pacman_conf=/root/hajime/misc/ol_pacman.conf
+
+    fi
 }
 
 
@@ -1201,9 +1220,9 @@ prepare_mnt_environment ()
 
 	1 )
 	    # chroot changes the apparent root directory
-	    # commands will run isolated inside their root jail
+	    # commands will run isolated inside their chroot jail
 	    #TODO check for proper workings
-	    # here: /mnt will become the future root
+	    # here: /mnt will become the / inside the chroot jail
 	    #arch-chroot /mnt git clone https://codeberg.org/oxo/hajime.git
 	    #arch-chroot /mnt /usr/bin/git clone https://codeberg.org/oxo/hajime
 	    cd /mnt
@@ -1212,7 +1231,7 @@ prepare_mnt_environment ()
 	    ;;
 
 	* )
-	    # copy hajime to root (/hajime in conf)
+	    # copy hajime to chroot jail (/hajime in conf)
 	    cp -prv /root/tmp/code/hajime /mnt
 	    ;;
 
@@ -1227,10 +1246,13 @@ prepare_mnt_environment ()
 
 user_advice ()
 {
-    echo 'now changing root'
-    echo 'to continue execute:'
+    ## technically after arch-chroot /mnt
+    echo '# exited archiso environment and'
+    echo '# entered chroot jail (/mnt)'
     echo
-    echo 'sh hajime/2conf.sh'
+    echo '# to continue execute:'
+    echo
+    printf "${st_bold}sh hajime/2conf.sh${st_def}\n"
     echo
 }
 
@@ -1241,9 +1263,10 @@ finishing ()
 }
 
 
-switch_to_installation_environment ()
+enter_chroot_jail_mnt ()
 {
     # default bash will be ran inside the chroot jail
+    # [Linux Virtualization - Chroot Jail - GeeksforGeeks](https://www.geeksforgeeks.org/linux-virtualization-using-chroot-jail/)
     arch-chroot /mnt
 }
 
@@ -1259,7 +1282,8 @@ autostart_next ()
     # 	arch-chroot /mnt sh /hajime/2conf.sh
 
     # fi
-    :
+    #DEV
+    arch-chroot /mnt "$code_dir"/code/hajime/2conf.sh
 }
 
 
@@ -1337,10 +1361,11 @@ arch_install ()
 
 main ()
 {
-    getargs $args
     define_text_appearance
     welcome
+    getargs $args
     sourcing
+    offline_installation
     get_bootmount
     network_setup
     #console_font
@@ -1370,7 +1395,7 @@ main ()
     prepare_mnt_environment
     user_advice
     finishing
-    switch_to_installation_environment
+    enter_chroot_jail_mnt
     #autostart_next
 }
 

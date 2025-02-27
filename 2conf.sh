@@ -48,6 +48,8 @@ https://www.gnu.org/licenses/gpl-3.0.txt
 # example
   n/a
 
+CAUTION 2conf runs inside chroot jail (/mnt)
+
 # '
 
 
@@ -133,11 +135,24 @@ offline_installation ()
 {
     if [[ $online -ne 1 ]]; then
 
-	code_lbl='CODE'
-	code_dir='/tmp'
-	repo_lbl='REPO'
-	repo_dir='/repo'
-	repo_re='\/repo'
+	## CAUTION 2conf runs inside chroot jail (/mnt)
+	## we have no ~/dock/2,3 yet
+	## therefore we use /root/tmp for the mountpoints
+	code_lbl=CODE
+	code_dir=/root/tmp/code
+	repo_lbl=REPO
+	repo_dir=/root/tmp/repo
+	repo_re=\/root\/tmp\/repo
+
+	file_etc_pacman_conf=/etc/pacman.conf
+	file_misc_pacman_conf=/root/hajime/misc/ol_pacman.conf
+
+	# code_lbl=CODE
+	# code_dir="/home/$(id -un)/dock/3"
+	# repo_lbl=REPO
+	# repo_dir="/home/$(id -un)/dock/2"
+	# repo_re="\/home\/$(id -un)\/dock\/2"
+	# file_etc_pacman_conf=/etc/pacman.conf
 
     fi
 }
@@ -600,10 +615,11 @@ motd_3post ()
     echo >> $file_etc_motd
 }
 
-exit_arch_chroot_mnt ()
+exit_chroot_jail_mnt ()
 {
     ## return to archiso environment
     echo
+    echo '# exit chroot jail (/mnt)'
     echo '# return to the archiso environment with:'
     echo
     printf "${st_bold}exit${st_def}\n"
@@ -647,7 +663,7 @@ main ()
     install_bootloader
     move_hajime
     motd_3post
-    exit_arch_chroot_mnt
+    exit_chroot_jail_mnt
 }
 
 main
