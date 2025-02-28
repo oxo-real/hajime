@@ -170,7 +170,7 @@ reply ()
 
 mount_repo ()
 {
-    repo_dev=$(blkid | grep "$repo_lbl" | awk -F : '{print $1}')
+    repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
 
     [[ -d $repo_dir ]] || mkdir -p "$repo_dir"
 

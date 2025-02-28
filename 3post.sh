@@ -141,7 +141,7 @@ reply_single ()
 
 dhcp_connect ()
 {
-    sh hajime/0init.sh
+    [[ "$online" -eq 1 ]] && sh hajime/0init.sh
 }
 
 
@@ -180,9 +180,9 @@ modify_pacman_conf ()
 	    ;;
 
 	* )
-	    ## set offline repo
+	    ## update offline repository location (that was used in the ch-root jail in 2conf)
+	    ## sed if ^[offline] is found substitute (s) the entire (.*) next line (n)
 	    sudo sed -i "/^\[offline\]/{n;s/.*/Server = file:\/\/$repo_re/}" $file_etc_pacman_conf
-	    #sudo sed -i "s|\/repo|$HOME\/repo|" $file_etc_pacman_conf
 	    ;;
 
     esac
@@ -198,7 +198,7 @@ pacman_init ()
 
 mount_repo ()
 {
-    repo_dev=$(blkid | grep "$repo_lbl" | awk -F : '{print $1}')
+    repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
 
     [[ -d $repo_dir ]] || mkdir -p "$repo_dir"
 
