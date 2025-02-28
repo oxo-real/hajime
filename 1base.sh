@@ -106,6 +106,9 @@ file_luks_pass=/root/tmp/code/hajime/luks_pass
 file_mnt_etc_fstab=/mnt/etc/fstab
 
 
+#--------------------------------
+
+
 define_text_appearance()
 {
     ## text color
@@ -118,8 +121,6 @@ define_text_appearance()
     st_ul=`tput smul`		# underline
     st_bold=`tput bold`		# bold
 }
-
-#--------------------------------
 
 
 # define reply functions

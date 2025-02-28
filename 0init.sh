@@ -187,7 +187,7 @@ config_file_warning ()
 {
     if [[ "$pit" -eq 0 && -n "$file_hi_config" ]]; then
 
-	printf 'WARNING config-file detected: %s\n' "$(realpath "$file_hi_config")"
+	printf "${st_bold}WARNING config-file${st_def} detected: %s\n" "$(realpath "$file_hi_config")"
 	echo
 	printf 'move this file if a interactive installation is preferred\n'
 	printf 'else this file WILL be used for automatic installation\n'
