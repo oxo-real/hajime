@@ -372,6 +372,13 @@ mount_repo ()
 get_offline_repo ()
 {
     [[ $online -ne 1 ]] && mount_repo
+
+    if [[ -z "$repo_dev" ]]; then
+
+	printf 'ERROR device REPO not found\n'
+	exit 30
+
+    fi
 }
 
 

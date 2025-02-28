@@ -18,7 +18,7 @@ dev_boot=/dev/sda
 part_boot=1
 size_boot=+512M
 type_boot=ef00
-dev_boot_clear='clear'
+dev_boot_clear=clear
 
 ## lvm partition
 dev_lvm=/dev/sda

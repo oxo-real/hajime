@@ -104,8 +104,9 @@ motd_remove ()
 }
 
 
-offline_installation ()
+installation_mode ()
 {
+    ## online or offline mode
     if [[ $online -ne 1 ]]; then
 
 	code_lbl=CODE
@@ -114,6 +115,11 @@ offline_installation ()
 	repo_dir="/home/$(id -un)/dock/2"
 	repo_re="\/home\/$(id -un)\/dock\/2"
 	file_etc_pacman_conf=/etc/pacman.conf
+
+    elif [[ "$online" -eq 1 ]]; then
+
+	## dhcp connect
+	sh hajime/0init.sh
 
     fi
 }
@@ -136,12 +142,6 @@ reply_single ()
     stty raw #-echo
     reply=$(head -c 1)
     stty $stty_0
-}
-
-
-dhcp_connect ()
-{
-    [[ "$online" -eq 1 ]] && sh hajime/0init.sh
 }
 
 
@@ -210,6 +210,13 @@ mount_repo ()
 get_offline_repo ()
 {
     [[ $online -ne 1 ]] && mount_repo
+
+    if [[ -z "$repo_dev" ]]; then
+
+	printf 'ERROR device REPO not found\n'
+	exit 30
+
+    fi
 }
 
 
@@ -227,6 +234,13 @@ mount_code ()
 get_offline_code ()
 {
     [[ $online -ne 1 ]] && mount_code
+
+    if [[ -z "$code_dev" ]]; then
+
+	printf 'ERROR device CODE not found\n'
+	exit 40
+
+    fi
 }
 
 
@@ -308,8 +322,7 @@ main ()
     sourcing
     getargs $args
     motd_remove
-    offline_installation
-    dhcp_connect
+    installation_mode
     set_read_write
     own_home
     modify_pacman_conf

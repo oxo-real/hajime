@@ -182,6 +182,13 @@ mount_repo ()
 get_offline_repo ()
 {
     [[ $online -ne 1 ]] && mount_repo
+
+    if [[ -z "$repo_dev" ]]; then
+
+	printf 'ERROR device REPO not found\n'
+	exit 30
+
+    fi
 }
 
 
@@ -199,6 +206,13 @@ mount_code ()
 get_offline_code ()
 {
     [[ $online -ne 1 ]] && mount_code
+
+    if [[ -z "$code_dev" ]]; then
+
+	printf 'ERROR device CODE not found\n'
+	exit 40
+
+    fi
 }
 
 
