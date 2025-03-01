@@ -384,7 +384,7 @@ get_offline_repo ()
 
 autostart_next ()
 {
-    ## triggered with configuration file
+    ## switch autostart via configuration file
     [[ -n $after_0init ]] && sh /root/hajime/1base.sh
 }
 

@@ -351,8 +351,18 @@ set_host_file ()
 # set root password
 pass_root ()
 {
-    printf "$(whoami)@$hostname\n"
-    printf '%s' "$root_pw" | passwd --stdin
+    if [[ -n "$root_pw" ]]; then
+
+	## password from config file
+	printf '%s' "$root_pw" | passwd --stdin
+
+    else
+
+	## manual root password entry
+	printf "$(whoami)@$hostname\n"
+	passwd
+
+    fi
 }
 
 
@@ -419,8 +429,8 @@ test_username ()
     username_length="$(printf "$username" | wc -c)"
     if [[ $username_length -gt 32 ]]; then
 
-	printf "${MAGENTA}$username${NOC} contains $username_length characters\n"
-	printf "usernames may only be up to 32 characters long\n"
+	printf "ERROR ${fg_magenta}$username${st_def} contains $username_length characters\n"
+	printf "username may not exceed 32 characters\n"
 	sleep 5
 	set_username
 
@@ -428,7 +438,7 @@ test_username ()
 
     if [[ ! "$username" =~ ^[a-z_][a-z0-9_-]*[$]? ]]; then
 
-	printf "${MAGENTA}$username${NOC} not matching useradd criteria\n"
+	printf "ERROR ${fg_magenta}$username${st_def} not matching useradd criteria\n"
 	printf "see useradd(8)\n"
 	sleep 5
 	set_username
@@ -439,22 +449,33 @@ test_username ()
 
 add_username ()
 {
-    useradd -m -g wheel $username
+    useradd --create-home --groups wheel $username
 }
 
 
 add_groups ()
 {
     ## add $username to video group (for brightnessctl)
-    usermod -a -G video $username
+    usermod --append --groups video $username
 }
 
 
 set_passphrase ()
 {
     ## set $username password
-    printf "$username@$hostname\n"
-    printf '%s' "$username_pw" | passwd --stdin $username
+
+    if [[ -n "$username_pw" ]]; then
+
+	## password from config file
+	printf '%s' "$username_pw" | passwd --stdin $username
+
+    else
+
+	## manual user password entry
+	printf "$(username)@$hostname\n"
+	passwd $username
+
+    fi
 }
 
 
@@ -628,6 +649,8 @@ motd_3post ()
     echo >> $file_etc_motd
     echo >> $file_etc_motd
 }
+
+## no autostart because of reboot
 
 exit_chroot_jail_mnt ()
 {

@@ -15,7 +15,7 @@
 : '
 hajime_3post
 third part of linux installation
-copyright (c) 2018 - 2024  |  oxo
+copyright (c) 2018 - 2025  |  oxo
 
 GNU GPLv3 GENERAL PUBLIC LICENSE
 This program is free software: you can redistribute it and/or modify
@@ -180,7 +180,7 @@ modify_pacman_conf ()
 	    ;;
 
 	* )
-	    ## update offline repository location (that was used in the ch-root jail in 2conf)
+	    ## update offline repository location (used in 2conf ch-root jail)
 	    ## sed if ^[offline] is found substitute (s) the entire (.*) next line (n)
 	    sudo sed -i "/^\[offline\]/{n;s/.*/Server = file:\/\/$repo_re/}" $file_etc_pacman_conf
 	    ;;
@@ -312,7 +312,7 @@ wrap_up ()
 
 autostart_next ()
 {
-    ## triggered with configuration file
+    ## switch autostart via configuration file
     [[ -n $after_3post ]] && sh $HOME/hajime/4apps.sh
 }
 

@@ -5,13 +5,27 @@
 # CAUTION be sure all variables are 100% correct
 
 
+
+# general
+
+## debug switch [default,debug,debug_verbose]
+exec_mode=debug
+
+
 # 0init
+
+## debugging
+hajime_src="/root/tmp/code/hajime"
 
 ## autostart next script
 after_0init=1base
 
 
 # 1base
+
+## debugging
+hajime_src="/root/tmp/code/hajime"
+debug_log="${hajime_src}/1base-debug.log"
 
 ## boot partition
 dev_boot=/dev/sda
@@ -47,6 +61,10 @@ after_1base=2conf
 
 # 2conf
 
+## debugging
+hajime_src="/root/tmp/code/hajime"
+debug_log="${hajime_src}/2conf-debug.log"
+
 ## user accounts
 hostname=dl3189
 root_pw=root
@@ -59,16 +77,26 @@ after_2conf=reboot
 
 # 3post
 
+## debugging
+hajime_src="$HOME/dock/3/code/hajime"
+debug_log="${hajime_src}/3post-debug.log"
+
 ## autostart next script
-after_3post=4apps
+#after_3post=4apps
 
 
 # 4apps
 
+## debugging
+hajime_src="$HOME/dock/3/code/hajime"
+debug_log="${hajime_src}/4apps-debug.log"
+
 ## autostart next script
-after_4apps=5dtcf
+#after_4apps=5dtcf
 
 
 # 5dotf
 
-## novars
+## debugging
+hajime_src="$HOME/dock/3/code/hajime"
+debug_log="${hajime_src}/5dtcf-debug.log"

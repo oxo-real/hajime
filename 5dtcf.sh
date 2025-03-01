@@ -113,6 +113,18 @@ getargs ()
 }
 
 
+debugging ()
+{
+    ## debug switch via configuration file
+    echo
+    echo
+    [[ -n "$debug_log" ]] \
+	&& printf '-------------------- %s_%X %s\n' "$(date +%Y%m%d_%H%M%S)" "$(date +'%s')" "$script_name"
+    echo
+    echo
+}
+
+
 mount_repo ()
 {
     repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
@@ -437,6 +449,7 @@ finishing_up ()
 
 main ()
 {
+    debugging
     sourcing
     getargs $args
     get_offline_repo

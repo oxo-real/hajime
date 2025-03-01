@@ -81,6 +81,40 @@ sourcing ()
 }
 
 
+debugging ()
+{
+    ## debug switch via configuration file
+    ## -z debugging prevents infinite loop
+    if [[ "$exec_mode" =~ debug* && -z "$debugging" ]]; then
+
+	debugging=on
+	debug_log="${hajime_src}/${script_name}-debug.log"
+
+	## debug header
+	printf '>>> %s_%X %s/%s-debug.log\n' "$(date +%Y%m%d_%H%M%S)" "$(date +'%s')" "$hajime_src" "$script_name"
+	echo
+
+	case "$exec_mode" in
+
+	    debug )
+		## start script in debug mode
+ 		sh "$hajime_src"/"$script_name" 2>&1 | tee -a "$debug_log"
+		;;
+
+	    debug_verbose )
+		## start script in verbose debug mode
+ 		sh -x "$hajime_src"/"$script_name" 2>&1 | tee -a "$debug_log"
+		;;
+
+	esac
+
+    fi
+
+    unset debugging
+    exit 0
+}
+
+
 args="$@"
 getargs ()
 {
@@ -214,7 +248,7 @@ loose_ends ()
 
 autostart_next ()
 {
-    ## triggered with configuration file
+    ## switch autostart via configuration file
     [[ -n $after_4apps ]] && sh $HOME/hajime/5dtcf.sh
 }
 
@@ -222,6 +256,7 @@ autostart_next ()
 main ()
 {
     sourcing
+    debugging
     getargs $args
     offline_installation
 

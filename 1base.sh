@@ -402,12 +402,16 @@ set_boot_device ()
 
 	* )
 	    ## using configuration file
+	    p_name=boot
+
 	    if [[ -n $dev_boot_clear ]]; then
 
+		printf "${st_bold}%s${st_def} ${fg_magenta}clear${st_def} partition and reset sector alignment\n" "$dev_boot"
 		sgdisk --clear $dev_boot
 
 	    fi
 
+	    printf "${st_bold}%s${st_def} ${fg_magenta}write${st_def} partition data (%s)\n" "$dev_boot" "$p_name"
 	    sgdisk --new $part_boot:0:${size_boot} --typecode $part_boot:$type_boot $dev_boot
 
 	    boot_part=$dev_boot$part_boot
@@ -485,12 +489,17 @@ set_lvm_device ()
 	    ;;
 
 	* )
+	    ## using configuration file
+	    p_name=boot
+
 	    if [[ -n $dev_lvm_clear ]]; then
 
+		printf "${st_bold}%s${st_def} ${fg_magenta}clear${st_def} partition and reset sector alignment\n" "$dev_lvm"
 		sgdisk --clear $dev_lvm
 
 	    fi
 
+	    printf "${st_bold}%s${st_def} ${fg_magenta}write${st_def} partition data (%s)\n" "$dev_lvm" "$p_name"
 	    sgdisk --new $part_lvm:0:$size_lvm --typecode $part_lvm:$type_lvm $dev_lvm
 
 	    lvm_part=$dev_lvm$part_lvm
@@ -1276,6 +1285,8 @@ enter_chroot_jail_mnt ()
 
 autostart_next ()
 {
+    ## instead of autostart go to chroot jail
+
     #TODO DEV because arch-chroot there is a problem executing
     # commands after arch-chroot
     # below did not work
