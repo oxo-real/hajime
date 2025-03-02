@@ -490,7 +490,7 @@ set_lvm_device ()
 
 	* )
 	    ## using configuration file
-	    p_name=boot
+	    p_name=lvm
 
 	    if [[ -n $dev_lvm_clear ]]; then
 

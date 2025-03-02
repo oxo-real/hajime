@@ -9,7 +9,7 @@
 # general
 
 ## debug switch [default,debug,debug_verbose]
-exec_mode=debug
+exec_mode=default
 
 
 # 0init

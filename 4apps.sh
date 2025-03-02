@@ -108,10 +108,10 @@ debugging ()
 
 	esac
 
-    fi
+	unset debugging
+	exit 0
 
-    unset debugging
-    exit 0
+    fi
 }
 
 
@@ -123,14 +123,23 @@ getargs ()
 }
 
 
-offline_installation ()
+installation_mode ()
 {
-    code_lbl=CODE
-    code_dir="/home/$(id -un)/dock/3"
-    repo_lbl=REPO
-    repo_dir="/home/$(id -un)/dock/2"
-    repo_re="\/home\/$(id -un)\/dock\/2"
-    file_etc_pacman_conf='/etc/pacman.conf'
+    ## online or offline mode
+    if [[ $online -ne 1 ]]; then
+
+	code_lbl=CODE
+	code_dir="/home/$(id -un)/dock/3"
+	repo_lbl=REPO
+	repo_dir="/home/$(id -un)/dock/2"
+	repo_re="\/home\/$(id -un)\/dock\/2"
+	file_etc_pacman_conf=/etc/pacman.conf
+
+    elif [[ "$online" -eq 1 ]]; then
+
+	:
+
+    fi
 }
 
 
@@ -140,8 +149,8 @@ mount_repo ()
 
     [[ -d $repo_dir ]] || mkdir -p "$repo_dir"
 
-    mountpoint -q $repo_dir
-    [[ $? -eq 0 ]] || sudo mount "$repo_dev" "$repo_dir"
+    mountpoint -q "$repo_dir"
+    [[ $? -ne 0 ]] && sudo mount "$repo_dev" "$repo_dir"
 }
 
 
@@ -164,8 +173,8 @@ mount_code ()
 
     [[ -d $code_dir ]] || mkdir -p "$code_dir"
 
-    mountpoint -q $code_dir
-    [[ $? -eq 0 ]] || sudo mount "$code_dev" "$code_dir"
+    mountpoint -q "$code_dir"
+    [[ $? -ne 0 ]] && sudo mount "$code_dev" "$code_dir"
 }
 
 
@@ -212,32 +221,27 @@ set_usr_ro ()
 
 install_apps_packages ()
 {
-    ## loop through core app packages
-    ## instead of one whole list entry in yay
-    ## this prevents that on error only one package is skipped
-    #local packages=$(echo "${core_applications[*]}")
-    #sudo pacman -S --noconfirm --needed $packages
-    # for pkg_pca in "${post_core_applications[@]}"; do
+    for pkg in "${apps_pkgs[@]}"; do
 
-    sudo pacman -S --needed --noconfirm "${apps_pkgs[@]}"
+	printf 'installing %s ' "$pkg"
 
-    # done
+	if ! pacman -S --noconfirm "$pkg"; then
+
+	    printf 'error - skipping\n'
+
+	else
+
+	    printf 'succes\n'
+
+	fi
+
+    done
+    #sudo pacman -S --needed --noconfirm "${apps_pkgs[@]}"
 }
 
 
 loose_ends ()
 {
-    #[TODO]remove candidate
-    ## tmux_plugin_manager
-    #tmux_plugin_dir="$HOME/.config/tmux/plugins"
-    #git clone https://github.com/tmux-plugins/tpm $tmux_plugin_dir/tpm
-
-    #[TODO]remove candidate
-    ## create w3mimgdisplay symlink
-    ## w3mimgdisplay is not in /usr/bin by default as of 20210114
-    ## alternative is to add /usr/lib/w3m to $PATH
-    #sudo ln -s /usr/lib/w3m/w3mimgdisplay /usr/bin/w3mimgdisplay
-
     ## recommend human to execute dotfiles install script
     echo 'sh hajime/5dtcf.sh'
 
@@ -258,18 +262,20 @@ main ()
     sourcing
     debugging
     getargs $args
-    offline_installation
+    installation_mode
 
     set_boot_rw
     set_usr_rw
+
     get_offline_repo
     get_offline_code
 
     install_apps_packages
 
-    loose_ends
     set_boot_ro
     set_usr_ro
+
+    loose_ends
 
     autostart_next
 }
