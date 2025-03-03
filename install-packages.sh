@@ -188,7 +188,7 @@ apps_packages ()
 	#bind-tools wireshark-cli wireshark-qt
 
 	## programming languages
-	zig zls
+	go zig zls
 	#lisp perl rustup zig go lua python
 
 	## python additions
