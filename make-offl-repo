@@ -64,7 +64,7 @@ initial_release='2021'
 
 ## hardcoded variables
 db_name='offline'
-cy="$XDG_CACHE_HOME/yay"
+src_aur="$XDG_CACHE_HOME/yay"
 vcpp='/var/cache/pacman/pkg'
 pkgs_hajime="$HOME/c/git/code/hajime/pkgs-$(id -u $USER)"
 pkgs_to_copy="$XDG_CACHE_HOME/temp/pkgs-to-copy-$(id -u $USER)"
@@ -127,8 +127,8 @@ define_pkgs_cache_ls ()
     ## vcpp
     add_pkg_cache_ls "$vcpp" pacman
 
-    ## cy
-    add_pkg_cache_ls "$cy" yay
+    ## src_aur
+    add_pkg_cache_ls "$src_aur" yay
 }
 
 
@@ -181,7 +181,9 @@ add_pkg_cache_ls ()
 	    ;;
 
 	yay )
-	    realpath $(fd --type file '.*(\.pkg)?\.tar\.(gz|xz|zst)$' $pkg_cache_dir) >> $pkgs_cache_ls
+	    # TODO DEV separate aur_cache_ls file
+	    realpath $(fd --type file '.*(\.pkg)?\.tar\.(gz|xz|zst)$' $pkg_cache_dir) >> $aur_cache_ls
+	    #realpath $(fd --type file '.*(\.pkg)?\.tar\.(gz|xz|zst)$' $pkg_cache_dir) >> $pkgs_cache_ls
 
 	    printf 'building pkgs_cache_ls %s\n' "$(basename $file)"
 	    ;;
@@ -232,7 +234,7 @@ get_latest_dep ()
 }
 
 
-get_pkg_deps ()
+get_pkgq_deps ()
 {
     pkg_main=$1
 

@@ -156,12 +156,16 @@ mount_repo ()
 
 get_offline_repo ()
 {
-    [[ $online -ne 1 ]] && mount_repo
+    if [[ $online -ne 1 ]]; then
 
-    if [[ -z "$repo_dev" ]]; then
+	mount_repo
 
-	printf 'ERROR device REPO not found\n'
-	exit 30
+	if [[ -z "$repo_dev" ]]; then
+
+	    printf 'ERROR device REPO not found\n'
+	    exit 20
+
+	fi
 
     fi
 }
@@ -180,12 +184,16 @@ mount_code ()
 
 get_offline_code ()
 {
-    [[ $online -ne 1 ]] && mount_code
+    if [[ $online -ne 1 ]]; then
 
-    if [[ -z "$code_dev" ]]; then
+	mount_code
 
-	printf 'ERROR device CODE not found\n'
-	exit 40
+	if [[ -z "$code_dev" ]]; then
+
+	    printf 'ERROR device CODE not found\n'
+	    exit 30
+
+	fi
 
     fi
 }
@@ -221,11 +229,12 @@ set_usr_ro ()
 
 install_apps_packages ()
 {
+    ## for to prevent pacman error exit
     for pkg in "${apps_pkgs[@]}"; do
 
 	printf 'installing %s ' "$pkg"
 
-	if ! pacman -S --noconfirm "$pkg"; then
+	if ! pacman -S --needed --noconfirm "$pkg"; then
 
 	    printf 'error - skipping\n'
 
@@ -237,6 +246,28 @@ install_apps_packages ()
 
     done
     #sudo pacman -S --needed --noconfirm "${apps_pkgs[@]}"
+}
+
+
+install_aur_packages ()
+{
+    ## using yay
+    for pkg in "${aur_pkgs[@]}"; do
+
+	printf 'installing %s ' "$pkg"
+
+	if ! yay -S --needed --noconfirm "$pkg"; then
+
+	    printf 'error - skipping\n'
+
+	else
+
+	    printf 'succes\n'
+
+	fi
+
+    done
+
 }
 
 
@@ -271,6 +302,7 @@ main ()
     get_offline_code
 
     install_apps_packages
+    install_aur_packages
 
     set_boot_ro
     set_usr_ro

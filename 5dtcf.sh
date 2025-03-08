@@ -138,12 +138,16 @@ mount_repo ()
 
 get_offline_repo ()
 {
-    [[ $online -ne 1 ]] && mount_repo
+    if [[ $online -ne 1 ]]; then
 
-    if [[ -z "$repo_dev" ]]; then
+	mount_repo
 
-	printf 'ERROR device REPO not found\n'
-	exit 30
+	if [[ -z "$repo_dev" ]]; then
+
+	    printf 'ERROR device REPO not found\n'
+	    exit 20
+
+	fi
 
     fi
 }
@@ -162,12 +166,16 @@ mount_code ()
 
 get_offline_code ()
 {
-    [[ $online -ne 1 ]] && mount_code
+    if [[ $online -ne 1 ]]; then
 
-    if [[ -z "$code_dev" ]]; then
+	mount_code
 
-	printf 'ERROR device CODE not found\n'
-	exit 40
+	if [[ -z "$code_dev" ]]; then
+
+	    printf 'ERROR device CODE not found\n'
+	    exit 30
+
+	fi
 
     fi
 }
@@ -348,29 +356,30 @@ set_permissions ()
 
 z_shell_config ()
 {
-    ## reset or re-login for changes to take effect
+    ## re-login or reset shell for changes to take effect
 
     ## symlink in etc_zsh to zshenv
     sudo ln -s $XDG_CONFIG_HOME/zsh/etc_zsh_zshenv /etc/zsh/zshenv
 
-    ## zsh default shell
+    ## zsh default shell for current user
     #sudo chsh -s $(which zsh)
 
-    ## alt1: zsh default shell for $USER
+    ## zsh default shell for $USER (alt1)
     #sudo usermod -s $(which zsh) $USER
 
-    ## alt2: zsh default shell by changing /etc/passwd directly
+    ## zsh default shell for $USER, changing /etc/passwd directly (alt2)
     sudo awk -F ':' -v user="$USER" \
 	 'BEGIN {OFS=":"} \
 	 $1 == user { $NF="/usr/bin/zsh"; print } \
 	 $1 != user { print }' \
-	 /etc/passwd > /tmp/passwd && sudo mv /tmp/passwd /etc/passwd
-    # Run awk with ':' as the field separator and set the variable 'user' to the current username
-    # Set the output field separator to ':'
-    # If the first field (username) matches 'user', change the last field (shell) to '/bin/zsh' and print the line
-    # If the first field does not match 'user', print the line as is
-    # Read from /etc/passwd and redirect output to a temporary file &&
-    # Move the temporary file back to overwrite the original /etc/passwd
+	 /etc/passwd > $XDG_CACHE_HOME/temp/passwd \
+	 && sudo mv $XDG_CACHE_HOME/temp/passwd /etc/passwd
+    # awk field separator ':'; set variable 'user' to $USER
+    # OFS output field separator ':'
+    # if field1 (username) matches 'user', change $NF last field (shell) to '/bin/zsh' and print the line
+    # if field1 does not match 'user', print the line as is
+    # read from /etc/passwd and redirect output to a temporary file &&
+    # move the temporary file back to overwrite the original /etc/passwd
 
     ## enable command history
     [[ -d "$XDG_LOGS_HOME/history" ]] || mkdir $XDG_LOGS_HOME/history

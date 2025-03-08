@@ -165,7 +165,8 @@ apps_packages ()
 	#vimball
 
 	## build_tools
-	make yay
+	yay-bin
+	#make (already in base-devel)
 
 	## terminal_text_tools
 	emacs figlet qrencode zbar jq tinyxxd
@@ -287,17 +288,22 @@ apps_packages ()
 
 	## database
 	sqlitebrowser arch-wiki-docs arch-wiki-lite
+    )
+}
 
 
-	## aur applications ()
+aur_packages ()
+{
+    # packages from arch user repository
 
+    aur_pkgs=(
 
 	## create the list for aur_applications:
 	#for dir in $(fd . --max-depth 1 --type directory ~/.cache/yay | sed 's/\/$//'); do printf '%s \\\n' "$(basename "$dir")"; done | wl-copy
 	## or
 	#yay -Qqm
 
-	7-zip
+	#7-zip
 	# 7-zip-debug
 	base16-shell-preview
 	brave-bin
@@ -306,12 +312,12 @@ apps_packages ()
 	# cava
 	# cava-debug
 	dotool
-	dotool-debug
+	# dotool-debug
 	fzf-tab-git
 	imhex
 	# kmonad-bin
 	# kmonad-bin-debug
-	lisp
+	# lisp
 	# mbrola
 	# ncurses5-compat-libs
 	# ncurses5-compat-libs-debug
@@ -346,8 +352,6 @@ apps_packages ()
 	# viddy
 	wlrobs
 	# wlrobs-debug
-	yay
-	# yay-debug
 	yazi-git
 	# yazi-git-debug
 
@@ -361,6 +365,7 @@ main ()
     conf_packages
     post_packages
     apps_packages
+    aur_packages
 }
 
 main
