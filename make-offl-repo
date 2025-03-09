@@ -64,9 +64,15 @@ initial_release='2021'
 
 ## hardcoded variables
 db_name='offline'
-src_aur="$XDG_CACHE_HOME/yay"
-vcpp='/var/cache/pacman/pkg'
-pkgs_hajime="$HOME/c/git/code/hajime/pkgs-$(id -u $USER)"
+src_foreign="$XDG_CACHE_HOME/yay"
+src_native='/var/cache/pacman/pkg'
+#     vcpp='/var/cache/pacman/pkg'
+pkgs_hajime="$HOME/c/git/code/hajime/pkgs-hajime-$(id -u $USER)"
+pkgs_real_paths="$HOME/c/git/code/hajime/pkgs-real-paths-$(id -u $USER)"
+pkgs_copy="$HOME/c/git/code/hajime/pkgs-copy-$(id -u $USER)"
+pkgs_deps="$HOME/c/git/code/hajime/pkgs-deps-$(id -u $USER)"
+pkgs_cache_ls_n="$XDG_CACHE_HOME/temp/pkgs-cache-ls-n-$(id -u $USER)"
+pkgs_cache_ls_f="$XDG_CACHE_HOME/temp/pkgs-cache-ls-f-$(id -u $USER)"
 pkgs_to_copy="$XDG_CACHE_HOME/temp/pkgs-to-copy-$(id -u $USER)"
 pkgs_to_repo="$XDG_CACHE_HOME/temp/pkgs-to-repo-$(id -u $USER)"
 pkgs_to_repo_err="$XDG_CACHE_HOME/temp/pkgs-to-repo-$(id -u $USER)-err"
@@ -79,7 +85,7 @@ file_packages="$HOME/c/git/code/hajime/install-packages.sh"
 sourcing ()
 {
     ## custom packages
-    [[ -f $file_packages ]] && source $file_packages
+    [[ -f "$file_packages" ]] && source "$file_packages"
 }
 
 
@@ -90,7 +96,12 @@ getargs ()
 
 	case $1 in
 
-	    *)
+	    '' )
+		printf 'error: dst\n'
+		exit 4
+		;;
+
+	    * )
 		dst="$1"
 		return
 		;;
@@ -101,324 +112,143 @@ getargs ()
 }
 
 
-create_hajime_pkgs ()
+remove_files ()
 {
-    hajime_pkgs=(
+    [[ -f "$pkgs_copy" ]] && rm -rf "$pkgs_copy"
+    [[ -f "$pkgs_deps" ]] && rm -rf "$pkgs_deps"
+    [[ -f "$pkgs_hajime" ]] && rm -rf "$pkgs_hajime"
+    [[ -f "$pkgs_real_paths" ]] && rm -rf "$pkgs_real_paths"
+}
+
+
+create_pkgs_hajime ()
+{
+    ## sourced from file_packages
+    pkgs_hajime_arr=(
 	"${base_pkgs[@]}"
 	"${conf_pkgs[@]}"
 	"${post_pkgs[@]}"
 	"${apps_pkgs[@]}"
+	"${fgn_pkgs[@]}"
     )
 
     ## write pkgs_hajime (pkgs-hajime-1000)
-    [[ -f $pkgs_hajime ]] && rm -rf $pkgs_hajime
-    printf '%s\n' "${hajime_pkgs[@]}" | sort > "$pkgs_hajime"
+    printf '%s\n' "${pkgs_hajime_arr[@]}" | sed '/^\s*$/d' | sort > "$pkgs_hajime"
 }
 
 
-define_pkgs_cache_ls ()
+create_pkgs_real_paths ()
 {
-    ## cache source file pkgs-cache-ls
-    pkgs_cache_ls="$XDG_CACHE_HOME/temp/pkgs-cache-ls-$(id -u $USER)"
+    while read -r pkg; do
+	## loop through pkgs_hajime file
 
-    ## remove existing pkgs_cache_ls file
-    [[ -f $pkgs_cache_ls ]] && rm -rf $pkgs_cache_ls
+	[[ -z "$pkg" ]] && continue
 
-    ## vcpp
-    add_pkg_cache_ls "$vcpp" pacman
+	pkg_path "$pkg"
 
-    ## src_aur
-    add_pkg_cache_ls "$src_aur" yay
-}
+	## add line to real_paths file (package)
+	write_pkg_real_path "$pkg_name" "$pkg_version"
 
+	## dump all dependencies for package in pkgs_deps
+	get_pkg_deps "$pkg"
 
-create_pkgs_to_copy ()
-{
-    ## remove existing pkgs_hajime_err file
-    [[ -f $pkgs_to_copy ]] && rm -rf $pkgs_to_copy
-    [[ -f $pkgs_to_repo_err ]] && rm -rf $pkgs_to_repo_err
-
-    ## get latest package cache file for every pkg_hajime in pkgs_cache_ls
-    while read -r pkg_hajime; do
-
-	get_latest_package
-
-	if [[ -z "$pkg_ver_latest" ]]; then
-
-	    ## error message on empty pkg_ver_latest
-	    printf '%s\n' "$pkg_hajime" >> $pkgs_to_repo_err
-	    printf 'ERROR adding %s %s\n' "$pkg_hajime"
-
-	elif [[ -n "$pkg_ver_latest" ]]; then
-
-	    printf '%s\n' "$pkg_ver_latest" >> $pkgs_to_copy
-	    printf 'added main %s %s\n' "$pkg_ver_latest" "$pkg_hajime"
-
-	    get_pkg_deps $pkg_hajime
-	    get_dep_file
-
-	fi
+	printf '%s\n' "$pkg_deps" >> "$pkgs_deps"
 
     done < "$pkgs_hajime"
+
+    ## create unique dependencies list
+    optimize_pkgs_deps
+
+    while read -r dep; do
+	## loop through pkgs_deps file
+
+	[[ -z "$dep" ]] && continue
+
+	pkg_path "$dep"
+
+	## add line to real_paths file (dependency)
+	write_pkg_real_path "$pkg_name" "$pkg_version"
+
+    done < "$pkgs_deps"
+
+
 }
 
 
-add_pkg_cache_ls ()
+write_pkg_real_path ()
 {
-    pkg_cache_dir="$1"
-    cache_source="$2"
+    pkg_name=$1
+    pkg_version=$2
 
-    case $cache_source in
-
-	pacman )
-	    for file in $pkg_cache_dir/*; do
-
-		realpath $file >> $pkgs_cache_ls
-
-		printf 'building pkgs_cache_ls %s\n' "$(basename $file)"
-
-	    done
-	    ;;
-
-	yay )
-	    # TODO DEV separate aur_cache_ls file
-	    realpath $(fd --type file '.*(\.pkg)?\.tar\.(gz|xz|zst)$' $pkg_cache_dir) >> $aur_cache_ls
-	    #realpath $(fd --type file '.*(\.pkg)?\.tar\.(gz|xz|zst)$' $pkg_cache_dir) >> $pkgs_cache_ls
-
-	    printf 'building pkgs_cache_ls %s\n' "$(basename $file)"
-	    ;;
-
-    esac
-
-    ## version sort and uniq pkgs_cache_ls content
-    pkgs_cache_ls_sorted=$(sort --version-sort $pkgs_cache_ls | uniq)
-    printf '%s' "$pkgs_cache_ls_sorted" > $pkgs_cache_ls
+    printf '%s\n' "$pkg_real_path" >> "$pkgs_real_paths"
 }
 
 
-get_latest_package ()
+pkg_path ()
 {
-    ## some packages have a slightly different name
-    package=$(pacman -Q $pkg_hajime | awk '{print $1}')
-    version=$(pacman -Q $pkg_hajime | awk '{print $2}')
+    pkg="$1"
 
-    pkg_ver_latest=$(cat "$pkgs_cache_ls" \
-		       | grep --extended-regexp ".*/${package}-${version}-.*\.pkg\.tar\.(xz|zst)$" \
-		       | sort --version-sort \
-		       | tail -n 1)
-		#| grep --extended-regexp ".*/${pkg_hajime}-${version}-.*\.pkg\.tar\.(xz|zst)$" \
-		#| grep --extended-regexp ".*/${pkg_hajime}-[0-9].*\.pkg\.tar\.(xz|zst)$" \
-}
+    pmn_Q=$(pacman -Q "$pkg")
+    pkg_name=${pmn_Q% *}
+    pkg_version=${pmn_Q##* }
 
+    if pacman -Qn "$pkg_name"; then
+	## native package
 
-get_latest_dep ()
-{
-    ## some packages have a slight different name
-    package=$(pacman -Q $pkg_dep | awk '{print $1}')
-    version=$(pacman -Q $pkg_dep | awk '{print $2}')
+	## grep prevent i.e. emacs libgccjit
+	pkg_real_path=$(pacman -S --print "$pkg_name" | grep "$pkg_name")
+	#pkg_real_path=$(pacman -S --print "$pkg_name")
 
-    pkg_dep_latest=$(cat "$pkgs_cache_ls" \
-		       | grep --extended-regexp ".*/${package}-${version}-.*\.pkg\.tar\.(xz|zst)$" \
-			 | sort --version-sort \
-			 | tail -n 1)
-			 #| grep --extended-regexp ".*/${pkg_dep}-${version}-.*\.pkg\.tar\.(xz|zst)$" \
-			 #| grep --extended-regexp ".*/${pkg_dep}-[0-9].*\.pkg\.tar\.(xz|zst)$" \
+    elif pacman -Qm "$pkg_name"; then
+	## foreign package
 
-    if [[ -z $pkg_dep_latest ]]; then
-
-	## pactree reported a non existent dependency file
-	printf 'err %s dep %s not found\n' "$pkg_dep" "$pkg_hajime"
-	printf '%s\n' "$pkg_dep" >> $pkgs_to_repo_err
+	## fd no-ignore-vcs; some packages have * in their .gitignore
+	pkg_real_path=$(fd --type file --no-ignore-vcs "$pkg_name"-"$pkg_version" "$src_foreign"/"$pkg_name")
 
     fi
+
+    pkg_dir="${pkg_real_path%/*}"
+    pkg_file_name="${pkg_real_path##*/}"
 }
 
 
-get_pkgq_deps ()
+get_pkg_deps ()
 {
-    pkg_main=$1
+    pkg_deps=''
+    pkg="$1"
 
     ## tail first line of pactree is queried package
     ## sed remove >= which is sometimes returned from pactree
-    #TODO DEV continue here
     # | sed 's/>.*$//'
-    pkg_main_deps=$(pactree --linear --unique $pkg_main | tail -n +2 | sort)
+    pkg_deps=$(pactree --linear --unique "$pkg" | tail -n +2 | sort)
     #pkg_main_deps=$(pactree --linear --depth 1 $pkg_main | tail -n +2 | sort)
 }
 
 
-get_dep_file ()
+optimize_pkgs_deps ()
 {
-    for pkg_dep in $pkg_main_deps; do
+    ## tempo var
+    pkgs_deps_tmp=$(cat "$pkgs_deps")
 
-	get_latest_dep
-
-	printf '%s\n' "$pkg_dep_latest" >> $pkgs_to_copy
-	printf 'pkgs_to_copy << dep  %s %s\n' "$pkg_dep" "$pkg_dep_latest"
-
-    done
+    printf '%s\n' "$pkgs_deps_tmp" \
+	| sort --numeric-sort \
+	| uniq \
+	      > "$pkgs_deps"
 }
 
 
-optimize_pkgs_to_repo ()
+optimize_real_paths ()
 {
-    ## sed removes empty lines, sort and uniq
-    pkgs_2_repo=$(sed '/^\s*$/d' $pkgs_to_copy | sort | uniq)
-    printf '%s' "$pkgs_2_repo" > $pkgs_to_repo
+    sort --numeric-sort "$pkgs_real_paths" \
+	| uniq \
+	| grep ^file:/// \
+	       > "$pkgs_copy"
 }
 
 
-optimize_pkgs_to_repo_err ()
+create_repo_db ()
 {
-    ## sed remove '>' entries (from pactree), empty lines, sort and uniq
-    pkgs_2_repo_err=$(sed 's/>.*$//' $pkgs_to_repo_err | sed '/^\s*$/d' | sort | uniq)
-    #pkgs_2_repo_err=$(sed '/^\s*$/d' $pkgs_to_repo_err | sort | uniq)
-    printf '%s' "$pkgs_2_repo_err" > $pkgs_to_repo_err
-}
-
-
-optimize_pkgs_to_repo_res ()
-{
-    ## sed remove '>' entries (from pactree), empty lines, sort and uniq
-    pkgs_2_repo_res=$(sed 's/>.*$//' $pkgs_to_repo_res | sed '/^\s*$/d' | sort | uniq)
-    #pkgs_2_repo_err=$(sed '/^\s*$/d' $pkgs_to_repo_err | sort | uniq)
-    printf '%s' "$pkgs_2_repo_res" > $pkgs_to_repo_res
-}
-
-
-optimize_pkgs_file ()
-{
-    file=$1
-
-    ## sed remove '>' entries (from pactree), empty lines, sort and uniq
-    pkgs_2_file=$(sed 's/>.*$//' $file | sed '/^\s*$/d' | sort | uniq)
-    #pkgs_2_repo_err=$(sed '/^\s*$/d' $pkgs_to_repo_err | sort | uniq)
-    printf '%s' "$pkgs_2_file" > $file
-}
-
-
-copy_pkgs_to_repo ()
-{
-    mountpoint -q "$dst"
-
-    if [[ $? -eq 0 ]]; then
-
-	for package in $(cat $pkgs_to_repo); do
-
-	    if [[ -f $package ]]; then
-
-		## copy package file
-		printf 'copy2repo %s %s\n' "$dst" "$package"
-		rsync -aAXv --delete "$package" "$dst"
-
-		## copy signature file
-		if [[ -f "$package".sig ]]; then
-
-		    printf 'copy sig to %s %s\n' "$dst" "$package"
-		    rsync -aAXv --delete "$package".sig "$dst"
-
-		elif [[ ! -f "$package".sig ]]; then
-
-		    pkg_dir=$(dirname $package)
-
-		    if [[ $pkg_dir =~ "$XDG_CACHE_DIR/yay/" ]]; then
-
-			package_debug=$package-debug
-
-			if [[ -f $package_debug ]]; then
-
-			    ## copy debug package file
-			    printf 'copy2repo %s %s\n' "$dst" "$package_debug"
-			    rsync -aAXv --delete "$package_debug" "$dst"
-
-			else
-
-			printf 'WARNING no debug file for %s\n' "$package" \
-			    | tee -a $pkgs_to_repo_err
-
-			fi
-
-		    else
-
-			printf 'WARNING no sig file for %s\n' "$package" \
-			    | tee -a $pkgs_to_repo_err
-
-		    fi
-
-		fi
-
-	    fi
-
-	done
-
-    fi
-}
-
-
-build_database ()
-{
-    mountpoint -q "$dst"
-
-    if [[ $? -eq 0 ]]; then
-
-	# build custom pacman offline package database
-	echo
-
-	for package in $(cat $pkgs_to_repo); do
-	    #TODO DEV read file directly
-
-	    p_basename=$(basename $package)
-	    printf '==> adding %s/%s\n' "$dst" "$p_basename"
-
-	    repo-add --new --remove --include-sigs $dst/$db_name.db.tar.zst $dst/$p_basename
-
-	done
-
-    fi
-}
-
-
-resolve_repo_errs ()
-{
-    while read -r pkg_err; do
-
-	package=$(pacman -Q $pkg_err | awk '{print $1}')
-	version=$(pacman -Q $pkg_err | awk '{print $2}')
-
-	## some packages have plus signs in their version number
-	## escape meta character '+' in version (for proper grep regexp)
-	ver_esc=${version//+/\\+}
-	version=$ver_esc
-
-	pkg_ver_latest=$(cat "$pkgs_cache_ls" \
-			     | grep --extended-regexp ".*/${package}-${version}-.*\.pkg\.tar\.(xz|zst)$" \
-			     | sort --version-sort \
-			     | tail -n 1)
-
-	if [[ -n "$pkg_ver_latest" ]]; then
-
-	    printf 'resolving %s %s\n' "$pkg_ver_latest" "$pkg_err"
-	    printf '%s\n' "$pkg_ver_latest" >> $pkgs_to_copy
-
-	    ## add pkg_err to resolved list pkgs_to_repo_res
-	    printf '%s\n' "$pkg_err" >> $pkgs_to_repo_res
-
-	    get_pkg_deps $pkg_err
-	    get_dep_file
-
-	fi
-
-    done < "$pkgs_to_repo_err"
-
-    ## update error file after resolving errors
-    while read -r pkg_res; do
-
-	sed -i "/$pkg_res/d" $pkgs_to_repo_err
-
-    done < "$pkgs_to_repo_res"
-
-    optimize_pkgs_to_repo_res
-    optimize_pkgs_to_repo_err
+    repo-add --new --remove --include-sigs $dst/$db_name.db.tar.zst $dst/$p_basename
 }
 
 
@@ -432,14 +262,10 @@ main ()
 {
     sourcing
     getargs $args
-    create_hajime_pkgs
-    define_pkgs_cache_ls
-    create_pkgs_to_copy
-    optimize_pkgs_to_repo_err
-    resolve_repo_errs
-    optimize_pkgs_to_repo
-    copy_pkgs_to_repo
-    build_database
+    remove_files
+    create_pkgs_hajime
+    create_pkgs_real_paths
+    optimize_real_paths
     beep
 }
 

@@ -292,16 +292,17 @@ apps_packages ()
 }
 
 
-aur_packages ()
+foreign_packages ()
 {
-    # packages from arch user repository
+    # foreign packages from arch user repository
 
-    aur_pkgs=(
+    fgn_pkgs=(
 
-	## create the list for aur_applications:
+	## create foreign package list:
 	#for dir in $(fd . --max-depth 1 --type directory ~/.cache/yay | sed 's/\/$//'); do printf '%s \\\n' "$(basename "$dir")"; done | wl-copy
 	## or
 	#yay -Qqm
+	#yay -Qm (version included)
 
 	#7-zip
 	# 7-zip-debug
@@ -365,7 +366,7 @@ main ()
     conf_packages
     post_packages
     apps_packages
-    aur_packages
+    foreign_packages
 }
 
 main

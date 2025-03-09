@@ -17,8 +17,11 @@
 │   ├── ol_pacman.conf
 │   └── rescue.sh
 ├── pkgs-1000
+├── pkgs-copy-1000
+├── pkgs-deps-1000
+├── pkgs-real-paths-1000
 ├── README.md
 └── repo-tree.md
 
-2 directories, 18 files
+2 directories, 21 files
 ```
