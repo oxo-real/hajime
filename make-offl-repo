@@ -66,18 +66,16 @@ initial_release='2021'
 db_name='offline'
 src_foreign="$XDG_CACHE_HOME/yay"
 src_native='/var/cache/pacman/pkg'
-#     vcpp='/var/cache/pacman/pkg'
-pkgs_hajime="$HOME/c/git/code/hajime/pkgs-hajime-$(id -u $USER)"
-pkgs_real_paths="$HOME/c/git/code/hajime/pkgs-real-paths-$(id -u $USER)"
-pkgs_copy="$HOME/c/git/code/hajime/pkgs-copy-$(id -u $USER)"
-pkgs_deps="$HOME/c/git/code/hajime/pkgs-deps-$(id -u $USER)"
-pkgs_cache_ls_n="$XDG_CACHE_HOME/temp/pkgs-cache-ls-n-$(id -u $USER)"
-pkgs_cache_ls_f="$XDG_CACHE_HOME/temp/pkgs-cache-ls-f-$(id -u $USER)"
-pkgs_to_copy="$XDG_CACHE_HOME/temp/pkgs-to-copy-$(id -u $USER)"
-pkgs_to_repo="$XDG_CACHE_HOME/temp/pkgs-to-repo-$(id -u $USER)"
-pkgs_to_repo_err="$XDG_CACHE_HOME/temp/pkgs-to-repo-$(id -u $USER)-err"
-pkgs_to_repo_res="$XDG_CACHE_HOME/temp/pkgs-to-repo-$(id -u $USER)-res"
-file_packages="$HOME/c/git/code/hajime/install-packages.sh"
+hajime_dir="$HOME/c/git/code/hajime"
+
+file_packages="${hajime_dir}/install/package.list"
+
+pkgs_copy="${hajime_dir}/logs/pkgs-copy-$(id -u $USER)"
+pkgs_copy_err="${hajime_dir}/logs/pkgs-copy-err-$(id -u $USER)"
+pkgs_hajime="${hajime_dir}/logs/pkgs-hajime-$(id -u $USER)"
+pkgs_deps="${hajime_dir}/logs/pkgs-deps-$(id -u $USER)"
+pkgs_real_paths="${hajime_dir}/logs/pkgs-real-paths-$(id -u $USER)"
+pkgs_sigs="${hajime_dir}/logs/pkgs-sigs-$(id -u $USER)"
 
 #--------------------------------
 
@@ -115,9 +113,11 @@ getargs ()
 remove_files ()
 {
     [[ -f "$pkgs_copy" ]] && rm -rf "$pkgs_copy"
+    [[ -f "$pkgs_copy_err" ]] && rm -rf "$pkgs_copy_err"
     [[ -f "$pkgs_deps" ]] && rm -rf "$pkgs_deps"
     [[ -f "$pkgs_hajime" ]] && rm -rf "$pkgs_hajime"
     [[ -f "$pkgs_real_paths" ]] && rm -rf "$pkgs_real_paths"
+    [[ -f "$pkgs_sigs" ]] && rm -rf "$pkgs_sigs"
 }
 
 
@@ -133,7 +133,11 @@ create_pkgs_hajime ()
     )
 
     ## write pkgs_hajime (pkgs-hajime-1000)
-    printf '%s\n' "${pkgs_hajime_arr[@]}" | sed '/^\s*$/d' | sort > "$pkgs_hajime"
+    printf '%s\n' "${pkgs_hajime_arr[@]}" \
+	| sed '/^\s*$/d' \
+	| sort \
+	| uniq \
+	      > "$pkgs_hajime"
 }
 
 
@@ -175,15 +179,6 @@ create_pkgs_real_paths ()
 }
 
 
-write_pkg_real_path ()
-{
-    pkg_name=$1
-    pkg_version=$2
-
-    printf '%s\n' "$pkg_real_path" >> "$pkgs_real_paths"
-}
-
-
 pkg_path ()
 {
     pkg="$1"
@@ -193,7 +188,7 @@ pkg_path ()
     pkg_version=${pmn_Q##* }
 
     if pacman -Qn "$pkg_name"; then
-	## native package
+	# native package
 
 	## grep prevent i.e. emacs libgccjit
 	pkg_real_path=$(pacman -S --print "$pkg_name" | grep "$pkg_name")
@@ -212,47 +207,128 @@ pkg_path ()
 }
 
 
+write_pkg_real_path ()
+{
+    pkg_name=$1
+    pkg_version=$2
+
+    printf '%s\n' "$pkg_real_path" >> "$pkgs_real_paths"
+}
+
+
 get_pkg_deps ()
 {
     pkg_deps=''
     pkg="$1"
 
     ## tail first line of pactree is queried package
-    ## sed remove >= which is sometimes returned from pactree
-    # | sed 's/>.*$//'
     pkg_deps=$(pactree --linear --unique "$pkg" | tail -n +2 | sort)
-    #pkg_main_deps=$(pactree --linear --depth 1 $pkg_main | tail -n +2 | sort)
 }
 
 
 optimize_pkgs_deps ()
 {
-    ## tempo var
-    pkgs_deps_tmp=$(cat "$pkgs_deps")
+    ## create tempo file
+    cp "$pkgs_deps" "${pkgs_deps}"-tmp
 
-    printf '%s\n' "$pkgs_deps_tmp" \
+    ## sed remove >= which is sometimes returned from pactree
+    # printf '%s\n' "$pkgs_deps_tmp" \
+    ## sed remove empty lines
+    sed -i '/^\s*$/d' "$pkgs_deps-tmp" \
 	| sort --numeric-sort \
 	| uniq \
+	| sed 's/>.*$//' \
 	      > "$pkgs_deps"
+
+    ## remove tempo file
+    rm -rf "${pkgs_deps}"-tmp
 }
 
 
-optimize_real_paths ()
+create_pkgs_copy ()
 {
-    sort --numeric-sort "$pkgs_real_paths" \
+    ## sed remove empty lines
+    ## sed remove uri prefix from pacman -S --print (pkg_real_path)
+    ## sed remove pacman comments
+    sed '/^\s*$/d' "$pkgs_real_paths" \
+	| sort --numeric-sort \
 	| uniq \
-	| grep ^file:/// \
+	| sed 's#^file://##' \
+	| sed '/^:: installing/d' \
 	       > "$pkgs_copy"
 }
 
 
-create_repo_db ()
+verify_pkgs_copy ()
 {
-    repo-add --new --remove --include-sigs $dst/$db_name.db.tar.zst $dst/$p_basename
+    while read -r pkg_copy; do
+
+	if [[ ! -f "$pkg_copy" ]]; then
+
+	    ## remove non existing file from pkgs_copy
+	    sed -i "/^{$pkg_copy}/d" "$pkgs_copy"
+
+	    ## add path to error file
+	    printf '%s\n' "$pkg_copy" >> "$pkgs_copy_err"
+
+	fi
+
+    done < "$pkgs_copy"
 }
 
 
-beep()
+create_pkgs_sigs ()
+{
+    ## sed remove empty lines
+    ## sed remove lines starting with $XDG_CACHE_HOME/yay (fgn)
+    ## sed adding .sig to pkgs_copy
+    sed '/^\s*$/d' "$pkgs_copy" \
+	| sed "#^${XDG_CACHE_HOME}/yay#d" \
+	| sed 's#$#.sig#' \
+	> "$pkgs_sigs"
+}
+
+
+copy_to_repo ()
+{
+    mountpoint -q "$dst"
+
+    if [[ $? -eq 0 ]]; then
+
+	## copy package files
+	printf "DEV$LINENO %s\n" "${dst}"
+	rsync -aAXv --delete --files-from="$pkgs_copy" / "$dst"
+
+	## copy signature files
+	printf "DEV$LINENO %s\n" "${dst}"
+	rsync -aAXv --delete --files-from="$pkgs_sigs" / "$dst"
+
+    fi
+}
+
+
+build_database ()
+{
+    mountpoint -q "$dst"
+
+    if [[ $? -eq 0 ]]; then
+
+	# build custom pacman offline package database
+
+	while read -r pkg_copy; do
+
+	    pkgs_base_name+=( "$dst"/"$(basename "$pkg_copy")" )
+	    #printf '==> adding %s/%s\n' "$dst" "$p_basename"
+
+	done < "$pkgs_copy"
+
+	repo-add --new --remove --include-sigs "$dst"/"$db_name.db.tar.zst" "${pkgs_base_name[@]}"
+
+    fi
+}
+
+
+beep ()
 {
     pw-play $XDG_DATA_HOME/a/media/audio/sound/airbus/da.ogg
 }
@@ -265,8 +341,14 @@ main ()
     remove_files
     create_pkgs_hajime
     create_pkgs_real_paths
-    optimize_real_paths
+    create_pkgs_copy
+    verify_pkgs_copy
+    create_pkgs_sigs
     beep
+    copy_to_repo
+    beep && beep
+    build_database
+    beep && beep && beep
 }
 
 main

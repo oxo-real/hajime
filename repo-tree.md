@@ -7,8 +7,15 @@
 ├── 4apps.sh
 ├── 5dtcf.sh
 ├── COPYING
-├── install-config.sh
-├── install-packages.sh
+├── install
+│   ├── dl3189.conf
+│   └── package.list
+├── logs
+│   ├── pkgs-copy-1000
+│   ├── pkgs-deps-1000
+│   ├── pkgs-hajime-1000
+│   ├── pkgs-real-paths-1000
+│   └── pkgs-sigs-1000
 ├── make-offl-repo
 ├── make-recov
 ├── misc
@@ -16,12 +23,8 @@
 │   ├── etc_doas.conf
 │   ├── ol_pacman.conf
 │   └── rescue.sh
-├── pkgs-1000
-├── pkgs-copy-1000
-├── pkgs-deps-1000
-├── pkgs-real-paths-1000
 ├── README.md
 └── repo-tree.md
 
-2 directories, 21 files
+4 directories, 22 files
 ```
