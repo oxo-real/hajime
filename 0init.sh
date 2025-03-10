@@ -92,7 +92,7 @@ getargs ()
 		## get config flag value
 		cfv="$1"
 
-		process_conf_flag_value
+		process_config_flag_value
 		;;
 
 	    --online )
@@ -106,7 +106,7 @@ getargs ()
 		## get config flag value
 		cfv="$1"
 
-		process_conf_flag_value
+		process_config_flag_value
 		break
 		;;
 
@@ -211,11 +211,11 @@ config_file_warning ()
 {
     if [[ "$pit" -eq 0 && -n "$file_hi_config" ]]; then
 
-	printf "WARNING ${st_bold}%s{st_def}\n" "$file_hi_config"
+	printf "WARNING ${st_bold}%s${st_def}\n" "$file_hi_config"
 	echo
 	echo
 	printf 'move this file if a interactive installation is preferred instead\n'
-	printf 'else this file WILL be used for (near) automatic installation\n'
+	printf 'else this file WILL be used for (near) ${fg_magenta}automatic installation${st_def}\n'
 	echo
 	printf 'before continuing, make 100%% sure that:\n'
 	echo
@@ -223,7 +223,7 @@ config_file_warning ()
 	printf "2 all the parameters in the file are correct\n"
 	echo
 	echo
-	printf 'continue with automatic installation? [y/N] '
+	printf '${fg_magenta}continue${st_def} with automatic installation? [y/N] '
 
 	reply_single
 	echo
@@ -234,7 +234,7 @@ config_file_warning ()
 
 	else
 
-	    printf 'installation aborted\n'
+	    printf 'installation aborted by user\n'
 	    exit 1
 
 	fi
