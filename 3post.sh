@@ -72,8 +72,8 @@ mirror_country=USA
 mirror_amount=5
 
 file_etc_motd=/etc/motd
-file_hi_config="$HOME/hajime/install-config.sh"
-file_hi_packages="$HOME/hajime/install-packages.sh"
+file_hi_config="$HOME/hajime/install/dl3189.conf"
+file_hi_packages="$HOME/hajime/install/package.list"
 
 #--------------------------------
 

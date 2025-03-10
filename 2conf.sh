@@ -83,8 +83,8 @@ file_etc_motd=/etc/motd
 file_etc_sudoers=/etc/sudoers
 file_etc_pacmand_mirrorlist=/etc/pacman.d/mirrorlist
 
-file_hi_config=/hajime/install-config.sh
-file_hi_packages=/hajime/install-packages.sh
+file_hi_config=/hajime/install/dl3189.conf
+file_hi_packages=/hajime/install/package.list
 
 ## variable values
 time_zone=Europe/CET

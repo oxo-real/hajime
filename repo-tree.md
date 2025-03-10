@@ -15,6 +15,7 @@
 │   ├── pkgs-deps-1000
 │   ├── pkgs-hajime-1000
 │   ├── pkgs-real-paths-1000
+│   ├── pkgs-real-paths-1000-err
 │   └── pkgs-sigs-1000
 ├── make-offl-repo
 ├── make-recov
@@ -26,5 +27,5 @@
 ├── README.md
 └── repo-tree.md
 
-4 directories, 22 files
+4 directories, 23 files
 ```

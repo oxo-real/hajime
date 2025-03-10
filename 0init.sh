@@ -68,7 +68,7 @@ initial_release=2020
 
 # hardcoded variables
 online_repo=https://codeberg.org/oxo/hajime
-file_hi_config=/root/tmp/code/hajime/install-config.sh
+file_config_loc="tmp/code/hajime/install/config_loc"
 
 #--------------------------------
 
@@ -88,9 +88,11 @@ getargs ()
 
 	    -c | --config )
 		shift
-		## override default configuration file
-		[[ -f "$1" ]] && file_hi_config="$1"
-		shift
+
+		## get config flag value
+		cfv="$1"
+
+		process_conf_flag_value
 		;;
 
 	    --online )
@@ -100,8 +102,11 @@ getargs ()
 
 	    -- )
 		shift
-		## override default configuration file
-		[[ -f "$1" ]] && file_hi_config="$1"
+
+		## get config flag value
+		cfv="$1"
+
+		process_conf_flag_value
 		break
 		;;
 
@@ -112,6 +117,25 @@ getargs ()
 	esac
 
     done
+}
+
+
+process_config_flag_value ()
+{
+    realpath_cfv=$(realpath "$cfv")
+
+    if [[ -f "$realpath_cfv" ]]; then
+
+	file_hi_config="$realpath_cfv"
+	printf '%s\n' "$file_hi_config" > "$file_config_loc"
+
+    else
+
+	unset file_hi_config
+	unset realpath_cfv
+	unset cfv
+
+    fi
 }
 
 
@@ -187,14 +211,17 @@ config_file_warning ()
 {
     if [[ "$pit" -eq 0 && -n "$file_hi_config" ]]; then
 
-	printf "${st_bold}WARNING config-file${st_def} detected: %s\n" "$(realpath "$file_hi_config")"
+	printf "WARNING ${st_bold}%s{st_def}\n" "$file_hi_config"
 	echo
-	printf 'move this file if a interactive installation is preferred\n'
-	printf 'else this file WILL be used for automatic installation\n'
 	echo
-	printf 'make 100%% sure that:\n'
+	printf 'move this file if a interactive installation is preferred instead\n'
+	printf 'else this file WILL be used for (near) automatic installation\n'
+	echo
+	printf 'before continuing, make 100%% sure that:\n'
+	echo
 	printf "1 the filename is correct\n"
 	printf "2 all the parameters in the file are correct\n"
+	echo
 	echo
 	printf 'continue with automatic installation? [y/N] '
 
@@ -391,8 +418,8 @@ autostart_next ()
 
 main ()
 {
-    sourcing
     getargs $args
+    sourcing
     define_text_appearance
     point_in_time
     header

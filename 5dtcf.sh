@@ -90,8 +90,8 @@ file_etc_pacman_conf=/etc/pacman.conf
 etc_doas_conf=/etc/doas.conf
 misc_doas_conf="$HOME/hajime/misc/etc_doas.conf"
 
-file_hi_config="$HOME/hajime/install-config.sh"
-file_hi_packages="$HOME/hajime/install-packages.sh"
+file_hi_config="$HOME/hajime/install/dl3189.conf"
+file_hi_packages="$HOME/hajime/install/package.list"
 
 #--------------------------------
 

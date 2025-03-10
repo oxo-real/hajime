@@ -112,6 +112,7 @@ getargs ()
 
 remove_files ()
 {
+    [[ ! -d "$hajime_dir"/logs ]] && mkdir -p "$hajime_dir"/logs
     [[ -f "$pkgs_copy" ]] && rm -rf "$pkgs_copy"
     [[ -f "$pkgs_copy_err" ]] && rm -rf "$pkgs_copy_err"
     [[ -f "$pkgs_deps" ]] && rm -rf "$pkgs_deps"
@@ -148,12 +149,12 @@ create_pkgs_real_paths ()
 
 	[[ -z "$pkg" ]] && continue
 
-	pkg_path "$pkg"
+	pkg_file_path "$pkg"
 
-	## add line to real_paths file (package)
+	## add line to real_paths file (package file path)
 	write_pkg_real_path "$pkg_name" "$pkg_version"
 
-	## dump all dependencies for package in pkgs_deps
+	## dump all dependencies for package in pkgs_deps file
 	get_pkg_deps "$pkg"
 
 	printf '%s\n' "$pkg_deps" >> "$pkgs_deps"
@@ -168,18 +169,16 @@ create_pkgs_real_paths ()
 
 	[[ -z "$dep" ]] && continue
 
-	pkg_path "$dep"
+	pkg_file_path "$dep"
 
 	## add line to real_paths file (dependency)
 	write_pkg_real_path "$pkg_name" "$pkg_version"
 
     done < "$pkgs_deps"
-
-
 }
 
 
-pkg_path ()
+pkg_file_path ()
 {
     pkg="$1"
 
@@ -190,15 +189,40 @@ pkg_path ()
     if pacman -Qn "$pkg_name"; then
 	# native package
 
-	## grep prevent i.e. emacs libgccjit
+	## grep prevent multiple hits i.e. emacs libgccjit
 	pkg_real_path=$(pacman -S --print "$pkg_name" | grep "$pkg_name")
-	#pkg_real_path=$(pacman -S --print "$pkg_name")
 
     elif pacman -Qm "$pkg_name"; then
 	## foreign package
 
 	## fd no-ignore-vcs; some packages have * in their .gitignore
 	pkg_real_path=$(fd --type file --no-ignore-vcs "$pkg_name"-"$pkg_version" "$src_foreign"/"$pkg_name")
+
+    fi
+
+    if [[ ! -f "$pkg_real_path" ]]; then
+	## case pkg is a dependency, but not in pkg database?
+    	## get latest package directly from repo directory
+
+    	## try1 native package
+    	pkg_real_path=$(fd --type file --no-ignore-vcs "$pkg_name" "$src_native" \
+			    | grep -v .sig$ \
+			    | sort --numeric-sort --reverse \
+			    | head -n 1
+		     )
+
+    fi
+
+    if [[ ! -f "$pkg_real_path" ]]; then
+
+    	## try2 foreign package
+    	pkg_real_path=$(fd --type file --no-ignore-vcs --max-depth 1 --absolute-path "$src_foreign"/"$pkg_name" \
+			    | sed "s#${XDG_CACHE_HOME}/yay/${pkg_name}/##" \
+			    | grep -v debug \
+			    | grep --extended-regexp '\.pkg\.tar\.(xz|zst)' \
+			    | sort --numeric-sort --reverse \
+			    | head -n 1
+		     )
 
     fi
 
@@ -212,7 +236,16 @@ write_pkg_real_path ()
     pkg_name=$1
     pkg_version=$2
 
-    printf '%s\n' "$pkg_real_path" >> "$pkgs_real_paths"
+    if [[ -f "$pkg_real_path" ]]; then
+
+	printf '%s\n' "$pkg_real_path" >> "$pkgs_real_paths"
+
+    else
+
+	printf 'no pkg_real_path %s %s\n' "$pkg_name" "$pkg_version" >> "$pkgs_real_paths"-err
+
+    fi
+
 }
 
 
@@ -234,10 +267,9 @@ optimize_pkgs_deps ()
     ## sed remove >= which is sometimes returned from pactree
     # printf '%s\n' "$pkgs_deps_tmp" \
     ## sed remove empty lines
-    sed -i '/^\s*$/d' "$pkgs_deps-tmp" \
+    sed '/^\s*$/d' "${pkgs_deps}"-tmp \
 	| sort --numeric-sort \
 	| uniq \
-	| sed 's/>.*$//' \
 	      > "$pkgs_deps"
 
     ## remove tempo file
@@ -296,11 +328,9 @@ copy_to_repo ()
     if [[ $? -eq 0 ]]; then
 
 	## copy package files
-	printf "DEV$LINENO %s\n" "${dst}"
 	rsync -aAXv --delete --files-from="$pkgs_copy" / "$dst"
 
 	## copy signature files
-	printf "DEV$LINENO %s\n" "${dst}"
 	rsync -aAXv --delete --files-from="$pkgs_sigs" / "$dst"
 
     fi
@@ -344,11 +374,9 @@ main ()
     create_pkgs_copy
     verify_pkgs_copy
     create_pkgs_sigs
-    beep
     copy_to_repo
-    beep && beep
     build_database
-    beep && beep && beep
+    beep
 }
 
 main

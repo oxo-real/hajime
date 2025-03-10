@@ -66,8 +66,8 @@ initial_release=2019
 
 ## hardcoded variables
 # user customizable variables
-file_hi_config="$HOME/hajime/install-config.sh"
-file_hi_packages="$HOME/hajime/install-packages.sh"
+file_hi_config="$HOME/hajime/install/dl3189.conf"
+file_hi_packages="$HOME/hajime/install/package.list"
 
 #--------------------------------
 

@@ -99,9 +99,10 @@ home_perc=0.60
 swap_size_recomm=4.00
 
 ## files
-file_hi_config=/root/hajime/install-config.sh
-file_hi_config_1=/hajime/install-config.sh
-file_hi_packages=/root/hajime/install-packages.sh
+file_hi_config=/root/hajime/install/dl3189.conf
+file_hi_config_1=/hajime/install/dl3189.conf
+#TODO DEV config file location
+file_hi_packages=/root/hajime/install/package.list
 file_luks_pass=/root/tmp/code/hajime/luks_pass
 file_mnt_etc_fstab=/mnt/etc/fstab
 

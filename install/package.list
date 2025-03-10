@@ -155,7 +155,8 @@ apps_packages ()
 	#fim ueberzug geekie
 
 	## bluetooth
-	bluez bluez-utils pulseaudio-bluetooth
+	bluez bluez-utils
+	#pulseaudio-bluetooth
 
 
 	## additional_tools ()
@@ -165,7 +166,7 @@ apps_packages ()
 	#vimball
 
 	## build_tools
-	yay-bin
+	#yay-bin
 	#make (already in base-devel)
 
 	## terminal_text_tools
@@ -224,7 +225,7 @@ apps_packages ()
 	#gnu-plot
 
 	## accounting
-	#ledger hledger
+#	#ledger hledger
 
 	## download_utilities
 	aria2 transmission-cli
@@ -254,7 +255,8 @@ apps_packages ()
 	#calibre okular
 
 	## video_capturing
-	wf-recorder obs xdg-desktop-portal-wlr qt6ct wlrobs
+	wf-recorder xdg-desktop-portal-wlr qt6ct wlrobs
+	#obs
 
 	## video_editing
 	kdenlive breeze
@@ -315,7 +317,7 @@ foreign_packages ()
 	dotool
 	# dotool-debug
 	fzf-tab-git
-	imhex
+	# imhex
 	# kmonad-bin
 	# kmonad-bin-debug
 	# lisp
