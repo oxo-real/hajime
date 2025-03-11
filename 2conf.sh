@@ -235,19 +235,15 @@ pacman_conf_offline ()
 {
     if [[ $online -ne 1 ]]; then
 
-	#### DEV now done in 1base
-	## see also man pacman.conf
-
 	## change SigLevel by adding PackageTrustAll to pacman.conf
 	### this prevents errors on marginal trusted packages
 	#sed -i 's/^SigLevel = Required DatabaseOptional/SigLevel = Required DatabaseOptional PackageTrustAll/' $file_etc_pacman_conf
 
 	## redirect offline 'server' (file) location
 	## define offline file location at the end of pacman.conf
-	#TODO DEV sed gives an error: ''unknown option to s'
+	#TODO DEV sed gives an non-critical error: ''unknown option to s'
 	## but seems to be working though
 	sed -i "/^\[offline\]/{n;s/.*/Server = file:\/\/$repo_re/}" $file_etc_pacman_conf
-	#sed -i "#^\[offline\]#{n;s#.*#Server = file:\/\/$repo_re/}" $file_etc_pacman_conf
 
 	initialize_pacman
 	echo
@@ -267,6 +263,20 @@ time_settings ()
 
 locale_settings ()
 {
+    # setting language, territory and codeset
+
+    ## language
+    ## [List of ISO 639 language codes - Wikipedia]
+    ## (https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes)
+
+    ## territory
+    ## [ISO 3166-1 - Wikipedia]
+    ## (https://en.wikipedia.org/wiki/ISO_3166-1#Codes)
+
+    ## codeset
+    ## [Character encoding - Wikipedia]
+    ## (https://en.wikipedia.org/wiki/Character_encoding#Unicode_encoding_model)
+
     sed -i "/^#en_US.UTF-8 UTF-8/c\en_US.UTF-8 UTF-8" $file_etc_locale_gen
     locale-gen
     echo $locale_conf > $file_etc_locale_conf

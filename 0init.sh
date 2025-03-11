@@ -66,17 +66,15 @@ developer=oxo
 license=gplv3
 initial_release=2020
 
-# hardcoded variables
+## online
 online_repo=https://codeberg.org/oxo/hajime
 
-#--------------------------------
+## tempo-active.conf contains path to active configuration file
+## after cp it is available in hajime exec during chroot and after reboot
+file_path_active_config=/root/hajime/setup/tempo-active.conf
 
-sourcing ()
-{
-    export script_name
-    ## configuration file
-    [[ -f $file_setup_config ]] && source $file_setup_config
-}
+
+#--------------------------------
 
 
 args="$@"
@@ -120,15 +118,29 @@ getargs ()
 }
 
 
+sourcing ()
+{
+    ## configuration file
+    ## script_name is used in file_setup_config
+    export script_name
+    [[ -f $file_setup_config ]] && source $file_setup_config
+}
+
+
 process_config_flag_value ()
 {
     realpath_cfv=$(realpath "$cfv")
 
     if [[ -f "$realpath_cfv" ]]; then
 
+	rhs=$(dirname "$file_path_active_config")
+	[[ -d "$rhs" ]] || mkdir -p "$rhs"
+
 	file_setup_config="$realpath_cfv"
-	export file_setup_config
-	# printf '%s\n' "$file_setup_config" > "$file_config_loc"
+	printf '%s\n' "$file_setup_config" > "$file_path_active_config"
+
+	## export does not survive chroot or reboot
+	#export file_setup_config
 
     else
 
@@ -180,29 +192,25 @@ header ()
 
 point_in_time ()
 {
-    if [[ -f $HOME/hajime/1base.done ]]; then
+    if [[ -f "$HOME"/hajime/1base.done ]]; then
 
-	# 1base.sh already ran
-	## later in time
+	## 1base.sh already ran; we are later in time
 	pit=1
 	# further data comes from calling script (3post)
 
     else
 
-	# 1base.sh has not yet ran
-	## beginning of times
+	# 1base.sh has not yet ran; we are at the beginning of times
 	pit=0
 
-	## we have no ~/dock/2,3 yet
+	## CODE and REPO mountpoints
+	## we have no "$HOME"/dock/{2,3} yet
 	## therefore we use /root/tmp for the mountpoints
 	code_lbl=CODE
 	code_dir=/root/tmp/code
 	repo_lbl=REPO
 	repo_dir=/root/tmp/repo
 	repo_re=\/root\/tmp\/repo
-
-	file_etc_pacman_conf=/etc/pacman.conf
-	file_pacman_offline_conf=/root/hajime/setup/pacman_offline.conf
 
     fi
 }
@@ -252,8 +260,6 @@ set_online ()
 
 select_interface ()
 {
-    #if printf "$reply" | grep -iq "^y" ; then
-
 	ip a
 	echo
 
@@ -269,8 +275,6 @@ select_interface ()
 	connect
 
 	printf "$interface connected to $wap\n"
-
-    #fi
 }
 
 
@@ -331,8 +335,8 @@ installation_mode ()
 	## code is already mounted manually
 	## it is the very reason this script runs :)
 
-	## copy hajime to /root
-	## from here hajime will be ran
+	## copy from hajime source to hajime exec
+	## from exec hajime will be ran
 	cp --preserve --recursive "$code_dir"/hajime /root
 
     elif [[ $online -eq 1 ]]; then

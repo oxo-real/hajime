@@ -99,12 +99,15 @@ home_perc=0.60
 swap_size_recomm=4.00
 
 ## files
-file_setup_config=/root/hajime/setup/dl3189.conf
-file_setup_config_1=/hajime/setup/dl3189.conf
-#TODO DEV config file location
-file_setup_packages=/root/hajime/setup/package.list
-file_luks_pass=/root/tmp/code/hajime/luks_pass
+## hajime exec setup
+rhs=/root/hajime/setup
+## hajime source setup
+rtchs=/root/tmp/code/hajime/setup
+
 file_mnt_etc_fstab=/mnt/etc/fstab
+file_setup_config=$(head -n 1 "$rhs"/tempo-active.conf)
+file_setup_packages="$rtchs"/package.list
+file_setup_luks_pass="$rtchs"/tempo-luks.pass
 
 
 #--------------------------------
@@ -171,18 +174,11 @@ sourcing ()
 {
     export script_name
     ## configuration file
-    if [[ -f $file_setup_config ]]; then
-
-	source $file_setup_config
-
-    else
-
-	source $file_setup_config_1
-
-    fi
+    [[ -f "$file_setup_config" ]] && source "$file_setup_config"
 
     ## sourcing base_pkgs
-    [[ -f $file_setup_packages ]] && source $file_setup_packages
+    [[ -f "$file_setup_packages" ]] && source "$file_setup_packages"
+
 }
 
 
@@ -208,11 +204,11 @@ installation_mode ()
 	repo_re=\/root\/tmp\/repo
 
 	file_etc_pacman_conf=/etc/pacman.conf
-	file_pacman_offline_conf="$code_dir"/hajime/setup/pacman_offline.conf
+	file_pacman_offline_conf="$rtch"/setup/pacman_offline.conf
 
     elif [[ "$online" -eq 1 ]]; then
 
-	file_pacman_online_conf="$code_dir"/hajime/setup/pacman_online.conf
+	file_pacman_online_conf="$rtch"/setup/pacman_online.conf
 
     fi
 }
@@ -919,14 +915,16 @@ legacy_cryptsetup ()
     if [[ -n $luks_pass ]]; then
 	## via configuration
 
-	## write key-file
-	printf '%s' "$luks_pass" > $file_luks_pass
+	echo
 
-	cryptsetup luksFormat --batch-mode --type luks2 --key-file $file_luks_pass "$lvm_part"
-	cryptsetup --key-file $file_luks_pass open "$lvm_part" cryptlvm
+	## write key-file
+	printf '%s' "$luks_pass" > $file_setup_luks_pass
+
+	cryptsetup luksFormat --batch-mode --type luks2 --key-file $file_setup_luks_pass "$lvm_part"
+	cryptsetup --key-file $file_setup_luks_pass open "$lvm_part" cryptlvm
 
 	## remove key-file
-	rm -rf $file_luks_pass
+	rm -rf $file_setup_luks_pass
 
     elif [[ -z $luks_pass ]]; then
 	## user interactive
