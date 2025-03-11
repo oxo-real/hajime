@@ -99,10 +99,10 @@ home_perc=0.60
 swap_size_recomm=4.00
 
 ## files
-file_hi_config=/root/hajime/install/dl3189.conf
-file_hi_config_1=/hajime/install/dl3189.conf
+file_setup_config=/root/hajime/setup/dl3189.conf
+file_setup_config_1=/hajime/setup/dl3189.conf
 #TODO DEV config file location
-file_hi_packages=/root/hajime/install/package.list
+file_setup_packages=/root/hajime/setup/package.list
 file_luks_pass=/root/tmp/code/hajime/luks_pass
 file_mnt_etc_fstab=/mnt/etc/fstab
 
@@ -169,19 +169,20 @@ exit_hajime ()
 
 sourcing ()
 {
+    export script_name
     ## configuration file
-    if [[ -f $file_hi_config ]]; then
+    if [[ -f $file_setup_config ]]; then
 
-	source $file_hi_config
+	source $file_setup_config
 
     else
 
-	source $file_hi_config_1
+	source $file_setup_config_1
 
     fi
 
     ## sourcing base_pkgs
-    [[ -f $file_hi_packages ]] && source $file_hi_packages
+    [[ -f $file_setup_packages ]] && source $file_setup_packages
 }
 
 
@@ -207,11 +208,11 @@ installation_mode ()
 	repo_re=\/root\/tmp\/repo
 
 	file_etc_pacman_conf=/etc/pacman.conf
-	file_offline_pacman_conf="$code_dir"/hajime/setup/offlline_pacman.conf
+	file_pacman_offline_conf="$code_dir"/hajime/setup/pacman_offline.conf
 
     elif [[ "$online" -eq 1 ]]; then
 
-	file_online_pacman_conf="$code_dir"/hajime/setup/online_pacman.conf
+	file_pacman_online_conf="$code_dir"/hajime/setup/pacman_online.conf
 
     fi
 }
@@ -1131,7 +1132,7 @@ configure_pacman ()
 	## configure pacman.conf for offline repository
 
 	## copy pacman.conf
-	cp --preserve --recursive --verbose "$file_offline_pacman_conf" "$file_etc_pacman_conf"
+	cp --preserve --recursive --verbose "$file_pacman_offline_conf" "$file_etc_pacman_conf"
 
 	## update pacman.conf
 	sed -i "s#0init_repo_here#${repo_dir}#" "$file_etc_pacman_conf"

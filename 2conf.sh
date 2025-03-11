@@ -83,8 +83,8 @@ file_etc_motd=/etc/motd
 file_etc_sudoers=/etc/sudoers
 file_etc_pacmand_mirrorlist=/etc/pacman.d/mirrorlist
 
-file_hi_config=/hajime/install/dl3189.conf
-file_hi_packages=/hajime/install/package.list
+file_setup_config=/hajime/setup/dl3189.conf
+file_setup_packages=/hajime/setup/package.list
 
 ## variable values
 time_zone=Europe/CET
@@ -101,11 +101,13 @@ bootloader_editor=0
 
 sourcing ()
 {
+    export script_name
     ## configuration file
-    [[ -f $file_hi_config ]] && source $file_hi_config
+    #TODO DEV config file is now hardcoded
+    [[ -f $file_setup_config ]] && source $file_setup_config
 
     ## sourcing conf_pkgs
-    [[ -f $file_hi_packages ]] && source $file_hi_packages
+    [[ -f $file_setup_packages ]] && source $file_setup_packages
 }
 
 
@@ -146,7 +148,7 @@ installation_mode ()
 	repo_re=\/root\/tmp\/repo
 
 	file_etc_pacman_conf=/etc/pacman.conf
-	file_offline_pacman_conf=/root/hajime/setup/offline_pacman.conf
+	file_pacman_offline_conf=/root/hajime/setup/pacman_offline.conf
 
 	# code_lbl=CODE
 	# code_dir="/home/$(id -un)/dock/3"
@@ -157,7 +159,7 @@ installation_mode ()
 
     elif [[ $online -eq 1 ]]; then
 
-	file_online_pacman_conf="$code_dir"/hajime/setup/online_pacman.conf
+	file_pacman_online_conf="$code_dir"/hajime/setup/pacman_online.conf
 
     fi
 }
@@ -242,10 +244,10 @@ pacman_conf_offline ()
 
 	## redirect offline 'server' (file) location
 	## define offline file location at the end of pacman.conf
+	#TODO DEV sed gives an error: ''unknown option to s'
+	## but seems to be working though
 	sed -i "/^\[offline\]/{n;s/.*/Server = file:\/\/$repo_re/}" $file_etc_pacman_conf
-
-	##sed -i "s|\/root\/tmp\/repo|\/repo|" $file_etc_pacman_conf
-	#### DEV now done in 1base
+	#sed -i "#^\[offline\]#{n;s#.*#Server = file:\/\/$repo_re/}" $file_etc_pacman_conf
 
 	initialize_pacman
 	echo
@@ -687,7 +689,6 @@ main ()
     sourcing
     define_text_appearance
     installation_mode
-    clear
     get_offline_repo
     pacman_conf_offline
     time_settings

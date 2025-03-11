@@ -90,18 +90,19 @@ file_etc_pacman_conf=/etc/pacman.conf
 etc_doas_conf=/etc/doas.conf
 misc_doas_conf="$HOME/hajime/misc/etc_doas.conf"
 
-file_hi_config="$HOME/hajime/install/dl3189.conf"
-file_hi_packages="$HOME/hajime/install/package.list"
+file_setup_config="$HOME/hajime/setup/dl3189.conf"
+file_setup_packages="$HOME/hajime/setup/package.list"
 
 #--------------------------------
 
 sourcing ()
 {
+    export script_name
     ## configuration file
-    [[ -f $file_hi_config ]] && source $file_hi_config
+    [[ -f $file_setup_config ]] && source $file_setup_config
 
     ## sourcing apps_pkgs
-    [[ -f $file_hi_packages ]] && source $file_hi_packages
+    [[ -f $file_setup_packages ]] && source $file_setup_packages
 }
 
 

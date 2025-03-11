@@ -66,18 +66,19 @@ initial_release=2019
 
 ## hardcoded variables
 # user customizable variables
-file_hi_config="$HOME/hajime/install/dl3189.conf"
-file_hi_packages="$HOME/hajime/install/package.list"
+file_setup_config="$HOME/hajime/setup/dl3189.conf"
+file_setup_packages="$HOME/hajime/setup/package.list"
 
 #--------------------------------
 
 sourcing ()
 {
+    export script_name
     ## configuration file
-    [[ -f $file_hi_config ]] && source $file_hi_config
+    [[ -f $file_setup_config ]] && source $file_setup_config
 
     ## sourcing apps_pkgs
-    [[ -f $file_hi_packages ]] && source $file_hi_packages
+    [[ -f $file_setup_packages ]] && source $file_setup_packages
 }
 
 
@@ -140,7 +141,8 @@ installation_mode ()
 	## dhcp connect
 	sh hajime/0init.sh
 
-	#TODO if previous mode was offline then activate pacman.conf to online repos
+	## if previous mode was offline then activate pacman.conf to online repos
+	file_pacman_online_conf="$hajime_exec"/setup/pacman_online.conf
 	pacman_conf_online
 
     fi
@@ -149,7 +151,7 @@ installation_mode ()
 
 pacman_conf_online ()
 {
-    :
+    cp "$file_pacman_online_conf" "$file_etc_pacman_conf"
 }
 
 

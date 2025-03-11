@@ -73,8 +73,9 @@ online_repo=https://codeberg.org/oxo/hajime
 
 sourcing ()
 {
+    export script_name
     ## configuration file
-    [[ -f $file_hi_config ]] && source $file_hi_config
+    [[ -f $file_setup_config ]] && source $file_setup_config
 }
 
 
@@ -125,12 +126,13 @@ process_config_flag_value ()
 
     if [[ -f "$realpath_cfv" ]]; then
 
-	file_hi_config="$realpath_cfv"
-	printf '%s\n' "$file_hi_config" > "$file_config_loc"
+	file_setup_config="$realpath_cfv"
+	export file_setup_config
+	# printf '%s\n' "$file_setup_config" > "$file_config_loc"
 
     else
 
-	unset file_hi_config
+	unset file_setup_config
 	unset realpath_cfv
 	unset cfv
 
@@ -200,7 +202,7 @@ point_in_time ()
 	repo_re=\/root\/tmp\/repo
 
 	file_etc_pacman_conf=/etc/pacman.conf
-	file_offline_pacman_conf=/root/hajime/setup/offline_pacman.conf
+	file_pacman_offline_conf=/root/hajime/setup/pacman_offline.conf
 
     fi
 }
@@ -208,9 +210,9 @@ point_in_time ()
 
 config_file_warning ()
 {
-    if [[ "$pit" -eq 0 && -n "$file_hi_config" ]]; then
+    if [[ "$pit" -eq 0 && -n "$file_setup_config" ]]; then
 
-	printf "WARNING ${st_bold}%s${st_def}\n" "$file_hi_config"
+	printf "WARNING ${st_bold}%s${st_def}\n" "$file_setup_config"
 	echo
 	echo
 	printf 'move this file if a interactive installation is preferred instead\n'

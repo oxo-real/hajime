@@ -72,8 +72,8 @@ mirror_country=USA
 mirror_amount=5
 
 file_etc_motd=/etc/motd
-file_hi_config="$HOME/hajime/install/dl3189.conf"
-file_hi_packages="$HOME/hajime/install/package.list"
+file_setup_config="$HOME/hajime/setup/dl3189.conf"
+file_setup_packages="$HOME/hajime/setup/package.list"
 
 #--------------------------------
 
@@ -82,11 +82,12 @@ file_hi_packages="$HOME/hajime/install/package.list"
 
 sourcing ()
 {
+    export script_name
     ## configuration file
-    [[ -f $file_hi_config ]] && source $file_hi_config
+    [[ -f $file_setup_config ]] && source $file_setup_config
 
     ## sourcing conf_pkgs
-    [[ -f $file_hi_packages ]] && source $file_hi_packages
+    [[ -f $file_setup_packages ]] && source $file_setup_packages
 }
 
 
@@ -122,7 +123,7 @@ installation_mode ()
 	## dhcp connect
 	sh hajime/0init.sh
 
-	file_online_pacman_conf="$code_dir"/hajime/setup/online_pacman.conf
+	file_pacman_online_conf="$code_dir"/hajime/setup/pacman_online.conf
 
     fi
 }

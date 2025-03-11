@@ -25,9 +25,9 @@
 ├── repo-tree.md
 └── setup
     ├── dl3189.conf
-    ├── offline_pacman.conf
-    ├── online_pacman.conf
-    └── package.list
+    ├── package.list
+    ├── pacman_offline.conf
+    └── pacman_online.conf
 
 4 directories, 25 files
 ```
