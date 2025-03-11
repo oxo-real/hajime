@@ -131,8 +131,9 @@ define_text_appearance()
 }
 
 
-offline_installation ()
+installation_mode ()
 {
+    ## online or offline mode
     if [[ $online -ne 1 ]]; then
 
 	## CAUTION 2conf runs inside chroot jail (/mnt)
@@ -145,7 +146,7 @@ offline_installation ()
 	repo_re=\/root\/tmp\/repo
 
 	file_etc_pacman_conf=/etc/pacman.conf
-	file_misc_pacman_conf=/root/hajime/misc/ol_pacman.conf
+	file_offline_pacman_conf=/root/hajime/setup/offline_pacman.conf
 
 	# code_lbl=CODE
 	# code_dir="/home/$(id -un)/dock/3"
@@ -153,6 +154,10 @@ offline_installation ()
 	# repo_dir="/home/$(id -un)/dock/2"
 	# repo_re="\/home\/$(id -un)\/dock\/2"
 	# file_etc_pacman_conf=/etc/pacman.conf
+
+    elif [[ $online -eq 1 ]]; then
+
+	file_online_pacman_conf="$code_dir"/hajime/setup/online_pacman.conf
 
     fi
 }
@@ -224,7 +229,7 @@ get_offline_code ()
 }
 
 
-reconfigure_pacman_conf ()
+pacman_conf_offline ()
 {
     if [[ $online -ne 1 ]]; then
 
@@ -566,15 +571,6 @@ install_core ()
     # [Installation guide - ArchWiki]
     # (https://wiki.archlinux.org/title/Installation_guide#Install_essential_packages)
     pacman -S --needed --noconfirm "${conf_pkgs[@]}"
-	   # $pkg_ucode \
-	   # $linux_kernel \
-	   # $linux_lts_kernel \
-	   # $core_applications \
-	   # $text_editor \
-	   # $network \
-	   # $network_wl \
-	   # $secure_connections \
-	   # $system_security
 }
 
 
@@ -650,7 +646,7 @@ move_hajime ()
 motd_3post ()
 {
     echo > $file_etc_motd
-    echo '# reinsert CODE and REPO media, then' >> $file_etc_motd
+    echo '# connect CODE and REPO media, then' >> $file_etc_motd
     echo '# continue hajime installation with:' >> $file_etc_motd
     echo >> $file_etc_motd
     printf "${st_bold}sh hajime/3post.sh${st_def}" >> $file_etc_motd
@@ -690,10 +686,10 @@ main ()
     getargs $args
     sourcing
     define_text_appearance
-    offline_installation
+    installation_mode
     clear
     get_offline_repo
-    reconfigure_pacman_conf
+    pacman_conf_offline
     time_settings
     locale_settings
     vconsole_settings

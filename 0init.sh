@@ -68,7 +68,6 @@ initial_release=2020
 
 # hardcoded variables
 online_repo=https://codeberg.org/oxo/hajime
-file_config_loc="tmp/code/hajime/install/config_loc"
 
 #--------------------------------
 
@@ -201,7 +200,7 @@ point_in_time ()
 	repo_re=\/root\/tmp\/repo
 
 	file_etc_pacman_conf=/etc/pacman.conf
-	file_misc_pacman_conf=/root/hajime/misc/ol_pacman.conf
+	file_offline_pacman_conf=/root/hajime/setup/offline_pacman.conf
 
     fi
 }
@@ -215,7 +214,7 @@ config_file_warning ()
 	echo
 	echo
 	printf 'move this file if a interactive installation is preferred instead\n'
-	printf 'else this file WILL be used for (near) ${fg_magenta}automatic installation${st_def}\n'
+	printf "else this file WILL be used for (near) ${fg_magenta}automatic installation${st_def}\n"
 	echo
 	printf 'before continuing, make 100%% sure that:\n'
 	echo
@@ -223,7 +222,7 @@ config_file_warning ()
 	printf "2 all the parameters in the file are correct\n"
 	echo
 	echo
-	printf '${fg_magenta}continue${st_def} with automatic installation? [y/N] '
+	printf "${fg_magenta}continue${st_def} with automatic installation? [y/N] "
 
 	reply_single
 	echo
@@ -311,14 +310,14 @@ install_or_exit ()
 
     else
 
-	prepare_install
+	installation_mode
 	autostart_next
 
     fi
 }
 
 
-prepare_install ()
+installation_mode ()
 {
     if [[ $online -ne 1 ]]; then
 	## offline
@@ -333,17 +332,6 @@ prepare_install ()
 	## copy hajime to /root
 	## from here hajime will be ran
 	cp --preserve --recursive "$code_dir"/hajime /root
-
-
-	## copy pacman.conf
-	# cp --preserve --recursive "$file_misc_pacman_conf" "$file_etc_pacman_conf"
-	#
-	## update pacman.conf
-	# sed -i "s#0init_repo_here#$repo_dir#" "$file_etc_pacman_conf"
-	#
-	## force a refresh of the package database
-	#pacman -Syy
-
 
     elif [[ $online -eq 1 ]]; then
 	## online

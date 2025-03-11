@@ -193,8 +193,9 @@ getargs ()
 }
 
 
-offline_installation ()
+installation_mode ()
 {
+    ## online or offline mode
     if [[ $online -ne 1 ]]; then
 
 	## we have no ~/dock/2,3 yet
@@ -206,19 +207,13 @@ offline_installation ()
 	repo_re=\/root\/tmp\/repo
 
 	file_etc_pacman_conf=/etc/pacman.conf
-	file_misc_pacman_conf="$code_dir"/hajime/misc/ol_pacman.conf
+	file_offline_pacman_conf="$code_dir"/hajime/setup/offlline_pacman.conf
+
+    elif [[ "$online" -eq 1 ]]; then
+
+	file_online_pacman_conf="$code_dir"/hajime/setup/online_pacman.conf
 
     fi
-}
-
-
-get_bootmount ()
-{
-    # get current bootmount blockdevice name
-    #bootmnt_dev=$(mount | grep bootmnt | awk '{print $1}')
-    # TODO
-    # seems to be deprecated
-    bootmnt_dev="deprecated"
 }
 
 
@@ -1136,7 +1131,7 @@ configure_pacman ()
 	## configure pacman.conf for offline repository
 
 	## copy pacman.conf
-	cp --preserve --recursive --verbose "$file_misc_pacman_conf" "$file_etc_pacman_conf"
+	cp --preserve --recursive --verbose "$file_offline_pacman_conf" "$file_etc_pacman_conf"
 
 	## update pacman.conf
 	sed -i "s#0init_repo_here#${repo_dir}#" "$file_etc_pacman_conf"
@@ -1380,8 +1375,7 @@ main ()
     welcome
     getargs $args
     sourcing
-    offline_installation
-    get_bootmount
+    installation_mode
     network_setup
     #console_font
     clock

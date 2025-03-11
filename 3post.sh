@@ -114,12 +114,15 @@ installation_mode ()
 	repo_lbl=REPO
 	repo_dir="/home/$(id -un)/dock/2"
 	repo_re="\/home\/$(id -un)\/dock\/2"
+
 	file_etc_pacman_conf=/etc/pacman.conf
 
     elif [[ "$online" -eq 1 ]]; then
 
 	## dhcp connect
 	sh hajime/0init.sh
+
+	file_online_pacman_conf="$code_dir"/hajime/setup/online_pacman.conf
 
     fi
 }

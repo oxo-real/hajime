@@ -137,9 +137,19 @@ installation_mode ()
 
     elif [[ "$online" -eq 1 ]]; then
 
-	:
+	## dhcp connect
+	sh hajime/0init.sh
+
+	#TODO if previous mode was offline then activate pacman.conf to online repos
+	pacman_conf_online
 
     fi
+}
+
+
+pacman_conf_online ()
+{
+    :
 }
 
 
@@ -229,7 +239,8 @@ set_usr_ro ()
 
 install_apps_packages ()
 {
-    ## for to prevent pacman error exit
+    ## for to prevent pacman exit on error
+    ## apps_pkgs sourced via setup/package.list
     for pkg in "${apps_pkgs[@]}"; do
 
 	printf 'installing %s ' "$pkg"

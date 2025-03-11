@@ -7,9 +7,6 @@
 ├── 4apps.sh
 ├── 5dtcf.sh
 ├── COPYING
-├── install
-│   ├── dl3189.conf
-│   └── package.list
 ├── logs
 │   ├── pkgs-copy-1000
 │   ├── pkgs-deps-1000
@@ -25,7 +22,12 @@
 │   ├── ol_pacman.conf
 │   └── rescue.sh
 ├── README.md
-└── repo-tree.md
+├── repo-tree.md
+└── setup
+    ├── dl3189.conf
+    ├── offline_pacman.conf
+    ├── online_pacman.conf
+    └── package.list
 
-4 directories, 23 files
+4 directories, 25 files
 ```

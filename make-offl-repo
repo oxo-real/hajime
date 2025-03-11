@@ -110,7 +110,7 @@ getargs ()
 }
 
 
-remove_files ()
+file_administration ()
 {
     [[ ! -d "$hajime_dir"/logs ]] && mkdir -p "$hajime_dir"/logs
     [[ -f "$pkgs_copy" ]] && rm -rf "$pkgs_copy"
@@ -368,7 +368,7 @@ main ()
 {
     sourcing
     getargs $args
-    remove_files
+    file_administration
     create_pkgs_hajime
     create_pkgs_real_paths
     create_pkgs_copy
