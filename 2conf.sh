@@ -99,12 +99,20 @@ bootloader_editor=0
 sourcing ()
 {
     export script_name
+    ## hajime_exec is needed to find file_setup_config
+    ## which is the source for the proper hajime_exec value
+    ## workaround for now is hardcode hajime_exec here
+    ## is this even an issue?
+    #TODO solve hardcoding hajime_exec
+    hajime_exec=/hajime
     file_setup_config=$(head -n 1 "$hajime_exec"/setup/tempo-active.conf)
 
     ## configuration file
     [[ -f $file_setup_config ]] && source $file_setup_config
 
-    ## sourcing conf_pkgs
+    file_setup_packages="$hajime_exec"/setup/package.list
+
+    ## sourcing package list
     [[ -f $file_setup_packages ]] && source $file_setup_packages
 }
 
@@ -183,6 +191,7 @@ mount_repo ()
     [[ -d $repo_dir ]] || mkdir -p "$repo_dir"
 
     mountpoint -q "$repo_dir"
+    # [[ $? -ne 0 ]] && mount "$repo_dev" "$repo_dir"
     [[ $? -ne 0 ]] && sudo mount "$repo_dev" "$repo_dir"
 }
 
@@ -211,6 +220,7 @@ mount_code ()
     [[ -d $code_dir ]] || mkdir -p "$code_dir"
 
     mountpoint -q "$code_dir"
+    # [[ $? -ne 0 ]] && mount "$code_dev" "$code_dir"
     [[ $? -ne 0 ]] && sudo mount "$code_dev" "$code_dir"
 }
 
@@ -507,10 +517,10 @@ set_passphrase ()
 
 set_privileges ()
 {
-    ## priviledge escalation for wheel group
+    ## privilege escalation for wheel group
     sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' $file_etc_sudoers
 
-    ## keep environment variable with elevated priviledges
+    ## keep environment variable with elevated privileges
     sed -i 's/# Defaults env_keep += "HOME"/Defaults env_keep += "HOME"\nDefaults !always_set_home, !set_home/' $file_etc_sudoers
 }
 
@@ -659,8 +669,8 @@ move_hajime ()
 motd_3post ()
 {
     echo > $file_etc_motd
-    echo '# connect CODE and REPO media, then' >> $file_etc_motd
-    echo '# continue hajime installation with:' >> $file_etc_motd
+    printf "# ${fg_magenta}connect CODE and REPO media${st_def}\n" >> $file_etc_motd
+    echo '# then continue hajime Arch Linux installation with:' >> $file_etc_motd
     echo >> $file_etc_motd
     printf "${st_bold}sh hajime/3post.sh${st_def}" >> $file_etc_motd
     echo >> $file_etc_motd
@@ -701,6 +711,7 @@ main ()
     define_text_appearance
     installation_mode
     get_offline_repo
+    get_offline_code
     pacman_conf_offline
     time_settings
     locale_settings

@@ -83,10 +83,20 @@ file_setup_packages="$HOME/hajime/setup/package.list"
 sourcing ()
 {
     export script_name
+    ## hajime_exec is needed to find file_setup_config
+    ## which is the source for the proper hajime_exec value
+    ## workaround for now is hardcode hajime_exec here
+    ## is this even an issue?
+    #TODO solve hardcoding hajime_exec
+    hajime_exec="$HOME/hajime"
+    file_setup_config=$(head -n 1 "$hajime_exec"/setup/tempo-active.conf)
+
     ## configuration file
     [[ -f $file_setup_config ]] && source $file_setup_config
 
-    ## sourcing conf_pkgs
+    file_setup_packages="$hajime_exec"/setup/package.list
+
+    ## sourcing package list
     [[ -f $file_setup_packages ]] && source $file_setup_packages
 }
 

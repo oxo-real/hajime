@@ -170,7 +170,9 @@ sourcing ()
     ## configuration file
     [[ -f "$file_setup_config" ]] && source "$file_setup_config"
 
-    ## sourcing base_pkgs
+    file_setup_packages="$hajime_exec"/setup/package.list
+
+    ## sourcing package list
     [[ -f "$file_setup_packages" ]] && source "$file_setup_packages"
 }
 
@@ -191,7 +193,6 @@ installation_mode ()
 	## configuration file is being sourced
 
 	file_setup_luks_pass="$hajime_exec"/setup/tempo-luks.pass
-	file_setup_packages="$hajime_exec"/setup/package.list
 
     fi
 
@@ -1250,12 +1251,16 @@ prepare_mnt_environment ()
 
 	    ## copy hajime_exec to chroot jail (/hajime in conf)
 	    cp --preserve --recursive --verbose "$hajime_exec" /mnt
+
+	    ## update configuration location for inside chroot jail (/mnt)
+	    sed -i 's#/root##' /mnt/hajime/setup/tempo-active.conf
 	    ;;
 
     esac
 
     # copy pacman.conf to root
-    cp -prv /etc/pacman.conf /mnt/etc/pacman.conf
+    #TODO is this necessary? only for offline mode?
+    cp --preserve --recursive --verbose /etc/pacman.conf /mnt/etc/pacman.conf
 
     echo
 }

@@ -211,7 +211,7 @@ point_in_time ()
 	code_dir=/root/tmp/code
 	repo_lbl=REPO
 	repo_dir=/root/tmp/repo
-	epo_re=\/root\/tmp\/repo
+	repo_re=\/root\/tmp\/repo
 
     fi
 }
@@ -352,7 +352,7 @@ installation_mode ()
 	    export hajime_exec=/root/hajime
 	    file_setup_config_exec=$(realpath $(find "$hajime_exec"/setup -iname $(basename "$file_setup_config")))
 
-	    ## overwrite file_setup_config_path with hajime_exec location
+	    ## write file_setup_config_path with hajime_exec location
 	    printf '%s\n' "$file_setup_config_exec" > "$file_setup_config_path"
 
 	fi
