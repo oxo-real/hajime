@@ -48,7 +48,7 @@ https://www.gnu.org/licenses/gpl-3.0.txt
 # example
   n/a
 
-CAUTION 2conf runs inside chroot jail (/mnt)
+CAUTION 2conf runs from inside chroot jail (/mnt)
 
 # '
 
@@ -83,14 +83,6 @@ file_etc_motd=/etc/motd
 file_etc_sudoers=/etc/sudoers
 file_etc_pacmand_mirrorlist=/etc/pacman.d/mirrorlist
 
-## hajime exec setup
-rhs=/root/hajime/setup
-## hajime source setup
-rtchs=/root/tmp/code/hajime/setup
-
-file_setup_config=$(head -n 1 "$rhs"/tempo-active.conf)
-file_setup_packages=/hajime/setup/package.list
-
 ## variable values
 time_zone=Europe/CET
 locale_conf=LANG=en_US.UTF-8
@@ -107,8 +99,9 @@ bootloader_editor=0
 sourcing ()
 {
     export script_name
+    file_setup_config=$(head -n 1 "$hajime_exec"/setup/tempo-active.conf)
+
     ## configuration file
-    #TODO DEV config file is now hardcoded
     [[ -f $file_setup_config ]] && source $file_setup_config
 
     ## sourcing conf_pkgs
