@@ -191,7 +191,6 @@ mount_repo ()
     [[ -d $repo_dir ]] || mkdir -p "$repo_dir"
 
     mountpoint -q "$repo_dir"
-    # [[ $? -ne 0 ]] && mount "$repo_dev" "$repo_dir"
     [[ $? -ne 0 ]] && sudo mount "$repo_dev" "$repo_dir"
 }
 
@@ -220,7 +219,6 @@ mount_code ()
     [[ -d $code_dir ]] || mkdir -p "$code_dir"
 
     mountpoint -q "$code_dir"
-    # [[ $? -ne 0 ]] && mount "$code_dev" "$code_dir"
     [[ $? -ne 0 ]] && sudo mount "$code_dev" "$code_dir"
 }
 
@@ -661,13 +659,19 @@ install_bootloader ()
 move_hajime ()
 {
     # move /hajime to $user home
-    cp -r /hajime /home/$username
-    sudo rm -rf /hajime
+    cp -r "$hajime_exec" /home/"$username"
+    #cp -r /hajime /home/"$username"
+    sudo rm -rf "$hajime_exec"
+    #sudo rm -rf /hajime
+
+    ## update configuration location for 3post
+    sed -i 's#/hajime#\$HOME/hajime#' /home/"$username"/hajime/setup/tempo-active.conf
 }
 
 
 motd_3post ()
 {
+    ## motd will show up after system reboot and OS login
     echo > $file_etc_motd
     printf "# ${fg_magenta}connect CODE and REPO media${st_def}\n" >> $file_etc_motd
     echo '# then continue hajime Arch Linux installation with:' >> $file_etc_motd
@@ -683,18 +687,21 @@ exit_chroot_jail_mnt ()
 {
     ## return to archiso environment
     echo
-    echo '# exit chroot jail (/mnt)'
+    echo '# exit chroot jail (/mnt) and'
     echo '# return to the archiso environment with:'
     echo
     printf "${st_bold}exit${st_def}\n"
+    echo
+    echo '# umount all /mnt mountpoints:'
+    echo
     printf "${st_bold}umount -R /mnt${st_def}\n"
     echo
-    echo '# remove archiso, CODE and REPO media'
-    echo '# to continue execute:'
+    printf "# ${fg_magenta}remove ARCHISO, REPO and CODE${st_def} media,"
+    echo '# then perform an initial autonomous system reboot:'
     echo
     printf "${st_bold}reboot${st_def}\n"
     echo
-    echo '# after reboot continue with:'
+    printf '# after reboot, login as %s and continue with:\n' "$username"
     echo
     echo 'sh hajime/3post.sh'
     echo

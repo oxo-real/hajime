@@ -64,20 +64,19 @@ developer=oxo
 license=gplv3
 initial_release=2019
 
-## hardcoded variables
-# user customizable variables
-file_setup_config="$HOME/hajime/setup/dl3189.conf"
-file_setup_packages="$HOME/hajime/setup/package.list"
-
 #--------------------------------
 
 sourcing ()
 {
     export script_name
+    file_setup_config=$(head -n 1 "$hajime_exec"/setup/tempo-active.conf)
+
     ## configuration file
     [[ -f $file_setup_config ]] && source $file_setup_config
 
-    ## sourcing apps_pkgs
+    file_setup_packages="$hajime_exec"/setup/package.list
+
+    ## sourcing package list
     [[ -f $file_setup_packages ]] && source $file_setup_packages
 }
 
