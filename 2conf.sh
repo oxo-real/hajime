@@ -83,7 +83,12 @@ file_etc_motd=/etc/motd
 file_etc_sudoers=/etc/sudoers
 file_etc_pacmand_mirrorlist=/etc/pacman.d/mirrorlist
 
-file_setup_config=/hajime/setup/dl3189.conf
+## hajime exec setup
+rhs=/root/hajime/setup
+## hajime source setup
+rtchs=/root/tmp/code/hajime/setup
+
+file_setup_config=$(head -n 1 "$rhs"/tempo-active.conf)
 file_setup_packages=/hajime/setup/package.list
 
 ## variable values
@@ -135,11 +140,21 @@ define_text_appearance()
 
 installation_mode ()
 {
-    ## online or offline mode
-    if [[ $online -ne 1 ]]; then
+    file_etc_pacman_conf=/etc/pacman.conf
 
-	## CAUTION 2conf runs inside chroot jail (/mnt)
-	## we have no ~/dock/2,3 yet
+    if [[ -n "$exec_mode" ]]; then
+	## configuration file is being sourced
+
+	file_setup_luks_pass="$hajime_exec"/setup/tempo-luks.pass
+	file_setup_packages="$hajime_exec"/setup/package.list
+
+    fi
+
+    if [[ $online -ne 1 ]]; then
+	## offline mode
+
+	## CODE and REPO mountpoints
+	## we have no "$HOME"/dock/{2,3} yet
 	## therefore we use /root/tmp for the mountpoints
 	code_lbl=CODE
 	code_dir=/root/tmp/code
@@ -147,19 +162,12 @@ installation_mode ()
 	repo_dir=/root/tmp/repo
 	repo_re=\/root\/tmp\/repo
 
-	file_etc_pacman_conf=/etc/pacman.conf
-	file_pacman_offline_conf=/root/hajime/setup/pacman_offline.conf
+	file_pacman_offline_conf="$hajime_exec"/setup/pacman_offline.conf
 
-	# code_lbl=CODE
-	# code_dir="/home/$(id -un)/dock/3"
-	# repo_lbl=REPO
-	# repo_dir="/home/$(id -un)/dock/2"
-	# repo_re="\/home\/$(id -un)\/dock\/2"
-	# file_etc_pacman_conf=/etc/pacman.conf
+    elif [[ "$online" -eq 1 ]]; then
+	## online mode
 
-    elif [[ $online -eq 1 ]]; then
-
-	file_pacman_online_conf="$code_dir"/hajime/setup/pacman_online.conf
+	file_pacman_online_conf="$hajime_exec"/setup/pacman_online.conf
 
     fi
 }

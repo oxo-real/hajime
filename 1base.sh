@@ -25,7 +25,7 @@ the Free Software Foundation, either version 3 of the License, or
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICst_ulAR PURPOSE.  See the
+MERCHANTABILITY or FITNESS FOR A PARTIClAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
@@ -99,15 +99,7 @@ home_perc=0.60
 swap_size_recomm=4.00
 
 ## files
-## hajime exec setup
-rhs=/root/hajime/setup
-## hajime source setup
-rtchs=/root/tmp/code/hajime/setup
-
 file_mnt_etc_fstab=/mnt/etc/fstab
-file_setup_config=$(head -n 1 "$rhs"/tempo-active.conf)
-file_setup_packages="$rtchs"/package.list
-file_setup_luks_pass="$rtchs"/tempo-luks.pass
 
 
 #--------------------------------
@@ -173,12 +165,13 @@ exit_hajime ()
 sourcing ()
 {
     export script_name
+    file_setup_config=$(head -n 1 "$hajime_exec"/setup/tempo-active.conf)
+
     ## configuration file
     [[ -f "$file_setup_config" ]] && source "$file_setup_config"
 
     ## sourcing base_pkgs
     [[ -f "$file_setup_packages" ]] && source "$file_setup_packages"
-
 }
 
 
@@ -192,10 +185,21 @@ getargs ()
 
 installation_mode ()
 {
-    ## online or offline mode
-    if [[ $online -ne 1 ]]; then
+    file_etc_pacman_conf=/etc/pacman.conf
 
-	## we have no ~/dock/2,3 yet
+    if [[ -n "$exec_mode" ]]; then
+	## configuration file is being sourced
+
+	file_setup_luks_pass="$hajime_exec"/setup/tempo-luks.pass
+	file_setup_packages="$hajime_exec"/setup/package.list
+
+    fi
+
+    if [[ $online -ne 1 ]]; then
+	## offline mode
+
+	## CODE and REPO mountpoints
+	## we have no "$HOME"/dock/{2,3} yet
 	## therefore we use /root/tmp for the mountpoints
 	code_lbl=CODE
 	code_dir=/root/tmp/code
@@ -203,12 +207,12 @@ installation_mode ()
 	repo_dir=/root/tmp/repo
 	repo_re=\/root\/tmp\/repo
 
-	file_etc_pacman_conf=/etc/pacman.conf
-	file_pacman_offline_conf="$rtch"/setup/pacman_offline.conf
+	file_pacman_offline_conf="$hajime_exec"/setup/pacman_offline.conf
 
     elif [[ "$online" -eq 1 ]]; then
+	## online mode
 
-	file_pacman_online_conf="$rtch"/setup/pacman_online.conf
+	file_pacman_online_conf="$hajime_exec"/setup/pacman_online.conf
 
     fi
 }
@@ -1075,6 +1079,7 @@ create_lvm_volumes ()
 
 make_filesystems ()
 {
+    echo
     mkfs.vfat -F 32 -n BOOT "$boot_part"
     mkfs.ext4 -L ROOT /dev/mapper/vg0-lv_root
     mkfs.ext4 -L HOME /dev/mapper/vg0-lv_home
@@ -1131,6 +1136,7 @@ configure_pacman ()
 
 	## copy pacman.conf
 	cp --preserve --recursive --verbose "$file_pacman_offline_conf" "$file_etc_pacman_conf"
+	echo
 
 	## update pacman.conf
 	sed -i "s#0init_repo_here#${repo_dir}#" "$file_etc_pacman_conf"
@@ -1226,6 +1232,8 @@ prepare_mnt_environment ()
     case $online in
 
 	1 )
+	    ## online mode
+
 	    # chroot changes the apparent root directory
 	    # commands will run isolated inside their chroot jail
 	    #TODO check for proper workings
@@ -1238,8 +1246,10 @@ prepare_mnt_environment ()
 	    ;;
 
 	* )
-	    # copy hajime to chroot jail (/hajime in conf)
-	    cp -prv /root/tmp/code/hajime /mnt
+	    ## offline mode
+
+	    ## copy hajime_exec to chroot jail (/hajime in conf)
+	    cp --preserve --recursive --verbose "$hajime_exec" /mnt
 	    ;;
 
     esac

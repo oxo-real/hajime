@@ -69,10 +69,6 @@ initial_release=2020
 ## online
 online_repo=https://codeberg.org/oxo/hajime
 
-## tempo-active.conf contains path to active configuration file
-## after cp it is available in hajime exec during chroot and after reboot
-file_path_active_config=/root/hajime/setup/tempo-active.conf
-
 
 #--------------------------------
 
@@ -133,20 +129,24 @@ process_config_flag_value ()
 
     if [[ -f "$realpath_cfv" ]]; then
 
-	rhs=$(dirname "$file_path_active_config")
-	[[ -d "$rhs" ]] || mkdir -p "$rhs"
+	# rhs=$(dirname "$file_setup_config_path")
+	# [[ -d "$rhs" ]] || mkdir -p "$rhs"
 
 	file_setup_config="$realpath_cfv"
-	printf '%s\n' "$file_setup_config" > "$file_path_active_config"
+	printf '%s\n' "$file_setup_config" > "$file_setup_config_path"
 
 	## export does not survive chroot or reboot
 	#export file_setup_config
 
     else
 
+	printf 'ERROR config file ${st_bold}%s${st_def} not found\n' "$cfv"
+
 	unset file_setup_config
 	unset realpath_cfv
 	unset cfv
+
+	exit 151
 
     fi
 }
@@ -187,6 +187,7 @@ header ()
     [[ $initial_release -ne $current_year ]] && printf ' - %s' "$current_year"
     printf '  |  %s\n' "$developer"
     echo
+    echo
 }
 
 
@@ -210,7 +211,7 @@ point_in_time ()
 	code_dir=/root/tmp/code
 	repo_lbl=REPO
 	repo_dir=/root/tmp/repo
-	repo_re=\/root\/tmp\/repo
+	epo_re=\/root\/tmp\/repo
 
     fi
 }
@@ -220,15 +221,16 @@ config_file_warning ()
 {
     if [[ "$pit" -eq 0 && -n "$file_setup_config" ]]; then
 
-	printf "WARNING ${st_bold}%s${st_def}\n" "$file_setup_config"
+	printf "${st_bold}CAUTION!${st_def}\n"
+	printf 'active configuration file:\n'
+	printf "${st_ul}%s${st_def}\n" "$file_setup_config"
 	echo
 	echo
-	printf 'move this file if a interactive installation is preferred instead\n'
-	printf "else this file WILL be used for (near) ${fg_magenta}automatic installation${st_def}\n"
+	printf "this file WILL be used for ${fg_magenta}automatic installation${st_def}\n"
 	echo
-	printf 'before continuing, make 100%% sure that:\n'
+	printf 'before continuing, though; make 100%% sure that:\n'
 	echo
-	printf "1 the filename is correct\n"
+	printf "1 the file designates this machine\n"
 	printf "2 all the parameters in the file are correct\n"
 	echo
 	echo
@@ -335,16 +337,32 @@ installation_mode ()
 	## code is already mounted manually
 	## it is the very reason this script runs :)
 
-	## copy from hajime source to hajime exec
-	## from exec hajime will be ran
+	## copy from hajime_src to hajime exec
+	## from hajime_exec the script will continue to run
 	cp --preserve --recursive "$code_dir"/hajime /root
+
+	if [[ -n "$exec_mode" ]]; then
+
+	    ## tempo-active.conf contains path to active configuration file
+	    file_setup_config_path=/root/hajime/setup/tempo-active.conf
+
+	    ## update file_setup_config_path with it's new hajime_exec location
+	    ## hajime_exec did not exist before cp, we define it here
+	    ## export for availability in 1base
+	    export hajime_exec=/root/hajime
+	    file_setup_config_exec=$(realpath $(find "$hajime_exec"/setup -iname $(basename "$file_setup_config")))
+
+	    ## overwrite file_setup_config_path with hajime_exec location
+	    printf '%s\n' "$file_setup_config_exec" > "$file_setup_config_path"
+
+	fi
 
     elif [[ $online -eq 1 ]]; then
 	## online
 
 	set_online
 
-	##must be similar to 1base configure_pacman
+	## must be similar to 1base configure_pacman
 	pacman-key --init
 	pacman-key --populate
 
@@ -367,6 +385,13 @@ installation_mode ()
 		;;
 
 	esac
+
+	if [[ -n "$exec_mode" ]]; then
+
+	    ## config file active; add setup dir to cloned hajime
+	    cp --preserve --recursive "$hajime_src/setup" hajime
+
+	fi
 
     fi
 

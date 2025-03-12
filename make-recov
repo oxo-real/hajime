@@ -43,7 +43,7 @@ source functions
 make-offl-repo
 
 # usage
-make_recov
+make_recov [rsync_options]
 
 # options
 options are rsync options
@@ -73,8 +73,10 @@ source $source_dir/get_sudo
 source $source_dir/reply_functions
 source $source_dir/text_appearance
 
-make_offl_repo="$XDG_DATA_HOME/c/git/code/hajime/make-offl-repo"
+hajime_dir="$XDG_DATA_HOME/c/git/code/hajime"
+make_offl_repo="$hajime_dir/make-offl-repo"
 
+options="$@"
 
 repo ()
 {
