@@ -696,7 +696,7 @@ exit_chroot_jail_mnt ()
     echo
     printf "${st_bold}umount -R /mnt${st_def}\n"
     echo
-    printf "# ${fg_magenta}remove ARCHISO, REPO and CODE${st_def} media,"
+    printf "# ${fg_magenta}remove ARCHISO, REPO and CODE${st_def} media,\n"
     echo '# then perform an initial autonomous system reboot:'
     echo
     printf "${st_bold}reboot${st_def}\n"
