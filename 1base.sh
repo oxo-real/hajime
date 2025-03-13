@@ -1139,6 +1139,10 @@ configure_pacman ()
 {
     # [TODO] CHECK if pacman.conf is correct after 202306
     ## see: https://archlinux.org/news/git-migration-completed/
+    #TODO online community repo is no longer valid
+
+    ## keep archiso original pacman.conf
+    cp --preserve --recursive --verbose "$file_etc_pacman_conf" "$file_etc_pacman_conf"-org-bu
 
     if [[ $online -ne 1 ]]; then
 	## configure pacman.conf for offline repository
@@ -1266,9 +1270,9 @@ prepare_mnt_environment ()
 
     esac
 
-    # copy pacman.conf to root
+    # copy pacman.conf and -org-bu to root
     #TODO is this necessary? only for offline mode?
-    cp --preserve --recursive --verbose /etc/pacman.conf /mnt/etc/pacman.conf
+    cp --preserve --recursive --verbose /etc/pacman.conf* /mnt/etc
 
     echo
 }

@@ -132,6 +132,7 @@ installation_mode ()
 
 	## make sure pacman.conf points to online repos
 	pacman_conf_copy online
+	sudo pacman -Syy
 
     fi
 }
@@ -280,7 +281,7 @@ install_apps_packages ()
 
 	printf 'installing %s ' "$pkg"
 
-	if ! pacman -S --needed --noconfirm "$pkg"; then
+	if ! sudo pacman -S --needed --noconfirm "$pkg"; then
 
 	    printf 'error - skipping\n'
 

@@ -193,11 +193,10 @@ header ()
 
 point_in_time ()
 {
-    if [[ -f "$HOME"/hajime/1base.done ]]; then
+    if [[ -f "$hajime_exec"/1base.done ]]; then
 
 	## 1base.sh already ran; we are later in time
 	pit=1
-	# further data comes from calling script (3post)
 
     else
 
@@ -272,11 +271,15 @@ select_interface ()
 	interface=$(ip a | grep "^$interface_number" | \
 	    awk '{print $2}' | sed 's/://')
 
-	sudo ip link set $interface up
-	setup_wap
+	sudo ip link set "$interface" up
+	[[ "$interface" =~ ^w ]] && setup_wap
+
 	connect
 
-	printf "$interface connected to $wap\n"
+	printf '%s connected' "$interface"
+	[[ -n "$wap" ]] && printf ' to %s' "$wap"
+	echo
+
 }
 
 
@@ -313,7 +316,8 @@ install_or_exit ()
 {
     if [[ $pit -eq 1 ]]; then
 
-	set_online
+	ping -D -i 1 -c 3 9.9.9.9 > /dev/null 2>&1
+	[[ $? -ne 0 ]] && select_interface
 	exit 0
 
     else
