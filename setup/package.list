@@ -111,7 +111,7 @@ apps_packages ()
 	#zellij byobu termite-nocsd urxvt
 
 	## terminal_additions
-	bat eza fzf fzf-tab-git mako pv
+	bat fzf fzf-tab-git mako pv
 	#bat eza delta fzf fzf-tab-git getoptions mako pv
 	#wofi rofi bemenu-wayland
 
@@ -147,7 +147,7 @@ apps_packages ()
 	#zsa-wally-cli wvkbd
 
 	## audio
-	alsa-utils pipewire pipewire-alsa pipewire-jack pipewire-pulse sof-firmware
+	# alsa-utils pipewire pipewire-alsa pipewire-jack pipewire-pulse sof-firmware
 	#pulseaudio pulseaudio-alsa pulsemixer qpwgraph-qt5
 
 	## image_viewers
@@ -165,10 +165,6 @@ apps_packages ()
 	## archivers
 	#vimball
 
-	## build_tools
-	#yay-bin
-	#make (already in base-devel)
-
 	## terminal_text_tools
 	emacs figlet qrencode zbar jq tinyxxd
 
@@ -182,7 +178,7 @@ apps_packages ()
 	#gdisk tmsu trash-cli
 
 	## debugging
-	strace
+	# strace
 	#gdb valgrind
 
 	## network tools
@@ -190,7 +186,7 @@ apps_packages ()
 	#bind-tools wireshark-cli wireshark-qt
 
 	## programming languages
-	go zig zls
+	# go zig zls
 	#lisp perl rustup zig go lua python
 
 	## python additions
@@ -255,11 +251,11 @@ apps_packages ()
 	#calibre okular
 
 	## video_capturing
-	wf-recorder xdg-desktop-portal-wlr qt6ct wlrobs
+	# wf-recorder xdg-desktop-portal-wlr qt6ct wlrobs
 	#obs
 
 	## video_editing
-	kdenlive breeze
+	# kdenlive breeze
 
 	## video_tools
 	yt-dlp mpv
@@ -353,8 +349,9 @@ foreign_packages ()
 	tofi
 	# tofi-debug
 	# viddy
-	wlrobs
+	#wlrobs
 	# wlrobs-debug
+	yay-bin
 	yazi-git
 	# yazi-git-debug
 

@@ -72,8 +72,8 @@ file_packages="${hajime_dir}/install/package.list"
 
 pkgs_copy="${hajime_dir}/logs/pkgs-copy-$(id -u $USER)"
 pkgs_copy_err="${hajime_dir}/logs/pkgs-copy-err-$(id -u $USER)"
-pkgs_hajime="${hajime_dir}/logs/pkgs-hajime-$(id -u $USER)"
 pkgs_deps="${hajime_dir}/logs/pkgs-deps-$(id -u $USER)"
+pkgs_hajime="${hajime_dir}/logs/pkgs-hajime-$(id -u $USER)"
 pkgs_real_paths="${hajime_dir}/logs/pkgs-real-paths-$(id -u $USER)"
 pkgs_sigs="${hajime_dir}/logs/pkgs-sigs-$(id -u $USER)"
 
@@ -320,6 +320,7 @@ create_pkgs_sigs ()
 	> "$pkgs_sigs"
 }
 
+#TODO copy fgn pkgs to separate src directory
 
 copy_to_repo ()
 {

@@ -36,8 +36,8 @@ https://www.gnu.org/licenses/gpl-3.0.txt
 
 
 # description
-zeroth part of five scripts in total
-helper script to bootstrap hajime up after archiso boot
+initial part of five scripts in total
+helper script to bootstrap hajime after archiso boot
 
 # dependencies
   REPO
@@ -49,7 +49,7 @@ helper script to bootstrap hajime up after archiso boot
   mkdir tmp
   lsblk
   mount /dev/sdX tmp
-  sh tmp/code/hajime/0init.sh
+  sh tmp/code/hajime/0init.sh -c tmp/code/hajime/setup/dl3189.conf
 
 # '
 
@@ -68,6 +68,9 @@ initial_release=2020
 
 ## online
 online_repo=https://codeberg.org/oxo/hajime
+
+## absolute file paths
+hajime_src=/root/tmp/code/hajime
 
 
 #--------------------------------
@@ -116,10 +119,16 @@ getargs ()
 
 sourcing ()
 {
-    ## configuration file
     ## script_name is used in file_setup_config
+
     export script_name
-    [[ -f $file_setup_config ]] && source $file_setup_config
+    hajime_exec=/root/hajime
+
+    ## configuration file
+    ### define
+    # via --config value
+    ## source
+    [[ -f "$file_setup_config" ]] && source "$file_setup_config"
 }
 
 
@@ -129,14 +138,8 @@ process_config_flag_value ()
 
     if [[ -f "$realpath_cfv" ]]; then
 
-	# rhs=$(dirname "$file_setup_config_path")
-	# [[ -d "$rhs" ]] || mkdir -p "$rhs"
-
 	file_setup_config="$realpath_cfv"
 	printf '%s\n' "$file_setup_config" > "$file_setup_config_path"
-
-	## export does not survive chroot or reboot
-	#export file_setup_config
 
     else
 
@@ -193,7 +196,7 @@ header ()
 
 point_in_time ()
 {
-    if [[ -f "$hajime_exec"/1base.done ]]; then
+    if [[ -f "$HOME"/hajime/1base.done ]]; then
 
 	## 1base.sh already ran; we are later in time
 	pit=1
@@ -253,12 +256,6 @@ config_file_warning ()
 }
 
 
-set_online ()
-{
-    [[ $online -eq 1 ]] && select_interface
-}
-
-
 select_interface ()
 {
 	ip a
@@ -307,8 +304,8 @@ setup_wap ()
 
 connect ()
 {
-    sudo dhcpcd -w $interface
-    sleep 2
+    sudo dhcpcd -w "$interface"
+    sleep 5
 }
 
 
@@ -318,7 +315,6 @@ install_or_exit ()
 
 	ping -D -i 1 -c 3 9.9.9.9 > /dev/null 2>&1
 	[[ $? -ne 0 ]] && select_interface
-	exit 0
 
     else
 
@@ -332,7 +328,7 @@ install_or_exit ()
 installation_mode ()
 {
     if [[ $online -ne 1 ]]; then
-	## offline
+	## offline mode
 
 	## mount repo
 	get_offline_repo
@@ -362,9 +358,7 @@ installation_mode ()
 	fi
 
     elif [[ $online -eq 1 ]]; then
-	## online
-
-	set_online
+	## online mode
 
 	## must be similar to 1base configure_pacman
 	pacman-key --init
@@ -393,7 +387,7 @@ installation_mode ()
 	if [[ -n "$exec_mode" ]]; then
 
 	    ## config file active; add setup dir to cloned hajime
-	    cp --preserve --recursive "$hajime_src/setup" hajime
+	    cp --preserve --recursive "$hajime_src/setup" "$hajime_exec"
 
 	fi
 

@@ -128,6 +128,7 @@ installation_mode ()
 	## online mode
 
 	## dhcp connect
+	export hajime_exec
 	sh hajime/0init.sh
 
 	## make sure pacman.conf points to online repos
@@ -144,11 +145,11 @@ pacman_conf_copy ()
     case "$1" in
 
 	offline )
-	    cp "$file_pacman_offline_conf" "$file_etc_pacman_conf"
+	    sudo cp "$file_pacman_offline_conf" "$file_etc_pacman_conf"
 	    ;;
 
 	online )
-	    cp "$file_pacman_online_conf" "$file_etc_pacman_conf"
+	    sudo cp "$file_pacman_online_conf" "$file_etc_pacman_conf"
 	    ;;
 
     esac
@@ -296,6 +297,43 @@ install_apps_packages ()
 }
 
 
+install_yay ()
+{
+    ## define foreign package repository
+    yay_cache="$HOME/.cache/yay"
+
+    ## create foreign package repository location
+    [[ -d "$yay_cache" ]] || mkdir -p "$yay_cache"
+
+    ## goto foreign package repository
+    cd "$yay_cache"
+
+    if [[ "$online" -eq 1 ]]; then
+	## online mode
+
+	## clone online yay-bin upstream source
+	git clone https://aur.archlinux.org/yay-bin.git
+
+    elif [[ "$online" -ne 1 ]]; then
+	## offline mode
+
+	## copy offline yay-bin
+	#TODO permission denied error
+	cp -r "$HOME"/dock/2/yay/yay-bin "$yay_cache"
+
+    fi
+
+    ## goto yay source
+    cd yay-bin
+
+    ## make and install yay
+    makepkg --syncdeps --install
+
+    ## return home
+    cd
+}
+
+
 install_fgn_packages ()
 {
     ## using yay
@@ -348,6 +386,7 @@ main ()
     get_offline_code
 
     install_apps_packages
+    install_yay
     install_fgn_packages
 
     set_boot_ro
