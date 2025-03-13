@@ -98,11 +98,76 @@ home_perc=0.60
 ###  >1GB     sqrt(ram_size)  2*ram_size
 swap_size_recomm=4.00
 
-## files
+## absolute file paths
+hajime_src=/root/tmp/code/hajime
 file_mnt_etc_fstab=/mnt/etc/fstab
+file_etc_pacman_conf=/etc/pacman.conf
 
 
 #--------------------------------
+
+
+args="$@"
+getargs ()
+{
+    ## online installation
+    [[ "$1" =~ online$ ]] && online=1
+}
+
+
+sourcing ()
+{
+    ## hajime exec location
+    export script_name
+    hajime_exec=/root/hajime
+
+    ## configuration file
+    ### define
+    file_setup_config=$(head -n 1 "$hajime_exec"/setup/tempo-active.conf)
+    ### source
+    [[ -f "$file_setup_config" ]] && source "$file_setup_config"
+
+    ## package list
+    ### define
+    file_setup_package_list="$hajime_exec"/setup/package.list
+    ### source
+    [[ -f "$file_setup_package_list" ]] && source "$file_setup_package_list"
+
+    relative_file_paths
+}
+
+
+relative_file_paths ()
+{
+    ## independent (i.e. no if) relative file paths
+    file_pacman_offline_conf="$hajime_exec"/setup/pacman_offline.conf
+    file_pacman_online_conf="$hajime_exec"/setup/pacman_online.conf
+}
+
+
+installation_mode ()
+{
+    if [[ -n "$exec_mode" ]]; then
+	## configuration file is being sourced
+
+	file_setup_luks_pass="$hajime_exec"/setup/tempo-luks.pass
+
+    fi
+
+    if [[ $online -ne 1 ]]; then
+	## offline mode
+
+	## CODE and REPO mountpoints
+	## we have no "$HOME"/dock/{2,3} yet
+	## therefore we use /root/tmp for the mountpoints
+	code_lbl=CODE
+	code_dir=/root/tmp/code
+	repo_lbl=REPO
+	repo_dir=/root/tmp/repo
+	repo_re=\/root\/tmp\/repo
+
+    fi
+}
 
 
 define_text_appearance()
@@ -159,63 +224,6 @@ exit_hajime ()
     printf " Bye!\n"
     sleep 1
     exit
-}
-
-
-sourcing ()
-{
-    export script_name
-    file_setup_config=$(head -n 1 "$hajime_exec"/setup/tempo-active.conf)
-
-    ## configuration file
-    [[ -f "$file_setup_config" ]] && source "$file_setup_config"
-
-    file_setup_packages="$hajime_exec"/setup/package.list
-
-    ## sourcing package list
-    [[ -f "$file_setup_packages" ]] && source "$file_setup_packages"
-}
-
-
-args="$@"
-getargs ()
-{
-    ## online installation
-    [[ "$1" =~ online$ ]] && online=1
-}
-
-
-installation_mode ()
-{
-    file_etc_pacman_conf=/etc/pacman.conf
-
-    if [[ -n "$exec_mode" ]]; then
-	## configuration file is being sourced
-
-	file_setup_luks_pass="$hajime_exec"/setup/tempo-luks.pass
-
-    fi
-
-    if [[ $online -ne 1 ]]; then
-	## offline mode
-
-	## CODE and REPO mountpoints
-	## we have no "$HOME"/dock/{2,3} yet
-	## therefore we use /root/tmp for the mountpoints
-	code_lbl=CODE
-	code_dir=/root/tmp/code
-	repo_lbl=REPO
-	repo_dir=/root/tmp/repo
-	repo_re=\/root\/tmp\/repo
-
-	file_pacman_offline_conf="$hajime_exec"/setup/pacman_offline.conf
-
-    elif [[ "$online" -eq 1 ]]; then
-	## online mode
-
-	file_pacman_online_conf="$hajime_exec"/setup/pacman_online.conf
-
-    fi
 }
 
 

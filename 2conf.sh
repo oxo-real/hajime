@@ -94,27 +94,12 @@ username_default=user
 bootloader_timeout=2
 bootloader_editor=0
 
+## absolute file paths
+hajime_src=/root/tmp/code/hajime
+file_etc_pacman_conf=/etc/pacman.conf
+
+
 #--------------------------------
-
-sourcing ()
-{
-    export script_name
-    ## hajime_exec is needed to find file_setup_config
-    ## which is the source for the proper hajime_exec value
-    ## workaround for now is hardcode hajime_exec here
-    ## is this even an issue?
-    #TODO solve hardcoding hajime_exec
-    hajime_exec=/hajime
-    file_setup_config=$(head -n 1 "$hajime_exec"/setup/tempo-active.conf)
-
-    ## configuration file
-    [[ -f $file_setup_config ]] && source $file_setup_config
-
-    file_setup_packages="$hajime_exec"/setup/package.list
-
-    ## sourcing package list
-    [[ -f $file_setup_packages ]] && source $file_setup_packages
-}
 
 
 args="$@"
@@ -125,29 +110,44 @@ getargs ()
 }
 
 
-define_text_appearance()
+sourcing ()
 {
-    ## text color
-    fg_magenta='\033[0;35m'	# magenta
-    fg_green='\033[0;32m'	# green
-    fg_red='\033[0;31m'		# red
+    ## hajime exec location
+    export script_name
+    hajime_exec=/hajime
 
-    ## text style
-    st_def='\033[0m'		# default
-    st_ul=`tput smul`		# underline
-    st_bold=`tput bold`		# bold
+    ## configuration file
+    ### define
+    file_setup_config=$(head -n 1 "$hajime_exec"/setup/tempo-active.conf)
+    ### source
+    [[ -f "$file_setup_config" ]] && source "$file_setup_config"
+
+    ## package list
+    ### define
+    file_setup_package_list="$hajime_exec"/setup/package.list
+    ### source
+    [[ -f "$file_setup_package_list" ]] && source "$file_setup_package_list"
+
+    relative_file_paths
+}
+
+
+relative_file_paths ()
+{
+    ## independent (i.e. no if) relative file paths
+    file_pacman_offline_conf="$hajime_exec"/setup/pacman_offline.conf
+    file_pacman_online_conf="$hajime_exec"/setup/pacman_online.conf
 }
 
 
 installation_mode ()
 {
-    file_etc_pacman_conf=/etc/pacman.conf
 
     if [[ -n "$exec_mode" ]]; then
 	## configuration file is being sourced
 
 	file_setup_luks_pass="$hajime_exec"/setup/tempo-luks.pass
-	file_setup_packages="$hajime_exec"/setup/package.list
+	file_setup_package_list="$hajime_exec"/setup/package.list
 
     fi
 
@@ -163,14 +163,21 @@ installation_mode ()
 	repo_dir=/root/tmp/repo
 	repo_re=\/root\/tmp\/repo
 
-	file_pacman_offline_conf="$hajime_exec"/setup/pacman_offline.conf
-
-    elif [[ "$online" -eq 1 ]]; then
-	## online mode
-
-	file_pacman_online_conf="$hajime_exec"/setup/pacman_online.conf
-
     fi
+}
+
+
+define_text_appearance()
+{
+    ## text color
+    fg_magenta='\033[0;35m'	# magenta
+    fg_green='\033[0;32m'	# green
+    fg_red='\033[0;31m'		# red
+
+    ## text style
+    st_def='\033[0m'		# default
+    st_ul=`tput smul`		# underline
+    st_bold=`tput bold`		# bold
 }
 
 

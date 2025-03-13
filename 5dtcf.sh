@@ -86,25 +86,13 @@ repo_dir="/home/$(id -un)/dock/2"
 repo_re="\/home\/$(id -un)\/dock\/2"
 file_etc_pacman_conf=/etc/pacman.conf
 
-## doas configuration file
+
+## absolute file paths
+hajime_src="$HOME/dock/3/code/hajime"
 etc_doas_conf=/etc/doas.conf
-misc_doas_conf="$HOME/hajime/misc/etc_doas.conf"
+
 
 #--------------------------------
-
-sourcing ()
-{
-    export script_name
-    file_setup_config=$(head -n 1 "$hajime_exec"/setup/tempo-active.conf)
-
-    ## configuration file
-    [[ -f $file_setup_config ]] && source $file_setup_config
-
-    file_setup_packages="$hajime_exec"/setup/package.list
-
-    ## sourcing package list
-    [[ -f $file_setup_packages ]] && source $file_setup_packages
-}
 
 
 args="$@"
@@ -112,6 +100,36 @@ getargs ()
 {
     ## online installation
     [[ "$1" =~ online$ ]] && online=1
+}
+
+
+sourcing ()
+{
+    ## hajime exec location
+    export script_name
+    hajime_exec="$HOME/hajime"
+
+    ## configuration file
+    ### define
+    file_setup_config=$(head -n 1 "$hajime_exec"/setup/tempo-active.conf)
+    ### source
+    [[ -f "$file_setup_config" ]] && source "$file_setup_config"
+
+    ## package list
+    ### define
+    file_setup_package_list="$hajime_exec"/setup/package.list
+    ### source
+    [[ -f "$file_setup_package_list" ]] && source "$file_setup_package_list"
+
+    relative_file_paths
+}
+
+
+relative_file_paths ()
+{
+    ## independent (i.e. no if) relative file paths
+    ## doas configuration file
+    file_setup_doas_conf="$hajime_exec/setup/etc_doas.conf"
 }
 
 

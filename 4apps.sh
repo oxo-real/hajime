@@ -64,20 +64,93 @@ developer=oxo
 license=gplv3
 initial_release=2019
 
+## absolute filepaths
+hajime_src="$HOME/dock/3/code/hajime"
+file_etc_pacman_conf=/etc/pacman.conf
+
+
 #--------------------------------
+
+
+args="$@"
+getargs ()
+{
+    ## online installation
+    [[ "$1" =~ online$ ]] && online=1
+}
+
 
 sourcing ()
 {
+    ## hajime exec location
     export script_name
-    file_setup_config=$(head -n 1 "$hajime_exec"/setup/tempo-active.conf)
+    hajime_exec="$HOME/hajime"
 
     ## configuration file
-    [[ -f $file_setup_config ]] && source $file_setup_config
+    ### define
+    file_setup_config=$(head -n 1 "$hajime_exec"/setup/tempo-active.conf)
+    ### source
+    [[ -f "$file_setup_config" ]] && source "$file_setup_config"
 
-    file_setup_packages="$hajime_exec"/setup/package.list
+    ## package list
+    ### define
+    file_setup_package_list="$hajime_exec"/setup/package.list
+    ### source
+    [[ -f "$file_setup_package_list" ]] && source "$file_setup_package_list"
 
-    ## sourcing package list
-    [[ -f $file_setup_packages ]] && source $file_setup_packages
+    relative_file_paths
+}
+
+
+relative_file_paths ()
+{
+    ## independent (i.e. no if) relative file paths
+    file_pacman_offline_conf="$hajime_exec"/setup/pacman_offline.conf
+    file_pacman_online_conf="$hajime_exec"/setup/pacman_online.conf
+}
+
+
+installation_mode ()
+{
+    if [[ $online -ne 1 ]]; then
+	## offline mode
+
+	code_lbl=CODE
+	code_dir="/home/$(id -un)/dock/3"
+	repo_lbl=REPO
+	repo_dir="/home/$(id -un)/dock/2"
+	repo_re="\/home\/$(id -un)\/dock\/2"
+
+	## make sure pacman.conf points to offline repos
+	pacman_conf_copy offline
+
+    elif [[ "$online" -eq 1 ]]; then
+	## online mode
+
+	## dhcp connect
+	sh hajime/0init.sh
+
+	## make sure pacman.conf points to online repos
+	pacman_conf_copy online
+
+    fi
+}
+
+
+pacman_conf_copy ()
+{
+    ## in case previous ($online) mode was different than current mode
+    case "$1" in
+
+	offline )
+	    cp "$file_pacman_offline_conf" "$file_etc_pacman_conf"
+	    ;;
+
+	online )
+	    cp "$file_pacman_online_conf" "$file_etc_pacman_conf"
+	    ;;
+
+    esac
 }
 
 
@@ -88,7 +161,7 @@ debugging ()
     if [[ "$exec_mode" =~ debug* && -z "$debugging" ]]; then
 
 	debugging=on
-	debug_log="${hajime_src}/${script_name}-debug.log"
+	debug_log="${hajime_exec}/${script_name}-debug.log"
 
 	## debug header
 	printf '>>> %s_%X %s/%s-debug.log\n' "$(date +%Y%m%d_%H%M%S)" "$(date +'%s')" "$hajime_src" "$script_name"
@@ -112,45 +185,6 @@ debugging ()
 	exit 0
 
     fi
-}
-
-
-args="$@"
-getargs ()
-{
-    ## online installation
-    [[ "$1" =~ online$ ]] && online=1
-}
-
-
-installation_mode ()
-{
-    ## online or offline mode
-    if [[ $online -ne 1 ]]; then
-
-	code_lbl=CODE
-	code_dir="/home/$(id -un)/dock/3"
-	repo_lbl=REPO
-	repo_dir="/home/$(id -un)/dock/2"
-	repo_re="\/home\/$(id -un)\/dock\/2"
-	file_etc_pacman_conf=/etc/pacman.conf
-
-    elif [[ "$online" -eq 1 ]]; then
-
-	## dhcp connect
-	sh hajime/0init.sh
-
-	## if previous mode was offline then activate pacman.conf to online repos
-	file_pacman_online_conf="$hajime_exec"/setup/pacman_online.conf
-	pacman_conf_online
-
-    fi
-}
-
-
-pacman_conf_online ()
-{
-    cp "$file_pacman_online_conf" "$file_etc_pacman_conf"
 }
 
 
@@ -261,10 +295,10 @@ install_apps_packages ()
 }
 
 
-install_aur_packages ()
+install_fgn_packages ()
 {
     ## using yay
-    for pkg in "${aur_pkgs[@]}"; do
+    for pkg in "${fgn_pkgs[@]}"; do
 
 	printf 'installing %s ' "$pkg"
 
@@ -279,13 +313,12 @@ install_aur_packages ()
 	fi
 
     done
-
 }
 
 
 loose_ends ()
 {
-    ## recommend human to execute dotfiles install script
+    ## recommend human to execute dotfiles configuration script
     echo 'sh hajime/5dtcf.sh'
 
     ## finishing
@@ -314,7 +347,7 @@ main ()
     get_offline_code
 
     install_apps_packages
-    install_aur_packages
+    install_fgn_packages
 
     set_boot_ro
     set_usr_ro

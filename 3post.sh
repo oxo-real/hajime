@@ -71,34 +71,13 @@ initial_release=2018
 mirror_country=USA
 mirror_amount=5
 
+## absolute file paths
+hajime_src=/root/tmp/code/hajime
 file_etc_motd=/etc/motd
-file_setup_config="$HOME/hajime/setup/dl3189.conf"
-file_setup_packages="$HOME/hajime/setup/package.list"
+file_etc_pacman_conf=/etc/pacman.conf
+
 
 #--------------------------------
-
-
-# functions
-
-sourcing ()
-{
-    export script_name
-    ## hajime_exec is needed to find file_setup_config
-    ## which is the source for the proper hajime_exec value
-    ## workaround for now is hardcode hajime_exec here
-    ## is this even an issue?
-    #TODO solve hardcoding hajime_exec
-    hajime_exec="$HOME/hajime"
-    file_setup_config=$(head -n 1 "$hajime_exec"/setup/tempo-active.conf)
-
-    ## configuration file
-    [[ -f $file_setup_config ]] && source $file_setup_config
-
-    file_setup_packages="$hajime_exec"/setup/package.list
-
-    ## sourcing package list
-    [[ -f $file_setup_packages ]] && source $file_setup_packages
-}
 
 
 args="$@"
@@ -109,16 +88,40 @@ getargs ()
 }
 
 
-motd_remove ()
+sourcing ()
 {
-    sudo rm -rf $file_etc_motd
+    ## hajime exec location
+    export script_name
+    hajime_exec="$HOME/hajime"
+
+    ## configuration file
+    ### define
+    file_setup_config=$(head -n 1 "$hajime_exec"/setup/tempo-active.conf)
+    ### source
+    [[ -f "$file_setup_config" ]] && source "$file_setup_config"
+
+    ## package list
+    ### define
+    file_setup_package_list="$hajime_exec"/setup/package.list
+    ### source
+    [[ -f "$file_setup_package_list" ]] && source "$file_setup_package_list"
+
+    relative_file_paths
+}
+
+
+relative_file_paths ()
+{
+    ## independent (i.e. no if) relative file paths
+    file_pacman_offline_conf="$hajime_exec"/setup/pacman_offline.conf
+    file_pacman_online_conf="$hajime_exec"/setup/pacman_online.conf
 }
 
 
 installation_mode ()
 {
-    ## online or offline mode
     if [[ $online -ne 1 ]]; then
+	## offline mode
 
 	code_lbl=CODE
 	code_dir="/home/$(id -un)/dock/3"
@@ -126,16 +129,38 @@ installation_mode ()
 	repo_dir="/home/$(id -un)/dock/2"
 	repo_re="\/home\/$(id -un)\/dock\/2"
 
-	file_etc_pacman_conf=/etc/pacman.conf
-
     elif [[ "$online" -eq 1 ]]; then
+	## online mode
 
 	## dhcp connect
 	sh hajime/0init.sh
 
-	file_pacman_online_conf="$code_dir"/hajime/setup/pacman_online.conf
+	## make sure pacman.conf points to online repos
+	pacman_conf_copy online
 
     fi
+}
+
+
+motd_remove ()
+{
+    sudo rm -rf $file_etc_motd
+}
+
+
+pacman_conf_copy ()
+{
+    case "$1" in
+
+	offline )
+            cp "$file_pacman_offline_conf" "$file_etc_pacman_conf"
+            ;;
+
+	online )
+            cp "$file_pacman_online_conf" "$file_etc_pacman_conf"
+            ;;
+
+    esac
 }
 
 
