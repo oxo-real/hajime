@@ -65,8 +65,9 @@ license=gplv3
 initial_release=2019
 
 ## absolute filepaths
-hajime_src="$HOME/dock/3/code/hajime"
 file_etc_pacman_conf=/etc/pacman.conf
+hajime_src="$HOME/dock/3/code/hajime"
+yay_cache="$HOME/.cache/yay"
 
 
 #--------------------------------
@@ -299,9 +300,6 @@ install_apps_packages ()
 
 install_yay ()
 {
-    ## define foreign package repository
-    yay_cache="$HOME/.cache/yay"
-
     ## create foreign package repository location
     [[ -d "$yay_cache" ]] || mkdir -p "$yay_cache"
 

@@ -133,6 +133,52 @@ relative_file_paths ()
 }
 
 
+installation_mode ()
+{
+    if [[ $online -ne 1 ]]; then
+	## offline mode
+
+	code_lbl=CODE
+	code_dir="/home/$(id -un)/dock/3"
+	repo_lbl=REPO
+	repo_dir="/home/$(id -un)/dock/2"
+	repo_re="\/home\/$(id -un)\/dock\/2"
+
+	## make sure pacman.conf points to offline repos
+	pacman_conf_copy offline
+
+    elif [[ "$online" -eq 1 ]]; then
+	## online mode
+
+	## dhcp connect
+	export hajime_exec
+	sh hajime/0init.sh
+
+	## make sure pacman.conf points to online repos
+	pacman_conf_copy online
+	sudo pacman -Syy
+
+    fi
+}
+
+
+pacman_conf_copy ()
+{
+    ## in case previous ($online) mode was different than current mode
+    case "$1" in
+
+	offline )
+	    sudo cp "$file_pacman_offline_conf" "$file_etc_pacman_conf"
+	    ;;
+
+	online )
+	    sudo cp "$file_pacman_online_conf" "$file_etc_pacman_conf"
+	    ;;
+
+    esac
+}
+
+
 debugging ()
 {
     ## debug switch via configuration file
@@ -270,12 +316,14 @@ git_clone_prvt ()
 get_git_repo ()
 {
     if [[ $online -eq 1 ]]; then
+	## online mode
 
 	git_clone_dotf
 	git_clone_code
 	git_clone_note
 
     elif [[ $online -ne 1 ]]; then
+	## offline mode
 
 	## define destinations
 	home_dir_dst="$HOME"
@@ -422,7 +470,7 @@ base16 ()
 
 qutebrowser ()
 {
-    # qutebrowser download directory
+    ## qutebrowser download directory
     qb_dl_dir="$XDG_DATA_HOME/c/download"
     [ -d $qb_dl_dir ] || mkdir -p $qb_dl_dir
 }
@@ -430,8 +478,7 @@ qutebrowser ()
 
 wallpaper ()
 {
-    # prepare wallpaper file
-
+    ## prepare wallpaper file
     [ -d $XDG_DATA_HOME/a/media/images/wallpaper ] || \
 	mkdir -p $XDG_DATA_HOME/a/media/images/wallpaper
 
@@ -441,15 +488,23 @@ wallpaper ()
 
 pacman_conf ()
 {
-    # disabling offline repo
+    ## disabling offline repo
     sudo sed -i '/^\[offline\]/ s/./#&/' $file_etc_pacman_conf
     sudo sed -i '/^Server = file:\/\// s/./#&/' $file_etc_pacman_conf
 
-    # enabling original repositories
+    ## restore default online pacman.conf repositories
     sudo sed -i 's/^#X--//' $file_etc_pacman_conf
 
-    # whenever network is available do:
-    #sudo pacman -Syy
+    ## check for network
+    ping -D -i 1 -c 3 9.9.9.9 > /dev/null 2>&1
+
+    if [[ $? -eq 0 ]]; then
+	## network available
+
+	## synchronize package databases
+	sudo pacman -Syy
+
+    fi
 }
 
 
