@@ -68,6 +68,7 @@ initial_release=2019
 file_etc_pacman_conf=/etc/pacman.conf
 hajime_src="$HOME/dock/3/code/hajime"
 yay_cache="$HOME/.cache/yay"
+yay_src="$HOME/dock/2/src/yay"
 
 
 #--------------------------------
@@ -275,6 +276,40 @@ set_usr_ro ()
 }
 
 
+install_yay ()
+{
+    ## create foreign package repository location
+    [[ -d "$yay_cache" ]] || mkdir -p "$yay_cache"
+
+    ## goto foreign package repository
+    cd "$yay_cache"
+
+    if [[ "$online" -eq 1 ]]; then
+	## online mode
+
+	## clone online yay-bin upstream source
+	git clone https://aur.archlinux.org/yay-bin.git
+
+    elif [[ "$online" -ne 1 ]]; then
+	## offline mode
+
+	## copy offline yay-bin
+	#TODO permission denied error
+	cp -r "$yay_src"/yay-bin "$yay_cache"
+
+    fi
+
+    ## goto yay-bin source
+    cd yay-bin
+
+    ## make and install yay-bin
+    makepkg --syncdeps --install
+
+    ## return home
+    cd
+}
+
+
 install_apps_packages ()
 {
     ## for to prevent pacman exit on error
@@ -295,40 +330,6 @@ install_apps_packages ()
 
     done
     #sudo pacman -S --needed --noconfirm "${apps_pkgs[@]}"
-}
-
-
-install_yay ()
-{
-    ## create foreign package repository location
-    [[ -d "$yay_cache" ]] || mkdir -p "$yay_cache"
-
-    ## goto foreign package repository
-    cd "$yay_cache"
-
-    if [[ "$online" -eq 1 ]]; then
-	## online mode
-
-	## clone online yay-bin upstream source
-	git clone https://aur.archlinux.org/yay-bin.git
-
-    elif [[ "$online" -ne 1 ]]; then
-	## offline mode
-
-	## copy offline yay-bin
-	#TODO permission denied error
-	cp -r "$HOME"/dock/2/yay/yay-bin "$yay_cache"
-
-    fi
-
-    ## goto yay source
-    cd yay-bin
-
-    ## make and install yay
-    makepkg --syncdeps --install
-
-    ## return home
-    cd
 }
 
 
@@ -383,9 +384,9 @@ main ()
     get_offline_repo
     get_offline_code
 
-    install_apps_packages
     install_yay
-    install_fgn_packages
+    # install_apps_packages
+    # install_fgn_packages
 
     set_boot_ro
     set_usr_ro
