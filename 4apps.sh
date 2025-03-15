@@ -109,6 +109,7 @@ relative_file_paths ()
     ## independent (i.e. no if) relative file paths
     file_pacman_offline_conf="$hajime_exec"/setup/pacman_offline.conf
     file_pacman_online_conf="$hajime_exec"/setup/pacman_online.conf
+    file_error_log="$hajime_exec"/logs/"$script_name"-error.log
 }
 
 
@@ -143,7 +144,7 @@ installation_mode ()
 
 pacman_conf_copy ()
 {
-    ## in case previous ($online) mode was different than current mode
+    ## in case current ($online) mode differs from previous
     case "$1" in
 
 	offline )
@@ -155,40 +156,6 @@ pacman_conf_copy ()
 	    ;;
 
     esac
-}
-
-
-debugging ()
-{
-    ## debug switch via configuration file
-    ## -z debugging prevents infinite loop
-    if [[ "$exec_mode" =~ debug* && -z "$debugging" ]]; then
-
-	debugging=on
-	debug_log="${hajime_exec}/${script_name}-debug.log"
-
-	## debug header
-	printf '>>> %s_%X %s/%s-debug.log\n' "$(date +%Y%m%d_%H%M%S)" "$(date +'%s')" "$hajime_src" "$script_name"
-	echo
-
-	case "$exec_mode" in
-
-	    debug )
-		## start script in debug mode
- 		sh "$hajime_src"/"$script_name" 2>&1 | tee -a "$debug_log"
-		;;
-
-	    debug_verbose )
-		## start script in verbose debug mode
- 		sh -x "$hajime_src"/"$script_name" 2>&1 | tee -a "$debug_log"
-		;;
-
-	esac
-
-	unset debugging
-	exit 0
-
-    fi
 }
 
 
@@ -316,41 +283,14 @@ install_apps_packages ()
     ## apps_pkgs sourced via setup/package.list
     for pkg in "${apps_pkgs[@]}"; do
 
-	printf 'installing %s ' "$pkg"
+	if ! yay -S --needed --noconfirm "$pkg"; then
 
-	if ! sudo pacman -S --needed --noconfirm "$pkg"; then
-
-	    printf 'error - skipping\n'
-
-	else
-
-	    printf 'succes\n'
+	    printf 'ERROR installing %s\n' "$pkg" | tee -a $file_error_log
 
 	fi
 
     done
     #sudo pacman -S --needed --noconfirm "${apps_pkgs[@]}"
-}
-
-
-install_fgn_packages ()
-{
-    ## using yay
-    for pkg in "${fgn_pkgs[@]}"; do
-
-	printf 'installing %s ' "$pkg"
-
-	if ! yay -S --needed --noconfirm "$pkg"; then
-
-	    printf 'error - skipping\n'
-
-	else
-
-	    printf 'succes\n'
-
-	fi
-
-    done
 }
 
 
@@ -371,6 +311,40 @@ autostart_next ()
 }
 
 
+debugging ()
+{
+    ## debug switch via configuration file
+    ## -z debugging prevents infinite loop
+    if [[ "$exec_mode" =~ debug* && -z "$debugging" ]]; then
+
+	debugging=on
+	debug_log="${hajime_exec}/${script_name}-debug.log"
+
+	## debug header
+	printf '>>> %s_%X %s/%s-debug.log\n' "$(date +%Y%m%d_%H%M%S)" "$(date +'%s')" "$hajime_src" "$script_name"
+	echo
+
+	case "$exec_mode" in
+
+	    debug )
+		## start script in debug mode
+ 		sh "$hajime_src"/"$script_name" 2>&1 | tee -a "$debug_log"
+		;;
+
+	    debug_verbose )
+		## start script in verbose debug mode
+ 		sh -x "$hajime_src"/"$script_name" 2>&1 | tee -a "$debug_log"
+		;;
+
+	esac
+
+	unset debugging
+	exit 0
+
+    fi
+}
+
+
 main ()
 {
     sourcing
@@ -385,8 +359,7 @@ main ()
     get_offline_code
 
     install_yay
-    # install_apps_packages
-    # install_fgn_packages
+    install_apps_packages
 
     set_boot_ro
     set_usr_ro

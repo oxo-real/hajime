@@ -82,6 +82,7 @@ pkg_help=reflector  ## keeping base_packages clean
 
 ## boot size (MB)
 boot_size=256
+
 ## recommended percentages of $lvm_size_calc
 root_perc=0.05	## recommended minimum 1G
 tmp_perc=0.02	## recommended minimum 1G
@@ -934,7 +935,7 @@ legacy_cryptsetup ()
 	printf '%s' "$luks_pass" > $file_setup_luks_pass
 
 	cryptsetup luksFormat --batch-mode --type luks2 --key-file $file_setup_luks_pass "$lvm_part"
-	cryptsetup --key-file $file_setup_luks_pass open "$lvm_part" cryptlvm
+	cryptsetup --key-file $file_setup_luks_pass open "$lvm_part" "$device_mapper"
 
 	## remove key-file
 	rm -rf $file_setup_luks_pass
@@ -943,7 +944,7 @@ legacy_cryptsetup ()
 	## user interactive
 
 	cryptsetup luksFormat --type luks2 "$lvm_part"
-	cryptsetup open "$lvm_part" cryptlvm
+	cryptsetup open "$lvm_part" "$device_mapper"
 
     fi
 }

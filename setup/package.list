@@ -89,7 +89,8 @@ apps_packages ()
 
 
 	## wayland
-	dotool qt6-wayland tofi wl-clipboard wev wlroots xorg-xwayland
+	dotool tofi wl-clipboard wev
+	#qt6-wayland wlroots xorg-xwayland
 	## qt5-wayland to prevent:
 	## WARNING: Could not find the Qt platform plugin 'wayland' in
 	## i.e. when starting qutebrowser
@@ -182,7 +183,7 @@ apps_packages ()
 	#gdb valgrind
 
 	## network tools
-	mtr iftop whois ufw trippy
+	#mtr iftop whois ufw trippy
 	#bind-tools wireshark-cli wireshark-qt
 
 	## programming languages
@@ -209,7 +210,7 @@ apps_packages ()
 	newsboat
 
 	## email
-	neomutt msmtp isync notmuch protonmail-bridge
+	#neomutt msmtp isync notmuch protonmail-bridge
 
 	## time_management
 	#calcurse task
@@ -224,15 +225,15 @@ apps_packages ()
 #	#ledger hledger
 
 	## download_utilities
-	aria2 transmission-cli
-	#transmission-remote-cli-git
+	transmission-cli
+	#aria2 transmission-remote-cli-git
 
 	## system_info
 	lshw usbutils
 
 	## system_monitoring
-	btop glances viddy
-	#ccze htop
+	glances
+	#viddy btop ccze htop
 
 	## virtualization
 	#qemu-full virt-manager virt-viewer bridge-utils dnsmasq libquestfs
@@ -285,45 +286,31 @@ apps_packages ()
 	#wttr
 
 	## database
-	sqlitebrowser arch-wiki-docs arch-wiki-lite
-    )
-}
+	arch-wiki-docs arch-wiki-lite
+	#sqlitebrowser
 
-
-foreign_packages ()
-{
     # foreign packages from arch user repository
 
-    fgn_pkgs=(
-
-	## create foreign package list:
+ 	## create foreign package list:
 	#for dir in $(fd . --max-depth 1 --type directory ~/.cache/yay | sed 's/\/$//'); do printf '%s \\\n' "$(basename "$dir")"; done | wl-copy
 	## or
 	#yay -Qqm
 	#yay -Qm (version included)
 
 	#7-zip
-	# 7-zip-debug
 	base16-shell-preview
 	brave-bin
 	# calcmysky
-	# calcmysky-debug
 	# cava
-	# cava-debug
 	dotool
-	# dotool-debug
 	fzf-tab-git
 	# imhex
 	# kmonad-bin
-	# kmonad-bin-debug
 	# lisp
 	# mbrola
 	# ncurses5-compat-libs
-	# ncurses5-compat-libs-debug
 	# obs-backgroundremoval
-	# obs-backgroundremoval-debug
 	# otf-unifont
-	# protonmail-bridge-debug
 	protonvpn-cli
 	# pup
 	# python-future
@@ -334,27 +321,18 @@ foreign_packages ()
 	# python-pythondialog
 	# python-sgp4
 	# python-skyfield
-	# qt5-webkit-debug
 	# qxlsx-qt6
 	# sdl2
-	# sentry-native-debug
 	# showmethekey
-	# showmethekey-debug
 	simple-mtpfs
-	# simple-mtpfs-debug
 	ssss
 	# stellarium
-	# stellarium-debug
 	swaynagmode
 	tofi
-	# tofi-debug
 	# viddy
 	#wlrobs
-	# wlrobs-debug
-	yay-bin
+	#yay-bin
 	yazi-git
-	# yazi-git-debug
-
     )
 }
 
@@ -365,7 +343,6 @@ main ()
     conf_packages
     post_packages
     apps_packages
-    foreign_packages
 }
 
 main

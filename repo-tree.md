@@ -18,13 +18,13 @@
 ├── make-recov
 ├── misc
 │   ├── alt_dtp_env
-│   ├── etc_doas.conf
 │   ├── ol_pacman.conf
 │   └── rescue.sh
 ├── README.md
 ├── repo-tree.md
 └── setup
     ├── dl3189.conf
+    ├── etc_doas.conf
     ├── package.list
     ├── pacman_offline.conf
     └── pacman_online.conf

@@ -408,7 +408,7 @@ set_permissions ()
     # sudo printf 'permit persist :wheel\n' > $etc_doas_conf
     # sudo chown -c root:root $etc_doas_conf
     # sudo chmod -c 0400 $etc_doas_conf
-    sudo cp $misc_doas_conf $etc_doas_conf
+    sudo cp $file_setup_doas_conf $etc_doas_conf
 
     ## test for errors
     if ! sudo doas -C $etc_doas_conf; then
