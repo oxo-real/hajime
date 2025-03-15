@@ -13,7 +13,7 @@
 # device parameters
 
 ## boot
-dev_boot=/dev/sda
+dev_boot=dev/sda
 part_boot=1
 boot_part="$dev_boot""$part_boot"
 
@@ -46,13 +46,7 @@ mkdir -p "$lvm_root"/{home,tmp,usr,var}
 ## decrypt lvm container
 cryptsetup open "$lvm_part" "$device_mapper"
 
-## search volume groups
-vgscan
-
-## activate logical volumes
-vgchange --activate --yes
-
-mount "${lvm_part}"/"${group_vol}"_root "${lvm_root}"
+mount "${map_dir}"/"${group_vol}"_root "${lvm_root}"
 mount "${boot_part}" "${lvm_root}"/boot
 mount "${map_dir}"/"${group_vol}"_home "${lvm_root}"/home
 mount "${map_dir}"/"${group_vol}"_tmp "${lvm_root}"/tmp

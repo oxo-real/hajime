@@ -7,6 +7,8 @@
 ├── 4apps.sh
 ├── 5dtcf.sh
 ├── COPYING
+├── emer
+│   └── rescue.sh
 ├── logs
 │   ├── pkgs-copy-1000
 │   ├── pkgs-deps-1000
@@ -18,7 +20,6 @@
 ├── make-recov
 ├── misc
 │   ├── alt_dtp_env
-│   ├── ol_pacman.conf
 │   └── rescue.sh
 ├── README.md
 ├── repo-tree.md
@@ -29,5 +30,5 @@
     ├── pacman_offline.conf
     └── pacman_online.conf
 
-4 directories, 25 files
+5 directories, 25 files
 ```
