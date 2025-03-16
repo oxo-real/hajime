@@ -1222,11 +1222,11 @@ make_filesystems ()
 {
     echo
     mkfs."$fs_boot" -F 32 -n "$lbl_boot" "$boot_part"
-    mkfs."$fs_root" -L "$lbl_root" "$map_dir"/"logic_vol"_root
-    mkfs."$fs_home" -L "$lbl_home" "$map_dir"/"logic_vol"_home
-    mkfs."$fs_tmp" -L "$lbl_tmp" "$map_dir"/"logic_vol"_tmp
-    mkfs."$fs_usr" -L "$lbl_usr" "$map_dir"/"logic_vol"_usr
-    mkfs."$fs_var" -L "$lbl_var" "$map_dir"/"logic_vol"_var
+    mkfs."$fs_root" -L "$lbl_root" "$map_dir"/"$logic_vol"_root
+    mkfs."$fs_home" -L "$lbl_home" "$map_dir"/"$logic_vol"_home
+    mkfs."$fs_tmp" -L "$lbl_tmp" "$map_dir"/"$logic_vol"_tmp
+    mkfs."$fs_usr" -L "$lbl_usr" "$map_dir"/"$logic_vol"_usr
+    mkfs."$fs_var" -L "$lbl_var" "$map_dir"/"$logic_vol"_var
 }
 
 

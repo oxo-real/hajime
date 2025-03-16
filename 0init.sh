@@ -152,6 +152,11 @@ sourcing ()
 relative_file_paths ()
 {
     ## independent (i.e. no if) relative file paths
+
+    ## tempo-active.conf will contain path to active configuration file
+    file_setup_config_path="$hajime_exec"/setup/tempo-active.conf
+
+    ## wireless network access point password
     wap_pass="$hajime_src"/setup/wap"$wap".pass
 
     if [[ "$pit" -eq 1 ]]; then
@@ -472,33 +477,29 @@ installation_mode ()
 
 	fi
 
+	## clone online remote repository
 	git clone $online_repo
 
 	case $? in
 
-	    0)
-		:
+	    0 )
+		if [[ -n "$exec_mode" ]]; then
+
+		    ## config file active; add setup dir to cloned hajime
+		    cp --preserve --recursive "$hajime_src/setup" "$hajime_exec"
+
+		fi
 		;;
 
-	    *)
+	    * )
 		printf 'ERROR cloning %s\n' "${online_repo##*/}"
 		;;
 
 	esac
 
-	if [[ -n "$exec_mode" ]]; then
-
-	    ## config file active; add setup dir to cloned hajime
-	    cp --preserve --recursive "$hajime_src/setup" "$hajime_exec"
-
-	fi
-
     fi
 
     if [[ -n "$exec_mode" ]]; then
-
-	## tempo-active.conf will contain path to active configuration file
-	file_setup_config_path=/root/hajime/setup/tempo-active.conf
 
 	## update file_setup_config_path with it's new hajime_exec location
 	## hajime_exec did not exist before cp, we define it here
