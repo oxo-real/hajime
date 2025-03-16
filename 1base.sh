@@ -74,7 +74,7 @@ rtc_local_timezone=0
 arch_mirrorlist=https://archlinux.org/mirrorlist/?country=SE&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on
 mirror_country=Germany,Netherlands,Sweden,USA
 mirror_amount=5
-pkg_help=reflector  ## keeping base_packages clean
+# pkg_help=reflector  ## keeping base_packages clean
 # [Installation guide - ArchWiki](https://wiki.archlinux.org/title/Installation_guide#Install_essential_packages)
 # 20230212 https://archlinux.org/news/switch-to-the-base-devel-meta-package-requires-manual-intervention/
 #pkg_core='base linux linux-firmware' (via install-packages)
@@ -89,6 +89,7 @@ tmp_perc=0.02	## recommended minimum 1G
 usr_perc=0.15	## recommended minimum 10G
 var_perc=0.15	## recommended minimum 10G
 home_perc=0.60
+
 ## recommended SWAP size (GB):
 ## with hibernation:
 ### swap_size_recomm => ram_size+sqrt(ram_size)
@@ -98,6 +99,34 @@ home_perc=0.60
 ###  <1GB     1*ram_size      2*ram_size
 ###  >1GB     sqrt(ram_size)  2*ram_size
 swap_size_recomm=4.00
+
+
+# cryptoluks parameters
+
+## cryptoluks source
+device_mapper=cryptlvm
+
+## device mapper directory
+map_dir=/dev/mapper
+
+
+# logical volume manager parameters
+
+## group name
+vol_grp_name=vg0
+logic_vol="$vol_grp_name"-lv
+
+## lvm root mountpoint
+lvm_root=/mnt
+
+## filesystems; labels
+fs_boot=vfat; lbl_boot=BOOT
+fs_root=ext4; lbl_root=ROOT
+fs_home=ext4; lbl_home=HOME
+fs_tmp=ext4; lbl_tmp=TMP
+fs_usr=ext4; lbl_usr=USR
+fs_var=ext4; lbl_var=VAR
+
 
 ## absolute file paths
 hajime_src=/root/tmp/code/hajime
@@ -111,8 +140,53 @@ file_etc_pacman_conf=/etc/pacman.conf
 args="$@"
 getargs ()
 {
-    ## online installation
-    [[ "$1" =~ online$ ]] && online=1
+    while :; do
+
+	case "$1" in
+
+	    -c | --config )
+		shift
+
+		## get config flag value
+		cfv="$1"
+
+		process_config_flag_value
+		shift
+		;;
+
+	    --online )
+		## explicit arguments overrule defaults or configuration file setting
+
+		## online installation
+		[[ "$1" =~ online$ ]] && online_arg=1 && online="$online_arg"
+		shift
+		;;
+
+	    --offline )
+		## explicit arguments overrule defaults or configuration file setting
+
+		## offline installation
+		[[ "$1" =~ offline$ ]] && offline_arg=1 && online=0
+		shift
+		;;
+
+	    -- )
+		shift
+
+		## get config flag value
+		cfv="$1"
+
+		process_config_flag_value
+		break
+		;;
+
+            * )
+		break
+		;;
+
+	esac
+
+    done
 }
 
 
@@ -135,6 +209,9 @@ sourcing ()
     [[ -f "$file_setup_package_list" ]] && source "$file_setup_package_list"
 
     relative_file_paths
+
+    ## config file is sourced; reevaluate explicit arguments
+    explicit_arguments
 }
 
 
@@ -143,6 +220,60 @@ relative_file_paths ()
     ## independent (i.e. no if) relative file paths
     file_pacman_offline_conf="$hajime_exec"/setup/pacman_offline.conf
     file_pacman_online_conf="$hajime_exec"/setup/pacman_online.conf
+}
+
+
+explicit_arguments ()
+{
+    ## explicit arguments override default and configuration settings
+    ## regarding network installation mode
+
+    if [[ "$online_arg" -eq 1 ]]; then
+	## online mode (forced)
+
+	online=1
+
+	## change network mode in configuration file
+	## uncomment line online=1
+	sed -i '/online=1/s/^[ \t]*#\+ *//' "$file_setup_config"
+	## comment line online=0
+	sed -i '/^online=0/ s/./#&/' "$file_setup_config"
+
+    elif [[ "$offline_arg" -eq 1 ]]; then
+	## offine mode (forced)
+
+	online=0
+
+	## change network mode in configuration file
+	## comment line online=1
+	sed -i '/^online=1/ s/./#&/' "$file_setup_config"
+	## uncomment line online=0
+	sed -i '/online=0/s/^[ \t]*#\+ *//' "$file_setup_config"
+
+    fi
+}
+
+
+process_config_flag_value ()
+{
+    realpath_cfv=$(realpath "$cfv")
+
+    if [[ -f "$realpath_cfv" ]]; then
+
+	file_setup_config="$realpath_cfv"
+	printf '%s\n' "$file_setup_config" > "$file_setup_config_path"
+
+    else
+
+	printf 'ERROR config file ${st_bold}%s${st_def} not found\n' "$cfv"
+
+	unset file_setup_config
+	unset realpath_cfv
+	unset cfv
+
+	exit 151
+
+    fi
 }
 
 
@@ -1073,50 +1204,50 @@ cryptlvm ()
 create_lvm_volumes ()
 {
     ## create physical volume with lvm
-    pvcreate /dev/mapper/cryptlvm
+    pvcreate "$map_dir"/"$device_mapper"
 
     ## create volumegroup 0 (vg0) with lvm
-    vgcreate vg0 /dev/mapper/cryptlvm
+    vgcreate "$vol_grp_name" "$map_dir"/"$device_mapper"
 
     ## create logical volumes
-    lvcreate -L "$root_size"G vg0 -n lv_root
-    lvcreate -L "$home_size"G vg0 -n lv_home
-    lvcreate -L "$tmp_size"G vg0 -n lv_tmp
-    lvcreate -L "$usr_size"G vg0 -n lv_var
-    lvcreate -L "$var_size"G vg0 -n lv_usr
+    lvcreate -L "$root_size"G "$vol_grp_name" -n lv_root
+    lvcreate -L "$home_size"G "$vol_grp_name" -n lv_home
+    lvcreate -L "$tmp_size"G "$vol_grp_name" -n lv_tmp
+    lvcreate -L "$usr_size"G "$vol_grp_name" -n lv_var
+    lvcreate -L "$var_size"G "$vol_grp_name" -n lv_usr
 }
 
 
 make_filesystems ()
 {
     echo
-    mkfs.vfat -F 32 -n BOOT "$boot_part"
-    mkfs.ext4 -L ROOT /dev/mapper/vg0-lv_root
-    mkfs.ext4 -L HOME /dev/mapper/vg0-lv_home
-    mkfs.ext4 -L TMP /dev/mapper/vg0-lv_tmp
-    mkfs.ext4 -L USR /dev/mapper/vg0-lv_usr
-    mkfs.ext4 -L VAR /dev/mapper/vg0-lv_var
+    mkfs."$fs_boot" -F 32 -n "$lbl_boot" "$boot_part"
+    mkfs."$fs_root" -L "$lbl_root" "$map_dir"/"logic_vol"_root
+    mkfs."$fs_home" -L "$lbl_home" "$map_dir"/"logic_vol"_home
+    mkfs."$fs_tmp" -L "$lbl_tmp" "$map_dir"/"logic_vol"_tmp
+    mkfs."$fs_usr" -L "$lbl_usr" "$map_dir"/"logic_vol"_usr
+    mkfs."$fs_var" -L "$lbl_var" "$map_dir"/"logic_vol"_var
 }
 
 
 create_mountpoints ()
 {
-    mount /dev/mapper/vg0-lv_root /mnt
-    mkdir /mnt/boot
-    mkdir /mnt/home
-    mkdir /mnt/tmp
-    mkdir /mnt/usr
-    mkdir /mnt/var
+    ## create system directories
+    mkdir -p "$lvm_root"/{boot,home,tmp,usr,var}
 }
 
 
 mount_partitions ()
 {
-    mount "$boot_part" /mnt/boot
-    mount /dev/mapper/vg0-lv_home /mnt/home
-    mount /dev/mapper/vg0-lv_tmp /mnt/tmp
-    mount /dev/mapper/vg0-lv_usr /mnt/usr
-    mount /dev/mapper/vg0-lv_var /mnt/var
+    ## mount volume group
+    mount "$map_dir"/"$logic_vol"_root "$lvm_root"
+
+    ## mount logical volumes
+    mount "$boot_part" "$lvm_root"/boot
+    mount "$map_dir"/"$logic_vol"_home "$lvm_root"/home
+    mount "$map_dir"/"$logic_vol"_tmp "$lvm_root"/tmp
+    mount "$map_dir"/"$logic_vol"_usr "$lvm_root"/usr
+    mount "$map_dir"/"$logic_vol"_var "$lvm_root"/var
 }
 
 
@@ -1138,21 +1269,18 @@ create_swap_partition()
 
 configure_pacman ()
 {
-    # [TODO] CHECK if pacman.conf is correct after 202306
-    ## see: https://archlinux.org/news/git-migration-completed/
-    #TODO online community repo is no longer valid
-
     ## keep archiso original pacman.conf
     cp --preserve --recursive --verbose "$file_etc_pacman_conf" "$file_etc_pacman_conf"-org-bu
 
     if [[ $online -ne 1 ]]; then
+	## offline mode
 	## configure pacman.conf for offline repository
 
-	## copy pacman.conf
+	## copy pacman offline configuration to /etc/pacman.conf
 	cp --preserve --recursive --verbose "$file_pacman_offline_conf" "$file_etc_pacman_conf"
 	echo
 
-	## update pacman.conf
+	## update repo name in /etc/pacman.conf
 	sed -i "s#0init_repo_here#${repo_dir}#" "$file_etc_pacman_conf"
 
     fi
@@ -1164,13 +1292,13 @@ configure_pacman ()
     #sed -i 's/^SigLevel = Required DatabaseOptional/SigLevel = Never/' /etc/pacman.conf
 
     # init package keys
-    pacman-key --init
+    #pacman-key --init  ## already done in 0init
 
     # populate keys from archlinux.gpg
-    pacman-key --populate
+    #pacman-key --populate  ## already done in 0init
 
-    # update package database
-    # pacman -Syy
+    # force a refresh of the package database
+    pacman -Syy
 }
 
 
@@ -1180,7 +1308,7 @@ install_helpers ()
 
 	## refresh package keys & install helpers
 	#pacman-key --refresh-keys
-	pacman -S --noconfirm $pkg_help
+	pacman -S --noconfirm $base_help
 
     fi
 }
@@ -1208,12 +1336,15 @@ configure_mirrorlists ()
 
 install_base_devel_package_groups ()
 {
-    # -K initialize an empty pacman keyring in the target (implies -G).
+    # pacstrap creates a new system installation from scratch
+    # -K initialises a new pacman keyring on the target (implies -G).
     # see note/linux/arch/pacstrap or
     # https://man.archlinux.org/man/pacstrap.8
     # [FS#79619 : [systemd] 20-systemd-sysusers.hook fails to execute on a fresh system](https://bugs.archlinux.org/task/79619)
     # [[SOLVED] bootctl install: Bad file descriptor / Installation / Arch Linux Forums](https://bbs.archlinux.org/viewtopic.php?id=288660)
-    pacstrap -K /mnt "${base_pkgs[@]}"
+    pacstrap /mnt "${base_pkgs[@]}"
+    ## _K already done in 0init.sh via pacman-key --init
+    # pacstrap -K /mnt "${base_pkgs[@]}"
 }
 
 
@@ -1248,15 +1379,13 @@ prepare_mnt_environment ()
 	1 )
 	    ## online mode
 
-	    # chroot changes the apparent root directory
-	    # commands will run isolated inside their chroot jail
-	    #TODO check for proper workings
-	    # here: /mnt will become the / inside the chroot jail
-	    #arch-chroot /mnt git clone https://codeberg.org/oxo/hajime.git
-	    #arch-chroot /mnt /usr/bin/git clone https://codeberg.org/oxo/hajime
+	    ## clone hajime online repository into chroot jail (/mnt)
 	    cd /mnt
 	    git clone https://codeberg.org/oxo/hajime
 	    cd
+
+	    ## copy current setup directory into chroot jail (/mnt)
+	    cp --preserve --recursive --verbose "$hajime_exec"/setup /mnt/hajime
 	    ;;
 
 	* )
@@ -1264,16 +1393,15 @@ prepare_mnt_environment ()
 
 	    ## copy hajime_exec to chroot jail (/hajime in conf)
 	    cp --preserve --recursive --verbose "$hajime_exec" /mnt
-
-	    ## update configuration location for inside chroot jail (/mnt)
-	    sed -i 's#/root##' /mnt/hajime/setup/tempo-active.conf
 	    ;;
 
     esac
 
-    # copy pacman.conf and -org-bu to root
-    #TODO is this necessary? only for offline mode?
+    ## copy pacman.conf and -org-bu to chroot jail (/mnt)
     cp --preserve --recursive --verbose /etc/pacman.conf* /mnt/etc
+
+    ## update configuration file location for inside chroot jail (/mnt)
+    sed -i 's#/root##' /mnt/hajime/setup/tempo-active.conf
 
     echo
 }

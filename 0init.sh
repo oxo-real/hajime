@@ -90,10 +90,22 @@ getargs ()
 		cfv="$1"
 
 		process_config_flag_value
+		shift
 		;;
 
 	    --online )
-		online=1
+		## explicit arguments overrule defaults or configuration file setting
+
+		## online installation
+		[[ "$1" =~ online$ ]] && online_arg=1 && online="$online_arg"
+		shift
+		;;
+
+	    --offline )
+		## explicit arguments overrule defaults or configuration file setting
+
+		## offline installation
+		[[ "$1" =~ offline$ ]] && offline_arg=1 && online=0
 		shift
 		;;
 
@@ -129,6 +141,55 @@ sourcing ()
     # via --config value
     ## source
     [[ -f "$file_setup_config" ]] && source "$file_setup_config"
+
+    relative_file_paths
+
+    ## config file is sourced; reevaluate explicit arguments
+    explicit_arguments
+}
+
+
+relative_file_paths ()
+{
+    ## independent (i.e. no if) relative file paths
+    wap_pass="$hajime_src"/setup/wap"$wap".pass
+
+    if [[ "$pit" -eq 1 ]]; then
+
+	wap_pass="$hajime_exec"/setup/wap"$wap".pass
+
+    fi
+}
+
+
+explicit_arguments ()
+{
+    ## explicit arguments override default and configuration settings
+    ## regarding network installation mode
+
+    if [[ "$online_arg" -eq 1 ]]; then
+	## online mode (forced)
+
+	online=1
+
+	## change network mode in configuration file
+	## uncomment line online=1
+	sed -i '/online=1/s/^[ \t]*#\+ *//' "$file_setup_config"
+	## comment line online=0
+	sed -i '/^online=0/ s/./#&/' "$file_setup_config"
+
+    elif [[ "$offline_arg" -eq 1 ]]; then
+	## offine mode (forced)
+
+	online=0
+
+	## change network mode in configuration file
+	## comment line online=1
+	sed -i '/^online=1/ s/./#&/' "$file_setup_config"
+	## uncomment line online=0
+	sed -i '/online=0/s/^[ \t]*#\+ *//' "$file_setup_config"
+
+    fi
 }
 
 
@@ -201,13 +262,17 @@ point_in_time ()
 	## 1base.sh already ran; we are later in time
 	pit=1
 
+	## wap_pass location is in hajime_exec now
+	## now we know pit; reevaluate relative_file_paths
+	relative_file_paths
+
     else
 
 	# 1base.sh has not yet ran; we are at the beginning of times
 	pit=0
 
 	## CODE and REPO mountpoints
-	## we have no "$HOME"/dock/{2,3} yet
+	## "$HOME"/dock/{2,3} are not available yet
 	## therefore we use /root/tmp for the mountpoints
 	code_lbl=CODE
 	code_dir=/root/tmp/code
@@ -256,65 +321,110 @@ config_file_warning ()
 }
 
 
-select_interface ()
+check_network_connection ()
 {
-	ip a
-	echo
+    ping -D -i 1 -c 3 9.9.9.9 > /dev/null 2>&1
+}
 
-	printf "please enter network interface number: "
-	read interface_number
 
-	# translate number to interface name
-	interface=$(ip a | grep "^$interface_number" | \
-	    awk '{print $2}' | sed 's/://')
+select_network_interface ()
+{
+    echo
+    ip a
+    echo
 
-	sudo ip link set "$interface" up
-	[[ "$interface" =~ ^w ]] && setup_wap
+    printf "please enter network interface number: "
+    read interface_number
 
-	connect
+    # translate number to interface name
+    interface=$(ip a \
+		    | grep "^$interface_number" \
+		    | awk '{print $2}' \
+		    | sed 's/://'
+	     )
+}
 
-	printf '%s connected' "$interface"
-	[[ -n "$wap" ]] && printf ' to %s' "$wap"
-	echo
 
+set_interface_up ()
+{
+    sudo ip link set "$interface" up
 }
 
 
 setup_wap ()
 {
     echo
-    wap_list=$(sudo iw dev $interface scan | grep SSID: | sed 's/SSID: //' | \
-	## awk removes leading and trailing whitespace
-	## nl adds line numbers
-	awk '{$1=$1;print}' | sort | uniq | sort | nl)
 
-    printf "visible wireless access points (wap's):\n"
-    printf "$wap_list\n"
+    ## awk removes leading and trailing whitespace
+    ## nl adds line numbers
+    wap_list=$(sudo iw dev $interface scan \
+		   | grep SSID: \
+		   | sed 's/SSID: //' \
+		   | awk '{$1=$1;print}' \
+		   | sort \
+		   | uniq \
+		   | sort \
+		   | nl
+	    )
+
+    printf 'wireless access points (wap) available:\n'
+    printf '%s\n' "$wap_list"
     echo
-    printf "please enter wap number: "
+
+    printf 'connect to wap [number]: '
     read wap_number
-    wap=$(echo "$wap_list" | awk '{if ($1=='"$wap_number"') {print $2}}')
+
+    wap=$(echo "$wap_list" \
+	      | awk '{if ($1=='"$wap_number"') {print $2}}'
+       )
+
     echo
-    printf "enter password for "$wap": "
-    sudo wpa_passphrase "$wap" > wap.wifi
-    echo
-    sudo wpa_supplicant -B -i $interface -c wap.wifi
+
+    if [[ ! -f "$wap_pass" ]]; then
+
+	printf 'enter password for %s: ' "$wap"
+	## create wireless connection configuration file
+	sudo wpa_passphrase "$wap" > "$wap_pass"
+	echo
+
+    fi
+
+    sudo wpa_supplicant -B -i $interface -c "$wap_pass"
 }
 
 
-connect ()
+dhcp_connect ()
 {
     sudo dhcpcd -w "$interface"
     sleep 5
+
+    printf '%s connected' "$interface"
+    [[ -n "$wap" ]] && printf ' to %s' "$wap"
+    echo
 }
 
 
-install_or_exit ()
+network_connect ()
+{
+    check_network_connection
+
+    if [[ $? -ne 0 ]]; then
+
+	select_network_interface
+	set_interface_up
+	[[ "$interface" =~ ^w ]] && setup_wap
+	dhcp_connect
+
+    fi
+}
+
+
+roadmap ()
 {
     if [[ $pit -eq 1 ]]; then
 
-	ping -D -i 1 -c 3 9.9.9.9 > /dev/null 2>&1
-	[[ $? -ne 0 ]] && select_interface
+	## entry point for later modules to connect to a network
+	network_connect
 
     else
 
@@ -341,32 +451,26 @@ installation_mode ()
 	## from hajime_exec the script will continue to run
 	cp --preserve --recursive "$code_dir"/hajime /root
 
-	if [[ -n "$exec_mode" ]]; then
-
-	    ## tempo-active.conf contains path to active configuration file
-	    file_setup_config_path=/root/hajime/setup/tempo-active.conf
-
-	    ## update file_setup_config_path with it's new hajime_exec location
-	    ## hajime_exec did not exist before cp, we define it here
-	    ## export for availability in 1base
-	    export hajime_exec=/root/hajime
-	    file_setup_config_exec=$(realpath $(find "$hajime_exec"/setup -iname $(basename "$file_setup_config")))
-
-	    ## write file_setup_config_path with hajime_exec location
-	    printf '%s\n' "$file_setup_config_exec" > "$file_setup_config_path"
-
-	fi
-
     elif [[ $online -eq 1 ]]; then
 	## online mode
+
+	network_connect
 
 	## must be similar to 1base configure_pacman
 	pacman-key --init
 	pacman-key --populate
 
+	# force a refresh of the package database
 	pacman -Syy
 
 	pacman -Sy --noconfirm git
+
+	if [[ -d "${online_repo##*/}" ]]; then
+
+	    ## hajime exists; move it to prevent git clone error
+	    mv "${online_repo##*/}" "$(date +'%s')""${online_repo##*/}"
+
+	fi
 
 	git clone $online_repo
 
@@ -377,9 +481,7 @@ installation_mode ()
 		;;
 
 	    *)
-		printf 'repo already exists\n'
-		mv hajime hajime"$($date +'%s')"
-		#cp -r hajime hajime"$($date +'%s')"
+		printf 'ERROR cloning %s\n' "${online_repo##*/}"
 		;;
 
 	esac
@@ -390,6 +492,22 @@ installation_mode ()
 	    cp --preserve --recursive "$hajime_src/setup" "$hajime_exec"
 
 	fi
+
+    fi
+
+    if [[ -n "$exec_mode" ]]; then
+
+	## tempo-active.conf will contain path to active configuration file
+	file_setup_config_path=/root/hajime/setup/tempo-active.conf
+
+	## update file_setup_config_path with it's new hajime_exec location
+	## hajime_exec did not exist before cp, we define it here
+	## export for availability in 1base
+	export hajime_exec=/root/hajime
+	file_setup_config_exec=$(realpath $(find "$hajime_exec"/setup -iname $(basename "$file_setup_config")))
+
+	## write file_setup_config_path with hajime_exec location
+	printf '%s\n' "$file_setup_config_exec" > "$file_setup_config_path"
 
     fi
 
@@ -441,7 +559,7 @@ main ()
     point_in_time
     header
     config_file_warning
-    install_or_exit
+    roadmap
 }
 
 main

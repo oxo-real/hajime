@@ -22,6 +22,9 @@ dev_lvm=/dev/sda
 part_lvm=2
 lvm_part="$dev_lvm""$part_lvm"
 
+
+# cryptoluks parameters
+
 ## cryptoluks source
 device_mapper=cryptlvm
 
@@ -29,28 +32,34 @@ device_mapper=cryptlvm
 map_dir=/dev/mapper
 
 
-# luks volume parameters
+# logical volume manager parameters
 
 ## group name
-group_vol=vg0-lv
+vol_grp_name=vg0
+logic_vol="$vol_grp_name"-lv
 
-## mountpoint root
+## lvm root mountpoint 
 lvm_root=/mnt
 
 
 # script
 
 ## create system directories
-mkdir -p "$lvm_root"/{home,tmp,usr,var}
+mkdir -p "$lvm_root"/{boot,home,tmp,usr,var}
 
 ## decrypt lvm container
 cryptsetup open "$lvm_part" "$device_mapper"
 
-mount "${map_dir}"/"${group_vol}"_root "${lvm_root}"
-mount "${boot_part}" "${lvm_root}"/boot
-mount "${map_dir}"/"${group_vol}"_home "${lvm_root}"/home
-mount "${map_dir}"/"${group_vol}"_tmp "${lvm_root}"/tmp
-mount "${map_dir}"/"${group_vol}"_usr "${lvm_root}"/usr
-mount "${map_dir}"/"${group_vol}"_var "${lvm_root}"/var
 
-arch-chroot "${lvm_root}"
+## mount volume group
+mount "$map_dir"/"$logic_vol"_root "$lvm_root"
+
+## mount logical volumes
+mount "$boot_part" "$lvm_root"/boot
+mount "$map_dir"/"$logic_vol"_home "$lvm_root"/home
+mount "$map_dir"/"$logic_vol"_tmp "$lvm_root"/tmp
+mount "$map_dir"/"$logic_vol"_usr "$lvm_root"/usr
+mount "$map_dir"/"$logic_vol"_var "$lvm_root"/var
+
+## enter chroot jail (/mnt)
+arch-chroot "$lvm_root"

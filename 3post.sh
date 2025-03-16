@@ -83,9 +83,56 @@ file_etc_pacman_conf=/etc/pacman.conf
 args="$@"
 getargs ()
 {
-    ## online installation
-    [[ "$1" =~ online$ ]] && online=1
+    while :; do
+
+	case "$1" in
+
+	    -c | --config )
+		shift
+
+		## get config flag value
+		cfv="$1"
+
+		process_config_flag_value
+		shift
+		;;
+
+	    --online )
+		## explicit arguments overrule defaults or configuration file setting
+
+		## online installation
+		[[ "$1" =~ online$ ]] && online_arg=1 && online="$online_arg"
+		shift
+		;;
+
+	    --offline )
+		## explicit arguments overrule defaults or configuration file setting
+
+		## offline installation
+		[[ "$1" =~ offline$ ]] && offline_arg=1 && online=0
+		shift
+		;;
+
+	    -- )
+		shift
+
+		## get config flag value
+		cfv="$1"
+
+		process_config_flag_value
+		break
+		;;
+
+            * )
+		break
+		;;
+
+	esac
+
+    done
 }
+
+
 
 
 sourcing ()
@@ -107,6 +154,9 @@ sourcing ()
     [[ -f "$file_setup_package_list" ]] && source "$file_setup_package_list"
 
     relative_file_paths
+
+    ## config file is sourced; reevaluate explicit arguments
+    explicit_arguments
 }
 
 
@@ -115,6 +165,60 @@ relative_file_paths ()
     ## independent (i.e. no if) relative file paths
     file_pacman_offline_conf="$hajime_exec"/setup/pacman_offline.conf
     file_pacman_online_conf="$hajime_exec"/setup/pacman_online.conf
+}
+
+
+explicit_arguments ()
+{
+    ## explicit arguments override default and configuration settings
+    ## regarding network installation mode
+
+    if [[ "$online_arg" -eq 1 ]]; then
+	## online mode (forced)
+
+	online=1
+
+	## change network mode in configuration file
+	## uncomment line online=1
+	sed -i '/online=1/s/^[ \t]*#\+ *//' "$file_setup_config"
+	## comment line online=0
+	sed -i '/^online=0/ s/./#&/' "$file_setup_config"
+
+    elif [[ "$offline_arg" -eq 1 ]]; then
+	## offine mode (forced)
+
+	online=0
+
+	## change network mode in configuration file
+	## comment line online=1
+	sed -i '/^online=1/ s/./#&/' "$file_setup_config"
+	## uncomment line online=0
+	sed -i '/online=0/s/^[ \t]*#\+ *//' "$file_setup_config"
+
+    fi
+}
+
+
+process_config_flag_value ()
+{
+    realpath_cfv=$(realpath "$cfv")
+
+    if [[ -f "$realpath_cfv" ]]; then
+
+	file_setup_config="$realpath_cfv"
+	printf '%s\n' "$file_setup_config" > "$file_setup_config_path"
+
+    else
+
+	printf 'ERROR config file ${st_bold}%s${st_def} not found\n' "$cfv"
+
+	unset file_setup_config
+	unset realpath_cfv
+	unset cfv
+
+	exit 151
+
+    fi
 }
 
 
