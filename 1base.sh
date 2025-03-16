@@ -1230,18 +1230,18 @@ make_filesystems ()
 }
 
 
-create_mountpoints ()
+create_mp_directories ()
 {
-    ## create system directories
+    ## mount volume group
+    mount "$map_dir"/"$logic_vol"_root "$lvm_root"
+
+    ## create system mountpoint directories
     mkdir -p "$lvm_root"/{boot,home,tmp,usr,var}
 }
 
 
 mount_partitions ()
 {
-    ## mount volume group
-    mount "$map_dir"/"$logic_vol"_root "$lvm_root"
-
     ## mount logical volumes
     mount "$boot_part" "$lvm_root"/boot
     mount "$map_dir"/"$logic_vol"_home "$lvm_root"/home
@@ -1547,7 +1547,7 @@ main ()
     legacy_cryptsetup
     create_lvm_volumes
     make_filesystems
-    create_mountpoints
+    create_mp_directories
     mount_partitions
     create_swap_partition
     #arch_install

@@ -478,6 +478,8 @@ installation_mode ()
 	fi
 
 	## clone online remote repository
+	#TODO move to 1base pacstrap
+	#TODO move clone hajime also to pacstrap
 	git clone $online_repo
 
 	case $? in

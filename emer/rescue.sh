@@ -44,9 +44,6 @@ lvm_root=/mnt
 
 # script
 
-## create system directories
-mkdir -p "$lvm_root"/{boot,home,tmp,usr,var}
-
 ## decrypt lvm container
 cryptsetup open "$lvm_part" "$device_mapper"
 
