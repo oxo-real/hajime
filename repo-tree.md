@@ -19,8 +19,9 @@
 ├── make-offl-repo
 ├── make-recov
 ├── misc
-│   ├── alt_dtp_env
-│   └── rescue.sh
+│   ├── 2conf_bashrc
+│   ├── 3post_motd
+│   └── alt_dtp_env
 ├── README.md
 ├── repo-tree.md
 └── setup
@@ -30,5 +31,5 @@
     ├── pacman_offline.conf
     └── pacman_online.conf
 
-5 directories, 25 files
+5 directories, 26 files
 ```

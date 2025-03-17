@@ -109,6 +109,11 @@ getargs ()
 		shift
 		;;
 
+	    --pit1 )
+		pit=1
+		shift
+		;;
+
 	    -- )
 		shift
 
@@ -134,7 +139,12 @@ sourcing ()
     ## script_name is used in file_setup_config
 
     export script_name
-    hajime_exec=/root/hajime
+
+    if [[ "$pit" -eq 0 ]]; then
+
+	hajime_exec=/root/hajime
+
+    fi
 
     ## configuration file
     ### define
@@ -153,14 +163,16 @@ relative_file_paths ()
 {
     ## independent (i.e. no if) relative file paths
 
-    ## tempo-active.conf will contain path to active configuration file
-    file_setup_config_path="$hajime_exec"/setup/tempo-active.conf
+    ## tempo-active.conf contains path to active setup configuration file
+    file_setup_config_path="$hajime_src"/setup/tempo-active.conf
+    printf '%s\n' "$file_setup_config" > "$file_setup_config_path"
 
     ## wireless network access point password
     wap_pass="$hajime_src"/setup/wap"$wap".pass
 
     if [[ "$pit" -eq 1 ]]; then
 
+	file_setup_config_path="$hajime_exec"/setup/tempo-active.conf
 	wap_pass="$hajime_exec"/setup/wap"$wap".pass
 
     fi
@@ -205,7 +217,6 @@ process_config_flag_value ()
     if [[ -f "$realpath_cfv" ]]; then
 
 	file_setup_config="$realpath_cfv"
-	printf '%s\n' "$file_setup_config" > "$file_setup_config_path"
 
     else
 
@@ -262,19 +273,7 @@ header ()
 
 point_in_time ()
 {
-    if [[ -f "$HOME"/hajime/1base.done ]]; then
-
-	## 1base.sh already ran; we are later in time
-	pit=1
-
-	## wap_pass location is in hajime_exec now
-	## now we know pit; reevaluate relative_file_paths
-	relative_file_paths
-
-    else
-
-	# 1base.sh has not yet ran; we are at the beginning of times
-	pit=0
+    if [[ "$pit" -eq 0 ]]; then
 
 	## CODE and REPO mountpoints
 	## "$HOME"/dock/{2,3} are not available yet
@@ -401,7 +400,14 @@ setup_wap ()
 dhcp_connect ()
 {
     sudo dhcpcd -w "$interface"
-    sleep 5
+
+    for i in {15..0}; do
+
+	printf 'dhcpcd connect  = %s\r' "$i"
+	sleep 1
+
+    done
+    echo
 
     printf '%s connected' "$interface"
     [[ -n "$wap" ]] && printf ' to %s' "$wap"
@@ -433,10 +439,23 @@ roadmap ()
 
     else
 
+	copy_hajime
 	installation_mode
 	autostart_next
 
     fi
+}
+
+
+copy_hajime ()
+{
+    ## copy from hajime_src to hajime exec
+    ## from hajime_exec the script will continue to run
+    echo
+    printf 'copying hajime to /root '
+    cp --preserve --recursive "$code_dir"/hajime /root
+    echo
+    echo
 }
 
 
@@ -452,61 +471,61 @@ installation_mode ()
 	## code is already mounted manually
 	## it is the very reason this script runs :)
 
-	## copy from hajime_src to hajime exec
-	## from hajime_exec the script will continue to run
-	cp --preserve --recursive "$code_dir"/hajime /root
-
     elif [[ $online -eq 1 ]]; then
 	## online mode
 
 	network_connect
 
-	## must be similar to 1base configure_pacman
-	pacman-key --init
-	pacman-key --populate
+	## ## replaced by -K option for pacstrap in 1base
+	## ## ## must be similar to 1base configure_pacman
+	## ## pacman-key --init
+	## ## pacman-key --populate
 
-	# force a refresh of the package database
-	pacman -Syy
+	## ## # force a refresh of the package database
+	## ## pacman -Syy
 
-	pacman -Sy --noconfirm git
+	#pacman -Sy --noconfirm git
 
-	if [[ -d "${online_repo##*/}" ]]; then
+	#if [[ -d "${online_repo##*/}" ]]; then
 
-	    ## hajime exists; move it to prevent git clone error
-	    mv "${online_repo##*/}" "$(date +'%s')""${online_repo##*/}"
+	#    ## hajime exists; move it to prevent git clone error
+	#    mv "${online_repo##*/}" "$(date +'%s')""${online_repo##*/}"
 
-	fi
+	#fi
 
-	## clone online remote repository
-	#TODO move to 1base pacstrap
-	#TODO move clone hajime also to pacstrap
-	git clone $online_repo
+	### clone online remote repository
+	##TODO move to 1base pacstrap
+	##TODO move clone hajime also to pacstrap
+	#git clone $online_repo
 
-	case $? in
+	#case $? in
 
-	    0 )
-		if [[ -n "$exec_mode" ]]; then
+	#    0 )
+	#	if [[ -n "$exec_mode" ]]; then
 
-		    ## config file active; add setup dir to cloned hajime
-		    cp --preserve --recursive "$hajime_src/setup" "$hajime_exec"
+	#	    ## config file active; add setup dir to cloned hajime
+	#	    cp --preserve --recursive "$hajime_src/setup" "$hajime_exec"
 
-		fi
-		;;
+	#	fi
+	#	;;
 
-	    * )
-		printf 'ERROR cloning %s\n' "${online_repo##*/}"
-		;;
+	#    * )
+	#	printf 'ERROR cloning %s\n' "${online_repo##*/}"
+	#	;;
 
-	esac
+	#esac
 
     fi
 
     if [[ -n "$exec_mode" ]]; then
+	## configuration file
 
 	## update file_setup_config_path with it's new hajime_exec location
 	## hajime_exec did not exist before cp, we define it here
 	## export for availability in 1base
 	export hajime_exec=/root/hajime
+	file_setup_config_path="$hajime_exec"/setup/tempo-active.conf
+	## file_setup_config_exec = file_setup_config_path in hajime_exec
 	file_setup_config_exec=$(realpath $(find "$hajime_exec"/setup -iname $(basename "$file_setup_config")))
 
 	## write file_setup_config_path with hajime_exec location

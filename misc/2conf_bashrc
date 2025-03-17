@@ -1,0 +1,10 @@
+#! /usr/bin/env bash
+echo 
+echo '# inside chroot jail (/mnt)'
+echo 
+echo '# to continue execute:' 
+echo 
+tput bold
+echo 'sh hajime/2conf.sh'
+tput sgr0
+echo 

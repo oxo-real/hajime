@@ -132,6 +132,7 @@ fs_var=ext4; lbl_var=VAR
 hajime_src=/root/tmp/code/hajime
 file_mnt_etc_fstab=/mnt/etc/fstab
 file_etc_pacman_conf=/etc/pacman.conf
+file_mnt_root_bash_profile=/mnt/root/.bashrc
 
 
 #--------------------------------
@@ -218,6 +219,7 @@ sourcing ()
 relative_file_paths ()
 {
     ## independent (i.e. no if) relative file paths
+    file_misc_bash_profile="$hajime_exec"/misc/2conf_bashrc
     file_pacman_offline_conf="$hajime_exec"/setup/pacman_offline.conf
     file_pacman_online_conf="$hajime_exec"/setup/pacman_online.conf
 }
@@ -379,19 +381,6 @@ network_setup ()
 	echo
 
     fi
-}
-
-
-console_font ()
-{
-    ## especially useful for hiDPI screens on X
-
-    ## install terminus font
-    pacman -S --noconfirm $terminus_font
-    pacman -Ql $terminus_font
-
-    ## set console font temporarily
-    setfont $console_font
 }
 
 
@@ -1292,25 +1281,13 @@ configure_pacman ()
     #sed -i 's/^SigLevel = Required DatabaseOptional/SigLevel = Never/' /etc/pacman.conf
 
     # init package keys
-    #pacman-key --init  ## already done in 0init
+    pacman-key --init
 
     # populate keys from archlinux.gpg
-    #pacman-key --populate  ## already done in 0init
+    pacman-key --populate
 
     # force a refresh of the package database
     pacman -Syy
-}
-
-
-install_helpers ()
-{
-    if [[ $online -eq 1 ]]; then
-
-	## refresh package keys & install helpers
-	#pacman-key --refresh-keys
-	pacman -S --noconfirm $base_help
-
-    fi
 }
 
 
@@ -1334,17 +1311,16 @@ configure_mirrorlists ()
 }
 
 
-install_base_devel_package_groups ()
+install_packages ()
 {
     # pacstrap creates a new system installation from scratch
     # -K initialises a new pacman keyring on the target (implies -G).
+    # already done in 1base configure_pacman, omit -K
     # see note/linux/arch/pacstrap or
     # https://man.archlinux.org/man/pacstrap.8
     # [FS#79619 : [systemd] 20-systemd-sysusers.hook fails to execute on a fresh system](https://bugs.archlinux.org/task/79619)
     # [[SOLVED] bootctl install: Bad file descriptor / Installation / Arch Linux Forums](https://bbs.archlinux.org/viewtopic.php?id=288660)
-    pacstrap /mnt "${base_pkgs[@]}"
-    ## _K already done in 0init.sh via pacman-key --init
-    # pacstrap -K /mnt "${base_pkgs[@]}"
+    pacstrap /mnt "${base_pkgs[@]}" "${base_help[@]}"
 }
 
 
@@ -1407,16 +1383,10 @@ prepare_mnt_environment ()
 }
 
 
-user_advice ()
+bash_profile ()
 {
-    ## technically after arch-chroot /mnt
-    echo '# exited archiso environment and'
-    echo '# entered chroot jail (/mnt)'
-    echo
-    echo '# to continue execute:'
-    echo
-    printf "${st_bold}sh hajime/2conf.sh${st_def}\n"
-    echo
+    ## instructional message when starting 2conf.sh
+    cp --preserve --recursive $file_misc_bash_profile $file_mnt_root_bash_profile
 }
 
 
@@ -1428,27 +1398,22 @@ finishing ()
 
 enter_chroot_jail_mnt ()
 {
-    # default bash will be ran inside the chroot jail
-    # [Linux Virtualization - Chroot Jail - GeeksforGeeks](https://www.geeksforgeeks.org/linux-virtualization-using-chroot-jail/)
     arch-chroot /mnt
 }
 
 
 autostart_next ()
 {
-    ## instead of autostart go to chroot jail
+     if [[ -n $after_1base ]]; then
 
-    #TODO DEV because arch-chroot there is a problem executing
-    # commands after arch-chroot
-    # below did not work
-    ## triggered with configuration file
-    # if [[ -n $after_1base ]]; then
+	 ## if after1base exists in the configuration file then autostart
+     	 arch-chroot /mnt sh hajime/2conf.sh
 
-    # 	arch-chroot /mnt sh /hajime/2conf.sh
+     else
 
-    # fi
-    #DEV
-    arch-chroot /mnt "$code_dir"/code/hajime/2conf.sh
+	 enter_chroot_jail_mnt
+
+     fi
 }
 
 
@@ -1518,12 +1483,6 @@ welcome ()
 }
 
 
-arch_install ()
-{
-    archinstall
-}
-
-
 main ()
 {
     define_text_appearance
@@ -1532,7 +1491,6 @@ main ()
     sourcing
     installation_mode
     network_setup
-    #console_font
     clock
     ## ##set_key_device
     set_boot_device
@@ -1550,18 +1508,15 @@ main ()
     create_mp_directories
     mount_partitions
     create_swap_partition
-    #arch_install
     configure_pacman
-    install_helpers
     configure_mirrorlists
-    install_base_devel_package_groups
+    install_packages
     generate_fstab
     modify_fstab
     prepare_mnt_environment
-    user_advice
+    bash_profile
     finishing
-    enter_chroot_jail_mnt
-    #autostart_next
+    autostart_next
 }
 
 main

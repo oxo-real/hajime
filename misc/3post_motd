@@ -1,0 +1,9 @@
+echo 
+printf "# \033[0;35mconnect CODE and REPO media\033[0m\n" 
+echo '# then continue hajime Arch Linux installation with:'
+echo 
+tput bold
+printf 'sh hajime/3post.sh' 
+tput sgr0
+echo 
+echo

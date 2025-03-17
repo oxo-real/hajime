@@ -97,6 +97,7 @@ bootloader_editor=0
 ## absolute file paths
 hajime_src=/root/tmp/code/hajime
 file_etc_pacman_conf=/etc/pacman.conf
+file_root_bash_profile=/root/.bashrc
 
 
 #--------------------------------
@@ -817,6 +818,10 @@ exit_chroot_jail_mnt ()
 
     # finishing
     touch /home/$username/hajime/2conf.done
+
+    ## remove 2conf_bashrc
+    ## NOTICE in 1base designated as file_mnt_root_bash_profile
+    rm -rf "$file_root_bash_profile"
 }
 
 
