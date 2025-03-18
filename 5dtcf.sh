@@ -267,14 +267,17 @@ process_config_flag_value ()
 
 installation_mode ()
 {
-    if [[ "$online" -eq 0 ]]; then
-	## offline mode
+    ## CODE and REPO mountpoints
+    ## we have no "$HOME"/dock/{2,3} yet
+    ## therefore we use /root/tmp for the mountpoints
+    code_lbl=CODE
+    code_dir=/root/tmp/code
+    repo_lbl=REPO
+    repo_dir=/root/tmp/repo
+    repo_re=\/root\/tmp\/repo
 
-	code_lbl=CODE
-	code_dir="/home/$(id -un)/dock/3"
-	repo_lbl=REPO
-	repo_dir="/home/$(id -un)/dock/2"
-	repo_re="\/home\/$(id -un)\/dock\/2"
+    if [[ $online -eq 0 ]]; then
+	## offline mode
 
 	## in case current ($online) mode differs from previous
 	## make sure pacman.conf points to offline repos
@@ -296,10 +299,10 @@ installation_mode ()
 	## update offline repo name in /etc/pacman.conf
 	sed -i "s#0init_repo_here#${repo_dir}#" "$file_etc_pacman_conf"
 
-	## update repository database
-	sudo pacman -Syu
-
     fi
+
+    ## update repository database
+    sudo pacman -Syu
 }
 
 

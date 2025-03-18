@@ -155,9 +155,11 @@ sourcing ()
     fi
 
     ## runmode (for informative text)
-    runmode=offline
+    if [[ "$online" -eq 0 ]]; then
 
-    if [[ "$online" -eq 1 ]]; then
+	runmode=offline
+
+    elif [[ "$online" -eq 1 ]]; then
 
 	runmode=online
 
@@ -169,8 +171,8 @@ sourcing ()
 
     ## configuration file
     ### define
-    # via --config value
-    ## source
+    #    via --config argument value
+    ### source
     [[ -f "$file_setup_config" ]] && source "$file_setup_config"
 
     relative_file_paths
@@ -331,7 +333,7 @@ config_file_warning ()
     if [[ "$pit" -eq 0 && -n "$file_setup_config" ]]; then
 
 	printf "${st_bold}CAUTION!${st_def}\n"
-	printf "active configuration file ${st_ul}%s${st_def}\n" "$file_setup_config"
+	printf "active configuration file  ${st_ul}%s${st_def}\n" "$file_setup_config"
 	echo
 	printf "this file WILL be used for ${fg_magenta}automatic installation${st_def}\n"
 	echo
@@ -500,19 +502,6 @@ copy_hajime ()
 
 installation_mode ()
 {
-    if [[ $online -eq 0 ]]; then
-	## offline mode
-
-	## mount repo
-	get_offline_repo
-
-    else
-	## online or hybrid mode
-
-	network_connect
-
-    fi
-
     if [[ -n "$exec_mode" ]]; then
 	## configuration file
 
@@ -529,6 +518,30 @@ installation_mode ()
 
     fi
 
+    ## CODE and REPO mountpoints
+    ## we have no "$HOME"/dock/{2,3} yet
+    ## therefore we use /root/tmp for the mountpoints
+    code_lbl=CODE
+    code_dir=/root/tmp/code
+    repo_lbl=REPO
+    repo_dir=/root/tmp/repo
+    repo_re=\/root\/tmp\/repo
+
+    if [[ "$online" -ne 1 ]]; then
+	## offline or hybrid mode
+
+	## mount repo
+	get_offline_repo
+
+    fi
+
+    if [[ "$online" -ne 0 ]]; then
+	## online or hybrid mode
+
+	network_connect
+
+    fi
+
     touch /root/hajime/0init.done
 
     echo
@@ -542,7 +555,7 @@ mount_repo ()
     # repo_lbl='REPO'
     repo_dev=$(lsblk -o label,path | grep "$repo_lbl" | awk '{print $2}')
 
-    [[ -d $repo_dir ]] || mkdir -p "$repo_dir"
+    [[ -d "$repo_dir" ]] || mkdir -p "$repo_dir"
 
     mountpoint -q "$repo_dir"
     [[ $? -ne 0 ]] && sudo mount "$repo_dev" "$repo_dir"
@@ -551,7 +564,7 @@ mount_repo ()
 
 get_offline_repo ()
 {
-    [[ $online -eq 0 ]] && mount_repo
+    mount_repo
 
     if [[ -z "$repo_dev" ]]; then
 
@@ -565,7 +578,7 @@ get_offline_repo ()
 autostart_next ()
 {
     ## switch autostart via configuration file
-    [[ -n $after_0init ]] && sh /root/hajime/1base.sh
+    [[ -n "$after_0init" ]] && sh /root/hajime/1base.sh
 }
 
 

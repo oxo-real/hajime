@@ -314,19 +314,62 @@ installation_mode ()
 
     fi
 
+    ## CODE and REPO mountpoints
+    ## we have no "$HOME"/dock/{2,3} yet
+    ## therefore we use /root/tmp for the mountpoints
+    code_lbl=CODE
+    code_dir=/root/tmp/code
+    repo_lbl=REPO
+    repo_dir=/root/tmp/repo
+    repo_re=\/root\/tmp\/repo
+
     if [[ $online -eq 0 ]]; then
 	## offline mode
 
-	## CODE and REPO mountpoints
-	## we have no "$HOME"/dock/{2,3} yet
-	## therefore we use /root/tmp for the mountpoints
-	code_lbl=CODE
-	code_dir=/root/tmp/code
-	repo_lbl=REPO
-	repo_dir=/root/tmp/repo
-	repo_re=\/root\/tmp\/repo
+	## in case current ($online) mode differs from previous
+	## make sure pacman.conf points to offline repos
+	pacman_conf_copy offline
+
+    elif [[ "$online" -ne 0 ]]; then
+	## online or hybrid mode
+
+	## dhcp connect
+	export hajime_exec
+	sh hajime/0init.sh --pit1
+
+	## in case current ($online) mode differs from previous
+	## make sure pacman.conf points to correct repos
+	[[ "$online" -eq 1 ]] && pm_version=online
+	[[ "$online" -eq 2 ]] && pm_version=hybrid
+	pacman_conf_copy "$pm_version"
+
+	## update offline repo name in /etc/pacman.conf
+	sed -i "s#0init_repo_here#${repo_dir}#" "$file_etc_pacman_conf"
 
     fi
+
+    ## update repository database
+    sudo pacman -Syu
+}
+
+
+pacman_conf_copy ()
+{
+    case "$1" in
+
+	offline )
+            cp "$file_pacman_offline_conf" "$file_etc_pacman_conf"
+            ;;
+
+	online )
+            cp "$file_pacman_online_conf" "$file_etc_pacman_conf"
+            ;;
+
+	hybrid )
+            cp "$file_pacman_hybrid_conf" "$file_etc_pacman_conf"
+            ;;
+
+    esac
 }
 
 
@@ -1270,7 +1313,7 @@ mount_partitions ()
 create_swap_partition()
 {
     ## yes from configuration
-    if [[ $swap_bool == "Y" || $swap_bool == "y" || $swap_bool == "yes" ]]; then
+    if [[ "$swap_bool" == "Y" || "$swap_bool" == "y" || "$swap_bool" == "yes" ]]; then
 
 	lvcreate -L "$swap_size"G vg0 -n lv_swap
 	mkswap -L SWAP /dev/mapper/vg0-lv_swap
@@ -1288,7 +1331,7 @@ configure_pacman ()
     ## backup archiso original pacman.conf
     cp --preserve --recursive --verbose "$file_etc_pacman_conf" "$file_etc_pacman_conf"-org-bu
 
-    if [[ $online -eq 0 ]]; then
+    if [[ "$online" -eq 0 ]]; then
 	## offline mode
 
 	## copy pacman offline configuration to /etc/pacman.conf
@@ -1298,14 +1341,14 @@ configure_pacman ()
 	## update offline repo name in /etc/pacman.conf
 	sed -i "s#0init_repo_here#${repo_dir}#" "$file_etc_pacman_conf"
 
-    elif [[ $online -eq 1 ]]; then
+    elif [[ "$online" -eq 1 ]]; then
 	## online mode
 
 	## copy pacman online configuration to /etc/pacman.conf
 	cp --preserve --recursive --verbose "$file_pacman_online_conf" "$file_etc_pacman_conf"
 	echo
 
-    elif [[ $online -eq 2 ]]; then
+    elif [[ "$online" -eq 2 ]]; then
 	## hybrid mode
 
 	## copy pacman hybrid configuration to /etc/pacman.conf
@@ -1317,11 +1360,11 @@ configure_pacman ()
 
     fi
 
-    ## change SigLevel by adding PackageTrustAll to pacman.conf
+    ## change pacman.conf by adding PackageTrustAll to SigLevel
     ## this prevents errors on installing marginal trusted packages
-    sed -i 's/^SigLevel = Required DatabaseOptional/SigLevel = Required DatabaseOptional PackageTrustAll/'  "$file_etc_pacman_conf"
-    ## disable pacman signature check (not recommended)
-    #sed -i 's/^SigLevel = Required DatabaseOptional/SigLevel = Never/' /etc/pacman.conf
+    sed -i 's/^SigLevel = Required DatabaseOptional/SigLevel = Required DatabaseOptional PackageTrustAll/' "$file_etc_pacman_conf"
+    ## disable pacman signature check (CAUTION not recommended)
+    #sed -i 's/^SigLevel = Required DatabaseOptional/SigLevel = Never/' "$file_etc_pacman_conf"
 
     # init package keys
     pacman-key --init
@@ -1329,14 +1372,14 @@ configure_pacman ()
     # populate keys from archlinux.gpg
     pacman-key --populate
 
-    # force a refresh of the package database
-    pacman -Syy
+    # refresh package database
+    pacman -Syu
 }
 
 
 configure_mirrorlists ()
 {
-    if [[ $online -ne 0 ]]; then
+    if [[ "$online" -ne 0 ]]; then
 	## online or hybrid mode
 
 	## backup old mirrorlist
@@ -1371,22 +1414,22 @@ install_packages ()
 generate_fstab ()
 {
     # file system table
-    genfstab -U -p /mnt >> $file_mnt_etc_fstab
+    genfstab -U -p /mnt >> "$file_mnt_etc_fstab"
 }
 
 
 modify_fstab ()
 {
     ## fstab /boot mount as ro
-    sed -i '/\/boot/s/rw,/ro,/' $file_mnt_etc_fstab
+    sed -i '/\/boot/s/rw,/ro,/' "$file_mnt_etc_fstab"
     ## fstab /boot fmask and dmask 0077
-    sed -i '/\/boot/s/fmask=0022/fmask=0077/' $file_mnt_etc_fstab
-    sed -i '/\/boot/s/dmask=0022/dmask=0077/' $file_mnt_etc_fstab
+    sed -i '/\/boot/s/fmask=0022/fmask=0077/' "$file_mnt_etc_fstab"
+    sed -i '/\/boot/s/dmask=0022/dmask=0077/' "$file_mnt_etc_fstab"
 
     ## fstab /usr mount as ro
-    sed -i '/\/usr/s/rw,/ro,/' $file_mnt_etc_fstab
+    sed -i '/\/usr/s/rw,/ro,/' "$file_mnt_etc_fstab"
     ## fstab /usr entry with nopass 0
-    sed -i '/\/usr/s/.$/0/' $file_mnt_etc_fstab
+    sed -i '/\/usr/s/.$/0/' "$file_mnt_etc_fstab"
 }
 
 
@@ -1438,7 +1481,7 @@ prepare_mnt_environment ()
 bash_profile ()
 {
     ## instructional message when starting 2conf.sh
-    cp --preserve --recursive $file_misc_bash_profile $file_mnt_root_bash_profile
+    cp --preserve --recursive "$file_misc_bash_profile" "$file_mnt_root_bash_profile"
 }
 
 
@@ -1456,7 +1499,7 @@ enter_chroot_jail_mnt ()
 
 autostart_next ()
 {
-     if [[ -n $after_1base ]]; then
+     if [[ -n "$after_1base" ]]; then
 
 	 ## if after1base exists in the configuration file then autostart
      	 arch-chroot /mnt sh hajime/2conf.sh

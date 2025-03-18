@@ -279,17 +279,17 @@ installation_mode ()
 
     fi
 
+    ## CODE and REPO mountpoints
+    ## we have no "$HOME"/dock/{2,3} yet
+    ## therefore we use /root/tmp for the mountpoints
+    code_lbl=CODE
+    code_dir=/root/tmp/code
+    repo_lbl=REPO
+    repo_dir=/root/tmp/repo
+    repo_re=\/root\/tmp\/repo
+
     if [[ $online -eq 0 ]]; then
 	## offline mode
-
-	## CODE and REPO mountpoints
-	## we have no "$HOME"/dock/{2,3} yet
-	## therefore we use /root/tmp for the mountpoints
-	code_lbl=CODE
-	code_dir=/root/tmp/code
-	repo_lbl=REPO
-	repo_dir=/root/tmp/repo
-	repo_re=\/root\/tmp\/repo
 
 	## in case current ($online) mode differs from previous
 	## make sure pacman.conf points to offline repos
@@ -311,11 +311,11 @@ installation_mode ()
 	## update offline repo name in /etc/pacman.conf
 	sed -i "s#0init_repo_here#${repo_dir}#" "$file_etc_pacman_conf"
 
-	## update repository database
-	sudo pacman -Syu
-
     fi
-}
+
+    ## update repository database
+    sudo pacman -Syu
+ }
 
 
 pacman_conf_copy ()
