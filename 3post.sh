@@ -44,7 +44,7 @@ https://www.gnu.org/licenses/gpl-3.0.txt
   archinstall, !REPO, 0init.sh, 1base.sh, 2conf.sh
 
 # usage
-  sh hajime/3post.sh [--online]
+  sh hajime/3post.sh [--offline|online|hybrid] [--config $custom_conf_file]
 
 # example
   n/a
@@ -97,6 +97,14 @@ getargs ()
 		shift
 		;;
 
+	    --offline )
+		## explicit arguments overrule defaults or configuration file setting
+
+		## offline installation
+		[[ "$1" =~ offline$ ]] && offline_arg=1 && online=0
+		shift
+		;;
+
 	    --online )
 		## explicit arguments overrule defaults or configuration file setting
 
@@ -105,11 +113,11 @@ getargs ()
 		shift
 		;;
 
-	    --offline )
+	    --hybrid )
 		## explicit arguments overrule defaults or configuration file setting
 
-		## offline installation
-		[[ "$1" =~ offline$ ]] && offline_arg=1 && online=0
+		## hybrid installation
+		[[ "$1" =~ hybrid$ ]] && online_arg=2 && online="$online_arg"
 		shift
 		;;
 
@@ -165,6 +173,7 @@ relative_file_paths ()
     ## independent (i.e. no if) relative file paths
     file_pacman_offline_conf="$hajime_exec"/setup/pacman_offline.conf
     file_pacman_online_conf="$hajime_exec"/setup/pacman_online.conf
+    file_pacman_hybrid_conf="$hajime_exec"/setup/pacman_hybrid.conf
 }
 
 
@@ -173,27 +182,44 @@ explicit_arguments ()
     ## explicit arguments override default and configuration settings
     ## regarding network installation mode
 
-    if [[ "$online_arg" -eq 1 ]]; then
-	## online mode (forced)
-
-	online=1
-
-	## change network mode in configuration file
-	## uncomment line online=1
-	sed -i '/online=1/s/^[ \t]*#\+ *//' "$file_setup_config"
-	## comment line online=0
-	sed -i '/^online=0/ s/./#&/' "$file_setup_config"
-
-    elif [[ "$offline_arg" -eq 1 ]]; then
+    if [[ "$offline_arg" -eq 1 ]]; then
 	## offine mode (forced)
 
 	online=0
 
 	## change network mode in configuration file
-	## comment line online=1
-	sed -i '/^online=1/ s/./#&/' "$file_setup_config"
 	## uncomment line online=0
 	sed -i '/online=0/s/^[ \t]*#\+ *//' "$file_setup_config"
+	## comment line online=1
+	sed -i '/^online=1/ s/./#&/' "$file_setup_config"
+	## comment line online=2
+	sed -i '/^online=2/ s/./#&/' "$file_setup_config"
+
+    elif [[ "$online_arg" -eq 1 ]]; then
+	## online mode (forced)
+
+	online=1
+
+	## change network mode in configuration file
+	## comment line online=0
+	sed -i '/^online=0/ s/./#&/' "$file_setup_config"
+	## uncomment line online=1
+	sed -i '/online=1/s/^[ \t]*#\+ *//' "$file_setup_config"
+	## comment line online=2
+	sed -i '/^online=2/ s/./#&/' "$file_setup_config"
+
+    elif [[ "$online_arg" -eq 2 ]]; then
+	## hybrid mode (forced)
+
+	online=2
+
+	## change network mode in configuration file
+	## comment line online=0
+	sed -i '/^online=0/ s/./#&/' "$file_setup_config"
+	## comment line online=1
+	sed -i '/^online=1/ s/./#&/' "$file_setup_config"
+	## uncomment line online=2
+	sed -i '/online=2/s/^[ \t]*#\+ *//' "$file_setup_config"
 
     fi
 }
@@ -224,7 +250,7 @@ process_config_flag_value ()
 
 installation_mode ()
 {
-    if [[ $online -ne 1 ]]; then
+    if [[ $online -eq 0 ]]; then
 	## offline mode
 
 	code_lbl=CODE
@@ -233,22 +259,30 @@ installation_mode ()
 	repo_dir="/home/$(id -un)/dock/2"
 	repo_re="\/home\/$(id -un)\/dock\/2"
 
-    elif [[ "$online" -eq 1 ]]; then
-	## online mode
+	## in case current ($online) mode differs from previous
+	## make sure pacman.conf points to offline repos
+	pacman_conf_copy offline
+
+    elif [[ "$online" -ne 0 ]]; then
+	## online or hybrid mode
 
 	## dhcp connect
+	export hajime_exec
 	sh hajime/0init.sh --pit1
 
-	## make sure pacman.conf points to online repos
-	pacman_conf_copy online
+	## in case current ($online) mode differs from previous
+	## make sure pacman.conf points to correct repos
+	[[ "$online" -eq 1 ]] && pm_version=online
+	[[ "$online" -eq 2 ]] && pm_version=hybrid
+	pacman_conf_copy "$pm_version"
+
+	## update offline repo name in /etc/pacman.conf
+	sed -i "s#0init_repo_here#${repo_dir}#" "$file_etc_pacman_conf"
+
+	## update repository database
+	sudo pacman -Syu
 
     fi
-}
-
-
-motd_remove ()
-{
-    sudo rm -rf $file_etc_motd
 }
 
 
@@ -264,7 +298,17 @@ pacman_conf_copy ()
             cp "$file_pacman_online_conf" "$file_etc_pacman_conf"
             ;;
 
+	hybrid )
+            cp "$file_pacman_hybrid_conf" "$file_etc_pacman_conf"
+            ;;
+
     esac
+}
+
+
+motd_remove ()
+{
+    sudo rm -rf $file_etc_motd
 }
 
 
@@ -304,9 +348,20 @@ own_home ()
 
 modify_pacman_conf ()
 {
+    #TODO check of this function is needed?
     case $online in
 
-	1 )
+	0 )
+	    ## offline mode
+
+	    ## update offline repository location (used in 2conf ch-root jail)
+	    ## sed if ^[offline] is found substitute (s) the entire (.*) next line (n)
+	    sudo sed -i "/^\[offline\]/{n;s/.*/Server = file:\/\/$repo_re/}" $file_etc_pacman_conf
+	    ;;
+
+	1|2 )
+	    ## online or hybrid mode
+
 	    ## activate color
 	    sudo sed -i 's/#Color/Color/' $file_etc_pacman_conf
 
@@ -320,12 +375,6 @@ modify_pacman_conf ()
 
 	    ## activate multilib repository
 	    sudo sed -i 's/\#\[multilib\]/\[multilib\]\nInclude \= \/etc\/pacman.d\/mirrorlist/' $file_etc_pacman_conf
-	    ;;
-
-	* )
-	    ## update offline repository location (used in 2conf ch-root jail)
-	    ## sed if ^[offline] is found substitute (s) the entire (.*) next line (n)
-	    sudo sed -i "/^\[offline\]/{n;s/.*/Server = file:\/\/$repo_re/}" $file_etc_pacman_conf
 	    ;;
 
     esac

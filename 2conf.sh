@@ -43,12 +43,12 @@ https://www.gnu.org/licenses/gpl-3.0.txt
   archiso, REPO, 0init.sh, 1base.sh
 
 # usage
-  sh hajime/2conf.sh [--online]
+  sh hajime/2conf.sh [--offline|online|hybrid] [--config $custom_conf_file]
 
 # example
   n/a
 
-CAUTION 2conf runs from inside chroot jail (/mnt)
+CAUTION 2conf.sh runs inside chroot jail (/mnt)
 
 # '
 
@@ -73,7 +73,6 @@ file_boot_loader_loader_conf=/boot/loader/loader.conf
 file_boot_loader_entries_arch_conf=/boot/loader/entries/arch.conf
 file_boot_loader_entries_arch_lts_conf=/boot/loader/entries/arch-lts.conf
 
-file_etc_pacman_conf=/etc/pacman.conf
 file_etc_locale_gen=/etc/locale.gen
 file_etc_locale_conf=/etc/locale.conf
 file_etc_vconsole_conf=/etc/vconsole.conf
@@ -120,6 +119,14 @@ getargs ()
 		shift
 		;;
 
+	    --offline )
+		## explicit arguments overrule defaults or configuration file setting
+
+		## offline installation
+		[[ "$1" =~ offline$ ]] && offline_arg=1 && online=0
+		shift
+		;;
+
 	    --online )
 		## explicit arguments overrule defaults or configuration file setting
 
@@ -128,11 +135,11 @@ getargs ()
 		shift
 		;;
 
-	    --offline )
+	    --hybrid )
 		## explicit arguments overrule defaults or configuration file setting
 
-		## offline installation
-		[[ "$1" =~ offline$ ]] && offline_arg=1 && online=0
+		## hybrid installation
+		[[ "$1" =~ hybrid$ ]] && online_arg=2 && online="$online_arg"
 		shift
 		;;
 
@@ -186,6 +193,7 @@ relative_file_paths ()
     ## independent (i.e. no if) relative file paths
     file_pacman_offline_conf="$hajime_exec"/setup/pacman_offline.conf
     file_pacman_online_conf="$hajime_exec"/setup/pacman_online.conf
+    file_pacman_hybrid_conf="$hajime_exec"/setup/pacman_hybrid.conf
 }
 
 
@@ -194,27 +202,44 @@ explicit_arguments ()
     ## explicit arguments override default and configuration settings
     ## regarding network installation mode
 
-    if [[ "$online_arg" -eq 1 ]]; then
-	## online mode (forced)
-
-	online=1
-
-	## change network mode in configuration file
-	## uncomment line online=1
-	sed -i '/online=1/s/^[ \t]*#\+ *//' "$file_setup_config"
-	## comment line online=0
-	sed -i '/^online=0/ s/./#&/' "$file_setup_config"
-
-    elif [[ "$offline_arg" -eq 1 ]]; then
+    if [[ "$offline_arg" -eq 1 ]]; then
 	## offine mode (forced)
 
 	online=0
 
 	## change network mode in configuration file
-	## comment line online=1
-	sed -i '/^online=1/ s/./#&/' "$file_setup_config"
 	## uncomment line online=0
 	sed -i '/online=0/s/^[ \t]*#\+ *//' "$file_setup_config"
+	## comment line online=1
+	sed -i '/^online=1/ s/./#&/' "$file_setup_config"
+	## comment line online=2
+	sed -i '/^online=2/ s/./#&/' "$file_setup_config"
+
+    elif [[ "$online_arg" -eq 1 ]]; then
+	## online mode (forced)
+
+	online=1
+
+	## change network mode in configuration file
+	## comment line online=0
+	sed -i '/^online=0/ s/./#&/' "$file_setup_config"
+	## uncomment line online=1
+	sed -i '/online=1/s/^[ \t]*#\+ *//' "$file_setup_config"
+	## comment line online=2
+	sed -i '/^online=2/ s/./#&/' "$file_setup_config"
+
+    elif [[ "$online_arg" -eq 2 ]]; then
+	## hybrid mode (forced)
+
+	online=2
+
+	## change network mode in configuration file
+	## comment line online=0
+	sed -i '/^online=0/ s/./#&/' "$file_setup_config"
+	## comment line online=1
+	sed -i '/^online=1/ s/./#&/' "$file_setup_config"
+	## uncomment line online=2
+	sed -i '/online=2/s/^[ \t]*#\+ *//' "$file_setup_config"
 
     fi
 }
@@ -254,7 +279,7 @@ installation_mode ()
 
     fi
 
-    if [[ $online -ne 1 ]]; then
+    if [[ $online -eq 0 ]]; then
 	## offline mode
 
 	## CODE and REPO mountpoints
@@ -266,7 +291,50 @@ installation_mode ()
 	repo_dir=/root/tmp/repo
 	repo_re=\/root\/tmp\/repo
 
+	## in case current ($online) mode differs from previous
+	## make sure pacman.conf points to offline repos
+	pacman_conf_copy offline
+
+    elif [[ "$online" -ne 0 ]]; then
+	## online or hybrid mode
+
+	## dhcp connect
+	export hajime_exec
+	sh hajime/0init.sh --pit1
+
+	## in case current ($online) mode differs from previous
+	## make sure pacman.conf points to correct repos
+	[[ "$online" -eq 1 ]] && pm_version=online
+	[[ "$online" -eq 2 ]] && pm_version=hybrid
+	pacman_conf_copy "$pm_version"
+
+	## update offline repo name in /etc/pacman.conf
+	sed -i "s#0init_repo_here#${repo_dir}#" "$file_etc_pacman_conf"
+
+	## update repository database
+	sudo pacman -Syu
+
     fi
+}
+
+
+pacman_conf_copy ()
+{
+    case "$1" in
+
+	offline )
+            cp "$file_pacman_offline_conf" "$file_etc_pacman_conf"
+            ;;
+
+	online )
+            cp "$file_pacman_online_conf" "$file_etc_pacman_conf"
+            ;;
+
+	hybrid )
+            cp "$file_pacman_hybrid_conf" "$file_etc_pacman_conf"
+            ;;
+
+    esac
 }
 
 
@@ -352,7 +420,8 @@ get_offline_code ()
 
 pacman_conf_offline ()
 {
-    if [[ $online -ne 1 ]]; then
+    if [[ $online -eq 0 ]]; then
+	## offline mode
 
 	## change SigLevel by adding PackageTrustAll to pacman.conf
 	### this prevents errors on marginal trusted packages
@@ -650,27 +719,23 @@ initialize_pacman ()
 }
 
 
-install_helpers ()
+configure_mirrorlists ()
 {
-    if [[ $online -eq 1 ]]; then
-
-	# install helpers
-	# clear
-	# pacman -S --noconfirm $install_helpers
-
-
-	# configuring the mirrorlist
+    if [[ $online -ne 0 ]]; then
+	## online or hybrid mode
 
 	## backup old mirrorlist
-	cp $file_etc_pacmand_mirrorlist /etc/pacman.d/`date "+%Y%m%d%H%M%S"`_mirrorlist.backup
+	file_etc_pacmand_mirrorlist="/etc/pacman.d/mirrorlist"
+	cp --preserve --verbose "$file_etc_pacmand_mirrorlist" /etc/pacman.d/"$(date '+%Y%m%d_%H%M%S')"_mirrorlist_bu
 
 	## select fastest mirrors
 	reflector \
 	    --verbose \
-	    --country $mirror_country \
-	    -l $mirror_amount \
+	    --country "$mirror_country" \
+	    -l "$mirror_amount" \
 	    --sort rate \
-	    --save $file_etc_pacmand_mirrorlist
+	    --save "$file_etc_pacmand_mirrorlist"
+
     fi
 }
 
@@ -721,8 +786,10 @@ install_bootloader ()
 
 
     # create an initial ramdisk environment (initramfs)
+    ## [mkinitcpio - ArchWiki](https://wiki.archlinux.org/title/Mkinitcpio#Common_hooks)
     ## enable systemd hooks
-    sed -i "/^HOOKS/c\HOOKS=(base systemd autodetect keyboard sd-vconsole modconf block sd-encrypt lvm2 filesystems fsck)" /etc/mkinitcpio.conf
+    #TODO base?
+    sed -i "/^HOOKS/c\HOOKS=(base systemd microcode autodetect modconf keyboard sd-vconsole block sd-encrypt lvm2 filesystems fsck)" /etc/mkinitcpio.conf
 
 
     # adding boot loader entries
@@ -842,7 +909,7 @@ main ()
     pass_root
     add_user
     initialize_pacman
-    install_helpers
+    configure_mirrorlists
     micro_code
     install_core
     install_bootloader

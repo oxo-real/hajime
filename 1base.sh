@@ -43,7 +43,7 @@ https://www.gnu.org/licenses/gpl-3.0.txt
   archiso, REPO, 0init.sh
 
 # usage
-  sh hajime/1base.sh [--online]
+  sh hajime/1base.sh [--offline|online|hybrid] [--config $custom_conf_file]
 
 # example
   n/a
@@ -155,6 +155,14 @@ getargs ()
 		shift
 		;;
 
+	    --offline )
+		## explicit arguments overrule defaults or configuration file setting
+
+		## offline installation
+		[[ "$1" =~ offline$ ]] && offline_arg=1 && online=0
+		shift
+		;;
+
 	    --online )
 		## explicit arguments overrule defaults or configuration file setting
 
@@ -163,11 +171,11 @@ getargs ()
 		shift
 		;;
 
-	    --offline )
+	    --hybrid )
 		## explicit arguments overrule defaults or configuration file setting
 
-		## offline installation
-		[[ "$1" =~ offline$ ]] && offline_arg=1 && online=0
+		## hybrid installation
+		[[ "$1" =~ hybrid$ ]] && online_arg=2 && online="$online_arg"
 		shift
 		;;
 
@@ -222,6 +230,7 @@ relative_file_paths ()
     file_misc_bash_profile="$hajime_exec"/misc/2conf_bashrc
     file_pacman_offline_conf="$hajime_exec"/setup/pacman_offline.conf
     file_pacman_online_conf="$hajime_exec"/setup/pacman_online.conf
+    file_pacman_hybrid_conf="$hajime_exec"/setup/pacman_hybrid.conf
 }
 
 
@@ -230,27 +239,44 @@ explicit_arguments ()
     ## explicit arguments override default and configuration settings
     ## regarding network installation mode
 
-    if [[ "$online_arg" -eq 1 ]]; then
-	## online mode (forced)
-
-	online=1
-
-	## change network mode in configuration file
-	## uncomment line online=1
-	sed -i '/online=1/s/^[ \t]*#\+ *//' "$file_setup_config"
-	## comment line online=0
-	sed -i '/^online=0/ s/./#&/' "$file_setup_config"
-
-    elif [[ "$offline_arg" -eq 1 ]]; then
+    if [[ "$offline_arg" -eq 1 ]]; then
 	## offine mode (forced)
 
 	online=0
 
 	## change network mode in configuration file
-	## comment line online=1
-	sed -i '/^online=1/ s/./#&/' "$file_setup_config"
 	## uncomment line online=0
 	sed -i '/online=0/s/^[ \t]*#\+ *//' "$file_setup_config"
+	## comment line online=1
+	sed -i '/^online=1/ s/./#&/' "$file_setup_config"
+	## comment line online=2
+	sed -i '/^online=2/ s/./#&/' "$file_setup_config"
+
+    elif [[ "$online_arg" -eq 1 ]]; then
+	## online mode (forced)
+
+	online=1
+
+	## change network mode in configuration file
+	## comment line online=0
+	sed -i '/^online=0/ s/./#&/' "$file_setup_config"
+	## uncomment line online=1
+	sed -i '/online=1/s/^[ \t]*#\+ *//' "$file_setup_config"
+	## comment line online=2
+	sed -i '/^online=2/ s/./#&/' "$file_setup_config"
+
+    elif [[ "$online_arg" -eq 2 ]]; then
+	## hybrid mode (forced)
+
+	online=2
+
+	## change network mode in configuration file
+	## comment line online=0
+	sed -i '/^online=0/ s/./#&/' "$file_setup_config"
+	## comment line online=1
+	sed -i '/^online=1/ s/./#&/' "$file_setup_config"
+	## uncomment line online=2
+	sed -i '/online=2/s/^[ \t]*#\+ *//' "$file_setup_config"
 
     fi
 }
@@ -288,7 +314,7 @@ installation_mode ()
 
     fi
 
-    if [[ $online -ne 1 ]]; then
+    if [[ $online -eq 0 ]]; then
 	## offline mode
 
 	## CODE and REPO mountpoints
@@ -369,7 +395,8 @@ get_lsblk ()
 
 network_setup ()
 {
-    if [[ $online -eq 1 ]]; then
+    if [[ $online -ne 0 ]]; then
+	## online or hybrid mode
 
 	# network setup
 
@@ -1258,18 +1285,34 @@ create_swap_partition()
 
 configure_pacman ()
 {
-    ## keep archiso original pacman.conf
+    ## backup archiso original pacman.conf
     cp --preserve --recursive --verbose "$file_etc_pacman_conf" "$file_etc_pacman_conf"-org-bu
 
-    if [[ $online -ne 1 ]]; then
+    if [[ $online -eq 0 ]]; then
 	## offline mode
-	## configure pacman.conf for offline repository
 
 	## copy pacman offline configuration to /etc/pacman.conf
 	cp --preserve --recursive --verbose "$file_pacman_offline_conf" "$file_etc_pacman_conf"
 	echo
 
-	## update repo name in /etc/pacman.conf
+	## update offline repo name in /etc/pacman.conf
+	sed -i "s#0init_repo_here#${repo_dir}#" "$file_etc_pacman_conf"
+
+    elif [[ $online -eq 1 ]]; then
+	## online mode
+
+	## copy pacman online configuration to /etc/pacman.conf
+	cp --preserve --recursive --verbose "$file_pacman_online_conf" "$file_etc_pacman_conf"
+	echo
+
+    elif [[ $online -eq 2 ]]; then
+	## hybrid mode
+
+	## copy pacman hybrid configuration to /etc/pacman.conf
+	cp --preserve --recursive --verbose "$file_pacman_hybrid_conf" "$file_etc_pacman_conf"
+	echo
+
+	## update offline repo name in /etc/pacman.conf
 	sed -i "s#0init_repo_here#${repo_dir}#" "$file_etc_pacman_conf"
 
     fi
@@ -1293,19 +1336,20 @@ configure_pacman ()
 
 configure_mirrorlists ()
 {
-    if [[ $online -eq 1 ]]; then
+    if [[ $online -ne 0 ]]; then
+	## online or hybrid mode
 
 	## backup old mirrorlist
 	file_etc_pacmand_mirrorlist="/etc/pacman.d/mirrorlist"
-	cp $file_etc_pacmand_mirrorlist /etc/pacman.d/`date "+%Y%m%d%H%M%S"`_mirrorlist_backup
+	cp --preserve --verbose "$file_etc_pacmand_mirrorlist" /etc/pacman.d/"$(date '+%Y%m%d_%H%M%S')"_mirrorlist_bu
 
 	## select fastest mirrors
 	reflector \
 	    --verbose \
-	    --country $mirror_country \
-	    -l $mirror_amount \
+	    --country "$mirror_country" \
+	    -l "$mirror_amount" \
 	    --sort rate \
-	    --save $file_etc_pacmand_mirrorlist
+	    --save "$file_etc_pacmand_mirrorlist"
 
     fi
 }
@@ -1350,25 +1394,33 @@ prepare_mnt_environment ()
 {
     echo 'copying hajime and pacman configuration into the new environment'
 
-    case $online in
+    case "$online" in
 
-	1 )
-	    ## online mode
+	0 )
+	    ## offline mode
+
+	    ## copy hajime_exec to chroot jail (/mnt)
+	    echo
+	    printf 'copying hajime -> /root '
+	    cp --preserve --recursive "$hajime_exec" /mnt
+	    echo
+	    echo
+	    ;;
+
+	1|2 )
+	    ## online or hybrid mode
 
 	    ## clone hajime online repository into chroot jail (/mnt)
 	    cd /mnt
 	    git clone https://codeberg.org/oxo/hajime
 	    cd
 
-	    ## copy current setup directory into chroot jail (/mnt)
-	    cp --preserve --recursive --verbose "$hajime_exec"/setup /mnt/hajime
-	    ;;
-
-	* )
-	    ## offline mode
-
-	    ## copy hajime_exec to chroot jail (/hajime in conf)
-	    cp --preserve --recursive --verbose "$hajime_exec" /mnt
+	    ## copy current setup directory to chroot jail (/mnt)
+	    echo
+	    printf 'copying hajime/setup -> /root '
+	    cp --preserve --recursive "$hajime_exec"/setup /mnt/hajime
+	    echo
+	    echo
 	    ;;
 
     esac

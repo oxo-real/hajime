@@ -43,7 +43,7 @@ helper script to bootstrap hajime after archiso boot
   REPO
 
 # usage
-  sh hajime/0init.sh [--config $custom_conf_file] [--online]
+  sh hajime/0init.sh [--offline|online|hybrid] [--config $custom_conf_file]
 
 # example
   mkdir tmp
@@ -93,6 +93,14 @@ getargs ()
 		shift
 		;;
 
+	    --offline )
+		## explicit arguments overrule defaults or configuration file setting
+
+		## offline installation
+		[[ "$1" =~ offline$ ]] && offline_arg=1 && online=0
+		shift
+		;;
+
 	    --online )
 		## explicit arguments overrule defaults or configuration file setting
 
@@ -101,11 +109,11 @@ getargs ()
 		shift
 		;;
 
-	    --offline )
+	    --hybrid )
 		## explicit arguments overrule defaults or configuration file setting
 
-		## offline installation
-		[[ "$1" =~ offline$ ]] && offline_arg=1 && online=0
+		## hybrid installation
+		[[ "$1" =~ hybrid$ ]] && online_arg=2 && online="$online_arg"
 		shift
 		;;
 
@@ -143,6 +151,19 @@ sourcing ()
     if [[ "$pit" -eq 0 ]]; then
 
 	hajime_exec=/root/hajime
+
+    fi
+
+    ## runmode (for informative text)
+    runmode=offline
+
+    if [[ "$online" -eq 1 ]]; then
+
+	runmode=online
+
+    elif [[ "$online" -eq 2 ]]; then
+
+	runmode=hybrid
 
     fi
 
@@ -184,27 +205,44 @@ explicit_arguments ()
     ## explicit arguments override default and configuration settings
     ## regarding network installation mode
 
-    if [[ "$online_arg" -eq 1 ]]; then
-	## online mode (forced)
-
-	online=1
-
-	## change network mode in configuration file
-	## uncomment line online=1
-	sed -i '/online=1/s/^[ \t]*#\+ *//' "$file_setup_config"
-	## comment line online=0
-	sed -i '/^online=0/ s/./#&/' "$file_setup_config"
-
-    elif [[ "$offline_arg" -eq 1 ]]; then
+    if [[ "$offline_arg" -eq 1 ]]; then
 	## offine mode (forced)
 
 	online=0
 
 	## change network mode in configuration file
-	## comment line online=1
-	sed -i '/^online=1/ s/./#&/' "$file_setup_config"
 	## uncomment line online=0
 	sed -i '/online=0/s/^[ \t]*#\+ *//' "$file_setup_config"
+	## comment line online=1
+	sed -i '/^online=1/ s/./#&/' "$file_setup_config"
+	## comment line online=2
+	sed -i '/^online=2/ s/./#&/' "$file_setup_config"
+
+    elif [[ "$online_arg" -eq 1 ]]; then
+	## online mode (forced)
+
+	online=1
+
+	## change network mode in configuration file
+	## comment line online=0
+	sed -i '/^online=0/ s/./#&/' "$file_setup_config"
+	## uncomment line online=1
+	sed -i '/online=1/s/^[ \t]*#\+ *//' "$file_setup_config"
+	## comment line online=2
+	sed -i '/^online=2/ s/./#&/' "$file_setup_config"
+
+    elif [[ "$online_arg" -eq 2 ]]; then
+	## hybrid mode (forced)
+
+	online=2
+
+	## change network mode in configuration file
+	## comment line online=0
+	sed -i '/^online=0/ s/./#&/' "$file_setup_config"
+	## comment line online=1
+	sed -i '/^online=1/ s/./#&/' "$file_setup_config"
+	## uncomment line online=2
+	sed -i '/online=2/s/^[ \t]*#\+ *//' "$file_setup_config"
 
     fi
 }
@@ -293,16 +331,17 @@ config_file_warning ()
     if [[ "$pit" -eq 0 && -n "$file_setup_config" ]]; then
 
 	printf "${st_bold}CAUTION!${st_def}\n"
-	printf 'active configuration file:\n'
-	printf "${st_ul}%s${st_def}\n" "$file_setup_config"
-	echo
+	printf "active configuration file ${st_ul}%s${st_def}\n" "$file_setup_config"
 	echo
 	printf "this file WILL be used for ${fg_magenta}automatic installation${st_def}\n"
 	echo
-	printf 'before continuing, though; make 100%% sure that:\n'
+	printf "hajime repository source   ${st_bold}%s${st_def}\n" "$runmode"
 	echo
-	printf "1 the file designates this machine\n"
-	printf "2 all the parameters in the file are correct\n"
+	echo
+	printf 'before continuing, be 100%% sure that:\n'
+	echo
+	printf "1. the file designates this machine, and\n"
+	printf "2. all the parameters in the file are correct\n"
 	echo
 	echo
 	printf "${fg_magenta}continue${st_def} with automatic installation? [y/N] "
@@ -403,7 +442,7 @@ dhcp_connect ()
 
     for i in {15..0}; do
 
-	printf 'dhcpcd connect  = %s\r' "$i"
+	printf 'dhcpcd connect %s %s\r' "$interface" "$i"
 	sleep 1
 
     done
@@ -461,59 +500,16 @@ copy_hajime ()
 
 installation_mode ()
 {
-    if [[ $online -ne 1 ]]; then
+    if [[ $online -eq 0 ]]; then
 	## offline mode
 
 	## mount repo
 	get_offline_repo
 
-	## mount code
-	## code is already mounted manually
-	## it is the very reason this script runs :)
-
-    elif [[ $online -eq 1 ]]; then
-	## online mode
+    else
+	## online or hybrid mode
 
 	network_connect
-
-	## ## replaced by -K option for pacstrap in 1base
-	## ## ## must be similar to 1base configure_pacman
-	## ## pacman-key --init
-	## ## pacman-key --populate
-
-	## ## # force a refresh of the package database
-	## ## pacman -Syy
-
-	#pacman -Sy --noconfirm git
-
-	#if [[ -d "${online_repo##*/}" ]]; then
-
-	#    ## hajime exists; move it to prevent git clone error
-	#    mv "${online_repo##*/}" "$(date +'%s')""${online_repo##*/}"
-
-	#fi
-
-	### clone online remote repository
-	##TODO move to 1base pacstrap
-	##TODO move clone hajime also to pacstrap
-	#git clone $online_repo
-
-	#case $? in
-
-	#    0 )
-	#	if [[ -n "$exec_mode" ]]; then
-
-	#	    ## config file active; add setup dir to cloned hajime
-	#	    cp --preserve --recursive "$hajime_src/setup" "$hajime_exec"
-
-	#	fi
-	#	;;
-
-	#    * )
-	#	printf 'ERROR cloning %s\n' "${online_repo##*/}"
-	#	;;
-
-	#esac
 
     fi
 
@@ -555,7 +551,7 @@ mount_repo ()
 
 get_offline_repo ()
 {
-    [[ $online -ne 1 ]] && mount_repo
+    [[ $online -eq 0 ]] && mount_repo
 
     if [[ -z "$repo_dev" ]]; then
 

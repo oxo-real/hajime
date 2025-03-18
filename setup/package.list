@@ -17,7 +17,7 @@ base_packages ()
     base_help=(
 
 	## network helper
-	reflector
+	reflector git
 
     )
 }
@@ -52,7 +52,7 @@ conf_packages ()
 	emacs neovim
 
 	## install helper
-	git
+	#
 
 	## network
 	dhcpcd
@@ -203,8 +203,9 @@ apps_packages ()
 	#android-tools adb-rootless-git
 
 	## internet_browser
-	firefox-developer-edition qutebrowser nyxt w3m
+	firefox-developer-edition qutebrowser w3m
 	#icecat lynx
+	#nyxt  ## seems to inflict a pacman error: libicuuc.so.75
 
 	## internet_search
 	#googler ddgr surfraw

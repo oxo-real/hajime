@@ -8,7 +8,11 @@
 ├── 5dtcf.sh
 ├── COPYING
 ├── emer
-│   └── rescue.sh
+│   ├── pacman-static
+│   ├── pacman-static.sig
+│   ├── repo-add
+│   ├── rescue.sh
+│   └── urls
 ├── logs
 │   ├── pkgs-copy-1000
 │   ├── pkgs-deps-1000
@@ -28,8 +32,9 @@
     ├── dl3189.conf
     ├── etc_doas.conf
     ├── package.list
+    ├── pacman_hybrid.conf
     ├── pacman_offline.conf
     └── pacman_online.conf
 
-5 directories, 26 files
+5 directories, 31 files
 ```
