@@ -71,6 +71,8 @@ timezone=CET
 sync_system_clock_over_ntp=true
 rtc_local_timezone=0
 
+## online
+online_repo=https://codeberg.org/oxo/hajime
 arch_mirrorlist=https://archlinux.org/mirrorlist/?country=SE&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on
 mirror_country=Germany,Netherlands,Sweden,USA
 mirror_amount=5
@@ -131,6 +133,8 @@ fs_var=ext4; lbl_var=VAR
 ## absolute file paths
 hajime_src=/root/tmp/code/hajime
 file_mnt_etc_fstab=/mnt/etc/fstab
+#TODO IDEA using pacman --cachedir $repodir --dppath $repodir
+## instead of altering pacman.conf according to $online mode
 file_etc_pacman_conf=/etc/pacman.conf
 file_mnt_root_bash_profile=/mnt/root/.bashrc
 
@@ -349,7 +353,7 @@ installation_mode ()
     fi
 
     ## update repository database
-    sudo pacman -Syu
+    # sudo pacman -Syy
 }
 
 
@@ -433,24 +437,6 @@ exit_hajime ()
 get_lsblk ()
 {
     lsblk --ascii --tree -o name,uuid,fstype,path,size,fsuse%,fsused,label,mountpoint
-}
-
-
-network_setup ()
-{
-    if [[ $online -ne 0 ]]; then
-	## online or hybrid mode
-
-	# network setup
-
-	## get network interface
-	i=$(ip -o -4 route show to default | awk '{print $5}')
-
-	## connect to network interface
-	dhcpcd $i
-	echo
-
-    fi
 }
 
 
@@ -1371,9 +1357,6 @@ configure_pacman ()
 
     # populate keys from archlinux.gpg
     pacman-key --populate
-
-    # refresh package database
-    pacman -Syu
 }
 
 
@@ -1400,14 +1383,11 @@ configure_mirrorlists ()
 
 install_packages ()
 {
-    # pacstrap creates a new system installation from scratch
+    # pacstrap installs a new system inside the chroot jail (/mnt)
+
     # -K initialises a new pacman keyring on the target (implies -G).
-    # already done in 1base configure_pacman, omit -K
-    # see note/linux/arch/pacstrap or
-    # https://man.archlinux.org/man/pacstrap.8
-    # [FS#79619 : [systemd] 20-systemd-sysusers.hook fails to execute on a fresh system](https://bugs.archlinux.org/task/79619)
-    # [[SOLVED] bootctl install: Bad file descriptor / Installation / Arch Linux Forums](https://bbs.archlinux.org/viewtopic.php?id=288660)
-    pacstrap /mnt "${base_pkgs[@]}" "${base_help[@]}"
+    # c note/linux/arch/pacstrap or https://man.archlinux.org/man/pacstrap.8
+    pacstrap -K /mnt "${base_pkgs[@]}"
 }
 
 
@@ -1435,44 +1415,21 @@ modify_fstab ()
 
 prepare_mnt_environment ()
 {
-    echo 'copying hajime and pacman configuration into the new environment'
+    echo
+    echo 'copying hajime and pacman configuration to chroot jail (/mnt)'
 
-    case "$online" in
+    ## update configuration file location for inside chroot jail (/mnt)
+    sed -i 's#/root##' "$hajime_exec"/setup/tempo-active.conf
 
-	0 )
-	    ## offline mode
-
-	    ## copy hajime_exec to chroot jail (/mnt)
-	    echo
-	    printf 'copying hajime -> /root '
-	    cp --preserve --recursive "$hajime_exec" /mnt
-	    echo
-	    echo
-	    ;;
-
-	1|2 )
-	    ## online or hybrid mode
-
-	    ## clone hajime online repository into chroot jail (/mnt)
-	    cd /mnt
-	    git clone https://codeberg.org/oxo/hajime
-	    cd
-
-	    ## copy current setup directory to chroot jail (/mnt)
-	    echo
-	    printf 'copying hajime/setup -> /root '
-	    cp --preserve --recursive "$hajime_exec"/setup /mnt/hajime
-	    echo
-	    echo
-	    ;;
-
-    esac
+    ## copy hajime_exec to chroot jail (/mnt)
+    echo
+    printf 'copying %s -> /root ' "$hajime_exec"
+    cp --preserve --recursive "$hajime_exec" /mnt
+    echo
+    echo
 
     ## copy pacman.conf and -org-bu to chroot jail (/mnt)
     cp --preserve --recursive --verbose /etc/pacman.conf* /mnt/etc
-
-    ## update configuration file location for inside chroot jail (/mnt)
-    sed -i 's#/root##' /mnt/hajime/setup/tempo-active.conf
 
     echo
 }
@@ -1585,7 +1542,6 @@ main ()
     getargs $args
     sourcing
     installation_mode
-    network_setup
     clock
     ## ##set_key_device
     set_boot_device

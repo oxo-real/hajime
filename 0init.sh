@@ -66,9 +66,6 @@ developer=oxo
 license=gplv3
 initial_release=2020
 
-## online
-online_repo=https://codeberg.org/oxo/hajime
-
 ## absolute file paths
 hajime_src=/root/tmp/code/hajime
 
@@ -412,11 +409,18 @@ setup_wap ()
 		   | nl
 	    )
 
-    printf 'wireless access points (wap) available:\n'
+    if [[ wc -l <<< "#wap_list" ]]; then
+
+	printf 'ERROR no wireless access points found\n'
+	exit 34
+
+    fi
+
+    printf 'available wireless access points (wap):\n'
     printf '%s\n' "$wap_list"
     echo
 
-    printf 'connect to wap [number]: '
+    printf 'enter number to connect to wap: '
     read wap_number
 
     wap=$(echo "$wap_list" \
@@ -444,7 +448,7 @@ dhcp_connect ()
 
     for i in {15..0}; do
 
-	printf 'dhcpcd connect %s %s\r' "$interface" "$i"
+	printf 'dhcpcd connect %s %d\r' "$interface" "$i"
 	sleep 1
 
     done

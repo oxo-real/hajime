@@ -7,17 +7,14 @@ base_packages ()
 
     base_pkgs=(
 
-	## core
+	## core (assential packages)
 	base linux linux-firmware
 
 	## base-devel
 	base-devel
-    )
 
-    base_help=(
-
-	## network helper
-	reflector git
+	## network and helper
+	# reflector git
 
     )
 }
@@ -52,10 +49,10 @@ conf_packages ()
 	emacs neovim
 
 	## install helper
-	#
+	git
 
 	## network
-	dhcpcd
+	dhcpcd reflector
 	#systemd-networkd systemd-resolved
 
 	## wireless network
@@ -340,6 +337,7 @@ apps_packages ()
 	#wlrobs
 	#yay-bin
 	yazi-git
+
     )
 }
 
