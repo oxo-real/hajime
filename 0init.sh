@@ -409,7 +409,7 @@ setup_wap ()
 		   | nl
 	    )
 
-    if [[ wc -l <<< "#wap_list" ]]; then
+    if [[ "$(wc -l <<< "#wap_list")" -eq 0 ]]; then
 
 	printf 'ERROR no wireless access points found\n'
 	exit 34

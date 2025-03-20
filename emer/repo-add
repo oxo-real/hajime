@@ -7,7 +7,20 @@ for file in !(*.sig); do
 done
 
 ## zsh
-setopt extended_glob  
-for file in ^*.sig; do
+setopt extended_glob
+for file in ./*[^.sig]; do
     repo-add --new --include-sigs $HOME/dock/2/offline.db.tar.zst "$file"
 done
+
+
+# [Offline installation - ArchWiki](https://wiki.archlinux.org/title/Offline_installation#Prepare_local_repository)
+# [pacman/Tips and tricks - ArchWiki](https://wiki.archlinux.org/title/Pacman/Tips_and_tricks#Installing_packages_from_a_CD/DVD_or_USB_stick)
+
+## download packages to dock/2
+pacman -Syw --cachedir $HOME/dock/2 base linux linux-firmware
+
+## create a repo database in dock/2 from native system packages
+repo-add --new --include-sigs $HOME/dock/2/offline.db.tar.zst /var/pacman/pkg/*[^.sig]
+
+# NOTICE for repo-add the database and the packages do not need to be in the same directory, but
+  	 when using pacman with that database, they should be together (in dock/2)!

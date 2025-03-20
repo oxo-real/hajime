@@ -288,54 +288,18 @@ installation_mode ()
     repo_dir=/root/tmp/repo
     repo_re=\/root\/tmp\/repo
 
-    if [[ $online -eq 0 ]]; then
-	## offline mode
-
-	## in case current ($online) mode differs from previous
-	## make sure pacman.conf points to offline repos
-	pacman_conf_copy offline
-
-    elif [[ "$online" -ne 0 ]]; then
+    if [[ "$online" -ne 0 ]]; then
 	## online or hybrid mode
 
 	## dhcp connect
 	export hajime_exec
 	sh hajime/0init.sh --pit1
 
-	## in case current ($online) mode differs from previous
-	## make sure pacman.conf points to correct repos
-	[[ "$online" -eq 1 ]] && pm_version=online
-	[[ "$online" -eq 2 ]] && pm_version=hybrid
-	pacman_conf_copy "$pm_version"
-
-	## update offline repo name in /etc/pacman.conf
-	sed -i "s#0init_repo_here#${repo_dir}#" "$file_etc_pacman_conf"
-
     fi
 
     ## update repository database
     sudo pacman -Syu
  }
-
-
-pacman_conf_copy ()
-{
-    case "$1" in
-
-	offline )
-            cp "$file_pacman_offline_conf" "$file_etc_pacman_conf"
-            ;;
-
-	online )
-            cp "$file_pacman_online_conf" "$file_etc_pacman_conf"
-            ;;
-
-	hybrid )
-            cp "$file_pacman_hybrid_conf" "$file_etc_pacman_conf"
-            ;;
-
-    esac
-}
 
 
 define_text_appearance()
@@ -413,28 +377,6 @@ get_offline_code ()
 	    exit 30
 
 	fi
-
-    fi
-}
-
-
-pacman_conf_offline ()
-{
-    if [[ $online -eq 0 ]]; then
-	## offline mode
-
-	## change SigLevel by adding PackageTrustAll to pacman.conf
-	### this prevents errors on marginal trusted packages
-	#sed -i 's/^SigLevel = Required DatabaseOptional/SigLevel = Required DatabaseOptional PackageTrustAll/' $file_etc_pacman_conf
-
-	## redirect offline 'server' (file) location
-	## define offline file location at the end of pacman.conf
-	#TODO DEV sed gives an non-critical error: ''unknown option to s'
-	## but seems to be working though
-	sed -i "/^\[offline\]/{n;s/.*/Server = file:\/\/$repo_re/}" $file_etc_pacman_conf
-
-	initialize_pacman
-	echo
 
     fi
 }
@@ -713,9 +655,48 @@ add_user ()
 }
 
 
-initialize_pacman ()
+micro_code ()
 {
-    pacman -Syy
+    cpu_name=$(lscpu | grep 'Model name:' | awk '{print $3}')
+
+    if [[ $cpu_name == 'AMD' ]]; then
+
+	cpu_type='amd'
+	pkg_ucode='amd-ucode'
+
+    else
+
+	cpu_type='intel'
+	pkg_ucode='intel-ucode iucode-tool'
+
+    fi
+
+    ucode="$cpu_type-ucode"
+}
+
+
+configure_pacman ()
+{
+    ## set correct pacman.conf
+
+    case "$online" in
+
+	0 )
+	    ## offline mode
+	    pm_alt_conf="$file_pacman_offline_conf"
+	    ;;
+
+	1 )
+	    ## online mode
+	    pm_alt_conf="$file_pacman_online_conf"
+	    ;;
+
+	2 )
+	    ## hybrid mode
+	    pm_alt_conf="$file_pacman_hybrid_conf"
+	    ;;
+
+    esac
 }
 
 
@@ -740,33 +721,12 @@ configure_mirrorlists ()
 }
 
 
-micro_code ()
-{
-    cpu_name=$(lscpu | grep 'Model name:' | awk '{print $3}')
-
-    if [[ $cpu_name == 'AMD' ]]; then
-
-	cpu_type='amd'
-	pkg_ucode='amd-ucode'
-
-    else
-
-	cpu_type='intel'
-	pkg_ucode='intel-ucode iucode-tool'
-
-    fi
-
-    #[TODO] check
-    ucode="$cpu_type-ucode"
-}
-
-
 install_core ()
 {
     # update repositories and install core applications
     # [Installation guide - ArchWiki]
     # (https://wiki.archlinux.org/title/Installation_guide#Install_essential_packages)
-    pacman -S --needed --noconfirm "${conf_pkgs[@]}"
+    pacman -S --needed --noconfirm --config "$pm_alt" -- "${conf_pkgs[@]}"
 }
 
 
@@ -883,12 +843,12 @@ exit_chroot_jail_mnt ()
     echo 'sh hajime/3post.sh'
     echo
 
-    # finishing
-    touch /home/$username/hajime/2conf.done
-
     ## remove 2conf_bashrc
     ## NOTICE in 1base designated as file_mnt_root_bash_profile
     rm -rf "$file_root_bash_profile"
+
+    # finishing
+    touch /home/$username/hajime/2conf.done
 }
 
 
@@ -900,7 +860,6 @@ main ()
     installation_mode
     get_offline_repo
     get_offline_code
-    pacman_conf_offline
     time_settings
     locale_settings
     vconsole_settings
@@ -908,9 +867,9 @@ main ()
     set_host_file
     pass_root
     add_user
-    initialize_pacman
+    configure_pacman
     configure_mirrorlists
-    micro_code
+    #DEL_micro_code
     install_core
     install_bootloader
     move_hajime

@@ -309,7 +309,7 @@ process_config_flag_value ()
 }
 
 
-installation_mode ()
+DELinstallation_mode ()
 {
     if [[ -n "$exec_mode" ]]; then
 	## configuration file is being sourced
@@ -357,7 +357,7 @@ installation_mode ()
 }
 
 
-pacman_conf_copy ()
+DELpacman_conf_copy ()
 {
     case "$1" in
 
@@ -1314,49 +1314,26 @@ create_swap_partition()
 
 configure_pacman ()
 {
-    ## backup archiso original pacman.conf
-    cp --preserve --recursive --verbose "$file_etc_pacman_conf" "$file_etc_pacman_conf"-org-bu
+    ## set correct pacman.conf
 
-    if [[ "$online" -eq 0 ]]; then
-	## offline mode
+    case "$online" in
 
-	## copy pacman offline configuration to /etc/pacman.conf
-	cp --preserve --recursive --verbose "$file_pacman_offline_conf" "$file_etc_pacman_conf"
-	echo
+	0 )
+	    ## offline mode
+	    pm_alt_conf="$file_pacman_offline_conf"
+	    ;;
 
-	## update offline repo name in /etc/pacman.conf
-	sed -i "s#0init_repo_here#${repo_dir}#" "$file_etc_pacman_conf"
+	1 )
+	    ## online mode
+	    pm_alt_conf="$file_pacman_online_conf"
+	    ;;
 
-    elif [[ "$online" -eq 1 ]]; then
-	## online mode
+	2 )
+	    ## hybrid mode
+	    pm_alt_conf="$file_pacman_hybrid_conf"
+	    ;;
 
-	## copy pacman online configuration to /etc/pacman.conf
-	cp --preserve --recursive --verbose "$file_pacman_online_conf" "$file_etc_pacman_conf"
-	echo
-
-    elif [[ "$online" -eq 2 ]]; then
-	## hybrid mode
-
-	## copy pacman hybrid configuration to /etc/pacman.conf
-	cp --preserve --recursive --verbose "$file_pacman_hybrid_conf" "$file_etc_pacman_conf"
-	echo
-
-	## update offline repo name in /etc/pacman.conf
-	sed -i "s#0init_repo_here#${repo_dir}#" "$file_etc_pacman_conf"
-
-    fi
-
-    ## change pacman.conf by adding PackageTrustAll to SigLevel
-    ## this prevents errors on installing marginal trusted packages
-    sed -i 's/^SigLevel = Required DatabaseOptional/SigLevel = Required DatabaseOptional PackageTrustAll/' "$file_etc_pacman_conf"
-    ## disable pacman signature check (CAUTION not recommended)
-    #sed -i 's/^SigLevel = Required DatabaseOptional/SigLevel = Never/' "$file_etc_pacman_conf"
-
-    # init package keys
-    pacman-key --init
-
-    # populate keys from archlinux.gpg
-    pacman-key --populate
+    esac
 }
 
 
@@ -1387,7 +1364,7 @@ install_packages ()
 
     # -K initialises a new pacman keyring on the target (implies -G).
     # c note/linux/arch/pacstrap or https://man.archlinux.org/man/pacstrap.8
-    pacstrap -K /mnt "${base_pkgs[@]}"
+    pacstrap -C "$pm_alt_conf" -K /mnt "${base_pkgs[@]}"
 }
 
 

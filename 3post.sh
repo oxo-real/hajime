@@ -259,7 +259,7 @@ installation_mode ()
     repo_dir=/root/tmp/repo
     repo_re=\/root\/tmp\/repo
 
-    if [[ $online -eq 0 ]]; then
+    if [[ "$online" -eq 0 ]]; then
 	## offline mode
 
 	## in case current ($online) mode differs from previous
@@ -289,7 +289,7 @@ installation_mode ()
 }
 
 
-pacman_conf_copy ()
+DELpacman_conf_copy ()
 {
     case "$1" in
 
@@ -349,9 +349,8 @@ own_home ()
 }
 
 
-modify_pacman_conf ()
+DELmodify_pacman_conf ()
 {
-    #TODO check of this function is needed?
     case $online in
 
 	0 )
@@ -386,8 +385,27 @@ modify_pacman_conf ()
 
 pacman_init ()
 {
-    sudo pacman-key --init
-    sudo pacman-key --populate archlinux
+    case "$online" in
+
+	0 )
+	    ## offline mode
+	    pm_alt_conf="$file_pacman_offline_conf"
+	    ;;
+
+	1 )
+	    ## online mode
+	    pm_alt_conf="$file_pacman_online_conf"
+	    ;;
+
+	2 )
+	    ## hybrid mode
+	    pm_alt_conf="$file_pacman_hybrid_conf"
+	    ;;
+
+    esac
+
+    sudo pacman-key --config "$pm_alt_conf" --init
+    sudo pacman-key --config "$pm_alt_conf" --populate archlinux
 }
 
 
