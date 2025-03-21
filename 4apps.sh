@@ -70,6 +70,15 @@ hajime_src="$HOME/dock/3/code/hajime"
 yay_cache="$HOME/.cache/yay"
 yay_src="$HOME/dock/2/src/yay"
 
+## CODE and REPO mountpoints
+## we have no "$HOME"/dock/{2,3} yet
+## therefore we use /root/tmp for the mountpoints
+code_lbl=CODE
+code_dir=/root/tmp/code
+repo_lbl=REPO
+repo_dir=/root/tmp/repo
+repo_re=\/root\/tmp\/repo
+
 
 #--------------------------------
 
@@ -245,15 +254,6 @@ process_config_flag_value ()
 
 installation_mode ()
 {
-    ## CODE and REPO mountpoints
-    ## we have no "$HOME"/dock/{2,3} yet
-    ## therefore we use /root/tmp for the mountpoints
-    code_lbl=CODE
-    code_dir=/root/tmp/code
-    repo_lbl=REPO
-    repo_dir=/root/tmp/repo
-    repo_re=\/root\/tmp\/repo
-
     if [[ $online -eq 0 ]]; then
 	## offline mode
 
@@ -266,7 +266,7 @@ installation_mode ()
 
 	## dhcp connect
 	export hajime_exec
-	sh hajime/0init.sh --pit1
+	sh hajime/0init.sh --pit 1
 
 	## in case current ($online) mode differs from previous
 	## make sure pacman.conf points to correct repos

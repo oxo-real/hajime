@@ -76,6 +76,15 @@ hajime_src=/root/tmp/code/hajime
 file_etc_motd=/etc/motd
 file_etc_pacman_conf=/etc/pacman.conf
 
+## CODE and REPO mountpoints
+## we have no "$HOME"/dock/{2,3} yet
+## therefore we use /root/tmp for the mountpoints
+code_lbl=CODE
+code_dir=/root/tmp/code
+repo_lbl=REPO
+repo_dir=/root/tmp/repo
+repo_re=\/root\/tmp\/repo
+
 
 #--------------------------------
 
@@ -250,140 +259,18 @@ process_config_flag_value ()
 
 installation_mode ()
 {
-    ## CODE and REPO mountpoints
-    ## we have no "$HOME"/dock/{2,3} yet
-    ## therefore we use /root/tmp for the mountpoints
-    code_lbl=CODE
-    code_dir=/root/tmp/code
-    repo_lbl=REPO
-    repo_dir=/root/tmp/repo
-    repo_re=\/root\/tmp\/repo
-
-    if [[ "$online" -eq 0 ]]; then
-	## offline mode
-
-	## in case current ($online) mode differs from previous
-	## make sure pacman.conf points to offline repos
-	pacman_conf_copy offline
-
-    elif [[ "$online" -ne 0 ]]; then
+    if [[ "$online" -ne 0 ]]; then
 	## online or hybrid mode
 
 	## dhcp connect
 	export hajime_exec
-	sh hajime/0init.sh --pit1
-
-	## in case current ($online) mode differs from previous
-	## make sure pacman.conf points to correct repos
-	[[ "$online" -eq 1 ]] && pm_version=online
-	[[ "$online" -eq 2 ]] && pm_version=hybrid
-	pacman_conf_copy "$pm_version"
-
-	## update offline repo name in /etc/pacman.conf
-	sed -i "s#0init_repo_here#${repo_dir}#" "$file_etc_pacman_conf"
+	sh hajime/0init.sh --pit 1
 
     fi
-
-    ## update repository database
-    sudo pacman -Syu
 }
 
 
-DELpacman_conf_copy ()
-{
-    case "$1" in
-
-	offline )
-            cp "$file_pacman_offline_conf" "$file_etc_pacman_conf"
-            ;;
-
-	online )
-            cp "$file_pacman_online_conf" "$file_etc_pacman_conf"
-            ;;
-
-	hybrid )
-            cp "$file_pacman_hybrid_conf" "$file_etc_pacman_conf"
-            ;;
-
-    esac
-}
-
-
-motd_remove ()
-{
-    sudo rm -rf $file_etc_motd
-}
-
-
-reply ()
-{
-    # first silently entered character goes directly to $reply
-    stty_0=$(stty -g)
-    stty raw -echo
-    reply=$(head -c 1)
-    stty $stty_0
-}
-
-
-reply_single ()
-{
-    # first entered character goes directly to $reply
-    stty_0=$(stty -g)
-    stty raw #-echo
-    reply=$(head -c 1)
-    stty $stty_0
-}
-
-
-set_read_write ()
-{
-    # set /usr and /boot read-write
-    sudo mount -o remount,rw  /usr
-    sudo mount -o remount,rw  /boot
-}
-
-
-own_home ()
-{
-    sudo chown -R $(id -un):$(id -gn) /home/$(id -un)
-}
-
-
-DELmodify_pacman_conf ()
-{
-    case $online in
-
-	0 )
-	    ## offline mode
-
-	    ## update offline repository location (used in 2conf ch-root jail)
-	    ## sed if ^[offline] is found substitute (s) the entire (.*) next line (n)
-	    sudo sed -i "/^\[offline\]/{n;s/.*/Server = file:\/\/$repo_re/}" $file_etc_pacman_conf
-	    ;;
-
-	1|2 )
-	    ## online or hybrid mode
-
-	    ## activate color
-	    sudo sed -i 's/#Color/Color/' $file_etc_pacman_conf
-
-	    ## activate verbose package lists
-	    sudo sed -i 's/#VerbosePkgLists/VerbosePkgLists/' $file_etc_pacman_conf
-
-	    ## activate parallel downloads
-	    sudo sed -i 's/#Parallel/Parallel/' pacman.conf
-	    #sudo awk '/VerbosePkgLists/ { print; print "ParallelDownloads = 5"; next }1' \
-		#	$file_etc_pacman_conf > $file_etc_pacman_conf
-
-	    ## activate multilib repository
-	    sudo sed -i 's/\#\[multilib\]/\[multilib\]\nInclude \= \/etc\/pacman.d\/mirrorlist/' $file_etc_pacman_conf
-	    ;;
-
-    esac
-}
-
-
-pacman_init ()
+configure_pacman ()
 {
     case "$online" in
 
@@ -404,6 +291,13 @@ pacman_init ()
 
     esac
 
+    ## update offline repo name in /etc/pacman.conf
+    sed -i "s#0init_repo_here#${repo_dir}#" "pm_alt_conf"
+}
+
+
+pacman_init ()
+{
     sudo pacman-key --config "$pm_alt_conf" --init
     sudo pacman-key --config "$pm_alt_conf" --populate archlinux
 }
@@ -462,6 +356,46 @@ get_offline_code ()
 	fi
 
     fi
+}
+
+
+motd_remove ()
+{
+    sudo rm -rf $file_etc_motd
+}
+
+
+reply ()
+{
+    # first silently entered character goes directly to $reply
+    stty_0=$(stty -g)
+    stty raw -echo
+    reply=$(head -c 1)
+    stty $stty_0
+}
+
+
+reply_single ()
+{
+    # first entered character goes directly to $reply
+    stty_0=$(stty -g)
+    stty raw #-echo
+    reply=$(head -c 1)
+    stty $stty_0
+}
+
+
+set_read_write ()
+{
+    # set /usr and /boot read-write
+    sudo mount -o remount,rw  /usr
+    sudo mount -o remount,rw  /boot
+}
+
+
+own_home ()
+{
+    sudo chown -R $(id -un):$(id -gn) /home/$(id -un)
 }
 
 
@@ -543,14 +477,14 @@ main ()
     sourcing
     getargs $args
     motd_remove
-    installation_mode
-    set_read_write
-    own_home
-    modify_pacman_conf
-    pacman_init
-    create_directories
     get_offline_repo
     get_offline_code
+    installation_mode
+    configure_pacman
+    pacman_init
+    set_read_write
+    own_home
+    create_directories
     base_mutations
     set_read_only
     wrap_up

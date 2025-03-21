@@ -98,6 +98,15 @@ hajime_src=/root/tmp/code/hajime
 file_etc_pacman_conf=/etc/pacman.conf
 file_root_bash_profile=/root/.bashrc
 
+## CODE and REPO mountpoints
+## we have no "$HOME"/dock/{2,3} yet
+## therefore we use /root/tmp for the mountpoints
+code_lbl=CODE
+code_dir=/root/tmp/code
+repo_lbl=REPO
+repo_dir=/root/tmp/repo
+repo_re=\/root\/tmp\/repo
+
 
 #--------------------------------
 
@@ -270,7 +279,6 @@ process_config_flag_value ()
 
 installation_mode ()
 {
-
     if [[ -n "$exec_mode" ]]; then
 	## configuration file is being sourced
 
@@ -278,15 +286,6 @@ installation_mode ()
 	file_setup_package_list="$hajime_exec"/setup/package.list
 
     fi
-
-    ## CODE and REPO mountpoints
-    ## we have no "$HOME"/dock/{2,3} yet
-    ## therefore we use /root/tmp for the mountpoints
-    code_lbl=CODE
-    code_dir=/root/tmp/code
-    repo_lbl=REPO
-    repo_dir=/root/tmp/repo
-    repo_re=\/root\/tmp\/repo
 
     if [[ "$online" -ne 0 ]]; then
 	## online or hybrid mode
@@ -738,18 +737,11 @@ install_bootloader ()
     ## install boot files
     bootctl install
 
-    ## boot loader configuration
+    ## configure boot loader
     printf "default arch\n" > $file_boot_loader_loader_conf
     printf "timeout $bootloader_timeout\n" >> $file_boot_loader_loader_conf
     printf "editor $bootloader_editor\n" >> $file_boot_loader_loader_conf
     printf "console-mode max" >> $file_boot_loader_loader_conf
-
-
-    # create an initial ramdisk environment (initramfs)
-    ## [mkinitcpio - ArchWiki](https://wiki.archlinux.org/title/Mkinitcpio#Common_hooks)
-    ## enable systemd hooks
-    #TODO base?
-    sed -i "/^HOOKS/c\HOOKS=(base systemd microcode autodetect modconf keyboard sd-vconsole block sd-encrypt lvm2 filesystems fsck)" /etc/mkinitcpio.conf
 
 
     # adding boot loader entries
@@ -760,10 +752,6 @@ install_bootloader ()
     echo 'linux /vmlinuz-linux' >> $file_boot_loader_entries_arch_conf
     echo "initrd /$ucode.img" >> $file_boot_loader_entries_arch_conf
     echo 'initrd /initramfs-linux.img' >> $file_boot_loader_entries_arch_conf
-    ### if lv_swap does not exist
-    [ ! -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> $file_boot_loader_entries_arch_conf
-    ### if lv_swap does exists
-    [ -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` rw resume=UUID=`blkid | grep lv_swap | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> $file_boot_loader_entries_arch_conf
 
     ## linux long term support kernel (LTS)
     file_boot_loader_entries_arch_lts_conf="/boot/loader/entries/arch-lts.conf"
@@ -771,25 +759,72 @@ install_bootloader ()
     echo 'linux /vmlinuz-linux-lts' >> $file_boot_loader_entries_arch_lts_conf
     echo "initrd /$ucode.img" >> $file_boot_loader_entries_arch_conf
     echo 'initrd /initramfs-linux-lts.img' >> $file_boot_loader_entries_arch_lts_conf
-    ### if lv_swap does not exist
-    [ ! -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> $file_boot_loader_entries_arch_lts_conf
-    ### if lv_swap does exist
-    [ -d /dev/mapper/vg0-lv_swap ] && echo "options rd.luks.name=`blkid | grep crypto_LUKS | awk '{print $2}' | cut -d '"' -f2`=cryptlvm root=UUID=`blkid | grep lv_root | awk '{print $3}' | cut -d '"' -f2` rw resume=UUID=`blkid | grep lv_swap | awk '{print $3}' | cut -d '"' -f2` nowatchdog module_blacklist=iTCO_wdt" >> $file_boot_loader_entries_arch_lts_conf
+
+
+    # kernel options
+
+    ## get parameter data
+    blk_dev_list==$(lsblk --list --noheadings --output fstype,uuid,name)
+
+    ## crypto_luks
+    kp_luks_uuid=$(grep crypto_LUKS <<< "$blk_dev_list" | awk '{print $2}')
+    kp_mapper_name=$(grep LVM2_member <<< "$blk_dev_list" | awk '{print $3}')
+
+    ## root and swap
+    kp_root_uuid=$(grep lv_root <<< "$blk_dev_list" | awk '{print $2}')
+    kp_swap_uuid=$(grep lv_swap <<< "$blk_dev_list" | awk '{print $2}')
+
+    ## additional options
+    kp_no_watchdog='nowatchdog module_blacklist=iTCO_wd'
+    kp_no_radios='rfkill.default_state=1'
+    kp_added_options="$kp_no_watchdog $kp_no_radios"
+
+    ## swap
+    swap_exist=$(grep swap <<< "$blk_dev_list")
+
+    case "$swap_exist" in
+
+	swap )
+	    ## lv_swap does exists
+	    kp_options=$(printf 'options rd.luks.name=%s=%s root=UUID=%s rw resume=UUID=%s %s' \
+				     "$kp_luks_uuid" \
+				     "$kp_mapper_name" \
+				     "$kp_root_uuid" \
+				     "$kp_swap_uuid" \
+				     "$kp_added_options"
+			   )
+	    ;;
+
+	* )
+	    ## lv_swap does not exist
+	    kp_options=$(printf 'options rd.luks.name=%s=%s root=UUID=%s rw %s' \
+				"$kp_luks_uuid" \
+				"$kp_mapper_name" \
+				"$kp_root_uuid" \
+				"$kp_added_options"
+		      )
+	    ;;
+
+    esac
+
+    ## adding kernel options to the boot loader entries (ble and lts)
+    printf '%s' "$kp_options" >> $file_boot_loader_entries_arch_conf
+    printf '%s' "$kp_options" >> $file_boot_loader_entries_arch_lts_conf
 
 
     # generate initramfs with mkinitcpio
 
-    ## [Installation guide - ArchWiki]
-    ## (https://wiki.archlinux.org/title/Installation_guide#Initramfs)
+    ## create an initial ramdisk environment (initramfs)
+    ## [mkinitcpio - ArchWiki](https://wiki.archlinux.org/title/Mkinitcpio#Common_hooks)
+    ## [Installation guide - ArchWiki](https://wiki.archlinux.org/title/Installation_guide#Initramfs)
+    ## enable systemd hooks
+    sed -i "/^HOOKS/c\HOOKS=(base systemd microcode autodetect modconf keyboard sd-vconsole block sd-encrypt lvm2 filesystems fsck)" /etc/mkinitcpio.conf
 
     ## for linux preset
     mkinitcpio -p linux
 
     ## for linux-lts preset
     mkinitcpio -p linux-lts
-
-    ## for all presets
-    #mkinitcpio -P
 }
 
 

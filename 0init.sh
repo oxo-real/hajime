@@ -115,11 +115,14 @@ getargs ()
 		;;
 
 	    --pit1 )
-		pit=1
+		shift
+
+		## get pit flag value
+		pit="$1"
 		shift
 		;;
 
-	    -- )
+	    - )
 		shift
 
 		## get config flag value

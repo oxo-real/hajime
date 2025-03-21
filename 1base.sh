@@ -133,10 +133,17 @@ fs_var=ext4; lbl_var=VAR
 ## absolute file paths
 hajime_src=/root/tmp/code/hajime
 file_mnt_etc_fstab=/mnt/etc/fstab
-#TODO IDEA using pacman --cachedir $repodir --dppath $repodir
-## instead of altering pacman.conf according to $online mode
 file_etc_pacman_conf=/etc/pacman.conf
 file_mnt_root_bash_profile=/mnt/root/.bashrc
+
+## CODE and REPO mountpoints
+## we have no "$HOME"/dock/{2,3} yet
+## therefore we use /root/tmp for the mountpoints
+code_lbl=CODE
+code_dir=/root/tmp/code
+repo_lbl=REPO
+repo_dir=/root/tmp/repo
+repo_re=\/root\/tmp\/repo
 
 
 #--------------------------------
@@ -309,71 +316,27 @@ process_config_flag_value ()
 }
 
 
-DELinstallation_mode ()
+installation_mode ()
 {
     if [[ -n "$exec_mode" ]]; then
 	## configuration file is being sourced
 
 	file_setup_luks_pass="$hajime_exec"/setup/tempo-luks.pass
+	file_setup_package_list="$hajime_exec"/setup/package.list
 
     fi
 
-    ## CODE and REPO mountpoints
-    ## we have no "$HOME"/dock/{2,3} yet
-    ## therefore we use /root/tmp for the mountpoints
-    code_lbl=CODE
-    code_dir=/root/tmp/code
-    repo_lbl=REPO
-    repo_dir=/root/tmp/repo
-    repo_re=\/root\/tmp\/repo
-
-    if [[ $online -eq 0 ]]; then
-	## offline mode
-
-	## in case current ($online) mode differs from previous
-	## make sure pacman.conf points to offline repos
-	pacman_conf_copy offline
-
-    elif [[ "$online" -ne 0 ]]; then
+    if [[ "$online" -ne 0 ]]; then
 	## online or hybrid mode
 
 	## dhcp connect
 	export hajime_exec
 	sh hajime/0init.sh --pit1
 
-	## in case current ($online) mode differs from previous
-	## make sure pacman.conf points to correct repos
-	[[ "$online" -eq 1 ]] && pm_version=online
-	[[ "$online" -eq 2 ]] && pm_version=hybrid
-	pacman_conf_copy "$pm_version"
-
-	## update offline repo name in /etc/pacman.conf
-	sed -i "s#0init_repo_here#${repo_dir}#" "$file_etc_pacman_conf"
-
     fi
 
     ## update repository database
-    # sudo pacman -Syy
-}
-
-
-DELpacman_conf_copy ()
-{
-    case "$1" in
-
-	offline )
-            cp "$file_pacman_offline_conf" "$file_etc_pacman_conf"
-            ;;
-
-	online )
-            cp "$file_pacman_online_conf" "$file_etc_pacman_conf"
-            ;;
-
-	hybrid )
-            cp "$file_pacman_hybrid_conf" "$file_etc_pacman_conf"
-            ;;
-
-    esac
+    #sudo pacman -Syu
 }
 
 
@@ -1334,6 +1297,18 @@ configure_pacman ()
 	    ;;
 
     esac
+
+    ## update offline repo dir
+    sed -i "s#0init_repo_here#${repo_dir}#" "$pm_alt_conf"
+
+    # init package keys
+    pacman-key --init
+
+    # populate keys from archlinux.gpg
+    pacman-key --populate
+
+    # update package database
+    # pacman -Syy
 }
 
 
