@@ -76,11 +76,6 @@ online_repo=https://codeberg.org/oxo/hajime
 arch_mirrorlist=https://archlinux.org/mirrorlist/?country=SE&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on
 mirror_country=Germany,Netherlands,Sweden,USA
 mirror_amount=5
-# pkg_help=reflector  ## keeping base_packages clean
-# [Installation guide - ArchWiki](https://wiki.archlinux.org/title/Installation_guide#Install_essential_packages)
-# 20230212 https://archlinux.org/news/switch-to-the-base-devel-meta-package-requires-manual-intervention/
-#pkg_core='base linux linux-firmware' (via install-packages)
-#pkg_base_devel='base-devel' (via install-packages)
 
 ## boot size (MB)
 boot_size=256
@@ -331,7 +326,7 @@ installation_mode ()
 
 	## dhcp connect
 	export hajime_exec
-	sh hajime/0init.sh --pit1
+	sh hajime/0init.sh --pit 1
 
     fi
 
@@ -1299,16 +1294,19 @@ configure_pacman ()
     esac
 
     ## update offline repo dir
-    sed -i "s#0init_repo_here#${repo_dir}#" "$pm_alt_conf"
+    ## sed replace the line after match [offline]
+    ## sed {n;...} on match read next line
+    ## sed s#search#replace# replace whole line (.*) with Server...
+    sed -i "/\[offline\]/{n;s#.*#Server = file://${repo_dir}#;}" $pm_alt_conf
 
     # init package keys
-    pacman-key --init
+    pacman-key --config "$pm_alt_conf" --init
 
     # populate keys from archlinux.gpg
-    pacman-key --populate
+    pacman-key --config "$pm_alt_conf" --populate
 
     # update package database
-    # pacman -Syy
+    pacman --needed --noconfirm --config "$pm_alt_conf" -Syu
 }
 
 
@@ -1368,7 +1366,7 @@ modify_fstab ()
 prepare_mnt_environment ()
 {
     echo
-    echo 'copying hajime and pacman configuration to chroot jail (/mnt)'
+    echo 'copying hajime configuration to chroot jail (/mnt)'
 
     ## update configuration file location for inside chroot jail (/mnt)
     sed -i 's#/root##' "$hajime_exec"/setup/tempo-active.conf
@@ -1381,8 +1379,7 @@ prepare_mnt_environment ()
     echo
 
     ## copy pacman.conf and -org-bu to chroot jail (/mnt)
-    cp --preserve --recursive --verbose /etc/pacman.conf* /mnt/etc
-
+    # cp --preserve --recursive --verbose "$pm_alt_conf" /mnt/etc
     echo
 }
 

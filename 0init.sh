@@ -69,6 +69,15 @@ initial_release=2020
 ## absolute file paths
 hajime_src=/root/tmp/code/hajime
 
+## CODE and REPO mountpoints
+## "$HOME"/dock/{2,3} are not available yet
+## therefore we use /root/tmp for the mountpoints
+code_lbl=CODE
+code_dir=/root/tmp/code
+repo_lbl=REPO
+repo_dir=/root/tmp/repo
+repo_re=\/root\/tmp\/repo
+
 
 #--------------------------------
 
@@ -114,7 +123,7 @@ getargs ()
 		shift
 		;;
 
-	    --pit1 )
+	    --pit )
 		shift
 
 		## get pit flag value
@@ -308,23 +317,6 @@ header ()
     printf '  |  %s\n' "$developer"
     echo
     echo
-}
-
-
-point_in_time ()
-{
-    if [[ "$pit" -eq 0 ]]; then
-
-	## CODE and REPO mountpoints
-	## "$HOME"/dock/{2,3} are not available yet
-	## therefore we use /root/tmp for the mountpoints
-	code_lbl=CODE
-	code_dir=/root/tmp/code
-	repo_lbl=REPO
-	repo_dir=/root/tmp/repo
-	repo_re=\/root\/tmp\/repo
-
-    fi
 }
 
 
@@ -594,7 +586,7 @@ main ()
     getargs $args
     sourcing
     define_text_appearance
-    point_in_time
+    # point_in_time
     header
     config_file_warning
     roadmap

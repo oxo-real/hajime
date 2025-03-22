@@ -292,13 +292,10 @@ installation_mode ()
 
 	## dhcp connect
 	export hajime_exec
-	sh hajime/0init.sh --pit1
+	sh hajime/0init.sh --pit 1
 
     fi
-
-    ## update repository database
-    sudo pacman -Syu
- }
+}
 
 
 define_text_appearance()
@@ -696,6 +693,19 @@ configure_pacman ()
 	    ;;
 
     esac
+
+    ## update offline repo dir
+    sed -i "s#0init_repo_here#${repo_dir}#" "$pm_alt_conf"
+
+    # init package keys
+    pacman-key --config "$pm_alt_conf" --init
+
+    # populate keys from archlinux.gpg
+    pacman-key --config "$pm_alt_conf" --populate
+
+    # update package database
+    pacman --needed --noconfirm --config "$pm_alt_conf" -Syu
+   # pacman -Syy
 }
 
 
@@ -725,7 +735,7 @@ install_core ()
     # update repositories and install core applications
     # [Installation guide - ArchWiki]
     # (https://wiki.archlinux.org/title/Installation_guide#Install_essential_packages)
-    pacman -S --needed --noconfirm --config "$pm_alt" -- "${conf_pkgs[@]}"
+    pacman -S --needed --noconfirm --config "$pm_alt_conf" "${conf_pkgs[@]}"
 }
 
 
