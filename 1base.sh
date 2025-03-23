@@ -123,6 +123,7 @@ fs_home=ext4; lbl_home=HOME
 fs_tmp=ext4; lbl_tmp=TMP
 fs_usr=ext4; lbl_usr=USR
 fs_var=ext4; lbl_var=VAR
+lbl_swap=SWAP
 
 
 ## absolute file paths
@@ -329,9 +330,6 @@ installation_mode ()
 	sh hajime/0init.sh --pit 1
 
     fi
-
-    ## update repository database
-    #sudo pacman -Syu
 }
 
 
@@ -1056,34 +1054,6 @@ set_lvm_partition_sizes ()
 }
 
 
-legacy_cryptsetup ()
-{
-    #cryptsetup on designated partition
-
-    if [[ -n $luks_pass ]]; then
-	## via configuration
-
-	echo
-
-	## write key-file
-	printf '%s' "$luks_pass" > $file_setup_luks_pass
-
-	cryptsetup luksFormat --batch-mode --type luks2 --key-file $file_setup_luks_pass "$lvm_part"
-	cryptsetup --key-file $file_setup_luks_pass open "$lvm_part" "$device_mapper"
-
-	## remove key-file
-	rm -rf $file_setup_luks_pass
-
-    elif [[ -z $luks_pass ]]; then
-	## user interactive
-
-	cryptsetup luksFormat --type luks2 "$lvm_part"
-	cryptsetup open "$lvm_part" "$device_mapper"
-
-    fi
-}
-
-
 cryptboot ()
 {
     ## parameters
@@ -1133,7 +1103,7 @@ cryptkey ()
     keyimg_hash="sha512"
     keyimg_cipher="serpent-xts-plain64"
     keyimg_keysize="512"
-    keyimg_iter_msecs="6000" 	# secure minimum = 6000ms
+    keyimg_iter_msecs="6000"  ## secure minimum = 6000ms
 
     ## create
     ## keyimg_file is nested inside cryptboot
@@ -1204,6 +1174,34 @@ cryptlvm ()
 }
 
 
+legacy_cryptsetup ()
+{
+    #cryptsetup on designated partition
+
+    if [[ -n $luks_pass ]]; then
+	## via configuration
+
+	echo
+
+	## write key-file
+	printf '%s' "$luks_pass" > $file_setup_luks_pass
+
+	cryptsetup luksFormat --batch-mode --type luks2 --key-file $file_setup_luks_pass "$lvm_part"
+	cryptsetup --key-file $file_setup_luks_pass open "$lvm_part" "$device_mapper"
+
+	## remove key-file
+	rm -rf $file_setup_luks_pass
+
+    elif [[ -z $luks_pass ]]; then
+	## user interactive
+
+	cryptsetup luksFormat --type luks2 "$lvm_part"
+	cryptsetup open "$lvm_part" "$device_mapper"
+
+    fi
+}
+
+
 create_lvm_volumes ()
 {
     ## create physical volume with lvm
@@ -1218,6 +1216,9 @@ create_lvm_volumes ()
     lvcreate -L "$tmp_size"G "$vol_grp_name" -n lv_tmp
     lvcreate -L "$usr_size"G "$vol_grp_name" -n lv_var
     lvcreate -L "$var_size"G "$vol_grp_name" -n lv_usr
+    ### swap_create from configuration
+    [[ -n "$swap_create" ]] && \
+	lvcreate -L "$swap_size"G "$vol_grp_name" -n lv_swap
 }
 
 
@@ -1230,6 +1231,9 @@ make_filesystems ()
     mkfs."$fs_tmp" -L "$lbl_tmp" "$map_dir"/"$logic_vol"_tmp
     mkfs."$fs_usr" -L "$lbl_usr" "$map_dir"/"$logic_vol"_usr
     mkfs."$fs_var" -L "$lbl_var" "$map_dir"/"$logic_vol"_var
+    ### swap_create from configuration
+    [[ -n "$swap_create" ]] && \
+	mkswap -L "$lbl_swap" "$map_dir"/"$logic_vol"_swap
 }
 
 
@@ -1251,20 +1255,28 @@ mount_partitions ()
     mount "$map_dir"/"$logic_vol"_tmp "$lvm_root"/tmp
     mount "$map_dir"/"$logic_vol"_usr "$lvm_root"/usr
     mount "$map_dir"/"$logic_vol"_var "$lvm_root"/var
+    ### swap_create from configuration
+    [[ -n "$swap_create" ]] && \
+	swapon "$map_dir"/"$logic_vol"_swap
 }
 
 
-create_swap_partition()
+configure_mirrorlists ()
 {
-    ## yes from configuration
-    if [[ "$swap_bool" == "Y" || "$swap_bool" == "y" || "$swap_bool" == "yes" ]]; then
+    if [[ "$online" -ne 0 ]]; then
+	## online or hybrid mode
 
-	lvcreate -L "$swap_size"G vg0 -n lv_swap
-	mkswap -L SWAP /dev/mapper/vg0-lv_swap
+	## backup old mirrorlist
+	file_etc_pacmand_mirrorlist="/etc/pacman.d/mirrorlist"
+	cp --preserve --verbose "$file_etc_pacmand_mirrorlist" /etc/pacman.d/"$(date '+%Y%m%d_%H%M%S')"_mirrorlist_bu
 
-	swapon /dev/mapper/vg0-lv_swap
-
-	echo
+	## select fastest mirrors
+	reflector \
+	    --verbose \
+	    --country "$mirror_country" \
+	    -l "$mirror_amount" \
+	    --sort rate \
+	    --save "$file_etc_pacmand_mirrorlist"
 
     fi
 }
@@ -1310,27 +1322,6 @@ configure_pacman ()
 }
 
 
-configure_mirrorlists ()
-{
-    if [[ "$online" -ne 0 ]]; then
-	## online or hybrid mode
-
-	## backup old mirrorlist
-	file_etc_pacmand_mirrorlist="/etc/pacman.d/mirrorlist"
-	cp --preserve --verbose "$file_etc_pacmand_mirrorlist" /etc/pacman.d/"$(date '+%Y%m%d_%H%M%S')"_mirrorlist_bu
-
-	## select fastest mirrors
-	reflector \
-	    --verbose \
-	    --country "$mirror_country" \
-	    -l "$mirror_amount" \
-	    --sort rate \
-	    --save "$file_etc_pacmand_mirrorlist"
-
-    fi
-}
-
-
 install_packages ()
 {
     # pacstrap installs a new system inside the chroot jail (/mnt)
@@ -1343,8 +1334,8 @@ install_packages ()
 
 generate_fstab ()
 {
-    # file system table
-    genfstab -U -p /mnt >> "$file_mnt_etc_fstab"
+    ## generate file system table
+    genfstab -p -t UUID /mnt >> "$file_mnt_etc_fstab"
 }
 
 
@@ -1422,7 +1413,7 @@ welcome ()
 {
     clear
     printf 'hajime - %s\n' "$script_name"
-    printf 'copyright (c) 2017 - 2025  |  oxo\n'
+    printf 'copyright (c) %s - %s  |  %s\n' "$initial_release" "$(date +'%Y')" "$developer"
     echo
     echo
     printf "${st_bold}CAUTION!${st_def}\n"
@@ -1507,9 +1498,8 @@ main ()
     make_filesystems
     create_mp_directories
     mount_partitions
-    create_swap_partition
-    configure_pacman
     configure_mirrorlists
+    configure_pacman
     install_packages
     generate_fstab
     modify_fstab

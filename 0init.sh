@@ -69,15 +69,6 @@ initial_release=2020
 ## absolute file paths
 hajime_src=/root/tmp/code/hajime
 
-## CODE and REPO mountpoints
-## "$HOME"/dock/{2,3} are not available yet
-## therefore we use /root/tmp for the mountpoints
-code_lbl=CODE
-code_dir=/root/tmp/code
-repo_lbl=REPO
-repo_dir=/root/tmp/repo
-repo_re=\/root\/tmp\/repo
-
 
 #--------------------------------
 
@@ -472,18 +463,32 @@ network_connect ()
 
 roadmap ()
 {
-    if [[ $pit -eq 1 ]]; then
+    if [[ "$pit" -eq 1 ]]; then
 
-	## entry point for later modules to connect to a network
+	## entry point modules to connect to a network
 	network_connect
 
     else
 
+	point_in_time
 	copy_hajime
 	installation_mode
 	autostart_next
 
     fi
+}
+
+
+point_in_time ()
+{
+    ## CODE and REPO mountpoints
+    ## "$HOME"/dock/{2,3} are not available yet
+    ## therefore set /root/tmp as mountpoint
+    code_lbl=CODE
+    code_dir=/root/tmp/code
+    repo_lbl=REPO
+    repo_dir=/root/tmp/repo
+    repo_re=\/root\/tmp\/repo
 }
 
 
@@ -516,15 +521,6 @@ installation_mode ()
 	printf '%s\n' "$file_setup_config_exec" > "$file_setup_config_path"
 
     fi
-
-    ## CODE and REPO mountpoints
-    ## we have no "$HOME"/dock/{2,3} yet
-    ## therefore we use /root/tmp for the mountpoints
-    code_lbl=CODE
-    code_dir=/root/tmp/code
-    repo_lbl=REPO
-    repo_dir=/root/tmp/repo
-    repo_re=\/root\/tmp\/repo
 
     if [[ "$online" -ne 1 ]]; then
 	## offline or hybrid mode
@@ -586,7 +582,6 @@ main ()
     getargs $args
     sourcing
     define_text_appearance
-    # point_in_time
     header
     config_file_warning
     roadmap
