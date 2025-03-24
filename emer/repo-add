@@ -18,9 +18,12 @@ done
 
 ## download packages to dock/2
 pacman -Syw --cachedir $HOME/dock/2 base linux linux-firmware
+# OR
+rsync -aAXv /var/cache/pacman/pkg/*.{zst,sig} $HOME/dock/2
+
 
 ## create a repo database in dock/2 from native system packages
-repo-add --new --include-sigs $HOME/dock/2/offline.db.tar.zst /var/pacman/pkg/*[^.sig]
+repo-add --new --include-sigs $HOME/dock/2/offline.db.tar.zst /var/cache/pacman/pkg/*[^.sig]
 
 # NOTICE for repo-add the database and the packages do not need to be in the same directory, but
   	 when using pacman with that database, they should be together (in dock/2)!

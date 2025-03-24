@@ -1312,6 +1312,7 @@ configure_pacman ()
     ## sed s#search#replace# replace whole line (.*) with Server...
     sed -i "/^\[offline\]/{n;s#.*#Server = file://${repo_dir}#;}" $pm_alt_conf
 
+    echo
     # init package keys
     pacman-key --config "$pm_alt_conf" --init
 
@@ -1327,6 +1328,7 @@ install_packages ()
 {
     # pacstrap installs a new system inside the chroot jail (/mnt)
 
+    echo
     # -K initialises a new pacman keyring on the target (implies -G).
     # c note/linux/arch/pacstrap or https://man.archlinux.org/man/pacstrap.8
     pacstrap -C "$pm_alt_conf" -K /mnt "${base_pkgs[@]}"
