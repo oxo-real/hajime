@@ -75,7 +75,7 @@ rtc_local_timezone=0
 online_repo=https://codeberg.org/oxo/hajime
 arch_mirrorlist=https://archlinux.org/mirrorlist/?country=SE&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on
 mirror_country=Germany,Netherlands,Sweden,USA
-mirror_amount=5
+mirror_amount=20
 
 ## boot size (MB)
 boot_size=256
@@ -1266,6 +1266,7 @@ configure_mirrorlists ()
     if [[ "$online" -ne 0 ]]; then
 	## online or hybrid mode
 
+	echo
 	## backup old mirrorlist
 	file_etc_pacmand_mirrorlist="/etc/pacman.d/mirrorlist"
 	cp --preserve --verbose "$file_etc_pacmand_mirrorlist" /etc/pacman.d/"$(date '+%Y%m%d_%H%M%S')"_mirrorlist_bu
@@ -1306,10 +1307,10 @@ configure_pacman ()
     esac
 
     ## update offline repo dir
-    ## sed replace the line after match [offline]
+    ## sed replace the line after match ^[offline]
     ## sed {n;...} on match read next line
     ## sed s#search#replace# replace whole line (.*) with Server...
-    sed -i "/\[offline\]/{n;s#.*#Server = file://${repo_dir}#;}" $pm_alt_conf
+    sed -i "/^\[offline\]/{n;s#.*#Server = file://${repo_dir}#;}" $pm_alt_conf
 
     # init package keys
     pacman-key --config "$pm_alt_conf" --init
@@ -1318,7 +1319,7 @@ configure_pacman ()
     pacman-key --config "$pm_alt_conf" --populate
 
     # update package database
-    pacman --needed --noconfirm --config "$pm_alt_conf" -Syu
+    # pacman --needed --noconfirm --config "$pm_alt_conf" -Syu
 }
 
 
@@ -1438,8 +1439,7 @@ welcome ()
     echo
     printf "Cancel the execution of this installation script by pressing 'N'.\n"
     echo
-    printf "Manifest the intent to continue, while ${st_bold}fully consent${st_def}\n"
-    printf "to the considerations above; press 'Y'.\n"
+    printf "Manifest the intent to continue, with ${st_bold}full consent${st_def}; press 'Y'.\n"
     echo
     echo
     printf "${fg_magenta}Continue installation?${st_def} [y/N] "

@@ -66,6 +66,9 @@ developer=oxo
 license=gplv3
 initial_release=2020
 
+## point in time
+pit=0
+
 ## absolute file paths
 hajime_src=/root/tmp/code/hajime
 
@@ -186,14 +189,18 @@ relative_file_paths ()
 {
     ## independent (i.e. no if) relative file paths
 
-    ## tempo-active.conf contains path to active setup configuration file
-    file_setup_config_path="$hajime_src"/setup/tempo-active.conf
-    printf '%s\n' "$file_setup_config" > "$file_setup_config_path"
+    if [[ "$pit" -eq 0 ]]; then
+
+	## tempo-active.conf contains path to active setup configuration file
+	file_setup_config_path="$hajime_src"/setup/tempo-active.conf
+	printf '%s\n' "$file_setup_config" > "$file_setup_config_path"
+
+    fi
 
     ## wireless network access point password
     wap_pass="$hajime_src"/setup/wap"$wap".pass
 
-    if [[ "$pit" -eq 1 ]]; then
+    if [[ "$pit" -gt 0 ]]; then
 
 	file_setup_config_path="$hajime_exec"/setup/tempo-active.conf
 	wap_pass="$hajime_exec"/setup/wap"$wap".pass
@@ -463,7 +470,7 @@ network_connect ()
 
 roadmap ()
 {
-    if [[ "$pit" -eq 1 ]]; then
+    if [[ "$pit" -gt 0 ]]; then
 
 	## entry point modules to connect to a network
 	network_connect

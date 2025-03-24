@@ -264,7 +264,7 @@ installation_mode ()
 
 	## dhcp connect
 	export hajime_exec
-	sh hajime/0init.sh --pit 1
+	sh hajime/0init.sh --pit 3
 
     fi
 }

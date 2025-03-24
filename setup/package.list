@@ -6,15 +6,13 @@ base_packages ()
     # packages 1base
 
     base_pkgs=(
+	## installed with pacstrap (1base install_packages)
 
 	## core (assential packages)
 	base linux linux-firmware
 
 	## base-devel
 	base-devel
-
-	## network and helper
-	# reflector git
 
     )
 }
@@ -25,13 +23,14 @@ conf_packages ()
     # packages 2conf
 
     conf_pkgs=(
+	## installed with pacman (2conf install_core)
 
 	## linux kernel
 	#linux (in base_pkgs)
 	linux-headers
 
 	## linux lts kernel
-	linux-lts linux-lts-headers
+	# linux-lts linux-lts-headers
 
 	## intel micro code
 	intel-ucode iucode-tool

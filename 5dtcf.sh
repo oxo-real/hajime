@@ -288,7 +288,7 @@ installation_mode ()
 
 	## dhcp connect
 	export hajime_exec
-	sh hajime/0init.sh --pit 1
+	sh hajime/0init.sh --pit 5
 
 	## in case current ($online) mode differs from previous
 	## make sure pacman.conf points to correct repos
