@@ -1,6 +1,57 @@
 #! /usr/bin/env sh
 
 
+# metapackage dependencies
+
+## base (3-2)
+: '
+    ## very very base
+    filesystem gcc-libs glibc bash
+
+    ## POSIX tools
+    coreutils file findutils gawk grep procps-ng sed tar
+
+    ## standard linux toolset
+    gettext pciutils psmisc shadow util-linux bzip2 gzip xz
+
+    ## distro defined requirements
+    licenses pacman archlinux-keyring systemd systemd-sysvcompat
+
+    ## networking, ping, etc
+    iputils iproute2
+# '
+
+## base-devel (1-2)
+: '
+    archlinux-keyring
+    autoconf
+    automake
+    binutils
+    bison
+    debugedit
+    fakeroot
+    file
+    findutils
+    flex
+    gawk
+    gcc
+    gettext
+    grep
+    groff
+    gzip
+    libtool
+    m4
+    make
+    pacman
+    patch
+    pkgconf
+    sed
+    sudo
+    texinfo
+    which
+# '
+
+
 base_packages ()
 {
     # packages 1base
@@ -8,9 +59,8 @@ base_packages ()
     base_pkgs=(
 	## installed with pacstrap (1base install_packages)
 
-	## core (assential packages)
+	## core (essential packages)
 	base linux linux-firmware
-
 	## base-devel
 	base-devel
 
@@ -23,10 +73,9 @@ conf_packages ()
     # packages 2conf
 
     conf_pkgs=(
-	## installed with pacman (2conf install_core)
+	## installed from chroot jail (/mnt) with pacman (2conf install_core)
 
 	## linux kernel
-	#linux (in base_pkgs)
 	linux-headers
 
 	## linux lts kernel
@@ -48,7 +97,7 @@ conf_packages ()
 	emacs neovim
 
 	## install helper
-	git
+	git rsync
 
 	## network
 	dhcpcd reflector
@@ -177,7 +226,7 @@ apps_packages ()
 	#vifm lf-git nnn ranger
 
 	## file_tools
-	rsync simple-mtpfs fd dust
+	simple-mtpfs fd dust
 	#gdisk tmsu trash-cli
 
 	## debugging

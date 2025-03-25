@@ -73,9 +73,10 @@ rtc_local_timezone=0
 
 ## online
 online_repo=https://codeberg.org/oxo/hajime
-arch_mirrorlist=https://archlinux.org/mirrorlist/?country=SE&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on
-mirror_country=Germany,Netherlands,Sweden,USA
-mirror_amount=20
+arch_mirrorlist_all=https://archlinux.org/mirrorlist/all/
+arch_mirrorlist_utd=https://archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on
+refl_mirror_country=Sweden,Netherlands,Germany,USA
+refl_mirror_amount=10
 
 ## boot size (MB)
 boot_size=256
@@ -1266,16 +1267,19 @@ configure_mirrorlists ()
     if [[ "$online" -ne 0 ]]; then
 	## online or hybrid mode
 
+	## copy up-to-date mirrorlist
+	curl -O "$arch_mirrorlist_utd" -C - -o /etc/pacman.d/"$(date '+%Y%m%d_%H%M%S')"_mirrorlist_utd
+
 	echo
 	## backup old mirrorlist
 	file_etc_pacmand_mirrorlist="/etc/pacman.d/mirrorlist"
-	cp --preserve --verbose "$file_etc_pacmand_mirrorlist" /etc/pacman.d/"$(date '+%Y%m%d_%H%M%S')"_mirrorlist_bu
+	cp --preserve --verbose "$file_etc_pacmand_mirrorlist" /etc/pacman.d/"$(date '+%Y%m%d_%H%M%S')"_mirrorlist_org_bu
 
 	## select fastest mirrors
 	reflector \
 	    --verbose \
-	    --country "$mirror_country" \
-	    -l "$mirror_amount" \
+	    --country "$refl_mirror_country" \
+	    -l "$refl_mirror_amount" \
 	    --sort rate \
 	    --save "$file_etc_pacmand_mirrorlist"
 

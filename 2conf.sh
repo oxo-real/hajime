@@ -756,20 +756,30 @@ install_bootloader ()
 
     # adding boot loader entries
 
-    ## linux kernel
+    ## linux kernel (compulsory)
     file_boot_loader_entries_arch_conf="/boot/loader/entries/arch.conf"
     echo 'title arch' > $file_boot_loader_entries_arch_conf
     echo 'linux /vmlinuz-linux' >> $file_boot_loader_entries_arch_conf
     echo "initrd /$ucode.img" >> $file_boot_loader_entries_arch_conf
     echo 'initrd /initramfs-linux.img' >> $file_boot_loader_entries_arch_conf
 
-    ## linux long term support kernel (LTS)
-    file_boot_loader_entries_arch_lts_conf="/boot/loader/entries/arch-lts.conf"
-    echo 'title arch-lts' > $file_boot_loader_entries_arch_lts_conf
-    echo 'linux /vmlinuz-linux-lts' >> $file_boot_loader_entries_arch_lts_conf
-    echo "initrd /$ucode.img" >> $file_boot_loader_entries_arch_conf
-    echo 'initrd /initramfs-linux-lts.img' >> $file_boot_loader_entries_arch_lts_conf
 
+    if
+
+	grep linux-lts <<< "${base_pkgs[@]} ${conf_pkgs[@]}" | grep --invert-match \#
+	## linux-lts exists uncommented in base or conf packages (is installed)
+
+    then
+
+	kernel_lts_installed=1
+	## linux long term support kernel (LTS) (optional)
+	file_boot_loader_entries_arch_lts_conf="/boot/loader/entries/arch-lts.conf"
+	echo 'title arch-lts' > $file_boot_loader_entries_arch_lts_conf
+	echo 'linux /vmlinuz-linux-lts' >> $file_boot_loader_entries_arch_lts_conf
+	echo "initrd /$ucode.img" >> $file_boot_loader_entries_arch_conf
+	echo 'initrd /initramfs-linux-lts.img' >> $file_boot_loader_entries_arch_lts_conf
+
+    fi
 
     # kernel options
 
@@ -817,10 +827,10 @@ install_bootloader ()
 
     esac
 
-    ## adding kernel options to the boot loader entries (ble and lts)
+    ## adding kernel options to the boot loader entries (ble and optional lts)
     printf '%s' "$kp_options" >> $file_boot_loader_entries_arch_conf
-    printf '%s' "$kp_options" >> $file_boot_loader_entries_arch_lts_conf
-
+    [[ "$kernel_lts_installed" -eq 1 ]] && \
+	printf '%s' "$kp_options" >> $file_boot_loader_entries_arch_lts_conf
 
     # generate initramfs with mkinitcpio
 
@@ -834,7 +844,8 @@ install_bootloader ()
     mkinitcpio -p linux
 
     ## for linux-lts preset
-    mkinitcpio -p linux-lts
+    [[ "$kernel_lts_installed" -eq 1 ]] && \
+	mkinitcpio -p linux-lts
 }
 
 
@@ -914,7 +925,7 @@ main ()
     add_user
     configure_pacman
     configure_mirrorlists
-    #DEL_micro_code
+    #micro_code
     install_core
     install_bootloader
     move_hajime

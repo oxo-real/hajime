@@ -1,19 +1,21 @@
 #! /usr/bin/env sh
 
 # manually entering luks encrypted archlinux system:
+# define system by setting parameters
 # boot archiso
-# set parameters
-# then run this file
+# CAUTION root will have escalated privileges
 
-# this script:
-# sets up an existing installation in a chroot jail (/mnt)
-# for maintenance and/or recovery
+# to set up an existing installation in a chroot jail (/mnt)
+# for maintenance and/or recovery, run:
+# % rescue.sh --open
+# when done:
+# % rescue.sh --close
 
 
 # device parameters
 
 ## boot
-dev_boot=dev/sda
+dev_boot=/dev/sda
 part_boot=1
 boot_part="$dev_boot""$part_boot"
 
@@ -38,25 +40,59 @@ map_dir=/dev/mapper
 vol_grp_name=vg0
 logic_vol="$vol_grp_name"-lv
 
-## lvm root mountpoint 
+## lvm root mountpoint
 lvm_root=/mnt
 
 
+args="$@"
+
+
 # script
+os_open ()
+{
+    ## decrypt lvm container
+    cryptsetup open "$lvm_part" "$device_mapper"
 
-## decrypt lvm container
-cryptsetup open "$lvm_part" "$device_mapper"
+    ## activate volumegroup
+    vgchange --activate y "$vol_grp_name"
+
+    ## mount volume group to root mountpoint
+    mount "$map_dir"/"$logic_vol"_root "$lvm_root"
+
+    ## mount logical volumes (submounts)
+    mount "$boot_part" "$lvm_root"/boot
+    mount "$map_dir"/"$logic_vol"_home "$lvm_root"/home
+    mount "$map_dir"/"$logic_vol"_tmp "$lvm_root"/tmp
+    mount "$map_dir"/"$logic_vol"_usr "$lvm_root"/usr
+    mount "$map_dir"/"$logic_vol"_var "$lvm_root"/var
+
+    ## enter chroot jail (/mnt)
+    arch-chroot "$lvm_root"
+}
 
 
-## mount volume group
-mount "$map_dir"/"$logic_vol"_root "$lvm_root"
+os_close ()
+{
+    ## exit chroot jail (/mnt)
+    ## NOTICE manually exit with:
+    ## exit
+    ## thereafter run rescue.sh --close
 
-## mount logical volumes
-mount "$boot_part" "$lvm_root"/boot
-mount "$map_dir"/"$logic_vol"_home "$lvm_root"/home
-mount "$map_dir"/"$logic_vol"_tmp "$lvm_root"/tmp
-mount "$map_dir"/"$logic_vol"_usr "$lvm_root"/usr
-mount "$map_dir"/"$logic_vol"_var "$lvm_root"/var
+    ## unmount root mountpoint with submounts
+    umount -R "$lvm_root"
 
-## enter chroot jail (/mnt)
-arch-chroot "$lvm_root"
+    ## deactivate volume group
+    vgchange --activate n "$vol_grp_name"
+
+    ## close luks container
+    cryptsetup close "$device_mapper"
+}
+
+
+main ()
+{
+    [[ "$args" == '--open' ]] && os_open
+    [[ "$args" == '--close' ]] && os_close
+}
+
+main
