@@ -182,7 +182,8 @@ sourcing ()
 
     ## configuration file
     ### define
-    file_setup_config=$(head -n 1 "$hajime_exec"/setup/tempo-active.conf)
+    file_setup_config_path="$hajime_exec"/setup/tempo-active.conf
+    file_setup_config=$(head -n 1 "$file_setup_config_path")
     ### source
     [[ -f "$file_setup_config" ]] && source "$file_setup_config"
 
@@ -734,7 +735,7 @@ configure_mirrorlists ()
 }
 
 
-install_core ()
+install_conf_pkgs ()
 {
     # update repositories and install core applications
     # [Installation guide - ArchWiki]
@@ -927,7 +928,7 @@ main ()
     configure_pacman
     configure_mirrorlists
     micro_code
-    install_core
+    install_conf_pkgs
     install_bootloader
     move_hajime
     motd_3post

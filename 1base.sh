@@ -1335,7 +1335,7 @@ configure_pacman ()
 }
 
 
-install_packages ()
+install_base_pkgs ()
 {
     # pacstrap installs a new system inside the chroot jail (/mnt)
 
@@ -1513,7 +1513,7 @@ main ()
     mount_partitions
     configure_mirrorlists
     configure_pacman
-    install_packages
+    install_base_pkgs
     generate_fstab
     modify_fstab
     prepare_mnt_environment

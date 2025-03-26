@@ -72,18 +72,16 @@ mirror_country=USA
 mirror_amount=5
 
 ## absolute file paths
-hajime_src=/root/tmp/code/hajime
+# hajime_src=/root/tmp/code/hajime
 file_etc_motd=/etc/motd
 file_etc_pacman_conf=/etc/pacman.conf
 
 ## CODE and REPO mountpoints
-## we have no "$HOME"/dock/{2,3} yet
-## therefore we use /root/tmp for the mountpoints
 code_lbl=CODE
-code_dir=/root/tmp/code
+code_dir="$HOME/dock/3"
 repo_lbl=REPO
-repo_dir=/root/tmp/repo
-repo_re=\/root\/tmp\/repo
+repo_dir="$HOME/dock/2"
+repo_re="${HOME}\/dock\/2"
 
 
 #--------------------------------
@@ -150,17 +148,17 @@ getargs ()
 }
 
 
-
-
 sourcing ()
 {
     ## hajime exec location
     export script_name
-    hajime_exec="$HOME/hajime"
+    hajime_exec="$HOME"/hajime
+
+    relative_file_paths
 
     ## configuration file
     ### define
-    file_setup_config=$(head -n 1 "$hajime_exec"/setup/tempo-active.conf)
+    file_setup_config=$(head -n 1 "$file_setup_config_path")
     ### source
     [[ -f "$file_setup_config" ]] && source "$file_setup_config"
 
@@ -169,8 +167,6 @@ sourcing ()
     file_setup_package_list="$hajime_exec"/setup/package.list
     ### source
     [[ -f "$file_setup_package_list" ]] && source "$file_setup_package_list"
-
-    relative_file_paths
 
     ## config file is sourced; reevaluate explicit arguments
     explicit_arguments
@@ -183,6 +179,7 @@ relative_file_paths ()
     file_pacman_offline_conf="$hajime_exec"/setup/pacman_offline.conf
     file_pacman_online_conf="$hajime_exec"/setup/pacman_online.conf
     file_pacman_hybrid_conf="$hajime_exec"/setup/pacman_hybrid.conf
+    file_setup_config_path="$hajime_exec"/setup/tempo-active.conf
 }
 
 
@@ -240,6 +237,10 @@ process_config_flag_value ()
 
     if [[ -f "$realpath_cfv" ]]; then
 
+	## early sourcing hajime_exec
+	hajime_exec="$HOME"/hajime
+	file_setup_config_path="$hajime_exec"/setup/tempo-active.conf
+
 	file_setup_config="$realpath_cfv"
 	printf '%s\n' "$file_setup_config" > "$file_setup_config_path"
 
@@ -257,6 +258,20 @@ process_config_flag_value ()
 }
 
 
+define_text_appearance()
+{
+    ## text color
+    fg_magenta='\033[0;35m' # magenta
+    fg_green='\033[0;32m'   # green
+    fg_red='\033[0;31m'     # red
+
+    ## text style
+    st_def='\033[0m'        # default
+    st_ul=`tput smul`       # underline
+    st_bold=`tput bold`     # bold
+}
+
+
 installation_mode ()
 {
     if [[ "$online" -ne 0 ]]; then
@@ -264,42 +279,35 @@ installation_mode ()
 
 	## dhcp connect
 	export hajime_exec
-	sh hajime/0init.sh --pit 3
+	sh "$HOME"/hajime/0init.sh --pit 3
 
     fi
 }
 
 
-configure_pacman ()
+create_home ()
 {
-    case "$online" in
+    ## create mountpoint docking bays
+    mkdir -p "$HOME"/dock/1
+    mkdir -p "$HOME"/dock/2
+    mkdir -p "$HOME"/dock/3
+    mkdir -p "$HOME"/dock/4
+    mkdir -p "$HOME"/dock/mobile
+    mkdir -p "$HOME"/dock/transfer
+    mkdir -p "$HOME"/dock/vlt
 
-	0 )
-	    ## offline mode
-	    pm_alt_conf="$file_pacman_offline_conf"
-	    ;;
-
-	1 )
-	    ## online mode
-	    pm_alt_conf="$file_pacman_online_conf"
-	    ;;
-
-	2 )
-	    ## hybrid mode
-	    pm_alt_conf="$file_pacman_hybrid_conf"
-	    ;;
-
-    esac
-
-    ## update offline repo name in /etc/pacman.conf
-    sed -i "s#0init_repo_here#${repo_dir}#" "pm_alt_conf"
+    ## create xdg directories
+    mkdir -p "$HOME"/.cache/temp
+    mkdir -p "$HOME"/.cache/test
+    mkdir -p "$HOME"/.config
+    mkdir -p "$HOME"/.local/share
+    mkdir -p "$HOME"/.logs
 }
 
 
-pacman_init ()
+own_home ()
 {
-    sudo pacman-key --config "$pm_alt_conf" --init
-    sudo pacman-key --config "$pm_alt_conf" --populate archlinux
+    sudo chown -R $(id -un):$(id -gn) /home/$(id -un)
 }
 
 
@@ -393,36 +401,42 @@ set_read_write ()
 }
 
 
-own_home ()
+configure_pacman ()
 {
-    sudo chown -R $(id -un):$(id -gn) /home/$(id -un)
+    case "$online" in
+
+	0 )
+	    ## offline mode
+	    pm_alt_conf="$file_pacman_offline_conf"
+	    ;;
+
+	1 )
+	    ## online mode
+	    pm_alt_conf="$file_pacman_online_conf"
+	    ;;
+
+	2 )
+	    ## hybrid mode
+	    pm_alt_conf="$file_pacman_hybrid_conf"
+	    ;;
+
+    esac
+
+    ## update offline repo name in /etc/pacman.conf
+    sed -i "s#0init_repo_here#${repo_dir}#" "$pm_alt_conf"
 }
 
 
-create_directories ()
+pacman_init ()
 {
-    # create mountpoint docking bays
+    sudo pacman-key --config "$pm_alt_conf" --init
+    sudo pacman-key --config "$pm_alt_conf" --populate archlinux
 
-    mkdir -p $HOME/dock/1
-    mkdir -p $HOME/dock/2
-    mkdir -p $HOME/dock/3
-    mkdir -p $HOME/dock/4
-    mkdir -p $HOME/dock/android
-    mkdir -p $HOME/dock/transfer
-    mkdir -p $HOME/dock/vlt
-
-
-    # create xdg directories
-
-    mkdir -p $HOME/.cache/temp
-    mkdir -p $HOME/.cache/test
-    mkdir -p $HOME/.config
-    mkdir -p $HOME/.local/share
-    mkdir -p $HOME/.logs
+    pacman -Syyu
 }
 
 
-base_mutations ()
+install_post_pkgs ()
 {
     ## add post core addditions
     sudo pacman -S --needed --noconfirm "${post_pkgs[@]}"
@@ -474,18 +488,19 @@ autostart_next ()
 
 main ()
 {
-    sourcing
     getargs $args
+    sourcing
+    define_text_appearance
+    installation_mode
     motd_remove
+    create_home
+    own_home
     get_offline_repo
     get_offline_code
-    installation_mode
+    set_read_write
     configure_pacman
     pacman_init
-    set_read_write
-    own_home
-    create_directories
-    base_mutations
+    install_post_pkgs
     set_read_only
     wrap_up
     autostart_next
