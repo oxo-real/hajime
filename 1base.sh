@@ -1378,7 +1378,7 @@ prepare_mnt_environment ()
 
     ## copy hajime_exec to chroot jail (/mnt)
     echo
-    printf 'copying %s -> /root ' "$hajime_exec"
+    printf 'copying %s -> /mnt ' "$hajime_exec"
     cp --preserve --recursive "$hajime_exec" /mnt
     echo
     echo

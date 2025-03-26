@@ -193,7 +193,7 @@ relative_file_paths ()
 
 	## tempo-active.conf contains path to active setup configuration file
 	file_setup_config_path="$hajime_src"/setup/tempo-active.conf
-	printf '%s\n' "$file_setup_config" > "$file_setup_config_path"
+	printf '%s\n' "$(realpath "$file_setup_config")" > "$file_setup_config_path"
 
     fi
 

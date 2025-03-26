@@ -626,7 +626,7 @@ set_passphrase ()
     else
 
 	## manual user password entry
-	printf "$(username)@$hostname\n"
+	printf '%s@%s\n ' "$username" "$hostname"
 	passwd $username
 
     fi
@@ -860,7 +860,7 @@ move_hajime ()
     #sudo rm -rf /hajime
 
     ## update configuration location for 3post
-    sed -i 's#/hajime#\$HOME/hajime#' /home/"$username"/hajime/setup/tempo-active.conf
+    sed -i "s#/hajime#\/home\/${username}\/hajime#" /home/"$username"/hajime/setup/tempo-active.conf
 }
 
 

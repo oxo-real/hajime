@@ -168,6 +168,9 @@ sourcing ()
     ### source
     [[ -f "$file_setup_package_list" ]] && source "$file_setup_package_list"
 
+    ## user owns home, not root
+    own_home
+
     ## config file is sourced; reevaluate explicit arguments
     explicit_arguments
 }
@@ -180,6 +183,7 @@ relative_file_paths ()
     file_pacman_online_conf="$hajime_exec"/setup/pacman_online.conf
     file_pacman_hybrid_conf="$hajime_exec"/setup/pacman_hybrid.conf
     file_setup_config_path="$hajime_exec"/setup/tempo-active.conf
+    file_setup_config=$(cat "$file_setup_config_path")
 }
 
 
@@ -422,7 +426,7 @@ configure_pacman ()
 
     esac
 
-    ## update offline repo name in /etc/pacman.conf
+    ## update offline repo name in pm_alt_conf
     sed -i "s#0init_repo_here#${repo_dir}#" "$pm_alt_conf"
 }
 
@@ -432,14 +436,14 @@ pacman_init ()
     sudo pacman-key --config "$pm_alt_conf" --init
     sudo pacman-key --config "$pm_alt_conf" --populate archlinux
 
-    pacman -Syyu
+    sudo pacman --config "$pm_alt_conf" -Syyu
 }
 
 
 install_post_pkgs ()
 {
     ## add post core addditions
-    sudo pacman -S --needed --noconfirm "${post_pkgs[@]}"
+    sudo pacman --config "$pm_alt_conf" --needed --noconfirm -S "${post_pkgs[@]}"
 }
 
 
@@ -494,7 +498,6 @@ main ()
     installation_mode
     motd_remove
     create_home
-    own_home
     get_offline_repo
     get_offline_code
     set_read_write
