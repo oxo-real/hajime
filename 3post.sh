@@ -78,10 +78,10 @@ file_etc_pacman_conf=/etc/pacman.conf
 
 ## CODE and REPO mountpoints
 code_lbl=CODE
-code_dir="$HOME/dock/3"
+code_dir="$HOME"/dock/3
 repo_lbl=REPO
-repo_dir="$HOME/dock/2"
-repo_re="${HOME}\/dock\/2"
+repo_dir="$HOME"/dock/2
+repo_re="${HOME}"\/dock\/2
 
 
 #--------------------------------
@@ -193,7 +193,7 @@ explicit_arguments ()
     ## regarding network installation mode
 
     if [[ "$offline_arg" -eq 1 ]]; then
-	## offine mode (forced)
+	## offline mode (forced)
 
 	online=0
 
