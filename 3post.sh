@@ -179,9 +179,9 @@ sourcing ()
 relative_file_paths ()
 {
     ## independent (i.e. no if) relative file paths
-    file_pacman_offline_conf="$hajime_exec"/setup/pacman_offline.conf
-    file_pacman_online_conf="$hajime_exec"/setup/pacman_online.conf
-    file_pacman_hybrid_conf="$hajime_exec"/setup/pacman_hybrid.conf
+    file_pacman_offline_conf="$hajime_exec"/setup/pacman/pacman_offline.conf
+    file_pacman_online_conf="$hajime_exec"/setup/pacman/pacman_online.conf
+    file_pacman_hybrid_conf="$hajime_exec"/setup/pacman/pacman_hybrid.conf
     file_setup_config_path="$hajime_exec"/setup/tempo-active.conf
     file_setup_config=$(cat "$file_setup_config_path")
 }
@@ -427,7 +427,10 @@ configure_pacman ()
     esac
 
     ## update offline repo name in pm_alt_conf
-    sed -i "s#0init_repo_here#${repo_dir}#" "$pm_alt_conf"
+    ## old name (2conf repo_dir)
+    pm_2conf_path=/root/tmp/repo
+    ## replace
+    sed -i "s#${pm_2conf_path}#${repo_dir}#" "$pm_alt_conf"
 }
 
 

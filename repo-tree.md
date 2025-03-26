@@ -14,12 +14,7 @@
 │   ├── rescue.sh
 │   └── urls
 ├── logs
-│   ├── pkgs-copy-1000
-│   ├── pkgs-deps-1000
-│   ├── pkgs-hajime-1000
-│   ├── pkgs-real-paths-1000
-│   ├── pkgs-real-paths-1000-err
-│   └── pkgs-sigs-1000
+│   └── pacman-Q-3conf
 ├── make-offl-repo
 ├── make-recov
 ├── misc
@@ -32,11 +27,12 @@
     ├── dl3189.conf
     ├── etc_doas.conf
     ├── mbp2011a1286.conf
-    ├── mirrorlist
     ├── package.list
-    ├── pacman_hybrid.conf
-    ├── pacman_offline.conf
-    └── pacman_online.conf
+    └── pacman
+        ├── mirrorlist
+        ├── pacman_hybrid.conf
+        ├── pacman_offline.conf
+        └── pacman_online.conf
 
-5 directories, 33 files
+6 directories, 28 files
 ```

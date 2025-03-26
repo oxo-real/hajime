@@ -203,9 +203,9 @@ sourcing ()
 relative_file_paths ()
 {
     ## independent (i.e. no if) relative file paths
-    file_pacman_offline_conf="$hajime_exec"/setup/pacman_offline.conf
-    file_pacman_online_conf="$hajime_exec"/setup/pacman_online.conf
-    file_pacman_hybrid_conf="$hajime_exec"/setup/pacman_hybrid.conf
+    file_pacman_offline_conf="$hajime_exec"/setup/pacman/pacman_offline.conf
+    file_pacman_online_conf="$hajime_exec"/setup/pacman/pacman_online.conf
+    file_pacman_hybrid_conf="$hajime_exec"/setup/pacman/pacman_hybrid.conf
 }
 
 
