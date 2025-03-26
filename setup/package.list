@@ -123,7 +123,7 @@ post_packages ()
     post_pkgs=(
 
 	## post_core_additions
-	archlinux-keyring lsof mlocate neofetch neovim pacman-contrib
+	lsof mlocate neofetch pacman-contrib
 
     )
 }

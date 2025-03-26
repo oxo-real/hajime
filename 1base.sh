@@ -75,6 +75,8 @@ rtc_local_timezone=0
 online_repo=https://codeberg.org/oxo/hajime
 arch_mirrorlist_all=https://archlinux.org/mirrorlist/all/
 arch_mirrorlist_utd=https://archlinux.org/mirrorlist/?country=all&protocol=http&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on
+refl_conn_to=10
+refl_down_to=10
 refl_mirror_country=Sweden,Netherlands,Germany,USA
 refl_mirror_amount=10
 
@@ -1268,7 +1270,7 @@ configure_mirrorlists ()
 	## online or hybrid mode
 
 	## copy up-to-date mirrorlist
-	curl -O "$arch_mirrorlist_utd" -C - -o /etc/pacman.d/"$(date '+%Y%m%d_%H%M%S')"_mirrorlist_utd
+	#curl -O "$arch_mirrorlist_utd" -C - -o /etc/pacman.d/"$(date '+%Y%m%d_%H%M%S')"_mirrorlist_full_utd
 
 	echo
 	## backup old mirrorlist
@@ -1276,12 +1278,17 @@ configure_mirrorlists ()
 	cp --preserve --verbose "$file_etc_pacmand_mirrorlist" /etc/pacman.d/"$(date '+%Y%m%d_%H%M%S')"_mirrorlist_org_bu
 
 	## select fastest mirrors
-	reflector \
-	    --verbose \
-	    --country "$refl_mirror_country" \
-	    -l "$refl_mirror_amount" \
-	    --sort rate \
-	    --save "$file_etc_pacmand_mirrorlist"
+	# reflector \
+	#     --connection-timeout "$refl_conn_to" \
+	#     --download-timeout "$refl_down_to" \
+	#     --save "$file_etc_pacmand_mirrorlist"
+	#     --sort rate \
+	#     --verbose \
+	#     --country "$refl_mirror_country" \
+	#     --latest "$refl_mirror_amount" \
+	#     --protocol https,rsync,http,ftp
+	    #--fastest+/latest/score/number
+	cp "$hajime_exec"/setup/mirrorlist "$file_etc_pacmand_mirrorlist"
 
     fi
 }

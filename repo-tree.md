@@ -32,10 +32,11 @@
     ├── dl3189.conf
     ├── etc_doas.conf
     ├── mbp2011a1286.conf
+    ├── mirrorlist
     ├── package.list
     ├── pacman_hybrid.conf
     ├── pacman_offline.conf
     └── pacman_online.conf
 
-5 directories, 32 files
+5 directories, 33 files
 ```

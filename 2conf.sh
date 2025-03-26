@@ -78,6 +78,7 @@ file_etc_locale_conf=/etc/locale.conf
 file_etc_vconsole_conf=/etc/vconsole.conf
 file_etc_hosts=/etc/hosts
 file_etc_hostname=/etc/hostname
+file_etc_mkinitcpio_conf=/etc/mkinitcpio.conf
 file_etc_motd=/etc/motd
 file_etc_sudoers=/etc/sudoers
 file_etc_pacmand_mirrorlist=/etc/pacman.d/mirrorlist
@@ -92,6 +93,7 @@ hostname_default=host
 username_default=user
 bootloader_timeout=2
 bootloader_editor=0
+mkinitcpio_hooks='base systemd microcode autodetect modconf keyboard sd-vconsole block sd-encrypt lvm2 filesystems fsck'
 
 ## absolute file paths
 hajime_src=/root/tmp/code/hajime
@@ -719,12 +721,14 @@ configure_mirrorlists ()
 	cp --preserve --verbose "$file_etc_pacmand_mirrorlist" /etc/pacman.d/"$(date '+%Y%m%d_%H%M%S')"_mirrorlist_bu
 
 	## select fastest mirrors
-	reflector \
-	    --verbose \
-	    --country "$mirror_country" \
-	    -l "$mirror_amount" \
-	    --sort rate \
-	    --save "$file_etc_pacmand_mirrorlist"
+	# reflector \
+	#     --verbose \
+	#     --country "$mirror_country" \
+	#     -l "$mirror_amount" \
+	#     --sort rate \
+	#     --save "$file_etc_pacmand_mirrorlist"
+
+	cp "$hajime_exec"/setup/mirrorlist "$file_etc_pacmand_mirrorlist"
 
     fi
 }
@@ -737,7 +741,6 @@ install_core ()
     # (https://wiki.archlinux.org/title/Installation_guide#Install_essential_packages)
     pacman -S --needed --noconfirm --config "$pm_alt_conf" "${conf_pkgs[@]}"
 }
-
 
 
 install_bootloader ()
@@ -763,7 +766,6 @@ install_bootloader ()
     echo "initrd /$ucode.img" >> $file_boot_loader_entries_arch_conf
     echo 'initrd /initramfs-linux.img' >> $file_boot_loader_entries_arch_conf
 
-
     if
 
 	grep linux-lts <<< "${base_pkgs[@]} ${conf_pkgs[@]}" | grep --invert-match \#
@@ -784,7 +786,7 @@ install_bootloader ()
     # kernel options
 
     ## get parameter data
-    blk_dev_list==$(lsblk --list --noheadings --output fstype,uuid,name)
+    blk_dev_list=$(lsblk --list --noheadings --output fstype,uuid,name)
 
     ## crypto_luks
     kp_luks_uuid=$(grep crypto_LUKS <<< "$blk_dev_list" | awk '{print $2}')
@@ -837,8 +839,7 @@ install_bootloader ()
     ## create an initial ramdisk environment (initramfs)
     ## [mkinitcpio - ArchWiki](https://wiki.archlinux.org/title/Mkinitcpio#Common_hooks)
     ## [Installation guide - ArchWiki](https://wiki.archlinux.org/title/Installation_guide#Initramfs)
-    ## enable systemd hooks
-    sed -i "/^HOOKS/c\HOOKS=(base systemd microcode autodetect modconf keyboard sd-vconsole block sd-encrypt lvm2 filesystems fsck)" /etc/mkinitcpio.conf
+    sed -i "/^HOOKS/c\HOOKS=(${mkinitcpio_hooks})" "$file_etc_mkinitcpio_conf"
 
     ## for linux preset
     mkinitcpio -p linux
@@ -925,7 +926,7 @@ main ()
     add_user
     configure_pacman
     configure_mirrorlists
-    #micro_code
+    micro_code
     install_core
     install_bootloader
     move_hajime
