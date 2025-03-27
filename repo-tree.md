@@ -23,16 +23,20 @@
 │   └── alt_dtp_env
 ├── README.md
 ├── repo-tree.md
-└── setup
-    ├── dl3189.conf
-    ├── etc_doas.conf
-    ├── mbp2011a1286.conf
-    ├── package.list
-    └── pacman
-        ├── mirrorlist
-        ├── pacman_hybrid.conf
-        ├── pacman_offline.conf
-        └── pacman_online.conf
+├── setup
+│   ├── dl3189.conf
+│   ├── doas
+│   │   └── etc_doas.conf
+│   ├── mbp2011a1286.conf
+│   ├── network
+│   ├── package.list
+│   └── pacman
+│       ├── 3conf_299_pkgs
+│       ├── mirrorlist
+│       ├── pm_hybrid.conf
+│       ├── pm_offline.conf
+│       └── pm_online.conf
+└── temp
 
-6 directories, 28 files
+9 directories, 29 files
 ```

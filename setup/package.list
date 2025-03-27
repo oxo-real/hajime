@@ -354,8 +354,8 @@ apps_packages ()
 	brave-bin
 	# calcmysky
 	# cava
-	dotool
-	fzf-tab-git
+	# dotool
+	# fzf-tab-git
 	# imhex
 	# kmonad-bin
 	# lisp
@@ -376,11 +376,11 @@ apps_packages ()
 	# qxlsx-qt6
 	# sdl2
 	# showmethekey
-	simple-mtpfs
+	# simple-mtpfs
 	ssss
 	# stellarium
-	swaynagmode
-	tofi
+	# swaynagmode
+	# tofi
 	# viddy
 	#wlrobs
 	#yay-bin

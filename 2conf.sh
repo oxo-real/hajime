@@ -14,7 +14,7 @@
 
 : '
 hajime_2conf
-second part of linux installation
+second linux installation module
 copyright (c) 2017 - 2025  |  oxo
 
 GNU GPLv3 GENERAL PUBLIC LICENSE
@@ -182,7 +182,7 @@ sourcing ()
 
     ## configuration file
     ### define
-    file_setup_config_path="$hajime_exec"/setup/tempo-active.conf
+    file_setup_config_path="$hajime_exec"/temp/active.conf
     file_setup_config=$(head -n 1 "$file_setup_config_path")
     ### source
     [[ -f "$file_setup_config" ]] && source "$file_setup_config"
@@ -203,9 +203,22 @@ sourcing ()
 relative_file_paths ()
 {
     ## independent (i.e. no if) relative file paths
-    file_pacman_offline_conf="$hajime_exec"/setup/pacman/pacman_offline.conf
-    file_pacman_online_conf="$hajime_exec"/setup/pacman/pacman_online.conf
-    file_pacman_hybrid_conf="$hajime_exec"/setup/pacman/pacman_hybrid.conf
+    file_pacman_offline_conf="$hajime_exec"/setup/pacman/pm_offline.conf
+    file_pacman_online_conf="$hajime_exec"/setup/pacman/pm_online.conf
+    file_pacman_hybrid_conf="$hajime_exec"/setup/pacman/pm_hybrid.conf
+
+    if [[ -z "$cfv" ]]; then
+	## no config file value given
+
+	## set default values based on existing path in file from 3post
+	file_setup_config_path="$hajime_exec"/temp/active.conf
+	file_setup_config_1base=$(cat $file_setup_config_path)
+	machine_file_name="${file_setup_config_1base#*/hajime/setup/}"
+	file_setup_config="$hajime_exec"/setup/"$machine_file_name"
+
+	printf '%s\n' "$file_setup_config" > "$file_setup_config_path"
+
+    fi
 }
 
 
@@ -285,7 +298,7 @@ installation_mode ()
     if [[ -n "$exec_mode" ]]; then
 	## configuration file is being sourced
 
-	file_setup_luks_pass="$hajime_exec"/setup/tempo-luks.pass
+	file_setup_luks_pass="$hajime_exec"/temp/luks.pass
 	file_setup_package_list="$hajime_exec"/setup/package.list
 
     fi
@@ -295,7 +308,7 @@ installation_mode ()
 
 	## dhcp connect
 	export hajime_exec
-	sh hajime/0init.sh --pit 2
+	sh "$hajime_exec"/0init.sh --pit 2
 
     fi
 }
@@ -332,7 +345,7 @@ mount_repo ()
     [[ -d $repo_dir ]] || mkdir -p "$repo_dir"
 
     mountpoint -q "$repo_dir"
-    [[ $? -ne 0 ]] && sudo mount "$repo_dev" "$repo_dir"
+    [[ $? -ne 0 ]] && sudo mount -o ro "$repo_dev" "$repo_dir"
 }
 
 
@@ -360,7 +373,7 @@ mount_code ()
     [[ -d $code_dir ]] || mkdir -p "$code_dir"
 
     mountpoint -q "$code_dir"
-    [[ $? -ne 0 ]] && sudo mount "$code_dev" "$code_dir"
+    [[ $? -ne 0 ]] && sudo mount -o ro "$code_dev" "$code_dir"
 }
 
 
@@ -860,7 +873,7 @@ move_hajime ()
     #sudo rm -rf /hajime
 
     ## update configuration location for 3post
-    sed -i "s#/hajime#\/home\/${username}\/hajime#" /home/"$username"/hajime/setup/tempo-active.conf
+    sed -i "s#/hajime#\/home\/${username}\/hajime#" /home/"$username"/hajime/temp/active.conf
 }
 
 

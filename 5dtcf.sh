@@ -14,7 +14,7 @@
 
 : '
 hajime_5dtcf
-fifth part of linux installation
+fifth linux installation module
 copyright (c) 2019 - 2025  |  oxo
 
 GNU GPLv3 GENERAL PUBLIC LICENSE
@@ -36,7 +36,7 @@ https://www.gnu.org/licenses/gpl-3.0.txt
 
 
 # description
-  grande finale: fifth and last part of a series
+  grande finale: fifth and last module of a series
   arch linux installation: dotfile configuration
 
 # dependencies
@@ -78,17 +78,17 @@ export XDG_CONFIG_DIRS=/etc/xdg
 git_local="$XDG_DATA_HOME/c/git"
 git_remote=https://codeberg.org/oxo
 
-## offline installation
+## CODE and REPO mountpoints
 code_lbl=CODE
-code_dir="/home/$(id -un)/dock/3"
+code_dir="$HOME"/dock/3
 repo_lbl=REPO
-repo_dir="/home/$(id -un)/dock/2"
-repo_re="\/home\/$(id -un)\/dock\/2"
+repo_dir="$HOME"/dock/2
+repo_re="${HOME}"\/dock\/2
+
 file_etc_pacman_conf=/etc/pacman.conf
 
-
 ## absolute file paths
-hajime_src="$HOME/dock/3/code/hajime"
+hajime_src="$code_dir"/code/hajime
 etc_doas_conf=/etc/doas.conf
 
 
@@ -166,7 +166,8 @@ sourcing ()
 
     ## configuration file
     ### define
-    file_setup_config=$(head -n 1 "$hajime_exec"/setup/tempo-active.conf)
+    file_setup_config_path="$hajime_exec"/temp/active.conf
+    file_setup_config=$(head -n 1 "$file_setup_config_path")
     ### source
     [[ -f "$file_setup_config" ]] && source "$file_setup_config"
 
@@ -186,11 +187,25 @@ sourcing ()
 relative_file_paths ()
 {
     ## independent (i.e. no if) relative file paths
-    file_pacman_offline_conf="$hajime_exec"/setup/pacman_offline.conf
-    file_pacman_online_conf="$hajime_exec"/setup/pacman_online.conf
-    file_pacman_hybrid_conf="$hajime_exec"/setup/pacman_hybrid.conf
+    file_pacman_offline_conf="$hajime_exec"/setup/pacman/pm_offline.conf
+    file_pacman_online_conf="$hajime_exec"/setup/pacman/pm_online.conf
+    file_pacman_hybrid_conf="$hajime_exec"/setup/pacman/pm_hybrid.conf
+
+    if [[ -z "$cfv" ]]; then
+	## no config file value given
+
+	## set default values based on existing path in file from 4apps
+	file_setup_config_path="$hajime_exec"/temp/active.conf
+	file_setup_config_4apps=$(cat $file_setup_config_path)
+	machine_file_name="${file_setup_config_4apps#*/hajime/setup/}"
+	file_setup_config="$hajime_exec"/setup/"$machine_file_name"
+
+	printf '%s\n' "$file_setup_config" > "$file_setup_config_path"
+
+    fi
+
     ## doas configuration file
-    file_setup_doas_conf="$hajime_exec/setup/etc_doas.conf"
+    file_setup_doas_conf="$hajime_exec/setup/doas/etc_doas.conf"
 }
 
 
@@ -288,7 +303,7 @@ installation_mode ()
 
 	## dhcp connect
 	export hajime_exec
-	sh hajime/0init.sh --pit 5
+	sh "$hajime_exec"/0init.sh --pit 5
 
 	## in case current ($online) mode differs from previous
 	## make sure pacman.conf points to correct repos
@@ -345,7 +360,7 @@ mount_repo ()
     [[ -d $repo_dir ]] || mkdir -p "$repo_dir"
 
     mountpoint -q $repo_dir
-    [[ $? -eq 0 ]] || sudo mount "$repo_dev" "$repo_dir"
+    [[ $? -eq 0 ]] || sudo mount -o ro "$repo_dev" "$repo_dir"
 }
 
 
@@ -373,7 +388,7 @@ mount_code ()
     [[ -d $code_dir ]] || mkdir -p "$code_dir"
 
     mountpoint -q $code_dir
-    [[ $? -eq 0 ]] || sudo mount "$code_dev" "$code_dir"
+    [[ $? -eq 0 ]] || sudo mount -o ro "$code_dev" "$code_dir"
 }
 
 

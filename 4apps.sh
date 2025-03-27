@@ -14,7 +14,7 @@
 
 : '
 hajime_4apps
-fourth part of linux installation
+fourth linux installation module
 copyright (c) 2019 - 2025  |  oxo
 
 GNU GPLv3 GENERAL PUBLIC LICENSE
@@ -68,16 +68,14 @@ initial_release=2019
 file_etc_pacman_conf=/etc/pacman.conf
 hajime_src="$HOME/dock/3/code/hajime"
 yay_cache="$HOME/.cache/yay"
-yay_src="$HOME/dock/2/src/yay"
+yay_src="$HOME/dock/2/yay"
 
 ## CODE and REPO mountpoints
-## we have no "$HOME"/dock/{2,3} yet
-## therefore we use /root/tmp for the mountpoints
 code_lbl=CODE
-code_dir=/root/tmp/code
+code_dir="$HOME"/dock/3
 repo_lbl=REPO
-repo_dir=/root/tmp/repo
-repo_re=\/root\/tmp\/repo
+repo_dir="$HOME"/dock/2
+repo_re="${HOME}"\/dock\/2
 
 
 #--------------------------------
@@ -144,8 +142,6 @@ getargs ()
 }
 
 
-
-
 sourcing ()
 {
     ## hajime exec location
@@ -154,7 +150,9 @@ sourcing ()
 
     ## configuration file
     ### define
-    file_setup_config=$(head -n 1 "$hajime_exec"/setup/tempo-active.conf)
+    #TODO
+    file_setup_config_path="$hajime_exec"/temp/active.conf
+    file_setup_config=$(head -n 1 "$file_setup_config_path")
     ### source
     [[ -f "$file_setup_config" ]] && source "$file_setup_config"
 
@@ -175,9 +173,23 @@ relative_file_paths ()
 {
     ## independent (i.e. no if) relative file paths
     file_error_log="$hajime_exec"/logs/"$script_name"-error.log
-    file_pacman_offline_conf="$hajime_exec"/setup/pacman_offline.conf
-    file_pacman_online_conf="$hajime_exec"/setup/pacman_online.conf
-    file_pacman_hybrid_conf="$hajime_exec"/setup/pacman_hybrid.conf
+
+    file_pacman_offline_conf="$hajime_exec"/setup/pacman/pm_offline.conf
+    file_pacman_online_conf="$hajime_exec"/setup/pacman/pm_online.conf
+    file_pacman_hybrid_conf="$hajime_exec"/setup/pacman/pm_hybrid.conf
+
+    if [[ -z "$cfv" ]]; then
+	## no config file value given
+
+	## set default values based on existing path in file from 3post
+	file_setup_config_path="$hajime_exec"/temp/active.conf
+	file_setup_config_3post=$(cat $file_setup_config_path)
+	machine_file_name="${file_setup_config_3post#*/hajime/setup/}"
+	file_setup_config="$hajime_exec"/setup/"$machine_file_name"
+
+	printf '%s\n' "$file_setup_config" > "$file_setup_config_path"
+
+    fi
 }
 
 
@@ -254,53 +266,14 @@ process_config_flag_value ()
 
 installation_mode ()
 {
-    if [[ $online -eq 0 ]]; then
-	## offline mode
-
-	## in case current ($online) mode differs from previous
-	## make sure pacman.conf points to offline repos
-	pacman_conf_copy offline
-
-    elif [[ "$online" -ne 0 ]]; then
+    if [[ "$online" -ne 0 ]]; then
 	## online or hybrid mode
 
 	## dhcp connect
 	export hajime_exec
-	sh hajime/0init.sh --pit 4
-
-	## in case current ($online) mode differs from previous
-	## make sure pacman.conf points to correct repos
-	[[ "$online" -eq 1 ]] && pm_version=online
-	[[ "$online" -eq 2 ]] && pm_version=hybrid
-	pacman_conf_copy "$pm_version"
-
-	## update offline repo name in /etc/pacman.conf
-	sed -i "s#0init_repo_here#${repo_dir}#" "$file_etc_pacman_conf"
+	sh "$hajime_exec"/0init.sh --pit 4
 
     fi
-
-    ## update repository database
-    sudo pacman -Syu
-}
-
-
-pacman_conf_copy ()
-{
-    case "$1" in
-
-	offline )
-            cp "$file_pacman_offline_conf" "$file_etc_pacman_conf"
-            ;;
-
-	online )
-            cp "$file_pacman_online_conf" "$file_etc_pacman_conf"
-            ;;
-
-	hybrid )
-            cp "$file_pacman_hybrid_conf" "$file_etc_pacman_conf"
-            ;;
-
-    esac
 }
 
 
@@ -311,7 +284,7 @@ mount_repo ()
     [[ -d $repo_dir ]] || mkdir -p "$repo_dir"
 
     mountpoint -q "$repo_dir"
-    [[ $? -ne 0 ]] && sudo mount "$repo_dev" "$repo_dir"
+    [[ $? -ne 0 ]] && sudo mount -o ro "$repo_dev" "$repo_dir"
 }
 
 
@@ -339,7 +312,7 @@ mount_code ()
     [[ -d $code_dir ]] || mkdir -p "$code_dir"
 
     mountpoint -q "$code_dir"
-    [[ $? -ne 0 ]] && sudo mount "$code_dev" "$code_dir"
+    [[ $? -ne 0 ]] && sudo mount -o ro "$code_dev" "$code_dir"
 }
 
 
@@ -388,8 +361,36 @@ set_usr_ro ()
 }
 
 
+configure_pacman ()
+{
+    case "$online" in
+
+    0 )
+        ## offline mode
+        pm_alt_conf="$file_pacman_offline_conf"
+        ;;
+
+    1 )
+        ## online mode
+        pm_alt_conf="$file_pacman_online_conf"
+        ;;
+
+    2 )
+        ## hybrid mode
+        pm_alt_conf="$file_pacman_hybrid_conf"
+        ;;
+
+    esac
+}
+
+
 install_yay ()
 {
+    ## ## from https://github.com/Jguer/yay/releases
+    ## ## add the latest x86_64.tar.gz
+    ## ## i.e. https://github.com/Jguer/yay/releases/download/v12.4.2/yay_12.4.2_x86_64.tar.gz
+    ## ## to yay_src/yay-bin (which is inside the REPO on dock/2)
+
     ## create foreign package repository location
     [[ -d "$yay_cache" ]] || mkdir -p "$yay_cache"
 
@@ -400,8 +401,8 @@ install_yay ()
 	## offline mode
 
 	## copy offline yay-bin
-	#TODO permission denied error
-	cp -r "$yay_src"/yay-bin "$yay_cache"
+	#TODO sudo why?
+	sudo cp -r "$yay_src"/yay-bin "$yay_cache"
 
     elif [[ "$online" -ne 0 ]]; then
 	## online or hybrid mode
@@ -411,8 +412,11 @@ install_yay ()
 
     fi
 
-    ## goto yay-bin source
+    ## goto yay_cache yay-bin
     cd yay-bin
+
+    ## ## in PKGBUILD redirect source_x86_64 to the added x86_64.tar.gz file:
+    ## ## source_x86_64=("$HOME/.cache/yay/yay-bin/${pkgname/-bin/}_${pkgver}_x86_64.tar.gz")
 
     ## make and install yay-bin
     makepkg --syncdeps --install
@@ -422,13 +426,13 @@ install_yay ()
 }
 
 
-install_apps_packages ()
+install_apps_pkgs ()
 {
     ## for to prevent pacman exit on error
     ## apps_pkgs sourced via setup/package.list
     for pkg in "${apps_pkgs[@]}"; do
 
-	if ! yay -S --needed --noconfirm "$pkg"; then
+	if ! yay -S --config "$pm_alt_conf" --needed --noconfirm "$pkg"; then
 
 	    printf 'ERROR installing %s\n' "$pkg" | tee -a $file_error_log
 
@@ -452,7 +456,7 @@ loose_ends ()
 autostart_next ()
 {
     ## switch autostart via configuration file
-    [[ -n $after_4apps ]] && sh $HOME/hajime/5dtcf.sh
+    [[ -n $after_4apps ]] && sh "$hajime_exec"/5dtcf.sh
 }
 
 
@@ -503,8 +507,9 @@ main ()
     get_offline_repo
     get_offline_code
 
+    configure_pacman
     install_yay
-    install_apps_packages
+    install_apps_pkgs
 
     set_boot_ro
     set_usr_ro

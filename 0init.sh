@@ -14,7 +14,7 @@
 
 : '
 hajime_0init
-initial part of linux installation
+initialization module for a linux installation
 copyright (c) 2020 - 2025  |  oxo
 
 GNU GPLv3 GENERAL PUBLIC LICENSE
@@ -37,7 +37,7 @@ https://www.gnu.org/licenses/gpl-3.0.txt
 
 # description
 initial part of five scripts in total
-helper script to bootstrap hajime after archiso boot
+helper script to bootstrap hajime and network after archiso boot
 
 # dependencies
   REPO
@@ -48,7 +48,7 @@ helper script to bootstrap hajime after archiso boot
 # example
   mkdir tmp
   lsblk
-  mount /dev/sdX tmp
+  mount -o ro /dev/sdX tmp
   sh tmp/code/hajime/0init.sh -c tmp/code/hajime/setup/dl3189.conf
 
 # '
@@ -187,22 +187,23 @@ sourcing ()
 
 relative_file_paths ()
 {
-    ## independent (i.e. no if) relative file paths
+    ## independent relative file paths
+
+    ## temp/active.conf contains path to active setup configuration file
+    file_setup_config_path="$hajime_src"/temp/active.conf
+
+    ## wireless network access point password
+    wap_pass="$hajime_src"/setup/network/wap"$wap".pass
+
 
     if [[ "$pit" -eq 0 ]]; then
 
-	## tempo-active.conf contains path to active setup configuration file
-	file_setup_config_path="$hajime_src"/setup/tempo-active.conf
 	printf '%s\n' "$(realpath "$file_setup_config")" > "$file_setup_config_path"
 
     fi
 
-    ## wireless network access point password
-    wap_pass="$hajime_src"/setup/wap"$wap".pass
-
     if [[ "$pit" -gt 0 ]]; then
 
-	file_setup_config_path="$hajime_exec"/setup/tempo-active.conf
 	wap_pass="$hajime_exec"/setup/wap"$wap".pass
 
     fi
@@ -504,9 +505,12 @@ copy_hajime ()
     ## copy from hajime_src to hajime exec
     ## from hajime_exec the script will continue to run
     echo
-    printf 'copying hajime to /root '
+    printf 'copying hajime to /root ... '
+
     cp --preserve --recursive "$code_dir"/hajime /root
-    echo
+
+    printf 'complete\n'
+    sleep 1
     echo
 }
 
@@ -520,7 +524,7 @@ installation_mode ()
 	## hajime_exec did not exist before cp, we define it here
 	## export for availability in 1base
 	export hajime_exec=/root/hajime
-	file_setup_config_path="$hajime_exec"/setup/tempo-active.conf
+	file_setup_config_path="$hajime_exec"/temp/active.conf
 	## file_setup_config_exec = file_setup_config_path in hajime_exec
 	file_setup_config_exec=$(realpath $(find "$hajime_exec"/setup -iname $(basename "$file_setup_config")))
 
@@ -560,7 +564,7 @@ mount_repo ()
     [[ -d "$repo_dir" ]] || mkdir -p "$repo_dir"
 
     mountpoint -q "$repo_dir"
-    [[ $? -ne 0 ]] && sudo mount "$repo_dev" "$repo_dir"
+    [[ $? -ne 0 ]] && sudo mount -o ro "$repo_dev" "$repo_dir"
 }
 
 
@@ -580,7 +584,7 @@ get_offline_repo ()
 autostart_next ()
 {
     ## switch autostart via configuration file
-    [[ -n "$after_0init" ]] && sh /root/hajime/1base.sh
+    [[ -n "$after_0init" ]] && sh "$hajime_exec"/1base.sh
 }
 
 

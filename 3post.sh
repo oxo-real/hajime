@@ -14,7 +14,7 @@
 
 : '
 hajime_3post
-third part of linux installation
+third linux installation module
 copyright (c) 2018 - 2025  |  oxo
 
 GNU GPLv3 GENERAL PUBLIC LICENSE
@@ -38,10 +38,9 @@ https://www.gnu.org/licenses/gpl-3.0.txt
 # description
   third part of a series
   arch linux installation: post
-  branch archinst: after default archinstall
 
 # dependencies
-  archinstall, !REPO, 0init.sh, 1base.sh, 2conf.sh
+  0init.sh, 1base.sh, 2conf.sh
 
 # usage
   sh hajime/3post.sh [--offline|online|hybrid] [--config $custom_conf_file]
@@ -179,11 +178,22 @@ sourcing ()
 relative_file_paths ()
 {
     ## independent (i.e. no if) relative file paths
-    file_pacman_offline_conf="$hajime_exec"/setup/pacman/pacman_offline.conf
-    file_pacman_online_conf="$hajime_exec"/setup/pacman/pacman_online.conf
-    file_pacman_hybrid_conf="$hajime_exec"/setup/pacman/pacman_hybrid.conf
-    file_setup_config_path="$hajime_exec"/setup/tempo-active.conf
-    file_setup_config=$(cat "$file_setup_config_path")
+    file_pacman_offline_conf="$hajime_exec"/setup/pacman/pm_offline.conf
+    file_pacman_online_conf="$hajime_exec"/setup/pacman/pm_online.conf
+    file_pacman_hybrid_conf="$hajime_exec"/setup/pacman/pm_hybrid.conf
+
+    if [[ -z "$cfv" ]]; then
+	## no config file value given
+
+	## set default values based on existing path in file from 2conf
+	file_setup_config_path="$hajime_exec"/temp/active.conf
+	file_setup_config_2conf=$(cat $file_setup_config_path)
+	machine_file_name="${file_setup_config_2conf#*/hajime/setup/}"
+	file_setup_config="$hajime_exec"/setup/"$machine_file_name"
+
+	printf '%s\n' "$file_setup_config" > "$file_setup_config_path"
+
+    fi
 }
 
 
@@ -243,9 +253,10 @@ process_config_flag_value ()
 
 	## early sourcing hajime_exec
 	hajime_exec="$HOME"/hajime
-	file_setup_config_path="$hajime_exec"/setup/tempo-active.conf
 
+	file_setup_config_path="$hajime_exec"/temp/active.conf
 	file_setup_config="$realpath_cfv"
+
 	printf '%s\n' "$file_setup_config" > "$file_setup_config_path"
 
     else
@@ -283,7 +294,7 @@ installation_mode ()
 
 	## dhcp connect
 	export hajime_exec
-	sh "$HOME"/hajime/0init.sh --pit 3
+	sh "$hajime_exec"/0init.sh --pit 3
 
     fi
 }
@@ -292,17 +303,10 @@ installation_mode ()
 create_home ()
 {
     ## create mountpoint docking bays
-    mkdir -p "$HOME"/dock/1
-    mkdir -p "$HOME"/dock/2
-    mkdir -p "$HOME"/dock/3
-    mkdir -p "$HOME"/dock/4
-    mkdir -p "$HOME"/dock/mobile
-    mkdir -p "$HOME"/dock/transfer
-    mkdir -p "$HOME"/dock/vlt
+    mkdir -p "$HOME"/dock/{1,2,3,4,mobile,transfer,vlt}
 
     ## create xdg directories
-    mkdir -p "$HOME"/.cache/temp
-    mkdir -p "$HOME"/.cache/test
+    mkdir -p "$HOME"/.cache/{temp,test}
     mkdir -p "$HOME"/.config
     mkdir -p "$HOME"/.local/share
     mkdir -p "$HOME"/.logs
@@ -322,7 +326,7 @@ mount_repo ()
     [[ -d $repo_dir ]] || mkdir -p "$repo_dir"
 
     mountpoint -q "$repo_dir"
-    [[ $? -ne 0 ]] && sudo mount "$repo_dev" "$repo_dir"
+    [[ $? -ne 0 ]] && sudo mount -o ro "$repo_dev" "$repo_dir"
 }
 
 
@@ -350,7 +354,7 @@ mount_code ()
     [[ -d $code_dir ]] || mkdir -p "$code_dir"
 
     mountpoint -q "$code_dir"
-    [[ $? -ne 0 ]] && sudo mount "$code_dev" "$code_dir"
+    [[ $? -ne 0 ]] && sudo mount -o ro "$code_dev" "$code_dir"
 }
 
 
@@ -427,9 +431,9 @@ configure_pacman ()
     esac
 
     ## update offline repo name in pm_alt_conf
-    ## old name (2conf repo_dir)
+    ## previous repo path (2conf repo_dir)
     pm_2conf_path=/root/tmp/repo
-    ## replace
+    ## replace with current repo path
     sed -i "s#${pm_2conf_path}#${repo_dir}#" "$pm_alt_conf"
 }
 
@@ -489,7 +493,7 @@ wrap_up ()
 autostart_next ()
 {
     ## switch autostart via configuration file
-    [[ -n $after_3post ]] && sh $HOME/hajime/4apps.sh
+    [[ -n $after_3post ]] && sh "$hajime_exec"/4apps.sh
 }
 
 

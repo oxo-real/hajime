@@ -1,4 +1,7 @@
 #! /usr/bin/env sh
+#TODO verify if we are chroot jailed:
+# [linux - Detecting a chroot jail from within - Stack Overflow](https://stackoverflow.com/questions/75182/detecting-a-chroot-jail-from-within)
+# ! [ -x /proc/1/root/. ] || [ /proc/1/root/. -ef / ]
 
 # manually entering luks encrypted archlinux system:
 # define system by setting parameters

@@ -14,7 +14,7 @@
 
 : '
 hajime_1base
-first part of linux installation
+first module of linux installation
 copyright (c) 2017 - 2025  |  oxo
 
 GNU GPLv3 GENERAL PUBLIC LICENSE
@@ -36,7 +36,7 @@ https://www.gnu.org/licenses/gpl-3.0.txt
 
 
 # description
-  first part of five scripts in total
+  first module of five scripts in total
   arch linux installation: base
 
 # dependencies
@@ -217,7 +217,7 @@ sourcing ()
 
     ## configuration file
     ### define
-    file_setup_config=$(head -n 1 "$hajime_exec"/setup/tempo-active.conf)
+    file_setup_config=$(head -n 1 "$hajime_exec"/temp/active.conf)
     ### source
     [[ -f "$file_setup_config" ]] && source "$file_setup_config"
 
@@ -236,11 +236,25 @@ sourcing ()
 
 relative_file_paths ()
 {
-    ## independent (i.e. no if) relative file paths
+    ## independent relative file paths
     file_misc_bash_profile="$hajime_exec"/misc/2conf_bashrc
-    file_pacman_offline_conf="$hajime_exec"/setup/pacman/pacman_offline.conf
-    file_pacman_online_conf="$hajime_exec"/setup/pacman/pacman_online.conf
-    file_pacman_hybrid_conf="$hajime_exec"/setup/pacman/pacman_hybrid.conf
+
+    file_pacman_offline_conf="$hajime_exec"/setup/pacman/pm_offline.conf
+    file_pacman_online_conf="$hajime_exec"/setup/pacman/pm_online.conf
+    file_pacman_hybrid_conf="$hajime_exec"/setup/pacman/pm_hybrid.conf
+
+    if [[ -z "$cfv" ]]; then
+	## no config file value given
+
+	## set default values based on existing path in file from 0init
+	file_setup_config_path="$hajime_exec"/temp/active.conf
+	file_setup_config_0init=$(cat $file_setup_config_path)
+	machine_file_name="${file_setup_config_0init#*/hajime/setup/}"
+	file_setup_config="$hajime_exec"/setup/"$machine_file_name"
+
+	printf '%s\n' "$file_setup_config" > "$file_setup_config_path"
+
+    fi
 }
 
 
@@ -320,7 +334,7 @@ installation_mode ()
     if [[ -n "$exec_mode" ]]; then
 	## configuration file is being sourced
 
-	file_setup_luks_pass="$hajime_exec"/setup/tempo-luks.pass
+	file_setup_luks_pass="$hajime_exec"/temp/luks.pass
 	file_setup_package_list="$hajime_exec"/setup/package.list
 
     fi
@@ -330,7 +344,7 @@ installation_mode ()
 
 	## dhcp connect
 	export hajime_exec
-	sh hajime/0init.sh --pit 1
+	sh "$hajime_exec"/0init.sh --pit 1
 
     fi
 }
@@ -1185,6 +1199,7 @@ legacy_cryptsetup ()
 	## via configuration
 
 	echo
+	printf 'encrypting %s ... ' "$lvm_part"
 
 	## write key-file
 	printf '%s' "$luks_pass" > $file_setup_luks_pass
@@ -1194,6 +1209,8 @@ legacy_cryptsetup ()
 
 	## remove key-file
 	rm -rf $file_setup_luks_pass
+
+	printf 'complete\n'
 
     elif [[ -z $luks_pass ]]; then
 	## user interactive
@@ -1374,7 +1391,7 @@ prepare_mnt_environment ()
     echo 'copying hajime configuration to chroot jail (/mnt)'
 
     ## update configuration file location for inside chroot jail (/mnt)
-    sed -i 's#/root##' "$hajime_exec"/setup/tempo-active.conf
+    sed -i 's#/root##' "$hajime_exec"/temp/active.conf
 
     ## copy hajime_exec to chroot jail (/mnt)
     echo
