@@ -197,6 +197,7 @@ relative_file_paths ()
 	## set default values based on existing path in file from 4apps
 	file_setup_config_path="$hajime_exec"/temp/active.conf
 	file_setup_config_4apps=$(cat $file_setup_config_path)
+	## /hajime/setup is always a part of path in file
 	machine_file_name="${file_setup_config_4apps#*/hajime/setup/}"
 	file_setup_config="$hajime_exec"/setup/"$machine_file_name"
 
@@ -507,12 +508,14 @@ rewrite_symlinks ()
     ln --symbolic --force $HOME/.local/share/c $HOME/c
     ln --symbolic --force $HOME/.local/share/d $HOME/d
 
-    ## change $USER symlinks
+    ## change $USER for broken symlinks
     ### change config_shln (default)
     sh $XDG_DATA_HOME/c/git/code/tool/chln
     ### change network_ua (non default)
+    #TODO DEV file not found
     sh $XDG_DATA_HOME/c/git/code/tool/chln $XDG_CONFIG_HOME/network/ua
     ### change code_blocklist (non default)
+    #TODO DEV file not found
     sh $XDG_DATA_HOME/c/git/code/tool/chln $XDG_DATA_HOME/c/git/code/blocklist
 }
 
