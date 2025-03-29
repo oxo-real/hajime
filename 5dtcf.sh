@@ -498,7 +498,7 @@ rewrite_symlinks ()
 {
     # rewrite symlinks in shln to current users home
 
-    ## create symlinks
+    ## create symlinks in $HOME
     ### to pass_vault mountpoint (vlt_pass)
     ln --symbolic --force $HOME/dock/vlt/pass $HOME/.password-store
 
@@ -508,15 +508,10 @@ rewrite_symlinks ()
     ln --symbolic --force $HOME/.local/share/c $HOME/c
     ln --symbolic --force $HOME/.local/share/d $HOME/d
 
-    ## change $USER for broken symlinks
-    ### change config_shln (default)
-    sh $XDG_DATA_HOME/c/git/code/tool/chln
-    ### change network_ua (non default)
-    #TODO DEV file not found
-    sh $XDG_DATA_HOME/c/git/code/tool/chln $XDG_CONFIG_HOME/network/ua
-    ### change code_blocklist (non default)
-    #TODO DEV file not found
-    sh $XDG_DATA_HOME/c/git/code/tool/chln $XDG_DATA_HOME/c/git/code/blocklist
+    ## change $USER for all broken symlinks in $HOME (recursive) to $HOME/*
+    echo
+    printf 'updating symlinks in $HOME\n'
+    sh $XDG_DATA_HOME/c/git/code/tool/chln $HOME
 }
 
 
