@@ -61,9 +61,9 @@ base_packages ()
 
 	## core (essential packages)
 	base linux linux-firmware
+
 	## base-devel
 	base-devel
-
     )
 }
 
@@ -79,7 +79,7 @@ conf_packages ()
 	linux-headers
 
 	## linux lts kernel
-	# linux-lts linux-lts-headers
+	linux-lts linux-lts-headers
 
 	## intel micro code
 	intel-ucode iucode-tool
@@ -111,7 +111,6 @@ conf_packages ()
 
 	## system_security
 	#nss-certs; comes with nss in core
-
     )
 }
 
@@ -124,7 +123,6 @@ post_packages ()
 
 	## post_core_additions
 	lsof mlocate neofetch pacman-contrib
-
     )
 }
 
@@ -351,7 +349,7 @@ apps_packages ()
 
 	#7-zip
 	base16-shell-preview
-	brave-bin
+	# brave-bin
 	# calcmysky
 	# cava
 	# dotool
@@ -384,8 +382,7 @@ apps_packages ()
 	# viddy
 	#wlrobs
 	#yay-bin
-	yazi-git
-
+	# yazi-git
     )
 }
 

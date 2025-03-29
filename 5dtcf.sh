@@ -205,7 +205,7 @@ relative_file_paths ()
     fi
 
     ## doas configuration file
-    file_setup_doas_conf="$hajime_exec/setup/doas/etc_doas.conf"
+    file_setup_doas_conf="$hajime_exec"/setup/doas/etc_doas.conf
 }
 
 
@@ -282,62 +282,14 @@ process_config_flag_value ()
 
 installation_mode ()
 {
-    ## CODE and REPO mountpoints
-    ## we have no "$HOME"/dock/{2,3} yet
-    ## therefore we use /root/tmp for the mountpoints
-    code_lbl=CODE
-    code_dir=/root/tmp/code
-    repo_lbl=REPO
-    repo_dir=/root/tmp/repo
-    repo_re=\/root\/tmp\/repo
-
-    if [[ $online -eq 0 ]]; then
-	## offline mode
-
-	## in case current ($online) mode differs from previous
-	## make sure pacman.conf points to offline repos
-	pacman_conf_copy offline
-
-    elif [[ "$online" -ne 0 ]]; then
+    if [[ "$online" -ne 0 ]]; then
 	## online or hybrid mode
 
 	## dhcp connect
 	export hajime_exec
 	sh "$hajime_exec"/0init.sh --pit 5
 
-	## in case current ($online) mode differs from previous
-	## make sure pacman.conf points to correct repos
-	[[ "$online" -eq 1 ]] && pm_version=online
-	[[ "$online" -eq 2 ]] && pm_version=hybrid
-	pacman_conf_copy "$pm_version"
-
-	## update offline repo name in /etc/pacman.conf
-	sed -i "s#0init_repo_here#${repo_dir}#" "$file_etc_pacman_conf"
-
     fi
-
-    ## update repository database
-    sudo pacman -Syu
-}
-
-
-pacman_conf_copy ()
-{
-    case "$1" in
-
-	offline )
-            cp "$file_pacman_offline_conf" "$file_etc_pacman_conf"
-            ;;
-
-	online )
-            cp "$file_pacman_online_conf" "$file_etc_pacman_conf"
-            ;;
-
-	hybrid )
-            cp "$file_pacman_hybrid_conf" "$file_etc_pacman_conf"
-            ;;
-
-    esac
 }
 
 
@@ -534,7 +486,7 @@ dotfbu_restore ()
     if [[ $online -eq 0 ]]; then
 	## offline mode
 
-	# restore .config from dotf
+	# restore .config from local git dotf
 	sh $XDG_DATA_HOME/c/git/code/tool/dotfbu restore $XDG_DATA_HOME/c/git/dotf/ $XDG_CONFIG_HOME
 
     fi
@@ -547,13 +499,13 @@ rewrite_symlinks ()
 
     ## create symlinks
     ### to pass_vault mountpoint (vlt_pass)
-    ln -s $HOME/dock/vlt/pass $HOME/.password-store
+    ln --symbolic --force $HOME/dock/vlt/pass $HOME/.password-store
 
     ### to archive, backup, current and device
-    ln -s $HOME/.local/share/a $HOME/a
-    ln -s $HOME/.local/share/b $HOME/b
-    ln -s $HOME/.local/share/c $HOME/c
-    ln -s $HOME/.local/share/d $HOME/d
+    ln --symbolic --force $HOME/.local/share/a $HOME/a
+    ln --symbolic --force $HOME/.local/share/b $HOME/b
+    ln --symbolic --force $HOME/.local/share/c $HOME/c
+    ln --symbolic --force $HOME/.local/share/d $HOME/d
 
     ## change $USER symlinks
     ### change config_shln (default)

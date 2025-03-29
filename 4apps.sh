@@ -381,48 +381,60 @@ configure_pacman ()
         ;;
 
     esac
+
+    sudo pacman -Syyu --config "$pm_alt_conf" --noconfirm
 }
 
 
 install_yay ()
 {
-    ## ## from https://github.com/Jguer/yay/releases
-    ## ## add the latest x86_64.tar.gz
-    ## ## i.e. https://github.com/Jguer/yay/releases/download/v12.4.2/yay_12.4.2_x86_64.tar.gz
-    ## ## to yay_src/yay-bin (which is inside the REPO on dock/2)
+    if ! pacman -Qs --config "$pm_alt_conf" yay; then
+	## yay is not already installed
 
-    ## create foreign package repository location
-    [[ -d "$yay_cache" ]] || mkdir -p "$yay_cache"
+	## ## from https://github.com/Jguer/yay/releases
+	## ## add the latest x86_64.tar.gz
+	## ## i.e. https://github.com/Jguer/yay/releases/download/v12.4.2/yay_12.4.2_x86_64.tar.gz
+	## ## to yay_src/yay-bin (which is inside the REPO on dock/2)
 
-    ## goto foreign package repository
-    cd "$yay_cache"
+	## create location for foreign package repository
+	[[ -d "$yay_cache" ]] || mkdir -p "$yay_cache"
 
-    if [[ "$online" -eq 0 ]]; then
-	## offline mode
+	## goto foreign package repository
+	cd "$yay_cache"
 
-	## copy offline yay-bin
-	#TODO sudo why?
-	sudo cp -r "$yay_src"/yay-bin "$yay_cache"
+	if [[ "$online" -eq 0 ]]; then
+	    ## offline mode
 
-    elif [[ "$online" -ne 0 ]]; then
-	## online or hybrid mode
+	    ## copy offline yay-bin
+	    # cp -r "$yay_src"/yay-bin "$yay_cache"
+	    ## .git/objects contains root ownership
+	    rsync -aAXv --exclude .git "$yay_src"/yay-bin "$yay_cache"
 
-	## clone online yay-bin upstream source
-	git clone https://aur.archlinux.org/yay-bin.git
+	elif [[ "$online" -ne 0 ]]; then
+	    ## online or hybrid mode
+
+	    ## clone online yay-bin upstream source
+	    git clone https://aur.archlinux.org/yay-bin.git
+
+	fi
+
+	## goto yay_cache yay-bin
+	cd yay-bin
+
+	## ## in PKGBUILD redirect source_x86_64 to the added x86_64.tar.gz file:
+	## ## source_x86_64=("$HOME/.cache/yay/yay-bin/${pkgname/-bin/}_${pkgver}_x86_64.tar.gz")
+
+	## make and install yay-bin
+	makepkg --needed --noconfirm --syncdeps --install
+
+	## return home
+	cd
+
+    else
+
+	printf 'yay already installed\n'
 
     fi
-
-    ## goto yay_cache yay-bin
-    cd yay-bin
-
-    ## ## in PKGBUILD redirect source_x86_64 to the added x86_64.tar.gz file:
-    ## ## source_x86_64=("$HOME/.cache/yay/yay-bin/${pkgname/-bin/}_${pkgver}_x86_64.tar.gz")
-
-    ## make and install yay-bin
-    makepkg --syncdeps --install
-
-    ## return home
-    cd
 }
 
 
@@ -430,6 +442,8 @@ install_apps_pkgs ()
 {
     ## for to prevent pacman exit on error
     ## apps_pkgs sourced via setup/package.list
+    #TODO
+    #yay -S --config "$pm_alt_conf" --needed --noconfirm "${apps_pkgs[@]}"
     for pkg in "${apps_pkgs[@]}"; do
 
 	if ! yay -S --config "$pm_alt_conf" --needed --noconfirm "$pkg"; then
@@ -439,7 +453,6 @@ install_apps_pkgs ()
 	fi
 
     done
-    #sudo pacman -S --needed --noconfirm "${apps_pkgs[@]}"
 }
 
 
