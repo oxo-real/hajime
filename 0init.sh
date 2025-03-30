@@ -148,14 +148,11 @@ getargs ()
 sourcing ()
 {
     ## script_name is used in file_setup_config
-
     export script_name
 
-    if [[ "$pit" -eq 0 ]]; then
-
-	hajime_exec=/root/hajime
-
-    fi
+    ## export for availability in 1base
+    export hajime_exec=/root/hajime
+    # hajime_exec=/root/hajime
 
     ## runmode (for informative text)
     if [[ "$online" -eq 0 ]]; then
@@ -189,20 +186,23 @@ relative_file_paths ()
 {
     ## independent relative file paths
 
-    ## temp/active.conf contains path to active setup configuration file
-    file_setup_config_path="$hajime_src"/temp/active.conf
-
-    ## wireless network access point password
-    wap_pass="$hajime_src"/setup/network/wap"$wap".pass
-
-
     if [[ "$pit" -eq 0 ]]; then
 
-	printf '%s\n' "$(realpath "$file_setup_config")" > "$file_setup_config_path"
+	## temp/active.conf contains path to active setup configuration file
+
+	## NOTICE if pit=0; file doesn't exist yet, but will be created below
+	file_setup_config_path="$hajime_exec"/temp/active.conf
+	#file_setup_config_path="$hajime_src"/temp/active.conf
 
     fi
 
-    if [[ "$pit" -gt 0 ]]; then
+    ## wireless network access point password
+    #TODO wpa network and passw in configuration
+    if [[ "$pit" -eq 0 ]]; then
+
+	wap_pass="$hajime_src"/setup/network/wap"$wap".pass
+
+    elif [[ "$pit" -gt 0 ]]; then
 
 	wap_pass="$hajime_exec"/setup/wap"$wap".pass
 
@@ -507,7 +507,10 @@ copy_hajime ()
     echo
     printf 'copying hajime to /root ... '
 
-    cp --preserve --recursive "$code_dir"/hajime /root
+    cp --preserve --recursive "$hajime_src" /root
+
+    ## create active.conf and write file_setup_config path
+    printf '%s\n' "$(realpath "$file_setup_config")" > "$file_setup_config_path"
 
     printf 'complete\n'
     sleep 1
@@ -517,22 +520,6 @@ copy_hajime ()
 
 installation_mode ()
 {
-    if [[ -n "$exec_mode" ]]; then
-	## configuration file
-
-	## update file_setup_config_path with it's new hajime_exec location
-	## hajime_exec did not exist before cp, we define it here
-	## export for availability in 1base
-	export hajime_exec=/root/hajime
-	file_setup_config_path="$hajime_exec"/temp/active.conf
-	## file_setup_config_exec = file_setup_config_path in hajime_exec
-	file_setup_config_exec=$(realpath $(find "$hajime_exec"/setup -iname $(basename "$file_setup_config")))
-
-	## write file_setup_config_path with hajime_exec location
-	printf '%s\n' "$file_setup_config_exec" > "$file_setup_config_path"
-
-    fi
-
     if [[ "$online" -ne 1 ]]; then
 	## offline or hybrid mode
 

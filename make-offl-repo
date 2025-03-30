@@ -37,6 +37,11 @@ https://www.gnu.org/licenses/gpl-3.0.txt
 
 # description
 
+hajime packages are in hajime/setup package.list
+outcommented packages are not copied to prevent bloat
+package dependencies are also copied to the offline repo
+pkgs_real_paths contains all zst files
+
 # dependencies
   archlinux installation
   REPO
@@ -68,7 +73,7 @@ src_foreign="$XDG_CACHE_HOME/yay"
 src_native='/var/cache/pacman/pkg'
 hajime_dir="$HOME/c/git/code/hajime"
 
-file_packages="${hajime_dir}/install/package.list"
+file_package_list="${hajime_dir}/setup/package.list"
 
 pkgs_copy="${hajime_dir}/logs/pkgs-copy-$(id -u $USER)"
 pkgs_copy_err="${hajime_dir}/logs/pkgs-copy-err-$(id -u $USER)"
@@ -83,7 +88,7 @@ pkgs_sigs="${hajime_dir}/logs/pkgs-sigs-$(id -u $USER)"
 sourcing ()
 {
     ## custom packages
-    [[ -f "$file_packages" ]] && source "$file_packages"
+    [[ -f "$file_package_list" ]] && source "$file_package_list"
 }
 
 
@@ -124,13 +129,12 @@ file_administration ()
 
 create_pkgs_hajime ()
 {
-    ## sourced from file_packages
+    ## sourced from file_package_list
     pkgs_hajime_arr=(
 	"${base_pkgs[@]}"
 	"${conf_pkgs[@]}"
 	"${post_pkgs[@]}"
 	"${apps_pkgs[@]}"
-	"${fgn_pkgs[@]}"
     )
 
     ## write pkgs_hajime (pkgs-hajime-1000)
@@ -256,6 +260,15 @@ get_pkg_deps ()
 
     ## tail first line of pactree is queried package
     pkg_deps=$(pactree --linear --unique "$pkg" | tail -n +2 | sort)
+
+    if pacman -Qm "$pkg"; then
+
+	fgn_pkg_dir="$XDG_CACHE_HOME/yay/$pkg"
+	pkgb_deps=$(rg --no-line-number ^depends "$fgn_pkg_dir"/PKGBUILD | awk -F '[()]' '{print $2}' | sed "s/'//g" | tr ' ' '\n')
+	pkgb_make_deps=$(rg --no-line-number ^makedepends "$fgn_pkg_dir"/PKGBUILD | awk -F '[()]' '{print $2}' | sed "s/'//g" | tr ' ' '\n')
+	pkg_deps=${pkgb_deps}\n${pkgb_make_deps}
+
+    fi
 }
 
 

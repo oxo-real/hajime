@@ -249,8 +249,9 @@ relative_file_paths ()
 	## set default values based on existing path in file from 0init
 	file_setup_config_path="$hajime_exec"/temp/active.conf
 	file_setup_config_0init=$(cat $file_setup_config_path)
-	machine_file_name="${file_setup_config_0init#*/hajime/setup/}"
-	file_setup_config="$hajime_exec"/setup/"$machine_file_name"
+	## /hajime/setup/machine is always a part of path in file
+	machine_file_name="${file_setup_config_0init#*/hajime/setup/machine/}"
+	file_setup_config="$hajime_exec"/setup/machine/"$machine_file_name"
 
 	printf '%s\n' "$file_setup_config" > "$file_setup_config_path"
 
@@ -399,8 +400,8 @@ exit_hajime ()
     echo
     echo
     printf " Hajime aborted by user!\n"
-    echo
     sleep 1
+    echo
     printf " Bye!\n"
     sleep 1
     exit
@@ -425,8 +426,8 @@ clock ()
     date
     hwclock -rv
     timedatectl status
-    echo
     sleep 3
+    echo
 }
 
 
@@ -1211,6 +1212,8 @@ legacy_cryptsetup ()
 	rm -rf $file_setup_luks_pass
 
 	printf 'complete\n'
+	sleep 1
+	echo
 
     elif [[ -z $luks_pass ]]; then
 	## user interactive

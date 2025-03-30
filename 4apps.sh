@@ -184,8 +184,9 @@ relative_file_paths ()
 	## set default values based on existing path in file from 3post
 	file_setup_config_path="$hajime_exec"/temp/active.conf
 	file_setup_config_3post=$(cat $file_setup_config_path)
-	machine_file_name="${file_setup_config_3post#*/hajime/setup/}"
-	file_setup_config="$hajime_exec"/setup/"$machine_file_name"
+	## /hajime/setup/machine is always a part of path in file
+	machine_file_name="${file_setup_config_3post#*/hajime/setup/machine/}"
+	file_setup_config="$hajime_exec"/setup/machine/"$machine_file_name"
 
 	printf '%s\n' "$file_setup_config" > "$file_setup_config_path"
 
@@ -419,13 +420,13 @@ install_yay ()
 	fi
 
 	## goto yay_cache yay-bin
-	cd yay-bin
+	# cd yay-bin
 
 	## ## in PKGBUILD redirect source_x86_64 to the added x86_64.tar.gz file:
 	## ## source_x86_64=("$HOME/.cache/yay/yay-bin/${pkgname/-bin/}_${pkgver}_x86_64.tar.gz")
 
-	## make and install yay-bin
-	makepkg --needed --noconfirm --syncdeps --install
+	## makepkg, sync dependencies and install package
+	makepkg --dir "$yay_cache"/yay-bin --syncdeps --install --needed --noconfirm
 
 	## return home
 	cd
@@ -448,7 +449,9 @@ install_apps_pkgs ()
 
 	if ! yay -S --config "$pm_alt_conf" --needed --noconfirm "$pkg"; then
 
-	    printf 'ERROR installing %s\n' "$pkg" | tee -a $file_error_log
+	    printf 'ERROR yay -S --config %s --needed --noconfirm %s\n' "$pm_alt_conf" "$pkg" | tee -a $file_error_log
+
+	    install_aur_pkg
 
 	fi
 

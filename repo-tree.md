@@ -24,10 +24,11 @@
 ├── README.md
 ├── repo-tree.md
 ├── setup
-│   ├── dl3189.conf
 │   ├── doas
 │   │   └── etc_doas.conf
-│   ├── mbp2011a1286.conf
+│   ├── machine
+│   │   ├── dl3189.conf
+│   │   └── mbp2011a1286.conf
 │   ├── network
 │   ├── package.list
 │   └── pacman
@@ -38,5 +39,5 @@
 │       └── pm_online.conf
 └── temp
 
-9 directories, 29 files
+10 directories, 29 files
 ```

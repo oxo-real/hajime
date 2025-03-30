@@ -197,9 +197,9 @@ relative_file_paths ()
 	## set default values based on existing path in file from 4apps
 	file_setup_config_path="$hajime_exec"/temp/active.conf
 	file_setup_config_4apps=$(cat $file_setup_config_path)
-	## /hajime/setup is always a part of path in file
-	machine_file_name="${file_setup_config_4apps#*/hajime/setup/}"
-	file_setup_config="$hajime_exec"/setup/"$machine_file_name"
+	## /hajime/setup/machine is always a part of path in file
+	machine_file_name="${file_setup_config_4apps#*/hajime/setup/machine/}"
+	file_setup_config="$hajime_exec"/setup/machine/"$machine_file_name"
 
 	printf '%s\n' "$file_setup_config" > "$file_setup_config_path"
 
