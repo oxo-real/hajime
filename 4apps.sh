@@ -383,7 +383,20 @@ configure_pacman ()
 
     esac
 
-    sudo pacman -Syyu --config "$pm_alt_conf" --noconfirm
+    ## update offline repo dir
+    ## sed replace the line after match ^[offline]
+    ## NOTICE #[offline] will be skipped
+    ## sed {n;...} on match read next line
+    ## sed s#search#replace# replace whole line (.*) with Server...
+    sed -i "/^\[offline\]/{n;s#.*#Server = file://${repo_dir}/ofcl/pkgs#;}" "$pm_alt_conf"
+
+    if [[ "$online" -gt 0 ]]; then
+	## online or hybrid mode
+
+	## update package database
+	pacman -Syyu --needed --noconfirm --config "$pm_alt_conf"
+
+    fi
 }
 
 

@@ -250,7 +250,7 @@ relative_file_paths ()
 	file_setup_config_path="$hajime_exec"/temp/active.conf
 	file_setup_config_0init=$(cat $file_setup_config_path)
 	## /hajime/setup/machine is always a part of path in file
-	machine_file_name="${file_setup_config_0init#*/hajime/setup/machine/}"
+	machine_file_name="${file_setup_config_0nit#*/hajime/setup/machine/}"
 	file_setup_config="$hajime_exec"/setup/machine/"$machine_file_name"
 
 	printf '%s\n' "$file_setup_config" > "$file_setup_config_path"
@@ -1341,17 +1341,17 @@ configure_pacman ()
     ## sed replace the line after match ^[offline]
     ## sed {n;...} on match read next line
     ## sed s#search#replace# replace whole line (.*) with Server...
-    sed -i "/^\[offline\]/{n;s#.*#Server = file://${repo_dir}#;}" $pm_alt_conf
-
+    sed -i "/^\[offline\]/{n;s#.*#Server = file://${repo_dir}/ofcl/pkgs#;}" $pm_alt_conf
     echo
-    # init package keys
+
+    ## init package keys
     pacman-key --config "$pm_alt_conf" --init
 
-    # populate keys from archlinux.gpg
+    ## populate keys from archlinux.gpg
     pacman-key --config "$pm_alt_conf" --populate
 
-    # update package database
-    # pacman --needed --noconfirm --config "$pm_alt_conf" -Syu
+    ## update package database
+    pacman -Syyu --needed --noconfirm --config "$pm_alt_conf"
 }
 
 

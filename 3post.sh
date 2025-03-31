@@ -430,11 +430,20 @@ configure_pacman ()
 
     esac
 
-    ## update offline repo name in pm_alt_conf
-    ## previous repo path (2conf repo_dir)
-    pm_2conf_path=/root/tmp/repo
-    ## replace with current repo path
-    sed -i "s#${pm_2conf_path}#${repo_dir}#" "$pm_alt_conf"
+    ## update offline repo dir
+    ## sed replace the line after match ^[offline]
+    ## NOTICE #[offline] will be skipped
+    ## sed {n;...} on match read next line
+    ## sed s#search#replace# replace whole line (.*) with Server...
+    sed -i "/^\[offline\]/{n;s#.*#Server = file://${repo_dir}/ofcl/pkgs#;}" "$pm_alt_conf"
+
+    if [[ "$online" -gt 0 ]]; then
+	## online or hybrid mode
+
+	## update package database
+	pacman -Syyu --needed --noconfirm --config "$pm_alt_conf"
+
+    fi
 }
 
 

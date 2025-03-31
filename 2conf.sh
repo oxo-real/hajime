@@ -712,17 +712,25 @@ configure_pacman ()
     esac
 
     ## update offline repo dir
-    sed -i "s#0init_repo_here#${repo_dir}#" "$pm_alt_conf"
+    ## sed replace the line after match ^[offline]
+    ## NOTICE #[offline] will be skipped
+    ## sed {n;...} on match read next line
+    ## sed s#search#replace# replace whole line (.*) with Server...
+    sed -i "/^\[offline\]/{n;s#.*#Server = file://${repo_dir}/ofcl/pkgs#;}" "$pm_alt_conf"
 
-    # init package keys
+    ## init package keys
     pacman-key --config "$pm_alt_conf" --init
 
-    # populate keys from archlinux.gpg
+    ## populate keys from archlinux.gpg
     pacman-key --config "$pm_alt_conf" --populate
 
-    # update package database
-    pacman --needed --noconfirm --config "$pm_alt_conf" -Syu
-   # pacman -Syy
+    if [[ "$online" -gt 0 ]]; then
+	## online or hybrid mode
+
+	## update package database
+	pacman -Syyu --needed --noconfirm --config "$pm_alt_conf"
+
+    fi
 }
 
 
