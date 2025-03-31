@@ -151,8 +151,9 @@ sourcing ()
     export script_name
 
     ## export for availability in 1base
-    export hajime_exec=/root/hajime
-    # hajime_exec=/root/hajime
+    #TODO test when removed export entirely here
+    [[ "$pit" -eq 0 ]] && \
+	export hajime_exec=/root/hajime
 
     ## runmode (for informative text)
     if [[ "$online" -eq 0 ]]; then
@@ -204,7 +205,7 @@ relative_file_paths ()
 
     elif [[ "$pit" -gt 0 ]]; then
 
-	wap_pass="$hajime_exec"/setup/wap"$wap".pass
+	wap_pass="$hajime_exec"/setup/network/wap"$wap".pass
 
     fi
 }

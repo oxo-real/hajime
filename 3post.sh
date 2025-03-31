@@ -71,7 +71,6 @@ mirror_country=USA
 mirror_amount=5
 
 ## absolute file paths
-# hajime_src=/root/tmp/code/hajime
 file_etc_motd=/etc/motd
 file_etc_pacman_conf=/etc/pacman.conf
 
