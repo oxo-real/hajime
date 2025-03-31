@@ -754,7 +754,8 @@ install_conf_pkgs ()
     # update repositories and install core applications
     # [Installation guide - ArchWiki]
     # (https://wiki.archlinux.org/title/Installation_guide#Install_essential_packages)
-    pacman -S --needed --noconfirm --config "$pm_alt_conf" "${conf_pkgs[@]}"
+    # pacman -S --needed --noconfirm --config "$pm_alt_conf" "${conf_pkgs[@]}"
+    pacman -S --needed --noconfirm --dbpath "$repo_dir"/ofcl/db --cachedir "repo_dir"/ofcl/pkgs "${conf_pkgs[@]}"
 }
 
 

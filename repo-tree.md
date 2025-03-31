@@ -14,7 +14,7 @@
 │   ├── rescue.sh
 │   └── urls
 ├── logs
-│   └── pacman-Q-3conf
+│   └── 3post-pkgs-w-deps.list
 ├── make-offl-repo
 ├── make-recov
 ├── misc

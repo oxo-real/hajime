@@ -443,14 +443,16 @@ pacman_init ()
     sudo pacman-key --config "$pm_alt_conf" --init
     sudo pacman-key --config "$pm_alt_conf" --populate archlinux
 
-    sudo pacman --config "$pm_alt_conf" -Syyu
+    # sudo pacman -Syyu --config "$pm_alt_conf"
+    sudo pacman -Syyu --needed --noconfirm --dbpath "$repo_dir"/ofcl/db --cachedir "repo_dir"/ofcl/pkgs
 }
 
 
 install_post_pkgs ()
 {
     ## add post core addditions
-    sudo pacman --config "$pm_alt_conf" --needed --noconfirm -S "${post_pkgs[@]}"
+    # sudo pacman -S --config "$pm_alt_conf" --needed --noconfirm "${post_pkgs[@]}"
+    sudo pacman -S --needed --noconfirm --dbpath "$repo_dir"/ofcl/db --cachedir "repo_dir"/ofcl/pkgs "${post_pkgs[@]}"
 }
 
 
