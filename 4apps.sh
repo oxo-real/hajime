@@ -390,6 +390,9 @@ configure_pacman ()
     ## sed s#search#replace# replace whole line (.*) with Server...
     sed -i "/^\[offline\]/{n;s#.*#Server = file://${repo_dir}/ofcl/pkgs#;}" "$pm_alt_conf"
 
+    ## copy database to pkgs (tempo)
+    cp "$repo_dir"/ofcl/db/offline* "$repo_dir"/ofcl/pkgs
+
     if [[ "$online" -gt 0 ]]; then
 	## online or hybrid mode
 
@@ -476,6 +479,9 @@ loose_ends ()
 {
     ## recommend human to execute dotfiles configuration script
     echo 'sh hajime/5dtcf.sh'
+
+    ## undo copy database to pkgs (tempo)
+    rm "$repo_dir"/ofcl/pkgs/offline*
 
     ## finishing
     sudo touch $HOME/hajime/4apps.done

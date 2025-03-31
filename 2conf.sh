@@ -718,6 +718,9 @@ configure_pacman ()
     ## sed s#search#replace# replace whole line (.*) with Server...
     sed -i "/^\[offline\]/{n;s#.*#Server = file://${repo_dir}/ofcl/pkgs#;}" "$pm_alt_conf"
 
+    ## copy database to pkgs (tempo)
+    cp "$repo_dir"/ofcl/db/offline* "$repo_dir"/ofcl/pkgs
+
     ## init package keys
     pacman-key --config "$pm_alt_conf" --init
 
@@ -929,6 +932,10 @@ exit_chroot_jail_mnt ()
     rm -rf "$file_root_bash_profile"
 
     # finishing
+
+    ## undo copy database to pkgs (tempo)
+    rm "$repo_dir"/ofcl/pkgs/offline*
+
     touch /home/$username/hajime/2conf.done
 }
 

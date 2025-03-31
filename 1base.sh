@@ -1344,6 +1344,9 @@ configure_pacman ()
     sed -i "/^\[offline\]/{n;s#.*#Server = file://${repo_dir}/ofcl/pkgs#;}" $pm_alt_conf
     echo
 
+    ## copy database to pkgs (tempo)
+    cp "$repo_dir"/ofcl/db/offline* "$repo_dir"/ofcl/pkgs
+
     ## init package keys
     pacman-key --config "$pm_alt_conf" --init
 
@@ -1418,6 +1421,9 @@ bash_profile ()
 
 finishing ()
 {
+    ## undo copy database to pkgs (tempo)
+    rm "$repo_dir"/ofcl/pkgs/offline*
+
     arch-chroot /mnt touch hajime/1base.done
 }
 

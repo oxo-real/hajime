@@ -437,6 +437,9 @@ configure_pacman ()
     ## sed s#search#replace# replace whole line (.*) with Server...
     sed -i "/^\[offline\]/{n;s#.*#Server = file://${repo_dir}/ofcl/pkgs#;}" "$pm_alt_conf"
 
+    ## copy database to pkgs (tempo)
+    cp "$repo_dir"/ofcl/db/offline* "$repo_dir"/ofcl/pkgs
+
     if [[ "$online" -gt 0 ]]; then
 	## online or hybrid mode
 
@@ -475,6 +478,9 @@ set_read_only ()
 
 wrap_up ()
 {
+    ## undo copy database to pkgs (tempo)
+    rm "$repo_dir"/ofcl/pkgs/offline*
+
     # human info
     clear
     echo
@@ -497,6 +503,7 @@ wrap_up ()
     clear
     echo
     neofetch --ascii_distro arch_small --gtk3 off --gtk2 off --colors 3 3 3 7 3 4 --separator '     \t'
+
     sudo touch hajime/3post.done
 }
 
