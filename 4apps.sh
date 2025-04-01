@@ -391,7 +391,9 @@ configure_pacman ()
     sed -i "/^\[offline\]/{n;s#.*#Server = file://${repo_dir}/ofcl/pkgs#;}" "$pm_alt_conf"
 
     ## copy database to pkgs (tempo)
+    sudo mount -o remount,rw "${repo_dir%/*}"
     cp "$repo_dir"/ofcl/db/offline* "$repo_dir"/ofcl/pkgs
+    sudo mount -o remount,ro "${repo_dir%/*}"
 
     if [[ "$online" -gt 0 ]]; then
 	## online or hybrid mode
@@ -481,7 +483,9 @@ loose_ends ()
     echo 'sh hajime/5dtcf.sh'
 
     ## undo copy database to pkgs (tempo)
+    sudo mount -o remount,rw "${repo_dir%/*}"
     rm "$repo_dir"/ofcl/pkgs/offline*
+    sudo mount -o remount,ro "${repo_dir%/*}"
 
     ## finishing
     sudo touch $HOME/hajime/4apps.done

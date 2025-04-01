@@ -1,0 +1,2 @@
+#! /usr/bin/env sh
+sh tmp/code/hajime/0init.sh --offline --config tmp/code/hajime/setup/machine/dl3189.conf 2>&1 | tee tmp/code/hajime/logs/0init.log

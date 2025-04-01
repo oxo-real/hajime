@@ -480,8 +480,8 @@ roadmap ()
     else
 
 	point_in_time
-	copy_hajime
 	installation_mode
+	copy_hajime
 	autostart_next
 
     fi
@@ -504,11 +504,11 @@ point_in_time ()
 copy_hajime ()
 {
     ## copy from hajime_src to hajime exec
-    ## from hajime_exec the script will continue to run
+    ## the script will continue to run from hajime_exec
     echo
     printf 'copying hajime to /root ... '
 
-    cp --preserve --recursive "$hajime_src" /root
+    cp --archive --recursive "$hajime_src" /root
 
     ## create active.conf and write file_setup_config path
     printf '%s\n' "$(realpath "$file_setup_config")" > "$file_setup_config_path"

@@ -1308,7 +1308,7 @@ configure_mirrorlists ()
 	#     --latest "$refl_mirror_amount" \
 	#     --protocol https,rsync,http,ftp
 	    #--fastest+/latest/score/number
-	cp "$hajime_exec"/setup/mirrorlist "$file_etc_pacmand_mirrorlist"
+	cp "$hajime_exec"/setup/pacman/mirrorlist "$file_etc_pacmand_mirrorlist"
 
     fi
 }
@@ -1345,7 +1345,9 @@ configure_pacman ()
     echo
 
     ## copy database to pkgs (tempo)
+    mount -o remount,rw "${repo_dir%/*}"
     cp "$repo_dir"/ofcl/db/offline* "$repo_dir"/ofcl/pkgs
+    mount -o remount,ro "${repo_dir%/*}"
 
     ## init package keys
     pacman-key --config "$pm_alt_conf" --init
@@ -1354,7 +1356,8 @@ configure_pacman ()
     pacman-key --config "$pm_alt_conf" --populate
 
     ## update package database
-    pacman -Syyu --needed --noconfirm --config "$pm_alt_conf"
+    # WARNING -Syyu at time point in time generates resolve errors
+    # pacman -Syyu --needed --noconfirm --config "$pm_alt_conf"
 }
 
 
@@ -1422,7 +1425,9 @@ bash_profile ()
 finishing ()
 {
     ## undo copy database to pkgs (tempo)
+    mount -o remount,rw "${repo_dir%/*}"
     rm "$repo_dir"/ofcl/pkgs/offline*
+    mount -o remount,ro "${repo_dir%/*}"
 
     arch-chroot /mnt touch hajime/1base.done
 }
@@ -1478,7 +1483,7 @@ welcome ()
     echo
     printf "Cancel the execution of this installation script by pressing 'N'.\n"
     echo
-    printf "Manifest the intent to continue, with ${st_bold}full consent${st_def}; press 'Y'.\n"
+    printf "Manifest the intent to ${st_bold}continue, with full consent${st_def}; press 'Y'.\n"
     echo
     echo
     printf "${fg_magenta}Continue installation?${st_def} [y/N] "
