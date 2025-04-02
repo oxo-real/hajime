@@ -1345,6 +1345,7 @@ configure_pacman ()
     echo
 
     ## copy database to pkgs (tempo)
+    #TODO error resolv
     mount -o remount,rw "${repo_dir%/*}"
     cp "$repo_dir"/ofcl/db/offline* "$repo_dir"/ofcl/pkgs
     mount -o remount,ro "${repo_dir%/*}"
