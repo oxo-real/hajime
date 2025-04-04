@@ -326,7 +326,8 @@ mount_repo ()
     [[ -d $repo_dir ]] || mkdir -p "$repo_dir"
 
     mountpoint -q "$repo_dir"
-    [[ $? -ne 0 ]] && sudo mount -o ro "$repo_dev" "$repo_dir"
+    [[ $? -ne 0 ]] && sudo mount "$repo_dev" "$repo_dir"
+    # [[ $? -ne 0 ]] && sudo mount -o ro "$repo_dev" "$repo_dir"
 }
 
 
@@ -354,7 +355,8 @@ mount_code ()
     [[ -d $code_dir ]] || mkdir -p "$code_dir"
 
     mountpoint -q "$code_dir"
-    [[ $? -ne 0 ]] && sudo mount -o ro "$code_dev" "$code_dir"
+    [[ $? -ne 0 ]] && sudo mount "$code_dev" "$code_dir"
+    # [[ $? -ne 0 ]] && sudo mount -o ro "$code_dev" "$code_dir"
 }
 
 
@@ -438,9 +440,9 @@ configure_pacman ()
     sed -i "/^\[offline\]/{n;s#.*#Server = file://${repo_dir}/ofcl/pkgs#;}" "$pm_alt_conf"
 
     ## copy database to pkgs (tempo)
-    sudo mount -o remount,rw "${repo_dir%/*}"
+    # sudo mount -o remount,rw "${repo_dir%/*}"
     cp "$repo_dir"/ofcl/db/offline* "$repo_dir"/ofcl/pkgs
-    sudo mount -o remount,ro "${repo_dir%/*}"
+    # sudo mount -o remount,ro "${repo_dir%/*}"
 
     if [[ "$online" -gt 0 ]]; then
 	## online or hybrid mode
@@ -481,9 +483,11 @@ set_read_only ()
 wrap_up ()
 {
     ## undo copy database to pkgs (tempo)
-    sudo mount -o remount,rw "${repo_dir%/*}"
-    rm "$repo_dir"/ofcl/pkgs/offline*
-    sudo mount -o remount,ro "${repo_dir%/*}"
+    # sudo mount -o remount,rw "${repo_dir%/*}"
+    [[ "$online" -ne 1 ]] && \
+	## offline or hybrid mode
+	rm "$repo_dir"/ofcl/pkgs/offline*
+    # sudo mount -o remount,ro "${repo_dir%/*}"
 
     # human info
     clear

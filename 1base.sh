@@ -250,7 +250,7 @@ relative_file_paths ()
 	file_setup_config_path="$hajime_exec"/temp/active.conf
 	file_setup_config_0init=$(cat $file_setup_config_path)
 	## /hajime/setup/machine is always a part of path in file
-	machine_file_name="${file_setup_config_0nit#*/hajime/setup/machine/}"
+	machine_file_name="${file_setup_config_0init#*/hajime/setup/machine/}"
 	file_setup_config="$hajime_exec"/setup/machine/"$machine_file_name"
 
 	printf '%s\n' "$file_setup_config" > "$file_setup_config_path"
@@ -1346,9 +1346,12 @@ configure_pacman ()
 
     ## copy database to pkgs (tempo)
     #TODO error resolv
-    mount -o remount,rw "${repo_dir%/*}"
-    cp "$repo_dir"/ofcl/db/offline* "$repo_dir"/ofcl/pkgs
-    mount -o remount,ro "${repo_dir%/*}"
+    [[ "$online" -ne 1 ]] && \
+	## offline or hybrid mode
+	# tempo mount rw
+	# mount -o remount,rw "${repo_dir%/*}"
+	cp "$repo_dir"/ofcl/db/offline* "$repo_dir"/ofcl/pkgs
+        # mount -o remount,ro "${repo_dir%/*}"
 
     ## init package keys
     pacman-key --config "$pm_alt_conf" --init
@@ -1426,9 +1429,11 @@ bash_profile ()
 finishing ()
 {
     ## undo copy database to pkgs (tempo)
-    mount -o remount,rw "${repo_dir%/*}"
-    rm "$repo_dir"/ofcl/pkgs/offline*
-    mount -o remount,ro "${repo_dir%/*}"
+    # mount -o remount,rw "${repo_dir%/*}"
+    [[ "$online" -ne 1 ]] && \
+	## offline or hybrid mode
+	rm "$repo_dir"/ofcl/pkgs/offline*
+    # mount -o remount,ro "${repo_dir%/*}"
 
     arch-chroot /mnt touch hajime/1base.done
 }

@@ -719,9 +719,9 @@ configure_pacman ()
     sed -i "/^\[offline\]/{n;s#.*#Server = file://${repo_dir}/ofcl/pkgs#;}" "$pm_alt_conf"
 
     ## copy database to pkgs (tempo)
-    mount -o remount,rw "${repo_dir%/*}"
+    # mount -o remount,rw "${repo_dir%/*}"
     cp "$repo_dir"/ofcl/db/offline* "$repo_dir"/ofcl/pkgs
-    mount -o remount,ro "${repo_dir%/*}"
+    # mount -o remount,ro "${repo_dir%/*}"
 
     ## init package keys
     pacman-key --config "$pm_alt_conf" --init
@@ -936,9 +936,11 @@ exit_chroot_jail_mnt ()
     # finishing
 
     ## undo copy database to pkgs (tempo)
-    mount -o remount,rw "${repo_dir%/*}"
-    rm "$repo_dir"/ofcl/pkgs/offline*
-    mount -o remount,ro "${repo_dir%/*}"
+    # mount -o remount,rw "${repo_dir%/*}"
+    [[ "$online" -ne 1 ]] && \
+	## offline or hybrid mode
+	rm "$repo_dir"/ofcl/pkgs/offline*
+    # mount -o remount,ro "${repo_dir%/*}"
 
     touch /home/$username/hajime/2conf.done
 }
