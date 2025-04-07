@@ -757,17 +757,19 @@ install_conf_pkgs ()
 	pacman -S \
 	       --needed \
 	       --noconfirm \
-	       --cachedir "$repo_dir"/ofcl/pkgs/ \
-	       --dbpath "$repo_dir"/ofcl/db/ \
+	       --cachedir "$repo_dir"/ofcl/pkgs \
+	       --dbpath "$repo_dir"/ofcl/db \
 	       "${conf_pkgs[@]}"
 
-    elif [[ "$online" -gt 0 ]]
+    elif [[ "$online" -gt 0 ]]; then
 	## online or hybrid mode
 
 	pacman -S \
 	       --needed \
 	       --noconfirm \
 	       "${conf_pkgs[@]}"
+	#TODO this works, but: test with adding
+	# --config "$pm_alt_conf"
 
     fi
 }

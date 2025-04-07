@@ -450,23 +450,24 @@ configure_pacman ()
 
     fi
 
-    if [[ "$online" -gt 0 ]]; then
-	## online or hybrid mode
+    # if [[ "$online" -gt 0 ]]; then
+    # 	## online or hybrid mode
 
-	## update package database
-	pacman -Syyu --needed --noconfirm --config "$pm_alt_conf"
+    # 	## update package database
+    # 	pacman -Syyu --needed --noconfirm --config "$pm_alt_conf"
 
-    fi
+    # fi
 }
 
 
 pacman_init ()
 {
-    sudo pacman-key --config "$pm_alt_conf" --init
-    sudo pacman-key --config "$pm_alt_conf" --populate archlinux
+    ## already done in 2conf
+    # sudo pacman-key --config "$pm_alt_conf" --init
+    # sudo pacman-key --config "$pm_alt_conf" --populate archlinux
 
     # sudo pacman -Syyu --config "$pm_alt_conf"
-    sudo pacman -Syyu --needed --noconfirm --dbpath "$repo_dir"/ofcl/db --cachedir "repo_dir"/ofcl/pkgs
+    #sudo pacman -Syyu --needed --noconfirm --dbpath "$repo_dir"/ofcl/db --cachedir "repo_dir"/ofcl/pkgs
 }
 
 
@@ -474,7 +475,29 @@ install_post_pkgs ()
 {
     ## add post core addditions
     # sudo pacman -S --config "$pm_alt_conf" --needed --noconfirm "${post_pkgs[@]}"
-    sudo pacman -S --needed --noconfirm --dbpath "$repo_dir"/ofcl/db --cachedir "repo_dir"/ofcl/pkgs "${post_pkgs[@]}"
+    # sudo pacman -Syyu --needed --noconfirm --dbpath "$repo_dir"/ofcl/db --cachedir "repo_dir"/ofcl/pkgs "${post_pkgs[@]}"
+
+    if [[ "$online" -eq 0 ]]; then
+	## offline mode
+
+	sudo pacman -Syyu \
+	       --needed \
+	       --noconfirm \
+	       --cachedir "$repo_dir"/ofcl/pkgs \
+	       --dbpath "$repo_dir"/ofcl/db \
+	       "${post_pkgs[@]}"
+
+    elif [[ "$online" -gt 0 ]]; then
+	## online or hybrid mode
+
+	sudo pacman -Syyu \
+	       --needed \
+	       --noconfirm \
+	       "${post_pkgs[@]}"
+	#TODO (this works,) but: test with adding
+	# --config "$pm_alt_conf"
+
+    fi
 }
 
 
@@ -541,7 +564,7 @@ main ()
     get_offline_code
     set_read_write
     configure_pacman
-    pacman_init
+    # pacman_init
     install_post_pkgs
     set_read_only
     wrap_up

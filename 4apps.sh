@@ -99,7 +99,7 @@ getargs ()
 		;;
 
 	    --offline )
-		## explicit arguments overrule defaults or configuration file setting
+		## specific arguments overrule defaults or configuration file setting
 
 		## offline installation
 		[[ "$1" =~ offline$ ]] && offline_arg=1 && online=0
@@ -107,7 +107,7 @@ getargs ()
 		;;
 
 	    --online )
-		## explicit arguments overrule defaults or configuration file setting
+		## specific arguments overrule defaults or configuration file setting
 
 		## online installation
 		[[ "$1" =~ online$ ]] && online_arg=1 && online="$online_arg"
@@ -115,7 +115,7 @@ getargs ()
 		;;
 
 	    --hybrid )
-		## explicit arguments overrule defaults or configuration file setting
+		## specific arguments overrule defaults or configuration file setting
 
 		## hybrid installation
 		[[ "$1" =~ hybrid$ ]] && online_arg=2 && online="$online_arg"
@@ -164,8 +164,8 @@ sourcing ()
 
     relative_file_paths
 
-    ## config file is sourced; reevaluate explicit arguments
-    explicit_arguments
+    ## config file is sourced; reevaluate specific arguments
+    specific_arguments
 }
 
 
@@ -194,9 +194,9 @@ relative_file_paths ()
 }
 
 
-explicit_arguments ()
+specific_arguments ()
 {
-    ## explicit arguments override default and configuration settings
+    ## specific arguments override default and configuration settings
     ## regarding network installation mode
 
     if [[ "$offline_arg" -eq 1 ]]; then
@@ -401,13 +401,13 @@ configure_pacman ()
 
     fi
 
-    if [[ "$online" -gt 0 ]]; then
-	## online or hybrid mode
+    #if [[ "$online" -gt 0 ]]; then
+    #	## online or hybrid mode
 
-	## update package database
-	pacman -Syyu --needed --noconfirm --config "$pm_alt_conf"
+    #	## update package database
+    #	pacman -Syyu --needed --noconfirm --config "$pm_alt_conf"
 
-    fi
+    #fi
 }
 
 
@@ -424,9 +424,6 @@ install_yay ()
 	## create location for foreign package repository
 	[[ -d "$yay_cache" ]] || mkdir -p "$yay_cache"
 
-	## goto foreign package repository
-	cd "$yay_cache"
-
 	if [[ "$online" -eq 0 ]]; then
 	    ## offline mode
 
@@ -438,22 +435,16 @@ install_yay ()
 	elif [[ "$online" -ne 0 ]]; then
 	    ## online or hybrid mode
 
-	    ## clone online yay-bin upstream source
-	    git clone https://aur.archlinux.org/yay-bin.git
+	    ## clone online yay-bin upstream source to yay_cache
+	    git clone https://aur.archlinux.org/yay-bin.git "$yay_cache"
 
 	fi
-
-	## goto yay_cache yay-bin
-	# cd yay-bin
 
 	## ## in PKGBUILD redirect source_x86_64 to the added x86_64.tar.gz file:
 	## ## source_x86_64=("$HOME/.cache/yay/yay-bin/${pkgname/-bin/}_${pkgver}_x86_64.tar.gz")
 
 	## makepkg, sync dependencies and install package
 	makepkg --dir "$yay_cache"/yay-bin --syncdeps --install --needed --noconfirm
-
-	## return home
-	cd
 
     else
 
