@@ -391,9 +391,15 @@ configure_pacman ()
     sed -i "/^\[offline\]/{n;s#.*#Server = file://${repo_dir}/ofcl/pkgs#;}" "$pm_alt_conf"
 
     ## copy database to pkgs (tempo)
-    # sudo mount -o remount,rw "${repo_dir%/*}"
-    cp "$repo_dir"/ofcl/db/offline* "$repo_dir"/ofcl/pkgs
-    # sudo mount -o remount,ro "${repo_dir%/*}"
+    if [[ "$online" -ne 1 ]]; then
+	## offline or hybrid mode
+
+	# tempo mount rw
+	# sudo mount -o remount,rw "${repo_dir%/*}"
+	cp "$repo_dir"/ofcl/db/offline* "$repo_dir"/ofcl/pkgs
+        # sudo mount -o remount,ro "${repo_dir%/*}"
+
+    fi
 
     if [[ "$online" -gt 0 ]]; then
 	## online or hybrid mode

@@ -131,7 +131,7 @@ getargs ()
 		;;
 
 	    --offline )
-		## explicit arguments overrule defaults or configuration file setting
+		## specific arguments overrule defaults or configuration file setting
 
 		## offline installation
 		[[ "$1" =~ offline$ ]] && offline_arg=1 && online=0
@@ -139,7 +139,7 @@ getargs ()
 		;;
 
 	    --online )
-		## explicit arguments overrule defaults or configuration file setting
+		## specific arguments overrule defaults or configuration file setting
 
 		## online installation
 		[[ "$1" =~ online$ ]] && online_arg=1 && online="$online_arg"
@@ -147,7 +147,7 @@ getargs ()
 		;;
 
 	    --hybrid )
-		## explicit arguments overrule defaults or configuration file setting
+		## specific arguments overrule defaults or configuration file setting
 
 		## hybrid installation
 		[[ "$1" =~ hybrid$ ]] && online_arg=2 && online="$online_arg"
@@ -195,8 +195,8 @@ sourcing ()
 
     relative_file_paths
 
-    ## config file is sourced; reevaluate explicit arguments
-    explicit_arguments
+    ## config file is sourced; reevaluate specific arguments
+    specific_arguments
 }
 
 
@@ -223,9 +223,9 @@ relative_file_paths ()
 }
 
 
-explicit_arguments ()
+specific_arguments ()
 {
-    ## explicit arguments override default and configuration settings
+    ## specific arguments override default and configuration settings
     ## regarding network installation mode
 
     if [[ "$offline_arg" -eq 1 ]]; then
@@ -719,9 +719,15 @@ configure_pacman ()
     sed -i "/^\[offline\]/{n;s#.*#Server = file://${repo_dir}/ofcl/pkgs#;}" "$pm_alt_conf"
 
     ## copy database to pkgs (tempo)
-    # mount -o remount,rw "${repo_dir%/*}"
-    cp "$repo_dir"/ofcl/db/offline* "$repo_dir"/ofcl/pkgs
-    # mount -o remount,ro "${repo_dir%/*}"
+    if [[ "$online" -ne 1 ]]; then
+	## offline or hybrid mode
+
+	# tempo mount rw
+	# mount -o remount,rw "${repo_dir%/*}"
+	cp "$repo_dir"/ofcl/db/offline* "$repo_dir"/ofcl/pkgs
+        # mount -o remount,ro "${repo_dir%/*}"
+
+    fi
 
     ## init package keys
     pacman-key --config "$pm_alt_conf" --init
@@ -729,36 +735,13 @@ configure_pacman ()
     ## populate keys from archlinux.gpg
     pacman-key --config "$pm_alt_conf" --populate
 
-    if [[ "$online" -gt 0 ]]; then
-	## online or hybrid mode
+    # if [[ "$online" -gt 0 ]]; then
+    # 	## online or hybrid mode
 
-	## update package database
-	pacman -Syyu --needed --noconfirm --config "$pm_alt_conf"
+    # 	## update package database
+    # 	pacman -Syyu --needed --noconfirm --config "$pm_alt_conf"
 
-    fi
-}
-
-
-configure_mirrorlists ()
-{
-    if [[ $online -ne 0 ]]; then
-	## online or hybrid mode
-
-	## backup old mirrorlist
-	file_etc_pacmand_mirrorlist="/etc/pacman.d/mirrorlist"
-	cp --preserve --verbose "$file_etc_pacmand_mirrorlist" /etc/pacman.d/"$(date '+%Y%m%d_%H%M%S')"_mirrorlist_bu
-
-	## select fastest mirrors
-	# reflector \
-	#     --verbose \
-	#     --country "$mirror_country" \
-	#     -l "$mirror_amount" \
-	#     --sort rate \
-	#     --save "$file_etc_pacmand_mirrorlist"
-
-	cp "$hajime_exec"/setup/mirrorlist "$file_etc_pacmand_mirrorlist"
-
-    fi
+    # fi
 }
 
 
@@ -768,7 +751,12 @@ install_conf_pkgs ()
     # [Installation guide - ArchWiki]
     # (https://wiki.archlinux.org/title/Installation_guide#Install_essential_packages)
     # pacman -S --needed --noconfirm --config "$pm_alt_conf" "${conf_pkgs[@]}"
-    pacman -S --needed --noconfirm --dbpath "$repo_dir"/ofcl/db --cachedir "repo_dir"/ofcl/pkgs "${conf_pkgs[@]}"
+    pacman -S \
+	   --needed \
+	   --noconfirm \
+	   --cachedir "$repo_dir"/ofcl/pkgs \
+	   --dbpath "$repo_dir"/ofcl/db \
+	   "${conf_pkgs[@]}"
 }
 
 
@@ -962,7 +950,6 @@ main ()
     pass_root
     add_user
     configure_pacman
-    configure_mirrorlists
     micro_code
     install_conf_pkgs
     install_bootloader

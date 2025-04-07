@@ -1298,17 +1298,20 @@ configure_mirrorlists ()
 	cp --preserve --verbose "$file_etc_pacmand_mirrorlist" /etc/pacman.d/"$(date '+%Y%m%d_%H%M%S')"_mirrorlist_org_bu
 
 	## select fastest mirrors
-	# reflector \
-	#     --connection-timeout "$refl_conn_to" \
-	#     --download-timeout "$refl_down_to" \
-	#     --save "$file_etc_pacmand_mirrorlist"
-	#     --sort rate \
-	#     --verbose \
-	#     --country "$refl_mirror_country" \
-	#     --latest "$refl_mirror_amount" \
-	#     --protocol https,rsync,http,ftp
+	reflector \
+	    --connection-timeout "$refl_conn_to" \
+	    --download-timeout "$refl_down_to" \
+	    --save "$file_etc_pacmand_mirrorlist" \
+	    --sort rate \
+	    --verbose \
+	    --country "$refl_mirror_country" \
+	    --latest "$refl_mirror_amount" \
+	    --protocol https
+	    # --protocol https,rsync,http,ftp
 	    #--fastest+/latest/score/number
-	cp "$hajime_exec"/setup/pacman/mirrorlist "$file_etc_pacmand_mirrorlist"
+
+	## alternative to reflector
+	# cp "$hajime_exec"/setup/pacman/mirrorlist "$file_etc_pacmand_mirrorlist"
 
     fi
 }
@@ -1341,17 +1344,19 @@ configure_pacman ()
     ## sed replace the line after match ^[offline]
     ## sed {n;...} on match read next line
     ## sed s#search#replace# replace whole line (.*) with Server...
-    sed -i "/^\[offline\]/{n;s#.*#Server = file://${repo_dir}/ofcl/pkgs#;}" $pm_alt_conf
+	sed -i "/^\[offline\]/{n;s#.*#Server = file://${repo_dir}/ofcl/pkgs#;}" $pm_alt_conf
     echo
 
     ## copy database to pkgs (tempo)
-    #TODO error resolv
-    [[ "$online" -ne 1 ]] && \
+    if [[ "$online" -ne 1 ]]; then
 	## offline or hybrid mode
+
 	# tempo mount rw
 	# mount -o remount,rw "${repo_dir%/*}"
 	cp "$repo_dir"/ofcl/db/offline* "$repo_dir"/ofcl/pkgs
         # mount -o remount,ro "${repo_dir%/*}"
+
+    fi
 
     ## init package keys
     pacman-key --config "$pm_alt_conf" --init
