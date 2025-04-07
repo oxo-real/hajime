@@ -751,12 +751,25 @@ install_conf_pkgs ()
     # [Installation guide - ArchWiki]
     # (https://wiki.archlinux.org/title/Installation_guide#Install_essential_packages)
     # pacman -S --needed --noconfirm --config "$pm_alt_conf" "${conf_pkgs[@]}"
-    pacman -S \
-	   --needed \
-	   --noconfirm \
-	   --cachedir "$repo_dir"/ofcl/pkgs \
-	   --dbpath "$repo_dir"/ofcl/db \
-	   "${conf_pkgs[@]}"
+    if [[ "$online" -eq 0 ]]; then
+	## offline mode
+
+	pacman -S \
+	       --needed \
+	       --noconfirm \
+	       --cachedir "$repo_dir"/ofcl/pkgs/ \
+	       --dbpath "$repo_dir"/ofcl/db/ \
+	       "${conf_pkgs[@]}"
+
+    elif [[ "$online" -gt 0 ]]
+	## online or hybrid mode
+
+	pacman -S \
+	       --needed \
+	       --noconfirm \
+	       "${conf_pkgs[@]}"
+
+    fi
 }
 
 
