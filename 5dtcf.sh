@@ -642,11 +642,11 @@ cursor_shapes ()
     sudo cp "$copilot" "$usiac"
 
     ## backup original cursor shapes
-    [[ -f "$usiac"/text ]] && cp "$usiac"/text "$usiac"/text_ORG
-    [[ -f "$usiac"/xterm ]] && cp "$usiac"/xterm "$usiac"/xterm_ORG
-    [[ -f "$usiac"/default ]] && cp "$usiac"/default "$usiac"/default_ORG
-    [[ -f "$usiac"/left_ptr ]] && cp "$usiac"/left_ptr "$usiac"/left_ptr_ORG
-    [[ -f "$usiac"/hand2 ]] && cp "$usiac"/hand2 "$usiac"/hand2_ORG
+    [[ -f "$usiac"/text ]] && sudo cp "$usiac"/text "$usiac"/text_ORG
+    [[ -f "$usiac"/xterm ]] && sudo cp "$usiac"/xterm "$usiac"/xterm_ORG
+    [[ -f "$usiac"/default ]] && sudo cp "$usiac"/default "$usiac"/default_ORG
+    [[ -f "$usiac"/left_ptr ]] && sudo cp "$usiac"/left_ptr "$usiac"/left_ptr_ORG
+    [[ -f "$usiac"/hand2 ]] && sudo cp "$usiac"/hand2 "$usiac"/hand2_ORG
 
     ## symlink cursor shapes to (co)pilot
     ## CAUTION overwrites existing files
