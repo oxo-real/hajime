@@ -386,12 +386,14 @@ git_clone_code ()
     git_repo='hajime'
     local_repo="code/$git_repo"
     git_clone_remote_local
-    #### git/hajime becomes the git repo;
-    #### remove git repo from install directory
-    rm -rf $HOME/hajime
 
     ### isolatest
     git_repo='isolatest'
+    local_repo="code/$git_repo"
+    git_clone_remote_local
+
+    ### network
+    git_repo='network'
     local_repo="code/$git_repo"
     git_clone_remote_local
 
@@ -404,25 +406,12 @@ git_clone_code ()
     git_repo='tool'
     local_repo="code/$git_repo"
     git_clone_remote_local
-
-    ### netconn
-    git_repo='netconn'
-    local_repo="code/$git_repo"
-    git_clone_remote_local
 }
 
 
 git_clone_note ()
 {
     git_repo='note'
-    local_repo="$git_repo"
-    git_clone_remote_local
-}
-
-
-git_clone_prvt ()
-{
-    git_repo='prvt'
     local_repo="$git_repo"
     git_clone_remote_local
 }
@@ -484,6 +473,7 @@ get_git_repo ()
 
 dotfbu_restore ()
 {
+    #TODO untested
     if [[ $online -eq 0 ]]; then
 	## offline mode
 
@@ -511,25 +501,41 @@ rewrite_symlinks ()
     ## change $USER for all broken symlinks in $HOME (recursive) to $HOME/*
     echo
     printf 'updating symlinks in $HOME\n'
-    sh $XDG_DATA_HOME/c/git/code/tool/chln $HOME
+    sh $XDG_DATA_HOME/c/git/code/tool/chln $XDG_CONFIG_HOME
+    sh $XDG_DATA_HOME/c/git/code/tool/chln $HOME/c
 }
 
 
-set_permissions ()
+recalculate_sums ()
+{
+    #TODO untested
+    while read sum; do
+
+	calc-sums $(dirname "$sum")
+
+    done <<< find "$XDG_DATA_HOME"/c/git/code -type f -name 'sha3-512sums'
+}
+
+
+set_doas ()
 {
     # configure doas
     # sudo printf 'permit persist :wheel\n' > $etc_doas_conf
     # sudo chown -c root:root $etc_doas_conf
     # sudo chmod -c 0400 $etc_doas_conf
-    sudo cp $file_setup_doas_conf $etc_doas_conf
+    sudo cp "$file_setup_doas_conf" "$etc_doas_conf"
 
     ## test for errors
-    if ! sudo doas -C $etc_doas_conf; then
+    if ! sudo doas -C "$etc_doas_conf"; then
 
 	printf 'ERROR doas config\n'
 
     fi
+}
 
+
+set_permissions ()
+{
     # set right permissions for gnupg home
     sh $XDG_DATA_HOME/c/git/note/crypto/gpg/gnupg_set_permissions
 }
@@ -621,6 +627,39 @@ pacman_conf ()
 }
 
 
+cursor_shapes ()
+{
+    ## from: note/linux/arch/icons/cursor
+    ## reset oxo cursor setup
+    pilot="$XDG_CONFIG_HOME"/icons/cursors/oxo/pilot
+    copilot="$XDG_CONFIG_HOME"/icons/cursors/oxo/copilot
+    usiac=/usr/share/icons/Adwaita/cursors
+
+    sudo mount -o remount,rw /usr
+
+    ## copy cursor shapes to usiac
+    sudo cp "$pilot" "$usiac"
+    sudo cp "$copilot" "$usiac"
+
+    ## backup original cursor shapes
+    [[ -f "$usiac"/text ]] && cp "$usiac"/text "$usiac"/text_ORG
+    [[ -f "$usiac"/xterm ]] && cp "$usiac"/xterm "$usiac"/xterm_ORG
+    [[ -f "$usiac"/default ]] && cp "$usiac"/default "$usiac"/default_ORG
+    [[ -f "$usiac"/left_ptr ]] && cp "$usiac"/left_ptr "$usiac"/left_ptr_ORG
+    [[ -f "$usiac"/hand2 ]] && cp "$usiac"/hand2 "$usiac"/hand2_ORG
+
+    ## symlink cursor shapes to (co)pilot
+    ## CAUTION overwrites existing files
+    sudo ln -s -f "$usiac"/pilot "$usiac"/text
+    sudo ln -s -f "$usiac"/pilot "$usiac"/xterm
+    sudo ln -s -f "$usiac"/copilot "$usiac"/default
+    sudo ln -s -f "$usiac"/copilot "$usiac"/left_ptr
+    sudo ln -s -f "$usiac"/copilot "$usiac"/hand2
+
+    sudo mount -o remount,ro /usr
+}
+
+
 finishing_up ()
 {
     # finishing
@@ -652,8 +691,10 @@ main ()
     get_offline_repo
     get_offline_code
     get_git_repo
-    #dotfbu_restore
+    dotfbu_restore
     rewrite_symlinks
+    recalculate_sums
+    set_doas
     set_permissions
     z_shell_config
     set_sway_hardware
@@ -661,6 +702,7 @@ main ()
     qutebrowser
     #wallpaper
     pacman_conf
+    cursor_shapes
     finishing_up
 }
 

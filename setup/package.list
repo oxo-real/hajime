@@ -168,6 +168,9 @@ apps_packages ()
 	## manpages
 	man-db man-pages tldr
 
+	## network
+	networkmanager
+
 	## password_security
 	pass pass-otp yubikey-manager
 	#pass-tomb bitwarden-cli pass-wl-clipboard
@@ -196,6 +199,9 @@ apps_packages ()
 
 	## input_devices
 	#zsa-wally-cli wvkbd
+
+	## cursor shapes
+	#xorg-xcursorgen
 
 	## audio
 	# alsa-utils pipewire pipewire-alsa pipewire-jack pipewire-pulse sof-firmware
