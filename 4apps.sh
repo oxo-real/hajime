@@ -36,7 +36,7 @@ https://www.gnu.org/licenses/gpl-3.0.txt
 
 
 # description
-  fourth part of a series
+  fourth module of a series
   arch linux installation: apps
 
 # dependencies
