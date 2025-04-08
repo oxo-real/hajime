@@ -436,7 +436,7 @@ install_yay ()
 	    ## online or hybrid mode
 
 	    ## clone online yay-bin upstream source to yay_cache
-	    git clone https://aur.archlinux.org/yay-bin.git "$yay_cache"
+	    git clone https://aur.archlinux.org/yay-bin.git "$yay_cache"/yay-bin
 
 	fi
 
