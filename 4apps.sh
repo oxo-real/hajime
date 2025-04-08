@@ -457,16 +457,11 @@ install_yay ()
 install_apps_pkgs ()
 {
     ## for to prevent pacman exit on error
-    ## apps_pkgs sourced via setup/package.list
-    #TODO
-    #yay -S --config "$pm_alt_conf" --needed --noconfirm "${apps_pkgs[@]}"
     for pkg in "${apps_pkgs[@]}"; do
 
 	if ! yay -S --config "$pm_alt_conf" --needed --noconfirm "$pkg"; then
 
 	    printf 'ERROR yay -S --config %s --needed --noconfirm %s\n' "$pm_alt_conf" "$pkg" | tee -a $file_error_log
-
-	    install_aur_pkg
 
 	fi
 
