@@ -166,7 +166,7 @@ getargs ()
 		;;
 
 	    --offline )
-		## explicit arguments overrule defaults or configuration file setting
+		## specific arguments overrule defaults or configuration file setting
 
 		## offline installation
 		[[ "$1" =~ offline$ ]] && offline_arg=1 && online=0
@@ -174,7 +174,7 @@ getargs ()
 		;;
 
 	    --online )
-		## explicit arguments overrule defaults or configuration file setting
+		## specific arguments overrule defaults or configuration file setting
 
 		## online installation
 		[[ "$1" =~ online$ ]] && online_arg=1 && online="$online_arg"
@@ -182,7 +182,7 @@ getargs ()
 		;;
 
 	    --hybrid )
-		## explicit arguments overrule defaults or configuration file setting
+		## specific arguments overrule defaults or configuration file setting
 
 		## hybrid installation
 		[[ "$1" =~ hybrid$ ]] && online_arg=2 && online="$online_arg"
@@ -229,8 +229,8 @@ sourcing ()
 
     relative_file_paths
 
-    ## config file is sourced; reevaluate explicit arguments
-    explicit_arguments
+    ## config file is sourced; reevaluate specific arguments
+    specific_arguments
 }
 
 
@@ -259,9 +259,9 @@ relative_file_paths ()
 }
 
 
-explicit_arguments ()
+specific_arguments ()
 {
-    ## explicit arguments override default and configuration settings
+    ## specific arguments override default and configuration settings
     ## regarding network installation mode
 
     if [[ "$offline_arg" -eq 1 ]]; then
@@ -369,7 +369,7 @@ define_text_appearance()
 
 reply_plain ()
 {
-    # entry must be confirmed explicitly (by pushing enter)
+    # entry must be confirmed specificly (by pushing enter)
     read reply
 }
 
