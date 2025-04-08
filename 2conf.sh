@@ -189,7 +189,7 @@ sourcing ()
 
     ## package list
     ### define
-    file_setup_package_list="$hajime_exec"/setup/package.list
+    file_setup_package_list="$hajime_exec"/setup/package-list.sh
     ### source
     [[ -f "$file_setup_package_list" ]] && source "$file_setup_package_list"
 
@@ -206,6 +206,7 @@ relative_file_paths ()
     file_pacman_offline_conf="$hajime_exec"/setup/pacman/pm_offline.conf
     file_pacman_online_conf="$hajime_exec"/setup/pacman/pm_online.conf
     file_pacman_hybrid_conf="$hajime_exec"/setup/pacman/pm_hybrid.conf
+    file_setup_luks_pass="$hajime_exec"/temp/luks.pass
 
     if [[ -z "$cfv" ]]; then
 	## no config file value given
@@ -296,13 +297,13 @@ process_config_flag_value ()
 
 installation_mode ()
 {
-    if [[ -n "$exec_mode" ]]; then
-	## configuration file is being sourced
+    # if [[ -n "$exec_mode" ]]; then
+    # 	## configuration file is being sourced
 
-	file_setup_luks_pass="$hajime_exec"/temp/luks.pass
-	file_setup_package_list="$hajime_exec"/setup/package.list
+    # 	file_setup_luks_pass="$hajime_exec"/temp/luks.pass
+    # 	file_setup_package_list="$hajime_exec"/setup/package.list
 
-    fi
+    # fi
 
     if [[ "$online" -ne 0 ]]; then
 	## online or hybrid mode

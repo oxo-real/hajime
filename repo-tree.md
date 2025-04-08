@@ -31,7 +31,7 @@
 │   │   ├── dl3189.conf
 │   │   └── mbp2011a1286.conf
 │   ├── network
-│   ├── package.list
+│   ├── package-list.sh
 │   └── pacman
 │       ├── 3conf_299_pkgs
 │       ├── mirrorlist

@@ -158,7 +158,7 @@ sourcing ()
 
     ## package list
     ### define
-    file_setup_package_list="$hajime_exec"/setup/package.list
+    file_setup_package_list="$hajime_exec"/setup/package-list.sh
     ### source
     [[ -f "$file_setup_package_list" ]] && source "$file_setup_package_list"
 
