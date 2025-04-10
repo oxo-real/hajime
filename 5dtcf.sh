@@ -484,6 +484,17 @@ dotfbu_restore ()
 }
 
 
+user_agent ()
+{
+    ## create an initial user-agent to prevent error from zshenv
+    ## [The Latest and Most Common User Agents List (Updated Weekly)](https://www.useragents.me/)
+    ## 20250410
+    ua='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.10 Safari/605.1.1'
+    lnac="$XDG_LOGS_HOME"/network/user_agent/current
+    printf '%s\n' "$ua" >> "$lnac"
+}
+
+
 rewrite_symlinks ()
 {
     # rewrite symlinks in shln to current users home
@@ -503,6 +514,19 @@ rewrite_symlinks ()
     printf 'updating symlinks in $HOME\n'
     sh $XDG_DATA_HOME/c/git/code/tool/chln $XDG_CONFIG_HOME
     sh $XDG_DATA_HOME/c/git/code/tool/chln $HOME/c
+
+    ## wireguard interface symlinks
+    cnvwpi="$XDG_CONFIG_HOME"/network/vpn/wg/proton/interface
+    etc_wg=/etc/wireguard
+    sudo ln -s "$cnvwpi"/wg*.conf "$etc_wg"
+
+    ## z-shell config root like user
+    rc=/root/.config
+    sudo mkdir -p "$rc"
+    sudo ln -s $XDG_CONFIG_HOME/.config/zsh "$rc"/zsh
+
+    ## zsh default shell for root
+    sudo chsh -s /usr/bin/zsh root
 }
 
 
@@ -699,6 +723,7 @@ main ()
     z_shell_config
     set_sway_hardware
     base16
+    user_agent
     qutebrowser
     #wallpaper
     pacman_conf

@@ -138,8 +138,8 @@ apps_packages ()
 
 
 	## wayland
-	dotool tofi wl-clipboard wev
-	#qt6-wayland wlroots xorg-xwayland
+	dotool tofi wl-clipboard wev qt6-wayland
+	# wlroots xorg-xwayland
 	## qt5-wayland to prevent:
 	## WARNING: Could not find the Qt platform plugin 'wayland' in
 	## i.e. when starting qutebrowser
@@ -204,7 +204,8 @@ apps_packages ()
 	#xorg-xcursorgen
 
 	## audio
-	# alsa-utils pipewire pipewire-alsa pipewire-jack pipewire-pulse sof-firmware
+	pipewire
+	# alsa-utils pipewire-alsa pipewire-jack pipewire-pulse sof-firmware
 	#pulseaudio pulseaudio-alsa pulsemixer qpwgraph-qt5
 
 	## image_viewers
@@ -226,12 +227,12 @@ apps_packages ()
 	emacs figlet qrencode zbar jq tinyxxd
 
 	## terminal_file_manager
-	lf
+	fff lf
 	#yazi (=aur)
 	#vifm lf-git nnn ranger
 
 	## file_tools
-	simple-mtpfs fd dust
+	dust fd ripgrep simple-mtpfs
 	#gdisk tmsu trash-cli
 
 	## debugging
@@ -289,7 +290,7 @@ apps_packages ()
 	lshw usbutils
 
 	## system_monitoring
-	glances
+	#glances
 	#viddy btop ccze htop
 
 	## virtualization
