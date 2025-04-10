@@ -203,9 +203,14 @@ apps_packages ()
 	## cursor shapes
 	#xorg-xcursorgen
 
-	## audio
-	pipewire
-	# alsa-utils pipewire-alsa pipewire-jack pipewire-pulse sof-firmware
+	## multimedia
+	## pipewire audio server
+	pipewire pipewire-alsa
+	## session manager
+	wireplumber
+	## pulseaudio compatibility
+	pipewire-pulse
+	# alsa-utils sof-firmware pipewire-jack
 	#pulseaudio pulseaudio-alsa pulsemixer qpwgraph-qt5
 
 	## image_viewers
