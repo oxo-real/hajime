@@ -473,14 +473,8 @@ get_git_repo ()
 
 dotfbu_restore ()
 {
-    #TODO untested
-    if [[ $online -eq 0 ]]; then
-	## offline mode
-
-	# restore .config from local git dotf
-	sh $XDG_DATA_HOME/c/git/code/tool/dotfbu restore $XDG_DATA_HOME/c/git/dotf/ $XDG_CONFIG_HOME
-
-    fi
+    # restore .config from local git dotf
+    sh $XDG_DATA_HOME/c/git/code/tool/dotfbu restore $XDG_DATA_HOME/c/git/dotf $XDG_CONFIG_HOME
 }
 
 
