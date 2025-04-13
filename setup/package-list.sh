@@ -94,7 +94,7 @@ conf_packages ()
 	lvm2
 
 	## text editors
-	emacs neovim
+	emacs-wayland neovim
 
 	## install helper
 	git rsync
@@ -108,9 +108,6 @@ conf_packages ()
 
 	## secure_connections
 	openssh
-
-	## system_security
-	#nss-certs; comes with nss in core
     )
 }
 
