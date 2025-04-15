@@ -6,6 +6,7 @@
 ├── 3post.sh
 ├── 4apps.sh
 ├── 5dtcf.sh
+├── build-repo
 ├── COPYING
 ├── emer
 │   ├── pacman-static
@@ -29,7 +30,8 @@
 │   │   └── etc_doas.conf
 │   ├── machine
 │   │   ├── dl3189.conf
-│   │   └── mbp2011a1286.conf
+│   │   ├── mbp2011a1286.conf
+│   │   └── tpx220.conf
 │   ├── network
 │   ├── package-list.sh
 │   └── pacman
@@ -41,5 +43,5 @@
 ├── sums
 └── temp
 
-11 directories, 30 files
+11 directories, 32 files
 ```

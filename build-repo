@@ -1,0 +1,467 @@
+#! /usr/bin/env sh
+
+
+# usage: build-repo -p src/pkg.list -r ofcl_dst [[--no-aur]|[--no-ofcl]] [-n alt_db_name] [-d alt_db_dst]
+
+# NOTICES
+# generate full system native package list with:
+# pacman -Qq > pacmanqq; or
+# find /var/cache/pacman/pkg -type f -name "*.xz" -o -name "*.zst" | sed 's#.*/##' | awk -F '-[0-9]+' '{print $1}' | sort | uniq
+# mount REPO (repo_dst) with write permissions
+
+# example: build-repo --package-list pacmanqq --repo-destination dock/2 --no-aur
+
+#TODO maintain-repo with pacman -Syu --needed --noconfirm --cachedir repopkgs --dbpath repodb
+#TODO specific repo source (cachedb) and add only latest version
+
+args="$@"
+getargs ()
+{
+    while :; do
+
+	case "$1" in
+
+	    --package-list|--pkg-lst|--pl|-p )
+		## package source file location
+		shift
+
+		arg_pkg_lst="$1"
+		shift
+		;;
+
+	    --repo-destination|--repo-dest|--repo-dst|--repo|-r )
+		## offline repository destination location
+		shift
+
+		arg_repo_dst="$1"
+		shift
+		;;
+
+	    --database-destination|--db-dest|--db-dst|--db|-d )
+		## offline repository database destination location
+		shift
+
+		arg_repo_ofcl_db="$1"
+		shift
+		;;
+
+	    --database-name|--db-name|--name|-n )
+		## offline repository database name
+		shift
+
+		arg_repo_ofcl_db_name="$1"
+		shift
+		;;
+
+	    --aur-destination|--aur-dest|--aur-dst|--aur|-a )
+		## offline repository destination location
+		shift
+
+		arg_repo_aur="$1"
+		shift
+		;;
+
+	    --no-ofcl|--aur-only )
+		## only search for aur packages no native
+		shift
+
+		no_ofcl_pkgs=1
+		;;
+
+	    --no-aur|--ofcl-only )
+		## only search for official packages no aur
+		shift
+
+		no_aur_pkgs=1
+		;;
+
+	    --download-missing|--down-miss|--dl )
+		## download files expected to be in pkgs
+		shift
+
+		download_missing=1
+		;;
+
+	    - )
+		shift
+
+		arg_pkg_lst="$1"
+		break
+		;;
+
+            * )
+		break
+		;;
+
+	esac
+
+    done
+}
+
+
+process_args ()
+{
+    ## create working realpath parameters
+    # [[ -n $arg_pkg_lst ]] && pkg_lst="$(realpath $arg_pkg_lst)"
+    # [[ -n $arg_repo_dst ]] && repo_dst="$(realpath $arg_repo_dst)"
+    # [[ -n $arg_db_name ]] && db_name="$(realpath $arg_db_name)"
+    # [[ -n $arg_db_dst ]] && db_dst="$(realpath $arg_db_dst)"
+
+    timestamp="$(date +'%Y%m%dT%H%M%S')"
+
+    ## compulsory user arguments
+    ### sort package list
+    pkg_lst="$(sort <<< $arg_pkg_lst)"
+    ### repo trunk
+    repo_dst="$arg_repo_dst"
+
+    [[ -f "$pkg_lst" ]] || ( printf 'error: package list %s not found\n' "$pkg_lst" && exit 76 )
+    [[ -n "$repo_dst" ]] || ( printf 'error: no destination\n' && exit 77 )
+    [[ -d "$repo_dst" ]] || mkdir -p "$repo_dst"
+
+    ## set default values
+    repo_ofcl="$repo_dst"/ofcl
+    repo_ofcl_pkgs="$repo_ofcl"/pkgs
+    repo_ofcl_db="$repo_ofcl"/db
+    repo_ofcl_db_name=offline
+    repo_aur="$repo_dst"/aur
+
+    ## specific user arguments
+    [[ -n "$arg_repo_ofcl_db" ]] && repo_ofcl_db="$arg_repo_ofcl_db"
+    [[ -n "$arg_repo_ofcl_db_name" ]] && repo_ofcl_db_name="$arg_repo_ofcl_db_name"
+    [[ -n "$arg_repo_aur" ]] && repo_aur="$arg_repo_aur"
+    [[ -n "$arg_repo_aur" ]] && [[ -d "$repo_aur" ]] || mkdir -p "$repo_aur"
+}
+
+
+definitions ()
+{
+    ## arch linux official repositories (native packages)
+    ### paths
+    pkg_src=/var/cache/pacman/pkg
+    ### directories
+    [[ -d "$repo_ofcl_db" ]] || mkdir -p "$repo_ofcl_db"
+    [[ -d "$repo_ofcl_pkgs" ]] || mkdir -p "$repo_ofcl_pkgs"
+
+    ## sync database directory
+    sync_db_src=/var/lib/pacman/sync
+
+    ## arch user repository (foreign packages)
+    src_aur="$HOME/.cache/yay"
+
+    ## define temporary files
+    [[ -d "$HOME"/.cache/temp ]] || mkdir "$HOME"/.cache/temp
+    pkgs_dump_list="$HOME"/.cache/temp/"$(date +'%s')"-pkgs-dump.list
+    ## sorted and unificied dump_list
+    pkgs_2_copy="$HOME"/.cache/temp/"$(date +'%s')"-pkgs-w-deps.list
+}
+
+
+check_mountpoint_rw ()
+{
+    dst_mountpoint=$(df --portability "$repo_dst" | tail -n 1 | awk '{print $1}')
+
+    if mount | grep "$dst_mountpoint" | grep ro; then
+
+	printf 'mountpoint %s will be temporarily set writable\n' "$dst_mountpoint"
+	for (( i=5; i>=0; i-- )); do printf '%s\r' "$i"; sleep 1; done
+	echo
+	sudo mount -o remount,rw "$dst_mountpoint"
+	reset_mp_ro=1
+
+    fi
+}
+
+
+delete_old_stuff ()
+{
+    ## remove existing temporary files
+    rm -rf "$pkgs_dump_list" "$pkgs_2_copy"
+}
+
+
+build_dump_list ()
+{
+    ## create package dump list with names of
+    ## all main native packages and their dependencies
+    # pacman -Qqn | while read -r pkg_name; do
+    while read -r pkg_name; do
+
+	if [[ -z "$no_ofcl_pkgs" ]]; then
+	    ## do search official packages
+
+	    abs_db_path=$(realpath $repo_ofcl_db)
+	    abs_cache_path=$(realpath $repo_ofcl_pkgs)
+	    # if pacman -Qqn --dbpath "$abs_db_path" --cachedir "$abs_cache_path" "$pkg_name"; then
+	    if pacman -Qqn "$pkg_name"; then
+
+		## first line of pactree is queried (main) package
+		## other lines are main package dependencies
+		pactree --linear --unique "$pkg_name" >> "$pkgs_dump_list"
+
+	    fi
+
+	elif [[ -z "$no_aur_pkgs" ]]; then
+	    ## do search aur packages
+
+	    ## pacman needs absolute paths
+	    abs_db_path=$(realpath $repo_ofcl_db)
+	    abs_cache_path=$(realpath $repo_ofcl_pkgs)
+	    # if pacman -Qqm --dbpath "$abs_db_path" --cachedir "$abs_cache_path" "$pkg_name"; then
+	    if pacman -Qqm "$pkg_name"; then
+
+		## add to package dump list the names of
+		## all aur packages and their dependencies
+		pactree --linear --unique "$pkg_name" >> "$pkgs_dump_list"
+
+		## add dependencies to dump list
+		#rg --no-line-number ^depends "$src_aur"/"$pkg_name"/PKGBUILD \
+		    grep ^depends "$src_aur"/"$pkg_name"/PKGBUILD \
+			| awk -F '[()]' '{print $2}' \
+			| sed "s/'//g" \
+			| sed 's/"//g' \
+			| tr ' ' '\n' \
+			     >> "$pkgs_dump_list"
+
+		    ## add make dependencies to dump list
+		    #rg --no-line-number ^makedepends "$src_aur"/"$pkg_name"/PKGBUILD \
+			grep ^makedepends "$src_aur"/"$pkg_name"/PKGBUILD \
+			    | awk -F '[()]' '{print $2}' \
+			    | sed "s/'//g" \
+			    | sed 's/"//g' \
+			    | tr ' ' '\n' \
+				 >> "$pkgs_dump_list"
+
+	    fi
+
+	fi
+
+    done < "$pkg_lst"
+}
+
+
+optimize_pkgs_dump_list ()
+{
+    ## 3 sed operations separated by ;
+    ## remove greater than and equal to (>=) version from dump list
+    ## convert to all lower case
+    ## remove .so suffixes
+    sed -i 's/[>=].*//; s/.*/\L&/; s/\.so//' "$pkgs_dump_list"
+
+    ## create pkgs_2_copy; dump_list with duplicate lines removed
+    sort < "$pkgs_dump_list" | uniq > "$pkgs_2_copy"
+}
+
+
+copy_pkg_files ()
+{
+    while read -r pkg_name; do
+
+	if [[ -z "$no_ofcl_pkgs" ]]; then
+	    ## do search official packages
+
+	    abs_db_path=$(realpath $repo_ofcl_db)
+	    abs_cache_path=$(realpath $repo_ofcl_pkgs)
+	    # if pacman -Qqn --dbpath "$abs_db_path" --cachedir "$abs_cache_path" "$pkg_name"; then
+	    if pacman -Qqn "$pkg_name"; then
+		## native package
+
+		latest_pkg=$(pacman -S --print "$pkg_name")
+		## WARNING requires a correct and complete database, that
+		##         reflects the actual status of its local cache, i.e.
+		## correctness:
+		## no db entries of package(versions) that are not in cache
+		## completeness:
+		## no package(versions) in cache that are not in the database
+
+		if [[ $(wc -l <<< "$latest_pkg") -gt 1 ]]; then
+		    ## latest_pkg has more than one line
+		    ## database has probably double entries,
+		    ## filter for local files:
+
+		    latest_pkg=$(pacman -S --print "$pkg_name" | grep file://)
+
+		    if [[ $(wc -l <<< "$latest_pkg") -gt 1 ]]; then
+			## latest_pkg has more than one line
+
+			pmn_Q=$(pacman -Q "$pkg")
+			pkg_name=${pmn_Q% *}
+			pkg_version=${pmn_Q##* }
+
+			## native package latest zst (and sig) file to repo
+			latest_pkg=$(find "$pkg_src" -type f -name '"${pkg_name}"-"${pkg_version}"*.zst' \
+					 | sort --version-sort \
+					 | tail -n 1 \
+				  )
+
+		    fi
+
+		fi
+
+		## remove file:// prefix if applicable
+		latest_pkg=$(sed 's#^file://##' <<< "$latest_pkg")
+
+		## verify package integrity
+		## to prevent repo-add error:
+		## bsdtar: Error opening archive: Unrecognized archive format
+		## ==> ERROR: 'libsysprof-capture-48.0-1-x86_64.pkg.tar.zst' is not a package file, skipping
+		if ! file "$latest_pkg" | grep 'Zstandard compressed data'; then
+
+		    printf 'ERROR file integrity: %s' "$latest_pkg"
+		    #TODO add to error log
+		    printf ' ...adding to https_list\n'
+
+		    ## https:// list of packages whose zst is not in pkgs
+		    ## these files can later be downloaded via download-missing
+		    append_https_list
+
+		fi
+
+		#TODO
+		   ## ==> Adding package 'pkgs/e2fsprogs-1.47.2-1-x86_64.pkg.tar.zst'
+		   # ==> WARNING: A newer version for 'e2fsprogs' is already present in database
+
+		if [[ -n "$latest_pkg" ]]; then
+
+		    latest_pkg_realpath="$(realpath $latest_pkg)"
+
+		    if [[ -f "$latest_pkg_realpath" ]]; then
+
+			## copy latest zst
+			cp --archive "$latest_pkg_realpath" "$repo_ofcl_pkgs"
+
+			if [[ -f "$latest_pkg_realpath".sig ]]; then
+
+			    ## copy signature file
+			    cp --archive "$latest_pkg_realpath".sig "$repo_ofcl_pkgs"
+
+			fi
+
+		    elif [[ "$latest_pkg" =~ https:// ]]; then
+
+			## https:// list of packages whose zst is not in pkgs
+			## these files can later be downloaded via download-missing
+			append_https_list
+
+		    fi
+
+		else
+
+		    printf 'ERROR no local zst file found for: %s\n' "$(pacman -Q $pkg_name)"
+
+		fi
+
+	    fi
+
+	elif [[ -z "$no_aur_pkgs" ]]; then
+	    ## do search aur packages
+
+	    abs_db_path=$(realpath $repo_ofcl_db)
+	    abs_cache_path=$(realpath $repo_ofcl_pkgs)
+	    # if pacman -Qqm --dbpath "$abs_db_path" --cachedir "$abs_cache_path" "$pkg_name"; then
+	    if pacman -Qqm "$pkg_name"; then
+		## aur package
+
+		copy_yay_source "$pkg_name"
+
+	    fi
+
+	fi
+
+    done < "$pkgs_2_copy"
+}
+
+
+append_https_list ()
+{
+    ## https:// list of packages whose zst is not in pkgs
+    ## these files can later be downloaded via download-missing
+    printf '%s\n' "$latest_pkg" >> "$repo_ofcl"/"$timestamp"_https.list
+    printf '%s\n' "$latest_pkg.sig" >> "$repo_ofcl"/"$timestamp"_https.list
+
+    printf '%s %s added to %s\n' "$pkg_name" "$pkg_version" "$repo_ofcl"/"$timestamp"_https.list
+}
+
+
+download_missing ()
+{
+    ## download missing packages with their signatures
+    if [[ "$download_missing" -eq 1 ]]; then
+
+       while IFS= read -r url; do
+
+	   printf '%s\n' "$url"
+	   curl -O "$url" -C - --output-dir ofcl/pkgs
+
+       done < "$repo_ofcl"/"$timestamp"_https.list
+
+    fi
+}
+
+
+copy_yay_source ()
+{
+    pkg_name="$1"
+    ## copy source files including PKGBUILD
+    ## sudo because .git has often root owner
+    sudo cp --archive --recursive "$src_aur"/"$pkg_name" "$repo_aur"
+    sudo chown -R $USER:$GROUP "$repo_aur"/"$pkg_name"
+}
+
+
+create_repo_database ()
+{
+    ## check for stowaway files in package cache
+    stowaways=$(find "$repo_ofcl_pkgs" -maxdepth 1 -type f \
+		     ! -name '*.sig' \
+		     ! -name '*.pkg.tar.gz' \
+		     ! -name '*.pkg.tar.xz' \
+		     ! -name '*.pkg.tar.zst' \
+	     )
+
+    [[ -n "$stowaways" ]] \
+	&& printf 'ERROR stowaways detected in package cache (%s):\n%s\n' "$repo_ofcl_pkgs" "$stowaways" \
+	&& exit 88
+
+    ## don't use exclusion patterns (like [^.sig]) because repo-add errors out on everything it can't read
+    # "$repo_ofcl_pkgs"/*.pkg.tar.zst \
+	# | repo-add --new --include-sigs "$repo_ofcl_db"/"$repo_ofcl_db_name".db.tar.zst
+	repo-add --new --include-sigs "$repo_ofcl_db"/"$repo_ofcl_db_name".db.tar.zst $(find /var/cache/pacman/pkg"$repo_ofcl_pkgs"/*.pkg.tar.zst)
+}
+
+
+copy_sync_database ()
+{
+    cp --archive --recursive "$sync_db_src" "$repo_dst"
+    printf '%s\n' "$sync_db_src" > "$repo_dst"/sync/sync-db.loc
+}
+
+
+check_mountpoint_ro ()
+{
+    if [[ -n "$reset_mp_ro" ]]; then
+
+	sudo mount -o remount,ro "$dst_mountpoint"
+	printf 'mountpoint %s reset to read-only\n' "$dst_mountpoint"
+
+    fi
+}
+
+
+main ()
+{
+    getargs $args
+    process_args
+    definitions
+    check_mountpoint_rw
+    delete_old_stuff
+    build_dump_list
+    optimize_pkgs_dump_list
+    copy_pkg_files
+    download_missing
+    create_repo_database
+    copy_sync_database
+    check_mountpoint_ro
+}
+
+main
