@@ -77,6 +77,7 @@ source $source_dir/text_appearance
 hajime_dir="$XDG_DATA_HOME/c/git/code/hajime"
 build_repo="$hajime_dir"/build-repo
 timestamp=$(date +'%Y%m%d_%H%M%S_%s')
+[[ -d "$hajime_dir/logs" ]] || mkdir -p "$hajime_dir/logs"
 pacman_qq="$hajime_dir"/logs/"$timestamp"_pacmanqq
 
 options="$@"

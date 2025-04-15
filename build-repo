@@ -305,17 +305,17 @@ copy_pkg_files ()
 		## to prevent repo-add error:
 		## bsdtar: Error opening archive: Unrecognized archive format
 		## ==> ERROR: 'libsysprof-capture-48.0-1-x86_64.pkg.tar.zst' is not a package file, skipping
-		if ! file "$latest_pkg" | grep 'Zstandard compressed data'; then
+		#if ! file "$latest_pkg" | grep 'Zstandard compressed data'; then
 
-		    printf 'ERROR file integrity: %s' "$latest_pkg"
-		    #TODO add to error log
-		    printf ' ...adding to https_list\n'
+		#    printf 'ERROR file integrity: %s' "$latest_pkg"
+		#    #TODO add to error log
+		#    printf ' ...adding to https_list\n'
 
-		    ## https:// list of packages whose zst is not in pkgs
-		    ## these files can later be downloaded via download-missing
-		    append_https_list
+		#    ## https:// list of packages whose zst is not in pkgs
+		#    ## these files can later be downloaded via download-missing
+		#    append_https_list
 
-		fi
+		#fi
 
 		#TODO
 		   ## ==> Adding package 'pkgs/e2fsprogs-1.47.2-1-x86_64.pkg.tar.zst'
@@ -426,7 +426,7 @@ create_repo_database ()
     ## don't use exclusion patterns (like [^.sig]) because repo-add errors out on everything it can't read
     # "$repo_ofcl_pkgs"/*.pkg.tar.zst \
 	# | repo-add --new --include-sigs "$repo_ofcl_db"/"$repo_ofcl_db_name".db.tar.zst
-	repo-add --new --include-sigs "$repo_ofcl_db"/"$repo_ofcl_db_name".db.tar.zst $(find /var/cache/pacman/pkg"$repo_ofcl_pkgs"/*.pkg.tar.zst)
+    repo-add --new --include-sigs "$repo_ofcl_db"/"$repo_ofcl_db_name".db.tar.zst "$repo_ofcl_pkgs"/*.pkg.tar.zst
 }
 
 
