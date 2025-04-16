@@ -736,26 +736,22 @@ configure_pacman ()
     ## populate keys from archlinux.gpg
     pacman-key --config "$pm_alt_conf" --populate
 
-    # if [[ "$online" -gt 0 ]]; then
-    # 	## online or hybrid mode
-
-    # 	## update package database
-    # 	pacman -Syyu --needed --noconfirm --config "$pm_alt_conf"
-
-    # fi
+    ## update package database in chroot jail (/mnt)
+    pacman -Syyu --needed --noconfirm --config "$pm_alt_conf"
 }
 
 
 install_conf_pkgs ()
 {
-    # update repositories and install core applications
+    # update repositories in chroot jail (/mnt) and install conf packages
     # [Installation guide - ArchWiki]
     # (https://wiki.archlinux.org/title/Installation_guide#Install_essential_packages)
     # pacman -S --needed --noconfirm --config "$pm_alt_conf" "${conf_pkgs[@]}"
     if [[ "$online" -eq 0 ]]; then
 	## offline mode
 
-	pacman -S \
+	# pacman -S \
+	pacman -Syu \
 	       --needed \
 	       --noconfirm \
 	       --cachedir "$repo_dir"/ofcl/pkgs \
@@ -765,7 +761,8 @@ install_conf_pkgs ()
     elif [[ "$online" -gt 0 ]]; then
 	## online or hybrid mode
 
-	pacman -S \
+	# pacman -S \
+	pacman -Syu \
 	       --needed \
 	       --noconfirm \
 	       "${conf_pkgs[@]}"
