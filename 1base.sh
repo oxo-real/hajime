@@ -1188,7 +1188,7 @@ cryptlvm ()
 	       #--key-file=$header_keyfile \
 	       #--keyfile-offset=$header_keyfile_offset \
 	       #--keyfile-size=$header_keyfile_size \
-	       $lvm_part cryptlvm
+	       "$lvm_part" "$device_mapper"
     ## /dev/mapper/cryptlvm
 }
 

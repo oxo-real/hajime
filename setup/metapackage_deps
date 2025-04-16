@@ -1,0 +1,49 @@
+# metapackage dependencies
+
+## base (3-2)
+: '
+    ## very very base
+    filesystem gcc-libs glibc bash
+
+    ## POSIX tools
+    coreutils file findutils gawk grep procps-ng sed tar
+
+    ## standard linux toolset
+    gettext pciutils psmisc shadow util-linux bzip2 gzip xz
+
+    ## distro defined requirements
+    licenses pacman archlinux-keyring systemd systemd-sysvcompat
+
+    ## networking, ping, etc
+    iputils iproute2
+# '
+
+## base-devel (1-2)
+: '
+    archlinux-keyring
+    autoconf
+    automake
+    binutils
+    bison
+    debugedit
+    fakeroot
+    file
+    findutils
+    flex
+    gawk
+    gcc
+    gettext
+    grep
+    groff
+    gzip
+    libtool
+    m4
+    make
+    pacman
+    patch
+    pkgconf
+    sed
+    sudo
+    texinfo
+    which
+# '

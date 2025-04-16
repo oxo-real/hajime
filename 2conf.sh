@@ -176,7 +176,7 @@ getargs ()
 
 sourcing ()
 {
-    ## hajime exec location
+    ## hajime exec location (inside arch-chroot jail (/mnt))
     export script_name
     hajime_exec=/hajime
 
@@ -347,13 +347,15 @@ mount_repo ()
     [[ -d $repo_dir ]] || mkdir -p "$repo_dir"
 
     mountpoint -q "$repo_dir"
-    [[ $? -ne 0 ]] && sudo mount -o ro "$repo_dev" "$repo_dir"
+    [[ $? -ne 0 ]] && sudo mount "$repo_dev" "$repo_dir"
+    # [[ $? -ne 0 ]] && sudo mount -o ro "$repo_dev" "$repo_dir"
 }
 
 
 get_offline_repo ()
 {
     if [[ $online -ne 1 ]]; then
+	## offline and hybrid mode
 
 	mount_repo
 
@@ -375,13 +377,15 @@ mount_code ()
     [[ -d $code_dir ]] || mkdir -p "$code_dir"
 
     mountpoint -q "$code_dir"
-    [[ $? -ne 0 ]] && sudo mount -o ro "$code_dev" "$code_dir"
+    [[ $? -ne 0 ]] && sudo mount "$code_dev" "$code_dir"
+    # [[ $? -ne 0 ]] && sudo mount -o ro "$code_dev" "$code_dir"
 }
 
 
 get_offline_code ()
 {
     if [[ $online -ne 1 ]]; then
+	## offline and hybrid mode
 
 	mount_code
 
@@ -720,6 +724,7 @@ configure_pacman ()
     sed -i "/^\[offline\]/{n;s#.*#Server = file://${repo_dir}/ofcl/pkgs#;}" "$pm_alt_conf"
 
     ## copy database to pkgs (tempo)
+    ## for pacman -Syu to work properly inside install_conf_pkgs
     if [[ "$online" -ne 1 ]]; then
 	## offline or hybrid mode
 
@@ -736,8 +741,8 @@ configure_pacman ()
     ## populate keys from archlinux.gpg
     pacman-key --config "$pm_alt_conf" --populate
 
-    ## update package database in chroot jail (/mnt)
-    pacman -Syyu --needed --noconfirm --config "$pm_alt_conf"
+    ## update package database in arch-chroot jail (/mnt)
+    pacman -Syy --needed --noconfirm --config "$pm_alt_conf"
 }
 
 
@@ -746,30 +751,11 @@ install_conf_pkgs ()
     # update repositories in chroot jail (/mnt) and install conf packages
     # [Installation guide - ArchWiki]
     # (https://wiki.archlinux.org/title/Installation_guide#Install_essential_packages)
-    # pacman -S --needed --noconfirm --config "$pm_alt_conf" "${conf_pkgs[@]}"
-    if [[ "$online" -eq 0 ]]; then
-	## offline mode
-
-	# pacman -S \
-	pacman -Syu \
-	       --needed \
-	       --noconfirm \
-	       --cachedir "$repo_dir"/ofcl/pkgs \
-	       --dbpath "$repo_dir"/ofcl/db \
-	       "${conf_pkgs[@]}"
-
-    elif [[ "$online" -gt 0 ]]; then
-	## online or hybrid mode
-
-	# pacman -S \
-	pacman -Syu \
-	       --needed \
-	       --noconfirm \
-	       "${conf_pkgs[@]}"
-	#TODO this works, but: test with adding
-	# --config "$pm_alt_conf"
-
-    fi
+    pacman -Syu \
+	   --needed \
+	   --noconfirm \
+	   --config "$pm_alt_conf" \
+	   "${conf_pkgs[@]}"
 }
 
 
@@ -819,8 +805,8 @@ install_bootloader ()
     blk_dev_list=$(lsblk --list --noheadings --output fstype,uuid,name)
 
     ## crypto_luks
-    kp_luks_uuid=$(grep crypto_LUKS <<< "$blk_dev_list" | awk '{print $2}')
     kp_mapper_name=$(grep LVM2_member <<< "$blk_dev_list" | awk '{print $3}')
+    kp_luks_uuid=$(blkid --match-tag UUID --output value "$kp_mapper_name")
 
     ## root and swap
     kp_root_uuid=$(grep lv_root <<< "$blk_dev_list" | awk '{print $2}')
@@ -869,6 +855,7 @@ install_bootloader ()
     ## create an initial ramdisk environment (initramfs)
     ## [mkinitcpio - ArchWiki](https://wiki.archlinux.org/title/Mkinitcpio#Common_hooks)
     ## [Installation guide - ArchWiki](https://wiki.archlinux.org/title/Installation_guide#Initramfs)
+    ## adjusting hooks in mkinitcpio configuration file
     sed -i "/^HOOKS/c\HOOKS=(${mkinitcpio_hooks})" "$file_etc_mkinitcpio_conf"
 
     ## for linux preset

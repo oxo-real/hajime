@@ -32,6 +32,7 @@
 │   │   ├── dl3189.conf
 │   │   ├── mbp2011a1286.conf
 │   │   └── tpx220.conf
+│   ├── metapackage_deps
 │   ├── network
 │   ├── package-list.sh
 │   └── pacman
@@ -43,5 +44,5 @@
 ├── sums
 └── temp
 
-11 directories, 32 files
+11 directories, 33 files
 ```
