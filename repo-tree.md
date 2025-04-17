@@ -30,8 +30,9 @@
 │   │   └── etc_doas.conf
 │   ├── machine
 │   │   ├── dl3189.conf
-│   │   ├── mbp2011a1286.conf
-│   │   └── tpx220.conf
+│   │   ├── ltx1c.conf
+│   │   ├── ltx220.conf
+│   │   └── mbp2011a1286.conf
 │   ├── metapackage_deps
 │   ├── network
 │   ├── package-list.sh
@@ -44,5 +45,5 @@
 ├── sums
 └── temp
 
-11 directories, 33 files
+11 directories, 34 files
 ```

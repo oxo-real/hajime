@@ -648,7 +648,7 @@ set_lvm_device ()
 
 	* )
 	    ## using configuration file
-	    p_name=lvm
+	    p_name=cryptlvm
 
 	    if [[ -n $dev_lvm_clear ]]; then
 

@@ -193,7 +193,6 @@ relative_file_paths ()
 
 	## NOTICE if pit=0; file doesn't exist yet, but will be created below
 	file_setup_config_path="$hajime_exec"/temp/active.conf
-	#file_setup_config_path="$hajime_src"/temp/active.conf
 
     fi
 

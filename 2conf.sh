@@ -442,19 +442,19 @@ vconsole_settings ()
 
 set_hostname ()
 {
-    if [[ -z $hostname ]]; then
+    if [[ -z "$hostname" ]]; then
 
 	clear
 
-	printf "hostname: '$hostname_default'\n"
-	printf "correct? (y/N) "
+	printf 'hostname: %s\n' "$hostname_default"
+	printf 'correct? [y/N] '
 	reply
 
 	if printf "$reply" | grep -iq "^y" ; then
 
 	    echo
-	    printf "using '$hostname_default' as hostname\n"
-	    printf "really sure? (Y/n) "
+	    printf 'using %s as hostname\n' "$hostname_default"
+	    printf 'really sure? [y/N] '
 	    reply
 
 	    if printf "$reply" | grep -iq "^n"; then
@@ -465,7 +465,7 @@ set_hostname ()
 	    else
 
 		echo
-		printf "using '$hostname_default' as hostname\n"
+		printf 'using %s as hostname\n' "$hostname_default"
 
 	    fi
 
@@ -473,7 +473,8 @@ set_hostname ()
 
 	    echo
 	    read -p "enter hostname: " hostname
-	    printf "hostname:	'$hostname', correct? (Y/n) "
+	    printf 'hostname: %s\n' "$hostname"
+	    printf 'correct? [y/N] '
 	    reply
 
 	    if printf "$reply" | grep -iq "^n"; then
@@ -484,7 +485,7 @@ set_hostname ()
 	    else
 
 		echo
-		printf "using '$hostname' as hostname\n"
+		printf 'using %s as hostname\n' "$hostname"
 
 	    fi
 
@@ -933,6 +934,17 @@ exit_chroot_jail_mnt ()
 }
 
 
+autostart_next ()
+{
+     if [[ -n "$after_2conf" ]]; then
+
+	 ## if after_2conf exists in the configuration file then autostart
+	 ## TODO request ignored from arch-chroot jail (/mnt)
+	 reboot
+
+     fi
+}
+
 main ()
 {
     getargs $args
@@ -955,6 +967,7 @@ main ()
     move_hajime
     motd_3post
     exit_chroot_jail_mnt
+    autostart_next
 }
 
 main
