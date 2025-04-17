@@ -68,7 +68,7 @@ initial_release=2019
 file_etc_pacman_conf=/etc/pacman.conf
 hajime_src="$HOME/dock/3/code/hajime"
 yay_cache="$HOME/.cache/yay"
-yay_src="$HOME/dock/2/yay"
+yay_src="$HOME/dock/2/aur"
 
 ## CODE and REPO mountpoints
 code_lbl=CODE
@@ -405,7 +405,7 @@ configure_pacman ()
     #	## online or hybrid mode
 
     #	## update package database
-    #	pacman -Syyu --needed --noconfirm --config "$pm_alt_conf"
+    sudo pacman -Sy --needed --noconfirm --config "$pm_alt_conf"
 
     #fi
 }

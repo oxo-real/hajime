@@ -794,53 +794,52 @@ install_bootloader ()
 	file_boot_loader_entries_arch_lts_conf="/boot/loader/entries/arch-lts.conf"
 	echo 'title arch-lts' > $file_boot_loader_entries_arch_lts_conf
 	echo 'linux /vmlinuz-linux-lts' >> $file_boot_loader_entries_arch_lts_conf
-	echo "initrd /$ucode.img" >> $file_boot_loader_entries_arch_conf
+	echo "initrd /$ucode.img" >> $file_boot_loader_entries_arch_lts_conf
 	echo 'initrd /initramfs-linux-lts.img' >> $file_boot_loader_entries_arch_lts_conf
 
     fi
 
-    # kernel options
+    # kernel parameters
 
     ## get parameter data
-    blk_dev_list=$(lsblk --list --noheadings --output fstype,uuid,name)
+    blk_dev_list=$(lsblk --list --noheadings --output fstype,uuid,name,path)
 
     ## crypto_luks
+    kp_uuid_luks=$(blkid --match-tag UUID --match-tag TYPE | grep crypto_LUKS | awk -F '"' '{print $2}')
     kp_mapper_name=$(grep LVM2_member <<< "$blk_dev_list" | awk '{print $3}')
-    kp_luks_uuid=$(blkid --match-tag UUID --output value "$kp_mapper_name")
 
-    ## root and swap
-    kp_root_uuid=$(grep lv_root <<< "$blk_dev_list" | awk '{print $2}')
-    kp_swap_uuid=$(grep lv_swap <<< "$blk_dev_list" | awk '{print $2}')
+    ## root
+    kp_uuid_root=$(grep lv_root <<< "$blk_dev_list" | awk '{print $2}')
+
+    ## swap
+    kp_uuid_swap=$(grep lv_swap <<< "$blk_dev_list" | awk '{print $2}')
 
     ## additional options
     kp_no_watchdog='nowatchdog module_blacklist=iTCO_wd'
     kp_no_radios='rfkill.default_state=1'
     kp_added_options="$kp_no_watchdog $kp_no_radios"
 
-    ## swap
-    swap_exist=$(grep swap <<< "$blk_dev_list")
+    case "$kp_uuid_swap" in
 
-    case "$swap_exist" in
-
-	swap )
-	    ## lv_swap does exists
-	    kp_options=$(printf 'options rd.luks.name=%s=%s root=UUID=%s rw resume=UUID=%s %s' \
-				     "$kp_luks_uuid" \
-				     "$kp_mapper_name" \
-				     "$kp_root_uuid" \
-				     "$kp_swap_uuid" \
-				     "$kp_added_options"
-			   )
+	'' )
+	    ## lv_swap does not exist
+	    kp_options=$(printf 'options rd.luks.name=%s=%s root=UUID=%s rw %s\n' \
+				"$kp_uuid_luks" \
+				"$kp_mapper_name" \
+				"$kp_uuid_root" \
+				"$kp_added_options"
+		      )
 	    ;;
 
 	* )
-	    ## lv_swap does not exist
-	    kp_options=$(printf 'options rd.luks.name=%s=%s root=UUID=%s rw %s' \
-				"$kp_luks_uuid" \
-				"$kp_mapper_name" \
-				"$kp_root_uuid" \
-				"$kp_added_options"
-		      )
+	    ## lv_swap does exists
+	    kp_options=$(printf 'options rd.luks.name=%s=%s root=UUID=%s rw resume=UUID=%s %s\n' \
+				     "$kp_uuid_luks" \
+				     "$kp_mapper_name" \
+				     "$kp_uuid_root" \
+				     "$kp_uuid_swap" \
+				     "$kp_added_options"
+			   )
 	    ;;
 
     esac

@@ -484,8 +484,10 @@ user_agent ()
     ## [The Latest and Most Common User Agents List (Updated Weekly)](https://www.useragents.me/)
     ## 20250410
     ua='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.10 Safari/605.1.1'
-    lnac="$XDG_LOGS_HOME"/network/user_agent/current
-    printf '%s\n' "$ua" >> "$lnac"
+    lnua="$XDG_LOGS_HOME"/network/user_agent
+    lnuac="$lnua"/current
+    [[ -d "$lnua" ]] || mkdir -p "$lnuac"
+    printf '%s\n' "$ua" > "$lnuac"
 }
 
 
@@ -529,9 +531,9 @@ recalculate_sums ()
     #TODO untested
     while read sum; do
 
-	calc-sums $(dirname "$sum")
+	calc-sum $(dirname "$sum")
 
-    done <<< find "$XDG_DATA_HOME"/c/git/code -type f -name 'sha3-512sums'
+    done <<< $(find "$XDG_DATA_HOME"/c/git/code -type f -name 'sha3-512sums')
 }
 
 

@@ -152,6 +152,9 @@ sourcing ()
     export script_name
     hajime_exec="$HOME"/hajime
 
+    ## user owns home, not root
+    own_home
+
     relative_file_paths
 
     ## configuration file
@@ -165,9 +168,6 @@ sourcing ()
     file_setup_package_list="$hajime_exec"/setup/package-list.sh
     ### source
     [[ -f "$file_setup_package_list" ]] && source "$file_setup_package_list"
-
-    ## user owns home, not root
-    own_home
 
     ## config file is sourced; reevaluate specific arguments
     specific_arguments
@@ -440,6 +440,7 @@ configure_pacman ()
     sed -i "/^\[offline\]/{n;s#.*#Server = file://${repo_dir}/ofcl/pkgs#;}" "$pm_alt_conf"
 
     ## copy database to pkgs (tempo)
+    ## pacman expects db in same directory as the packages
     if [[ "$online" -ne 1 ]]; then
 	## offline or hybrid mode
 
@@ -460,44 +461,24 @@ configure_pacman ()
 }
 
 
-pacman_init ()
-{
+# pacman_init ()
+# {
     ## already done in 2conf
     # sudo pacman-key --config "$pm_alt_conf" --init
     # sudo pacman-key --config "$pm_alt_conf" --populate archlinux
 
     # sudo pacman -Syyu --config "$pm_alt_conf"
     #sudo pacman -Syyu --needed --noconfirm --dbpath "$repo_dir"/ofcl/db --cachedir "repo_dir"/ofcl/pkgs
-}
+# }
 
 
 install_post_pkgs ()
 {
-    ## add post core addditions
-    # sudo pacman -S --config "$pm_alt_conf" --needed --noconfirm "${post_pkgs[@]}"
-    # sudo pacman -Syyu --needed --noconfirm --dbpath "$repo_dir"/ofcl/db --cachedir "repo_dir"/ofcl/pkgs "${post_pkgs[@]}"
-
-    if [[ "$online" -eq 0 ]]; then
-	## offline mode
-
-	sudo pacman -Syyu \
-	       --needed \
-	       --noconfirm \
-	       --cachedir "$repo_dir"/ofcl/pkgs \
-	       --dbpath "$repo_dir"/ofcl/db \
-	       "${post_pkgs[@]}"
-
-    elif [[ "$online" -gt 0 ]]; then
-	## online or hybrid mode
-
-	sudo pacman -Syyu \
-	       --needed \
-	       --noconfirm \
-	       "${post_pkgs[@]}"
-	#TODO (this works,) but: test with adding
-	# --config "$pm_alt_conf"
-
-    fi
+    sudo pacman -Syu \
+	 --needed \
+	 --noconfirm \
+	 --config "$pm_alt_conf" \
+	 "${post_pkgs[@]}"
 }
 
 
