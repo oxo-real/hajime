@@ -362,7 +362,7 @@ copy_pkg_files ()
 	    if pacman -Qqm "$pkg_name"; then
 		## aur package
 
-		copy_yay_source "$pkg_name"
+		copy_aur_source "$pkg_name"
 
 	    fi
 
@@ -399,15 +399,38 @@ download_missing ()
 }
 
 
-copy_yay_source ()
+copy_aur_source ()
 {
     pkg_name="$1"
     ## copy source files including PKGBUILD
-    ## sudo because .git has often root owner
+    ## sudo because .git often has root owner
     sudo cp --archive --recursive "$src_aur"/"$pkg_name" "$repo_aur"
     sudo chown -R $USER:$GROUP "$repo_aur"/"$pkg_name"
+
+    create_latest_aur_pkg_symlink "$pkg_name"
 }
 
+create_latest_aur_pkg_symlink ()
+{
+    pkg_name="$1"
+    pmn_Qm=$(pacman -Qm "$pkg")
+    pkg_name=${pmn_Qm% *}
+    pkg_version=${pmn_Qm##* }
+
+    ## aur package latest zst (and sig) file to repo
+    #TODO what to do with debug?
+    #TODO remove sort and tail?
+    latest_pkg_zst=$(find "$repo_aur" -type f -name "${pkg_name}"-"${pkg_version}"*.zst \
+		     | sort --version-sort \
+		     | tail -n 1 \
+		   )
+
+    #TODO remove old link(s) for pkg in aur/pkgs
+    # unlink
+
+    ## create symlink in aur/pkgs to latest package file
+    ln --symbolic $(realpath "$latest_pkg_zst")
+}
 
 create_repo_database ()
 {

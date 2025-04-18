@@ -519,7 +519,7 @@ rewrite_symlinks ()
     ## z-shell config root like user
     rc=/root/.config
     sudo mkdir -p "$rc"
-    sudo ln -s $XDG_CONFIG_HOME/.config/zsh "$rc"/zsh
+    sudo ln -s "$XDG_CONFIG_HOME"/.config/zsh "$rc"/zsh
 
     ## zsh default shell for root
     sudo chsh -s /usr/bin/zsh root
@@ -528,12 +528,13 @@ rewrite_symlinks ()
 
 recalculate_sums ()
 {
-    #TODO untested
+    lscgc="$XDG_DATA_HOME"/c/git/code
+
     while read sum; do
 
-	calc-sum --noconfirm $(dirname "$sum")
+	sh "$lscgc"/tool/calc-sum --noconfirm $(dirname "$sum")
 
-    done <<< $(find "$XDG_DATA_HOME"/c/git/code -type f -name 'sha3-512sums')
+    done <<< $(find "$lscgc" -type f -name 'sha3-512sums')
 }
 
 
@@ -596,7 +597,9 @@ z_shell_config ()
 
 set_sway_hardware ()
 {
-    sh $XDG_CONFIG_HOME/sway/hw/select_current_machine
+    # sh $XDG_CONFIG_HOME/sway/hw/select_current_machine
+    unlink $XDG_DATA_HOME/sway/current
+    ln --symbolic --force $XDG_CONFIG_HOME/sway/machine/"$sway_machine" $XDG_DATA_HOME/sway/current
 }
 
 
