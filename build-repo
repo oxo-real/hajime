@@ -9,10 +9,8 @@
 # find /var/cache/pacman/pkg -type f -name "*.xz" -o -name "*.zst" | sed 's#.*/##' | awk -F '-[0-9]+' '{print $1}' | sort | uniq
 # mount REPO (repo_dst) with write permissions
 
-# example: build-repo --package-list pacmanqq --repo-destination dock/2 --no-aur
+# example: build-repo --package-list ~/dock/2/pacmanqq --repo-destination ~/dock/2
 
-#TODO maintain-repo with pacman -Syu --needed --noconfirm --cachedir repopkgs --dbpath repodb
-#TODO specific repo source (cachedb) and add only latest version
 
 args="$@"
 getargs ()
@@ -420,8 +418,8 @@ create_latest_aur_pkg_symlink ()
 
     ## create symlink in aur/pkgs to latest package file
     ## symlink is relative to $repo_aur
-    target="$latest_pkg_zst"
-    link_name="$repo_aur"/pkgs/"${latest_pkg_zst##*/}"
+    target=$(realpath "$latest_pkg_zst")
+    link_name=$(realpath "$repo_aur"/pkgs/"${latest_pkg_zst##*/}")
     ln --symbolic "$target" "$link_name"
 }
 
