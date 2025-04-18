@@ -1,4 +1,4 @@
-#! /usr/bin/env sh
+! /usr/bin/env sh
 
 ###  _            _ _                  _
 ### | |__   __ _ (_|_)_ __ ___   ___  | |__   __ _ ___  ___
@@ -1349,15 +1349,15 @@ configure_pacman ()
     echo
 
     ## copy database to pkgs (tempo)
-    if [[ "$online" -ne 1 ]]; then
+    # if [[ "$online" -ne 1 ]]; then
 	## offline or hybrid mode
 
 	# tempo mount rw
 	# mount -o remount,rw "${repo_dir%/*}"
-	cp "$repo_dir"/ofcl/db/offline* "$repo_dir"/ofcl/pkgs
+	# cp "$repo_dir"/ofcl/db/offline* "$repo_dir"/ofcl/pkgs
         # mount -o remount,ro "${repo_dir%/*}"
 
-    fi
+    # fi
 
     ## init package keys
     pacman-key --config "$pm_alt_conf" --init
@@ -1436,9 +1436,9 @@ finishing ()
 {
     ## undo copy database to pkgs (tempo)
     # mount -o remount,rw "${repo_dir%/*}"
-    [[ "$online" -ne 1 ]] && \
+    # [[ "$online" -ne 1 ]] && \
 	## offline or hybrid mode
-	rm "$repo_dir"/ofcl/pkgs/offline*
+	# rm "$repo_dir"/ofcl/pkgs/offline*
     # mount -o remount,ro "${repo_dir%/*}"
 
     arch-chroot /mnt touch hajime/1base.done

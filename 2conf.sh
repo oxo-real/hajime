@@ -726,15 +726,15 @@ configure_pacman ()
 
     ## copy database to pkgs (tempo)
     ## for pacman -Syu to work properly inside install_conf_pkgs
-    if [[ "$online" -ne 1 ]]; then
+    # if [[ "$online" -ne 1 ]]; then
 	## offline or hybrid mode
 
 	# tempo mount rw
 	# mount -o remount,rw "${repo_dir%/*}"
-	cp "$repo_dir"/ofcl/db/offline* "$repo_dir"/ofcl/pkgs
+	# cp "$repo_dir"/ofcl/db/offline* "$repo_dir"/ofcl/pkgs
         # mount -o remount,ro "${repo_dir%/*}"
 
-    fi
+    # fi
 
     ## init package keys
     pacman-key --config "$pm_alt_conf" --init
@@ -925,9 +925,9 @@ exit_chroot_jail_mnt ()
 
     ## undo copy database to pkgs (tempo)
     # mount -o remount,rw "${repo_dir%/*}"
-    [[ "$online" -ne 1 ]] && \
+    # [[ "$online" -ne 1 ]] && \
 	## offline or hybrid mode
-	rm "$repo_dir"/ofcl/pkgs/offline*
+	# rm "$repo_dir"/ofcl/pkgs/offline*
     # mount -o remount,ro "${repo_dir%/*}"
 
     touch /home/$username/hajime/2conf.done

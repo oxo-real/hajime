@@ -122,7 +122,9 @@ process_args ()
     ## set default values
     repo_ofcl="$repo_dst"/ofcl
     repo_ofcl_pkgs="$repo_ofcl"/pkgs
-    repo_ofcl_db="$repo_ofcl"/db
+    # pacman wants db inside pkgs dir
+    repo_ofcl_db="$repo_ofcl"/pkgs
+    # repo_ofcl_db="$repo_ofcl"/db
     repo_ofcl_db_name=offline
     repo_aur="$repo_dst"/aur
 
@@ -187,13 +189,13 @@ build_dump_list ()
     # pacman -Qqn | while read -r pkg_name; do
     while read -r pkg_name; do
 
-	if [[ -z "$no_ofcl_pkgs" ]]; then
-	    ## do search official packages
+	printf 'adding to dumplist %s\n' "$pkg_name"
 
-	    abs_db_path=$(realpath $repo_ofcl_db)
-	    abs_cache_path=$(realpath $repo_ofcl_pkgs)
-	    # if pacman -Qqn --dbpath "$abs_db_path" --cachedir "$abs_cache_path" "$pkg_name"; then
-	    if pacman -Qqn "$pkg_name"; then
+	if pacman -Qqn "$pkg_name"; then
+	    ## native package
+
+	    if [[ -z "$no_ofcl_pkgs" ]]; then
+		## do search official packages
 
 		## first line of pactree is queried (main) package
 		## other lines are main package dependencies
@@ -201,36 +203,31 @@ build_dump_list ()
 
 	    fi
 
-	elif [[ -z "$no_aur_pkgs" ]]; then
-	    ## do search aur packages
+	elif pacman -Qqm "$pkg_name"; then
+	    ## aur package
 
-	    ## pacman needs absolute paths
-	    abs_db_path=$(realpath $repo_ofcl_db)
-	    abs_cache_path=$(realpath $repo_ofcl_pkgs)
-	    # if pacman -Qqm --dbpath "$abs_db_path" --cachedir "$abs_cache_path" "$pkg_name"; then
-	    if pacman -Qqm "$pkg_name"; then
+	    if [[ -z "$no_aur_pkgs" ]]; then
+		## do search aur packages
 
 		## add to package dump list the names of
 		## all aur packages and their dependencies
 		pactree --linear --unique "$pkg_name" >> "$pkgs_dump_list"
 
 		## add dependencies to dump list
-		#rg --no-line-number ^depends "$src_aur"/"$pkg_name"/PKGBUILD \
-		    grep ^depends "$src_aur"/"$pkg_name"/PKGBUILD \
-			| awk -F '[()]' '{print $2}' \
-			| sed "s/'//g" \
-			| sed 's/"//g' \
-			| tr ' ' '\n' \
-			     >> "$pkgs_dump_list"
-
-		    ## add make dependencies to dump list
-		    #rg --no-line-number ^makedepends "$src_aur"/"$pkg_name"/PKGBUILD \
-			grep ^makedepends "$src_aur"/"$pkg_name"/PKGBUILD \
-			    | awk -F '[()]' '{print $2}' \
-			    | sed "s/'//g" \
-			    | sed 's/"//g' \
-			    | tr ' ' '\n' \
-				 >> "$pkgs_dump_list"
+		### pkgbuild depends
+		grep ^depends "$src_aur"/"$pkg_name"/PKGBUILD \
+		    | awk -F '[()]' '{print $2}' \
+		    | sed "s/'//g" \
+		    | sed 's/"//g' \
+		    | tr ' ' '\n' \
+			 >> "$pkgs_dump_list"
+		### pkgbuild makedepends
+		grep ^makedepends "$src_aur"/"$pkg_name"/PKGBUILD \
+		    | awk -F '[()]' '{print $2}' \
+		    | sed "s/'//g" \
+		    | sed 's/"//g' \
+		    | tr ' ' '\n' \
+			 >> "$pkgs_dump_list"
 
 	    fi
 
@@ -257,14 +254,11 @@ copy_pkg_files ()
 {
     while read -r pkg_name; do
 
-	if [[ -z "$no_ofcl_pkgs" ]]; then
-	    ## do search official packages
+	if pacman -Qqn "$pkg_name"; then
+	    ## native package
 
-	    abs_db_path=$(realpath $repo_ofcl_db)
-	    abs_cache_path=$(realpath $repo_ofcl_pkgs)
-	    # if pacman -Qqn --dbpath "$abs_db_path" --cachedir "$abs_cache_path" "$pkg_name"; then
-	    if pacman -Qqn "$pkg_name"; then
-		## native package
+	    if [[ -z "$no_ofcl_pkgs" ]]; then
+	    ## do search official packages
 
 		latest_pkg=$(pacman -S --print "$pkg_name")
 		## WARNING requires a correct and complete database, that
@@ -353,14 +347,11 @@ copy_pkg_files ()
 
 	    fi
 
-	elif [[ -z "$no_aur_pkgs" ]]; then
-	    ## do search aur packages
+	elif pacman -Qqm "$pkg_name"; then
+	    ## aur package
 
-	    abs_db_path=$(realpath $repo_ofcl_db)
-	    abs_cache_path=$(realpath $repo_ofcl_pkgs)
-	    # if pacman -Qqm --dbpath "$abs_db_path" --cachedir "$abs_cache_path" "$pkg_name"; then
-	    if pacman -Qqm "$pkg_name"; then
-		## aur package
+	    if [[ -z "$no_aur_pkgs" ]]; then
+		## do search aur packages
 
 		copy_aur_source "$pkg_name"
 
@@ -404,8 +395,8 @@ copy_aur_source ()
     pkg_name="$1"
     ## copy source files including PKGBUILD
     ## sudo because .git often has root owner
-    sudo cp --archive --recursive "$src_aur"/"$pkg_name" "$repo_aur"
-    sudo chown -R $USER:$GROUP "$repo_aur"/"$pkg_name"
+    # sudo cp --archive --recursive "$src_aur"/"$pkg_name" "$repo_aur"
+    cp --archive --recursive "$src_aur"/"$pkg_name" "$repo_aur"
 
     create_latest_aur_pkg_symlink "$pkg_name"
 }
@@ -413,33 +404,36 @@ copy_aur_source ()
 create_latest_aur_pkg_symlink ()
 {
     pkg_name="$1"
-    pmn_Qm=$(pacman -Qm "$pkg")
+    pmn_Qm=$(pacman -Qm "$pkg_name")
     pkg_name=${pmn_Qm% *}
     pkg_version=${pmn_Qm##* }
 
     ## aur package latest zst (and sig) file to repo
-    #TODO what to do with debug?
     #TODO remove sort and tail?
     latest_pkg_zst=$(find "$repo_aur" -type f -name "${pkg_name}"-"${pkg_version}"*.zst \
 		     | sort --version-sort \
 		     | tail -n 1 \
 		   )
 
-    #TODO remove old link(s) for pkg in aur/pkgs
-    # unlink
+    #TODO check if not too harsh
+    unlink "$pkg_name"-*
 
     ## create symlink in aur/pkgs to latest package file
-    ln --symbolic $(realpath "$latest_pkg_zst")
+    ## symlink is relative to $repo_aur
+    target="$latest_pkg_zst"
+    link_name="$repo_aur"/pkgs/"${latest_pkg_zst##*/}"
+    ln --symbolic "$target" "$link_name"
 }
 
 create_repo_database ()
 {
     ## check for stowaway files in package cache
     stowaways=$(find "$repo_ofcl_pkgs" -maxdepth 1 -type f \
-		     ! -name '*.sig' \
-		     ! -name '*.pkg.tar.gz' \
-		     ! -name '*.pkg.tar.xz' \
-		     ! -name '*.pkg.tar.zst' \
+		     ! -name "*$repo_ofcl_db_name"* \
+		     ! -name *.sig \
+		     ! -name *.pkg.tar.gz \
+		     ! -name *.pkg.tar.xz \
+		     ! -name *.pkg.tar.zst \
 	     )
 
     [[ -n "$stowaways" ]] \
@@ -471,6 +465,12 @@ check_mountpoint_ro ()
 }
 
 
+set_permissions_aur ()
+{
+    sudo chown -R $USER:$GROUP "$repo_aur"
+}
+
+
 main ()
 {
     getargs $args
@@ -481,6 +481,7 @@ main ()
     build_dump_list
     optimize_pkgs_dump_list
     copy_pkg_files
+    set_permissions_aur
     download_missing
     create_repo_database
     copy_sync_database
