@@ -1,7 +1,7 @@
 #! /usr/bin/env sh
 
 
-# usage: build-repo -p src/pkg.list -r ofcl_dst [[--no-aur]|[--no-ofcl]] [-n alt_db_name] [-d alt_db_dst]
+# usage: make-repo -p src/pkg.list -r ofcl_dst [[--no-aur]|[--no-ofcl]] [-n alt_db_name] [-d alt_db_dst]
 
 # NOTICES
 # generate full system native package list with:
@@ -9,7 +9,7 @@
 # find /var/cache/pacman/pkg -type f -name "*.xz" -o -name "*.zst" | sed 's#.*/##' | awk -F '-[0-9]+' '{print $1}' | sort | uniq
 # mount REPO (repo_dst) with write permissions
 
-# example: build-repo --package-list ~/dock/2/pacmanqq --repo-destination ~/dock/2
+# example: make-repo --package-list ~/dock/2/pacmanqq --repo-destination ~/dock/2
 
 
 args="$@"
@@ -237,11 +237,12 @@ build_dump_list ()
 
 optimize_pkgs_dump_list ()
 {
-    ## 3 sed operations separated by ;
+    ## 4 sed operations separated by ;
     ## remove greater than and equal to (>=) version from dump list
     ## convert to all lower case
     ## remove .so suffixes
-    sed -i 's/[>=].*//; s/.*/\L&/; s/\.so//' "$pkgs_dump_list"
+    ## remove empty lines
+    sed -i 's/[>=].*//; s/.*/\L&/; s/\.so// /^$/d' "$pkgs_dump_list"
 
     ## create pkgs_2_copy; dump_list with duplicate lines removed
     sort < "$pkgs_dump_list" | uniq > "$pkgs_2_copy"
@@ -348,6 +349,11 @@ copy_pkg_files ()
 	elif pacman -Qqm "$pkg_name"; then
 	    ## aur package
 
+	    ## NOTICE installed packages (in pkgs_2_copy) only
+	    ## after a hajime installation be sure to install
+	    ## aur packages first before building repo
+	    ## only symlinked aur tar.pkg.zst files are installed by hajime
+
 	    if [[ -z "$no_aur_pkgs" ]]; then
 		## do search aur packages
 
@@ -394,10 +400,12 @@ copy_aur_source ()
     ## copy source files including PKGBUILD
     ## sudo because .git often has root owner
     # sudo cp --archive --recursive "$src_aur"/"$pkg_name" "$repo_aur"
-    cp --archive --recursive "$src_aur"/"$pkg_name" "$repo_aur"
+    rsync -aAXv "$src_aur"/"$pkg_name" "$repo_aur"
+    # cp --archive --recursive "$src_aur"/"$pkg_name" "$repo_aur"
 
     create_latest_aur_pkg_symlink "$pkg_name"
 }
+
 
 create_latest_aur_pkg_symlink ()
 {
@@ -413,11 +421,10 @@ create_latest_aur_pkg_symlink ()
 		     | tail -n 1 \
 		   )
 
-    #TODO check if not too harsh
-    unlink "$pkg_name"-*
+    ## remove old symlink
+    unlink $(realpath "$repo_aur")/pkgs/"$pkg_name"-"$pkg_version"*.zst
 
     ## create symlink in aur/pkgs to latest package file
-    ## symlink is relative to $repo_aur
     target=$(realpath "$latest_pkg_zst")
     link_name=$(realpath "$repo_aur")/pkgs/"${latest_pkg_zst##*/}"
     ln --symbolic "$target" "$link_name"

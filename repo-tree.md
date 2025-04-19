@@ -6,7 +6,6 @@
 ├── 3post.sh
 ├── 4apps.sh
 ├── 5dtcf.sh
-├── build-repo
 ├── COPYING
 ├── emer
 │   ├── pacman-static
@@ -16,8 +15,8 @@
 │   └── urls
 ├── logs
 │   └── 3post-pkgs-w-deps.list
-├── make-offl-repo
 ├── make-recov
+├── make-repo
 ├── misc
 │   ├── 0init-offl-dl3189
 │   ├── 2conf_bashrc
@@ -42,8 +41,8 @@
 │       ├── pm_hybrid.conf
 │       ├── pm_offline.conf
 │       └── pm_online.conf
-├── sums
+├── sha3-512sums
 └── temp
 
-11 directories, 34 files
+10 directories, 34 files
 ```

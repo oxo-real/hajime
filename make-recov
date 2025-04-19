@@ -75,7 +75,7 @@ source $source_dir/text_appearance
 
 # make_offl_repo="$hajime_dir/make-offl-repo"
 hajime_dir="$XDG_DATA_HOME/c/git/code/hajime"
-build_repo="$hajime_dir"/build-repo
+make_repo="$hajime_dir"/make-repo
 timestamp=$(date +'%Y%m%d_%H%M%S_%s')
 [[ -d "$hajime_dir/logs" ]] || mkdir -p "$hajime_dir/logs"
 pacman_qq="$hajime_dir"/logs/"$timestamp"_pacmanqq
@@ -102,13 +102,9 @@ repo ()
 	    # permissions
 	    sudo chown -R $USER:$GROUP $repo_mount
 
-	    ## build-repo
+	    ## make-repo
 	    pacman -Qq > "$pacman_qq"
-	    "$build_repo" --package-list "$pacman_qq" --repo-destination "$repo_mount"
-	    # $make_offl_repo "$repo_mount"
-
-	    # NOTICE options = rsync options
-	    # $make_offl_repo "$repo_mount" "$options"
+	    "$make_repo" --package-list "$pacman_qq" --repo-destination "$repo_mount"
 	    ;;
 
 	* )
