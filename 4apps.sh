@@ -462,9 +462,15 @@ install_apps_pkgs ()
 	if ! yay -S --config "$pm_alt_conf" --needed --noconfirm "$pkg"; then
 	    ## install from repo
 
-	    # printf 'ERROR yay -S --config %s --needed --noconfirm %s\n' "$pm_alt_conf" "$pkg" | tee -a $file_error_log
+	    ## find aur package installed version
+	    pmn_Qm=$(pacman -Qm "$pkg")
+	    pkg_name=${pmn_Qm% *}
+	    pkg_version=${pmn_Qm##* }
 
-	    if ! yay -U --config "$pm_alt_conf" --needed --noconfirm "$pkg_tar_zst"; then
+	    ## redirect to symlink of aur package installed version in repo_dir
+	    aur_pkg_tar_zst="$repo_dir"/aur/pkgs/"$pkg_name"-"$pkg_version"*.pkg.tar.zst
+
+	    if ! yay -U --config "$pm_alt_conf" --needed --noconfirm "$aur_pkg_tar_zst"; then
 		## install from local aur pkg.tar.zst file
 
 		printf 'ERROR yay -U --config %s --needed --noconfirm %s\n' "$pm_alt_conf" "$pkg_tar_zst" | tee -a $file_error_log

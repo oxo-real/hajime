@@ -598,8 +598,8 @@ z_shell_config ()
 set_sway_hardware ()
 {
     # sh $XDG_CONFIG_HOME/sway/hw/select_current_machine
-    unlink $XDG_DATA_HOME/sway/current
-    ln --symbolic --force $XDG_CONFIG_HOME/sway/machine/"$sway_machine" $XDG_DATA_HOME/sway/current
+    unlink $XDG_CONFIG_HOME/sway/current
+    ln --symbolic --force $XDG_CONFIG_HOME/sway/machine/"$sway_machine" $XDG_CONFIG_HOME/sway/current
 }
 
 
@@ -692,6 +692,7 @@ finishing_up ()
 
 
     echo 'finished installation'
+    #TODO countdown timer
     read -p "abort reboot? [Y/n] " -n 1 -r reply
 
     if [[ "$reply" =~ ^[Nn]$ ]] ; then
@@ -705,6 +706,8 @@ finishing_up ()
 
     else
 
+	echo
+	echo
 	exit
 
     fi
