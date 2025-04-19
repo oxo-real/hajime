@@ -265,6 +265,12 @@ process_config_flag_value ()
 }
 
 
+get_sudo ()
+{
+    sudo -v
+}
+
+
 installation_mode ()
 {
     if [[ "$online" -ne 0 ]]; then
@@ -557,6 +563,7 @@ main ()
     sourcing
     debugging
     getargs $args
+    get_sudo
     installation_mode
 
     set_boot_rw

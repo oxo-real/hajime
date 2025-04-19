@@ -692,16 +692,10 @@ finishing_up ()
 
 
     echo 'finished installation'
-    #TODO countdown timer
-    read -p "abort reboot? [Y/n] " -n 1 -r reply
+    read -p "reboot now? [y/N] " -n 1 -r reply
 
-    if [[ "$reply" =~ ^[Nn]$ ]] ; then
+    if [[ "$reply" =~ ^[Yy]$ ]] ; then
 
-	sudo reboot
-
-    elif [[ -z "$reply" ]] ; then
-
-	## auto reboot after timeout
 	sudo reboot
 
     else
