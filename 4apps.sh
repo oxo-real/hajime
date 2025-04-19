@@ -465,38 +465,32 @@ install_apps_pkgs ()
     ## for to prevent yay exit on error
     for pkg in "${apps_pkgs[@]}"; do
 
-	if ! yay -S --config "$pm_alt_conf" --needed --noconfirm "$pkg"; then
+	if find "$repo_dir"/aur/pkgs -type l "$pkg"; then
+
 	    ## install from repo
+	    yay -S --config "$pm_alt_conf" --needed --noconfirm "$pkg"
+
+	else
 
 	    ## find aur package installed version
-	    pmn_Qm=$(pacman -Qm "$pkg")
-	    pkg_name=${pmn_Qm% *}
-	    pkg_version=${pmn_Qm##* }
+	    ### via pacman
+	    ### NOTICE this method does not work on initial install
+	    # pmn_Qm=$(pacman -Qm "$pkg")
+	    # pkg_name=${pmn_Qm% *}
+	    # pkg_version=${pmn_Qm##* }
+	    ### via package's PKGBUILD
+	    pkg_build="$repo_dir"/aur/"$pkg"/PKGBUILD
+	    pkg_name=$(grep '^pkgname' "$pkg_build" | awk -F '=' '{print $2}')
+	    pkg_version=$(grep '^pkgver' "$pkg_build" | awk -F '=' '{print $2}')
+	    pkg_release=$(grep '^pkgrel' "$pkg_build" | awk -F '=' '{print $2}')
+	    latest_pkg_link=$(find "$repo_dir"/aur/pkgs -type l -name "${pkg_name}"-"${pkg_version}"-"${pkg_release}"*.zst)
 
-	    ## redirect to symlink of aur package installed version in repo_dir
-	    aur_pkg_tar_zst="$repo_dir"/aur/pkgs/"$pkg_name"-"$pkg_version"*.pkg.tar.zst
-
-	    if ! yay -U --config "$pm_alt_conf" --needed --noconfirm "$aur_pkg_tar_zst"; then
-		## install from local aur pkg.tar.zst file
-
-		printf 'ERROR yay -U --config %s --needed --noconfirm %s\n' "$pm_alt_conf" "$pkg_tar_zst" | tee -a $file_error_log
-
-	    fi
+	    ## install from local aur pkg.tar.zst file
+	    yay -U --config "$pm_alt_conf" --needed --noconfirm "$latest_pkg_link"
 
 	fi
 
     done
-
-    # for pkg_tar_zst in "$repo_dir"/aur/pkgs; do
-
-    # 	if ! yay -U --config "$pm_alt_conf" --needed --noconfirm "$pkg_tar_zst"; then
-    # 	    ## install from local aur pkg.tar.zst file
-
-    # 	    printf 'ERROR yay -U --config %s --needed --noconfirm %s\n' "$pm_alt_conf" "$pkg_tar_zst" | tee -a $file_error_log
-
-    # 	fi
-
-    # done
 }
 
 
