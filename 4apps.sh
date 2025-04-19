@@ -462,22 +462,29 @@ install_apps_pkgs ()
 	if ! yay -S --config "$pm_alt_conf" --needed --noconfirm "$pkg"; then
 	    ## install from repo
 
-	    printf 'ERROR yay -S --config %s --needed --noconfirm %s\n' "$pm_alt_conf" "$pkg" | tee -a $file_error_log
+	    # printf 'ERROR yay -S --config %s --needed --noconfirm %s\n' "$pm_alt_conf" "$pkg" | tee -a $file_error_log
+
+	    if ! yay -U --config "$pm_alt_conf" --needed --noconfirm "$pkg_tar_zst"; then
+		## install from local aur pkg.tar.zst file
+
+		printf 'ERROR yay -U --config %s --needed --noconfirm %s\n' "$pm_alt_conf" "$pkg_tar_zst" | tee -a $file_error_log
+
+	    fi
 
 	fi
 
     done
 
-    for pkg_tar_zst_file in "$repo_dir"/aur/pkgs; do
+    # for pkg_tar_zst in "$repo_dir"/aur/pkgs; do
 
-	if ! yay -U --config "$pm_alt_conf" --needed --noconfirm "$pkg_tar_zst_file"; then
-	    ## install from local aur pkg.tar.zst file
+    # 	if ! yay -U --config "$pm_alt_conf" --needed --noconfirm "$pkg_tar_zst"; then
+    # 	    ## install from local aur pkg.tar.zst file
 
-	    printf 'ERROR yay -U --config %s --needed --noconfirm %s\n' "$pm_alt_conf" "$pkg_tar_zst_file" | tee -a $file_error_log
+    # 	    printf 'ERROR yay -U --config %s --needed --noconfirm %s\n' "$pm_alt_conf" "$pkg_tar_zst" | tee -a $file_error_log
 
-	fi
+    # 	fi
 
-    done
+    # done
 }
 
 

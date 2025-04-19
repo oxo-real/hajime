@@ -692,15 +692,20 @@ finishing_up ()
 
 
     echo 'finished installation'
-    read -p "sudo reboot? (Y/n) " -n 1 -r reply
+    read -p "abort reboot? [Y/n] " -n 1 -r reply
 
-    if [[ $reply =~ ^[Nn]$ ]] ; then
+    if [[ "$reply" =~ ^[Nn]$ ]] ; then
 
-	exit
+	sudo reboot
+
+    elif [[ -z "$reply" ]] ; then
+
+	## auto reboot after timeout
+	sudo reboot
 
     else
 
-	sudo reboot
+	exit
 
     fi
 }
