@@ -462,33 +462,43 @@ install_yay ()
 
 install_apps_pkgs ()
 {
-    ## for to prevent yay exit on error
+    ## for prevents yay exit on error
     for pkg in "${apps_pkgs[@]}"; do
 
-	if find "$repo_dir"/aur/pkgs -type l "$pkg"; then
+	## install from repo ofcl/pkgs
+	yay -S --config "$pm_alt_conf" --needed --noconfirm "$pkg"
 
-	    ## install from repo
-	    yay -S --config "$pm_alt_conf" --needed --noconfirm "$pkg"
-
-	else
+	# if [[ $? -ne 0 ]]; then
+	    ## on err exit search aur_pkgs_arr
 
 	    ## find aur package installed version
+	    ### best method hitherto
+	    # latest_pkg_link=$(find "$repo_dir"/aur/pkgs -type l -name "${pkg}*.pkg.tar.zst")
+
 	    ### via pacman
 	    ### NOTICE this method does not work on initial install
 	    # pmn_Qm=$(pacman -Qm "$pkg")
 	    # pkg_name=${pmn_Qm% *}
 	    # pkg_version=${pmn_Qm##* }
-	    ### via package's PKGBUILD
-	    pkg_build="$repo_dir"/aur/"$pkg"/PKGBUILD
-	    pkg_name=$(grep '^pkgname' "$pkg_build" | awk -F '=' '{print $2}')
-	    pkg_version=$(grep '^pkgver' "$pkg_build" | awk -F '=' '{print $2}')
-	    pkg_release=$(grep '^pkgrel' "$pkg_build" | awk -F '=' '{print $2}')
-	    latest_pkg_link=$(find "$repo_dir"/aur/pkgs -type l -name "${pkg_name}"-"${pkg_version}"-"${pkg_release}"*.zst)
+	    ### via $pkg PKGBUILD
+	    ### NOTICE not 100% reliable
+	    # pkg_build="$repo_dir"/aur/"$pkg"/PKGBUILD
+	    # pkg_name=$(grep '^pkgname' "$pkg_build" | awk -F '=' '{print $2}')
+	    # pkg_version=$(grep '^pkgver' "$pkg_build" | awk -F '=' '{print $2}')
+	    # pkg_release=$(grep '^pkgrel' "$pkg_build" | awk -F '=' '{print $2}')
+	    # latest_pkg_link=$(find "$repo_dir"/aur/pkgs -type l -name "${pkg_name}"-"${pkg_version}"-"${pkg_release}"*.zst)
 
 	    ## install from local aur pkg.tar.zst file
-	    yay -U --config "$pm_alt_conf" --needed --noconfirm "$latest_pkg_link"
+	    # yay -U --config "$pm_alt_conf" --needed --noconfirm "$latest_pkg_link"
 
-	fi
+	# fi
+
+    done
+
+    ## aur package from "$repo_dir"/aur/pkgs (symlinks)
+    for pgk_aur_link in "$repo_dir"/aur/pkgs/*; do
+
+	yay -U --config "$pm_alt_conf" --needed --noconfirm "$pkg_aur_link"
 
     done
 }
