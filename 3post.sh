@@ -515,10 +515,17 @@ wrap_up ()
     echo
     printf "sh hajime/4apps.sh\n"
     echo
-    echo
-    printf "press any key to continue... "
-    reply_single
-    clear
+
+    if [[ -z $"exec_mode" ]];
+       ## only if not unattended
+
+       echo
+       printf "press any key to continue... "
+       reply_single
+       clear
+
+    fi
+
     echo
     neofetch --ascii_distro arch_small --gtk3 off --gtk2 off --colors 3 3 3 7 3 4 --separator '     \t'
 

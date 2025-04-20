@@ -305,7 +305,7 @@ umount_rck ()
 
 make_recovery ()
 {
-    # repo
+    repo
     code
     keys
 }
