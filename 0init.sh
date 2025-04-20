@@ -326,7 +326,7 @@ config_file_warning ()
 	printf "${st_bold}CAUTION!${st_def}\n"
 	printf "active configuration file  ${st_ul}%s${st_def}\n" "$file_setup_config"
 	echo
-	printf "this file WILL be used for ${fg_magenta}automatic installation${st_def}\n"
+	printf "this file WILL be used for ${fg_magenta}unattended installation${st_def}\n"
 	echo
 	printf "hajime repository source   ${st_bold}%s${st_def}\n" "$runmode"
 	echo
