@@ -187,8 +187,6 @@ build_dump_list ()
     # pacman -Qqn | while read -r pkg_name; do
     while read -r pkg_name; do
 
-	printf 'adding to dumplist %s\n' "$pkg_name"
-
 	if pacman -Qqn "$pkg_name"; then
 	    ## native package
 

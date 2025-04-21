@@ -541,7 +541,7 @@ recalculate_sums ()
 set_doas ()
 {
     # configure doas
-    # sudo printf 'permit persist :wheel\n' > $etc_doas_conf
+    ## [doas - ArchWiki](https://wiki.archlinux.org/title/Doas#Configuration)
     # sudo chown -c root:root $etc_doas_conf
     # sudo chmod -c 0400 $etc_doas_conf
     sudo cp "$file_setup_doas_conf" "$etc_doas_conf"
@@ -552,6 +552,9 @@ set_doas ()
 	printf 'ERROR doas config\n'
 
     fi
+
+    alias sudo='doas '
+    ## also change alia!
 }
 
 
@@ -726,7 +729,7 @@ main ()
     dotfbu_restore
     rewrite_symlinks
     recalculate_sums
-    set_doas
+    #set_doas
     set_permissions
     z_shell_config
     set_sway_hardware

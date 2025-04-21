@@ -40,10 +40,10 @@ connected recovery device with partitions: REPO, CODE and KEYS
 
 # dependencies
 source functions
-make-offl-repo
+make-repo
 
 # usage
-make_recov [rsync_options]
+make_recov [repo] [code] [keys] [rsync_options]
 
 # options
 options are rsync options
@@ -80,7 +80,39 @@ timestamp=$(date +'%Y%m%d_%H%M%S_%s')
 [[ -d "$hajime_dir/logs" ]] || mkdir -p "$hajime_dir/logs"
 pacman_qq="$hajime_dir"/logs/"$timestamp"_pacmanqq
 
-options="$@"
+
+args="$@"
+getargs ()
+{
+    while :; do
+
+	case "$1" in
+
+	    repo )
+		repo_run=1
+		shift
+		;;
+
+	    code )
+		code_run=1
+		shift
+		;;
+
+	    keys )
+		keys_run=1
+		shift
+		;;
+
+	    * )
+		## rsync options optionally as last arguments
+		options="$@"
+		break
+
+	esac
+
+    done
+}
+
 
 repo ()
 {
@@ -306,14 +338,15 @@ umount_rck ()
 
 make_recovery ()
 {
-    # repo
-    code
-    keys
+    [[ -n "$repo_run" ]] && repo
+    [[ -n "$code_run" ]] && code
+    [[ -n "$keys_run" ]] && keys
 }
 
 
 main ()
 {
+    getargs $args
     make_recovery
     umount_rck
 }
