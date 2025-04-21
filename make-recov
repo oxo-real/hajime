@@ -297,6 +297,7 @@ keys ()
 
 umount_rck ()
 {
+    ## rck repo code keys
     [[ $repo_mounted == 1 ]] && sudo umount $repo_mount
     [[ $code_mounted == 1 ]] && sudo umount $code_mount
     [[ $keys_mounted == 1 ]] && sudo umount $keys_mount
@@ -305,7 +306,7 @@ umount_rck ()
 
 make_recovery ()
 {
-    repo
+    # repo
     code
     keys
 }

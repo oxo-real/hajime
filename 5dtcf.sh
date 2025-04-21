@@ -690,8 +690,15 @@ finishing_up ()
     ## administration
     sudo touch $HOME/hajime/5dtcf.done
 
-
     echo 'finished installation'
+
+    if [[ -z $"exec_mode" ]]; then
+	## uanattended installation mode
+
+	sudo reboot
+
+    fi
+
     read -p "reboot now? [y/N] " -n 1 -r reply
 
     if [[ "$reply" =~ ^[Yy]$ ]] ; then

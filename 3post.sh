@@ -516,8 +516,8 @@ wrap_up ()
     printf "sh hajime/4apps.sh\n"
     echo
 
-    if [[ -z $"exec_mode" ]];
-       ## only if not unattended
+    if [[ -z $"exec_mode" ]]; then
+       ## only attended installation mode
 
        echo
        printf "press any key to continue... "

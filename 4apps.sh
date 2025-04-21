@@ -495,12 +495,8 @@ install_apps_pkgs ()
 
     done
 
-    ## aur package from "$repo_dir"/aur/pkgs (symlinks)
-    for pgk_aur_link in "$repo_dir"/aur/pkgs/*; do
-
-	yay -U --config "$pm_alt_conf" --needed --noconfirm "$pkg_aur_link"
-
-    done
+    ## install all aur packages from "$repo_dir"/aur/pkgs (symlinks)
+    yay -U --config "$pm_alt_conf" --needed --noconfirm "$repo_dir"/aur/pkgs/*.pkg.tar.zst
 }
 
 
