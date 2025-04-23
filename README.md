@@ -18,10 +18,13 @@
 # hajime
 copyright (c) 2017 - 2025  |  oxo
 
-This installation script installs an up-to-date Arch Linux system on an x64 architecture.
-For installation a network connection is optional.
+This installation script installs an Arch Linux system on an x64 architecture.
+The installation can be done with or without a network connection (internet).
 
 ## a five part arch linux installation series
+
+### 0 init
+This script initializes the installation process, like copying files over to the machine and, if applicable, establishing an internet connection.
 
 ### 1  base
 The 'base' script creates a Globally Unique Identifiers (GUID) partition table (GPT) and Unified Extensible Firmware Interface (UEFI) system partition with systemd boot to bootstrap the user space for latest stable release (LSR) and long term support (LTS) arch linux kernel.
@@ -61,7 +64,7 @@ An (Arch) Linux machine, in order to be able to copy an offline repository.
 
 The host machine must have an internet connection.
 
-	*	operating system		archlinux
+	*	operating system	archlinux
 	*	network				internet access
 
 ### REQUIRED	target machine
@@ -69,8 +72,8 @@ Arch Linux is expected to run on almost every contemporary computer.
 
 The (minimum) requirements are:
 
-	*	architecture			x86-64	(or compatible)
-	*	storage capacity		>=	2G
+	*	architecture		x86-64	(or compatible)
+	*	storage capacity	>=	2G
 	*	RA memory			>=	512M
 
 ### REQUIRED	usb1 archiso
@@ -88,7 +91,7 @@ packages are copied from the host machine.
 	*	usb2				>=	20G
 
 ### OPTIONAL	usb3 boot
-Optional, but a privacy recommendation, is a separate boot device. It does not have to be big.
+Optional, though a security recommendation, is a separate boot device. It does not have to be big.
 
 	*	usb3				>=	256M
 
@@ -107,7 +110,7 @@ Use isolatest to automatically download the iso image, verify signatures and pre
 Download it from the internet via codeberg.org/oxo (recommended) or gitlab.com/cytopyge.
 
 	* isolatest				https://codeberg.org/oxo/isolatest
-						https://gitlab.com/cytopyge/isolatest
+	                        https://gitlab.com/cytopyge/isolatest
 
 
 ### REQUIRED	hajime
@@ -116,12 +119,12 @@ The installer script itself.
 Download it from the internet via codeberg.org/oxo (recommended) or gitlab.com/cytopyge.
 
 	* hajime				https://codeberg.org/oxo/hajime
-						https://gitlab.com/cytopyge/hajime
+						    https://gitlab.com/cytopyge/hajime
 
 ###	OPT / REQ	network
-For the preparation phase an internet connection is required.
+For the preparation phase a network (internet) connection is required.
 
-During installation an internet connection is optional
+During installation a network (internet) connection is optional.
 
 # step-by-step guide
 
@@ -130,7 +133,7 @@ During installation an internet connection is optional
 
 The preparation phase is executed on the host machine.
 
-enter and execute code after '%' sign on your own host machine
+Enter and execute code after the '%' sign on your own host machine;
 
 ## 01
 Connect a host machine to the internet.
@@ -140,16 +143,20 @@ install git if it is not already done so
 % sudo pacman -S git
 ```
 
-download isolatest via codeberg:
+git clone isolatest via codeberg.org (recommended):
 ```
 % git clone https://codeberg.org/oxo/isolatest
 ```
 
+or download files an other way, i.e. with curl
+```
+% curl --location --remote-name https://codeberg.org/oxo/isolatest/archive/main.zip -C -
+```
 
 CAUTION!
-{values} between curly braces are specific and volatile!
-
-be sure to take the right one in your case!
+Values between curly braces {} are specific and volatile!
+Command option flags between square hooks [] are optional.
+Be sure to always have the right value in your specific case!
 
 i.e. /dev/sd{RC1} can be /dev/sdc1
 
@@ -176,11 +183,13 @@ execute isolatest
 ## 04
 insert usb2
 
-create ext4 partitions labeled REPO, CODE and KEYS
+Prepar ext4 partitions labeled REPO, CODE and KEYS
 
 CAUTION! DESIGNATE THE RIGHT DEVICE!
 
 WARNING! ALL DATA WILL BE DESTROYED!
+
+NOTICE for offline installation only REPO and CODE are mandatory
 
 ```
 % sudo gdisk /dev/sd{RC}
@@ -206,10 +215,10 @@ enter:	o	to rewrite GPT table
 ```
 
 ## 05
-Prepare the REPO, CODE and KEYS partition
+write the REPO, CODE and KEYS partitions
 
 ```
-% make-recov
+% make-recov [repo] [code] [keys]
 ```
 
 Preparation is now finished. We now have:
@@ -218,7 +227,7 @@ usb1	with archiso
 
 usb2	with REPO, CODE and KEYS
 
-usb3	optional boot stick
+usb3	optional boot device
 
 
 # installation
@@ -236,40 +245,57 @@ insert usb1
 switch the target machine on
 
 ## 12
-after booting into archiso insert usb2
+after entering the commandline prompt
 
-mount usb2 to tmp
+insert usb2
 
-```
-% lsblk -o LABEL,PATH
-```
-or
-```
-% lsblk -paf
-```
-or
-```
-% blkid
-```
-
-then
 ```
 % mkdir tmp
 ```
 
+then, get device information
+
+```
+% lsblk
+```
+
+or, for more information
+
+```
+% lsblk -paf
+```
+
+or
+
+```
+% blkid
+```
+
+mount CODE to tmp
+
 CAUTION! DESIGNATE THE RIGHT DEVICE!
 
 ```
-% mount -o ro /dev/sdX tmp
-% sh tmp/code/hajime/0init.sh
+% mount /dev/sdX tmp
 ```
 
-hajime is primarily designed to run without internet connection
+execute 0init.sh to start the installation
 
-it is recommended to install entirely offline and connect to any network
+```
+% sh tmp/code/hajime/0init.sh [--offline]|[--online]|[--hybrid] [--config machine.conf]
+```
+
+If you have configured an installation configuration for your specific machine,
+
+you can run hajime unattended. be 100% sure to have the right settings!
+
+If you have an offline repository, hajime can be run entirely offline.
+
+It is recommended to install entirely offline and connect to any network
 
 not earlier than after the installation is fully completed.
 
+Read the text carefully, acknowledge, then confirm.
 
 ## 13	start hajime
 insert usb3 (optional)
@@ -277,7 +303,7 @@ insert usb3 (optional)
 let's roll!
 
 ```
-% sh hajime/1base.sh
+% sh hajime/1base.sh [--offline]|[--online]|[--hybrid] [--config machine.conf]
 ```
 
 from here run the scripts in their numerical order:
@@ -289,9 +315,7 @@ from here run the scripts in their numerical order:
 
 CAUTION! READ AND EXECUTE THE ON-SCREEN INSTRUCTIONS THOROUGHLY!
 
-the system reboots after 2conf has been executed
-
-CAUTION! REMOVE USB1 BEFORE REBOOTING!
+the system reboots after 2conf.sh has been executed
 
 
 ## install log
@@ -300,30 +324,10 @@ For debug purposes it can be useful to be able to review an logging of the insta
 Create a full debug log of the installation with:
 
 ```
-sh hajime/1base.sh | tee hajime/1base.log
+sh hajime/1base.sh 2>&1 | tee tmp/1base.log
 ```
 
-After execution of the 1base.sh script is finished, copy the log file to the arch-chroot environment:
-
-```
-mv /root/hajime/1base.log /mnt/hajime/1base.log
-```
-
-The log of the second script can be directly written in de arch-chroot environment:
-
-```
-sh hajime/2conf.sh | tee /mnt/hajime/2conf.log
-```
-
-From the third script on, the installation process is running inside the operating system environment,
-therefore logs can be written to the home folder of the current user:
-
-```
-sh hajime/3post.sh | tee $HOME/hajime/3post.log
-```
-
-NOTICE the fact that in specific occasions, writing to debug logs
-can cause some troubles with proper execution of the installation scripts.
+NOTICE commandline feedback can be influenced by tee
 
 
 # resource reference
