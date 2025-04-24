@@ -174,7 +174,7 @@ designate (verify!) the device name of usb1
 ```
 
 ## 03
-execute isolatest
+execute isolatest, indicate target device
 
 ```
 % sh isolatest /dev/sd{AI}
@@ -183,7 +183,7 @@ execute isolatest
 ## 04
 insert usb2
 
-Prepar ext4 partitions labeled REPO, CODE and KEYS
+Prepare ext4 partitions labeled REPO, CODE and KEYS
 
 CAUTION! DESIGNATE THE RIGHT DEVICE!
 
@@ -195,23 +195,21 @@ NOTICE for offline installation only REPO and CODE are mandatory
 % sudo gdisk /dev/sd{RC}
 ```
 
-enter:	o	to rewrite GPT table
-
+enter:
+	    o	to rewrite GPT table
 		n	create a 10G 8300 partition (REPO)
-
 		n	create a 10G 8300 partition (CODE)
-
 		n	create a  1G 8300 partition (KEYS)
-
 		w	write changes to device
-
 		q	quit gdisk
+
+NOTICE approximated partition sizes
 
 ```
 % sudo mkfs.ext4 -L REPO /dev/sd{RC2}
 % sudo mkfs.ext4 -L CODE /dev/sd{RC3}
 % sudo mkfs.ext4 -L KEYS /dev/sd{RC4}
-% mkdir -p $HOME/dock/{2,3,3/code,4}
+% mkdir -p $HOME/dock/{2,3/code,4}
 ```
 
 ## 05
