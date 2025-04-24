@@ -196,11 +196,17 @@ NOTICE for offline installation only REPO and CODE are mandatory
 ```
 
 enter:
+
 o	to rewrite GPT table
+
 n	create a 10G 8300 partition (REPO)
+
 n	create a 10G 8300 partition (CODE)
+
 n	create a  1G 8300 partition (KEYS)
+
 w	write changes to device
+
 q	quit gdisk
 
 NOTICE approximated partition sizes
