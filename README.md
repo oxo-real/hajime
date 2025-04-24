@@ -315,6 +315,10 @@ from here run the scripts in their numerical order:
 
 CAUTION! READ AND EXECUTE THE ON-SCREEN INSTRUCTIONS THOROUGHLY!
 
+or
+
+If you have configured a config file; enjoy your free time during the unattended installation!
+
 the system reboots after 2conf.sh has been executed
 
 
