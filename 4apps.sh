@@ -495,8 +495,11 @@ install_apps_pkgs ()
 
     done
 
-    ## install all aur packages from "$repo_dir"/aur/pkgs (symlinks)
-    yay -U --config "$pm_alt_conf" --needed --noconfirm "$repo_dir"/aur/pkgs/*.pkg.tar.zst
+    ## install aur packages from "$repo_dir"/aur/ofcl/pkgs (symlinks)
+
+    [[ "$online" -ne 1 ]] && \
+	## offline or hybrid mode
+	yay -U --config "$pm_alt_conf" --needed --noconfirm "$repo_dir"/aur/ofcl/pkgs/*.pkg.tar.zst
 }
 
 

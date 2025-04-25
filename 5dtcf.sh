@@ -369,6 +369,7 @@ git_clone_remote_local ()
     #[ -d $local_dir ] || mkdir -p $local_dir
 
     git clone $remote_repo $local_dir
+    [[ $? -ne 0 ]] && git --git-dir "$local_dir"/.git pull
 }
 
 
@@ -417,7 +418,7 @@ git_clone_note ()
 }
 
 
-get_git_repo ()
+get_git_repos ()
 {
     if [[ "$online" -eq 0 ]]; then
 	## offline mode
@@ -514,12 +515,12 @@ rewrite_symlinks ()
     ## wireguard interface symlinks
     cnvwpi="$XDG_CONFIG_HOME"/network/vpn/wg/proton/interface
     etc_wg=/etc/wireguard
-    sudo ln -s "$cnvwpi"/wg*.conf "$etc_wg"
+    sudo ln --symbolic --force "$cnvwpi"/wg*.conf "$etc_wg"
 
     ## z-shell config root like user
     rc=/root/.config
     sudo mkdir -p "$rc"
-    sudo ln -s "$XDG_CONFIG_HOME"/.config/zsh "$rc"/zsh
+    sudo ln --symbolic --force "$XDG_CONFIG_HOME"/.config/zsh "$rc"/zsh
 
     ## zsh default shell for root
     sudo chsh -s /usr/bin/zsh root
@@ -723,9 +724,10 @@ main ()
     debugging
     sourcing
     getargs $args
+    installation_mode
     get_offline_repo
     get_offline_code
-    get_git_repo
+    get_git_repos
     dotfbu_restore
     rewrite_symlinks
     recalculate_sums
