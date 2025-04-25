@@ -561,7 +561,7 @@ set_doas ()
 
 set_permissions ()
 {
-    # set right permissions for gnupg home
+    ## set right permissions for gnupg home
     sh $XDG_DATA_HOME/c/git/note/crypto/gpg/gnupg_set_permissions
 }
 
