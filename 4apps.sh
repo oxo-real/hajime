@@ -499,7 +499,7 @@ install_apps_pkgs ()
 
     [[ "$online" -ne 1 ]] && \
 	## offline or hybrid mode
-	yay -U --config "$pm_alt_conf" --needed --noconfirm "$repo_dir"/aur/ofcl/pkgs/*.pkg.tar.zst
+	yay -U --config "$pm_alt_conf" --needed --noconfirm "$repo_dir"/aur/pkgs/*.pkg.tar.zst
 }
 
 
