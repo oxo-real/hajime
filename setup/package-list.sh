@@ -127,10 +127,12 @@ apps_packages ()
 	#'haveged veracrypt tomb'
 
 	## security
-	opendoas arch-audit
+	arch-audit
+	# opendoas
 
 	## secure_connections
-	wireguard-tools sshfs
+	## systemd-resolvconf for wireguard
+	sshfs systemd-resolvconf wireguard-tools
 	#wireguard-tools protonvpn-cli-ng sshfs
 
 	## filesystems

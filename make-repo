@@ -425,7 +425,8 @@ create_latest_aur_pkg_symlink ()
     ## create symlink in aur/pkgs to latest package file
     target=$(realpath "$latest_pkg_zst")
     link_name=$(realpath "$repo_aur")/pkgs/"${latest_pkg_zst##*/}"
-    ln --symbolic "$target" "$link_name"
+    ## target relative to link_name location
+    ln --symbolic --relative "$target" "$link_name"
 }
 
 create_repo_database ()
