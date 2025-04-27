@@ -474,7 +474,24 @@ get_git_repos ()
 
 dotfbu_restore ()
 {
-    # restore .config from local git dotf
+    hcgct="$HOME"/c/git/code/tool
+
+    ## username in sha3-512sums file
+    s3s_home=$(head -n 1 "$hcgct"/sha3-512sums \
+		   | awk '{print $2}' \
+		   | awk -F '/' '{print "/"$2"/"$3}' \
+	    )
+
+    if [[ "$s3s_home" != "$HOME" ]]; then
+	## different username in sha3-512sums file
+
+	## remove sha3sums
+	rm -rf "$hcgct"/sha3-512sums
+	## recalculate sha3sums
+	sh "$hcgct"/calc-sum "$hcgct"
+
+    fi
+
     sh $XDG_DATA_HOME/c/git/code/tool/dotfbu restore $XDG_DATA_HOME/c/git/dotf $XDG_CONFIG_HOME
 }
 
@@ -642,7 +659,7 @@ pacman_conf ()
     sudo sed -i 's/^#X--//' $file_etc_pacman_conf
 
     ## check for network
-    ping -D -i 1 -c 3 9.9.9.9 > /dev/null 2>&1
+    ping -D -i 1 -c 1 9.9.9.9 > /dev/null 2>&1
 
     if [[ $? -eq 0 ]]; then
 	## network available
