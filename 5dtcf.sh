@@ -588,7 +588,7 @@ z_shell_config ()
     ## re-login or reset shell for changes to take effect
 
     ## symlink in etc_zsh to zshenv
-    sudo ln -s $XDG_CONFIG_HOME/zsh/etc_zsh_zshenv /etc/zsh/zshenv
+    sudo ln --symbolic --force $XDG_CONFIG_HOME/zsh/etc_zsh_zshenv /etc/zsh/zshenv
 
     ## zsh default shell for current user
     #sudo chsh -s $(which zsh)
@@ -613,6 +613,9 @@ z_shell_config ()
     ## enable command history
     [[ -d "$XDG_LOGS_HOME/history" ]] || mkdir $XDG_LOGS_HOME/history
     touch $XDG_LOGS_HOME/history/history
+
+    ## initialize zsh
+    zsh
 }
 
 
