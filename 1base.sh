@@ -569,8 +569,18 @@ set_boot_device ()
 
 	    fi
 
-	    printf "${st_bold}%s${st_def} ${fg_magenta}write${st_def} partition data (%s)\n" "$dev_boot" "$p_name"
-	    sgdisk --new $part_boot:0:${size_boot} --typecode $part_boot:$type_boot $dev_boot
+	    ## option to not run gdisk partitioning on dev_boot
+	    ## in case of reusing multi partition usb device
+	    if [[ -n $dev_boot_gdisk ]]; then
+
+		printf "${st_bold}%s${st_def} ${fg_magenta}write${st_def} partition data (%s)\n" "$dev_boot" "$p_name"
+		sgdisk --new $part_boot:0:${size_boot} --typecode $part_boot:$type_boot $dev_boot
+
+	    elif [[ -z "$dev_boot_gdisk" ]]; then
+
+		printf "${st_bold}%s${st_def} ${fg_magenta}skip${st_def} partitioning (%s)\n" "$dev_boot" "$p_name"
+
+	    fi
 
 	    boot_part=$dev_boot$part_boot
 	    ;;

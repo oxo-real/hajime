@@ -169,6 +169,7 @@ code ()
     declare -A code_source=( \
 	[.config]="$XDG_CONFIG_HOME" \
 	[code]="$XDG_DATA_HOME/c/git/code" \
+	[dotf]="$XDG_DATA_HOME/c/git/dotf" \
         [note]="$XDG_DATA_HOME/c/git/note" \
     )
 
