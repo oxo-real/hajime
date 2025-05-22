@@ -1,6 +1,7 @@
 ```
 /home/oxo/.local/share/c/git/code/hajime
 ├── 0init.sh
+├── \033[0mssh_oxo
 ├── 1base.sh
 ├── 2conf.sh
 ├── 3post.sh
@@ -14,6 +15,13 @@
 │   ├── rescue.sh
 │   └── urls
 ├── logs
+│   ├── 20250506_074837_1746510517_pacmanqq
+│   ├── 20250506_121534_1746526534_pacmanqq
+│   ├── 20250510_073950_1746855590_pacmanqq
+│   ├── 20250510_171444_1746890084_pacmanqq
+│   ├── 20250512_075908_1747029548_pacmanqq
+│   ├── 20250512_111224_1747041144_pacmanqq
+│   ├── 20250512_114904_1747043344_pacmanqq
 │   └── 3post-pkgs-w-deps.list
 ├── make-recov
 ├── make-repo
@@ -44,5 +52,5 @@
 ├── sha3-512sums
 └── temp
 
-10 directories, 34 files
+10 directories, 42 files
 ```

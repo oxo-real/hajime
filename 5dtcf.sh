@@ -501,11 +501,14 @@ user_agent ()
     ## create an initial user-agent to prevent error from zshenv
     ## [The Latest and Most Common User Agents List (Updated Weekly)](https://www.useragents.me/)
     ## 20250407
-    ua='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.10 Safari/605.1.1'
     lnua="$XDG_LOGS_HOME"/network/user_agent
-    lnuac="$lnua"/current
     [[ -d "$lnua" ]] || mkdir -p "$lnua"
-    printf '%s\n' "$ua" > "$lnuac"
+    ua='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.10 Safari/605.1.1'
+    lnuac="$lnua"/current
+    # printf '%s\n' "$ua" > "$lnuac"
+    ## DEV printf give permission error, why?
+    ## sed as printf gives an error
+    sed -i "$ua" "$lnuac"
 }
 
 
@@ -616,6 +619,13 @@ z_shell_config ()
 
     ## initialize zsh
     zsh
+}
+
+
+groups ()
+{
+    ## add $username to input group (for dotool)
+    sudo usermod --append --groups input "$username"
 }
 
 
@@ -754,6 +764,7 @@ main ()
     #set_doas
     set_permissions
     z_shell_config
+    groups
     set_sway_hardware
     base16
     user_agent

@@ -66,19 +66,23 @@ repo_mount="$HOME"/dock/2
 code_mount="$HOME"/dock/3
 keys_mount="$HOME"/dock/4
 
-
-# sourcing
+## sourcing
 source_dir="$XDG_DATA_HOME"/c/git/code/source/function
 source $source_dir/get_sudo
 source $source_dir/reply_functions
 source $source_dir/text_appearance
 
-# make_offl_repo="$hajime_dir/make-offl-repo"
-hajime_dir="$XDG_DATA_HOME/c/git/code/hajime"
+#make_offl_repo="$hajime_dir/make-offl-repo"
+hajime_dir="$XDG_DATA_HOME"/c/git/code/hajime
 make_repo="$hajime_dir"/make-repo
 timestamp=$(date +'%Y%m%d_%H%M%S_%s')
-[[ -d "$hajime_dir/logs" ]] || mkdir -p "$hajime_dir/logs"
+[[ -d "$hajime_dir"/logs ]] || mkdir -p "$hajime_dir"/logs
 pacman_qq="$hajime_dir"/logs/"$timestamp"_pacmanqq
+
+## paccache keep package versions
+keep_installed=2
+keep_uninstalled=1
+yay_cache_dir="$XDG_CACHE_HOME"/yay
 
 
 args="$@"
@@ -137,6 +141,33 @@ repo ()
 	    ## make-repo
 	    pacman -Qq > "$pacman_qq"
 	    "$make_repo" --package-list "$pacman_qq" --repo-destination "$repo_mount"
+
+	    ###
+	    # remove old packages from the pacman cache directory
+	    printf "==> cleanup paccache\n"
+
+	    # printf "rk3v  "
+	    printf '    rk%sv %s\n' "$keep_installed" "$repo_mount"/pkgs/ofcl
+	    paccache --remove --keep $keep_installed --verbose "$repo_mount"/pkgs/ofcl
+
+	    # printf "ruk0v "
+	    printf '    ruk%sv %s\n' "$keep_uninstalled" "$repo_mount"/pkgs/ofcl
+	    paccache --remove --uninstalled --keep $keep_uninstalled --verbose
+
+	    # remove old packages from the yay cache directory
+	    yay_cache_dirs="$(find "$yay_cache_dir" -maxdepth 1 -type d | awk '{ print "--cachedir " $1 }' | tail -n +2)"
+
+	    printf "==> cleanup yaycache\n"
+	    # printf "rk3v  "
+	    printf '    rk%sv %s\n' "$keep_installed" "$yay_cache_dirs"
+	    paccache --remove --keep $keep_installed --verbose $yay_cache_dirs
+	    # printf "ruk0v "
+	    printf '    ruk%sv %s\n' "$keep_uninstalled" "$yay_cache_dirs"
+	    paccache --remove --uninstalled --keep $keep_uninstalled --verbose $yay_cache_dirs
+	    echo
+	    #
+	    ###
+
 	    ;;
 
 	* )
@@ -169,6 +200,7 @@ code ()
     declare -A code_source=( \
 	[.config]="$XDG_CONFIG_HOME" \
 	[code]="$XDG_DATA_HOME/c/git/code" \
+	[dotf]="$XDG_DATA_HOME/c/git/dotf" \
         [note]="$XDG_DATA_HOME/c/git/note" \
     )
 
@@ -286,6 +318,7 @@ keys ()
 
     # keys source array (dictionary)
     declare -A keys_source=( \
+	[gnupg]="$XDG_CONFIG_HOME/gnupg" \
 	[keys]="$XDG_DATA_HOME/c/keys" \
 	[pass]="$(readlink $HOME/.password-store)" \
     )
@@ -298,6 +331,8 @@ keys ()
 
 	    for src_key in "${!keys_source[@]}"; do
 
+		echo
+		printf '==> %s\n' "$src_key"
 		local src=$(printf "${keys_source[$src_key]}")
 		local dst=$(printf "$keys_mount")
 		#local dst=$(printf "$keys_mount/$(printf "$src_key" | \

@@ -118,7 +118,9 @@ apps_packages ()
 	networkmanager
 
 	## password_security
-	pass pass-otp yubikey-manager
+	pass pass-otp 
+	## for ykman and yubikey usb communication
+	yubikey-manager libfido2
 	#pass-tomb bitwarden-cli pass-wl-clipboard
 
 	## encryption
@@ -158,7 +160,9 @@ apps_packages ()
 	wireplumber
 	## pulseaudio compatibility
 	pipewire-pulse
-	# alsa-utils sof-firmware pipewire-jack
+	## sound open firmware
+	sof-firmware
+	# alsa-utils pipewire-jack
 	#pulseaudio pulseaudio-alsa pulsemixer qpwgraph-qt5
 
 	## image_viewers
