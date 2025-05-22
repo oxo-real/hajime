@@ -1,7 +1,6 @@
 ```
 /home/oxo/.local/share/c/git/code/hajime
 ├── 0init.sh
-├── \033[0mssh_oxo
 ├── 1base.sh
 ├── 2conf.sh
 ├── 3post.sh
@@ -52,5 +51,5 @@
 ├── sha3-512sums
 └── temp
 
-10 directories, 42 files
+10 directories, 41 files
 ```
