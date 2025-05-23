@@ -514,6 +514,11 @@ copy_hajime ()
 
     printf 'complete\n'
     sleep 1
+
+    touch /root/hajime/0init.done
+
+    echo
+    printf 'sh hajime/1base.sh\n'
     echo
 }
 
@@ -534,12 +539,6 @@ installation_mode ()
 	network_connect
 
     fi
-
-    touch /root/hajime/0init.done
-
-    echo
-    printf 'sh hajime/1base.sh\n'
-    echo
 }
 
 

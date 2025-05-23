@@ -468,8 +468,14 @@ install_apps_pkgs ()
 	## install from repo ofcl/pkgs
 	yay -S --config "$pm_alt_conf" --needed --noconfirm "$pkg"
 
-	# if [[ $? -ne 0 ]]; then
-	    ## on err exit search aur_pkgs_arr
+	if [[ $? -ne 0 ]]; then
+	    ## on err exit try install from repo aur/pkgs
+
+	    yay -U --config "$pm_alt_conf" --needed --noconfirm "$repo_dir"/aur/pkgs/*.pkg.tar.zst
+
+	fi
+
+    done
 
 	    ## find aur package installed version
 	    ### best method hitherto
@@ -491,18 +497,14 @@ install_apps_pkgs ()
 	    ## install from local aur pkg.tar.zst file
 	    # yay -U --config "$pm_alt_conf" --needed --noconfirm "$latest_pkg_link"
 
-	# fi
+    # done
 
-    done
+    #if [[ "$online" -ne 1 ]]; then
 
-    ## install aur packages from "$repo_dir"/aur/pkgs (symlinks)
+    #	## offline or hybrid mode
+    #	yay -U --config "$pm_alt_conf" --needed --noconfirm "$repo_dir"/aur/pkgs/*.pkg.tar.zst
 
-    if [[ "$online" -ne 1 ]]; then
-
-	## offline or hybrid mode
-	yay -U --config "$pm_alt_conf" --needed --noconfirm "$repo_dir"/aur/pkgs/*.pkg.tar.zst
-
-    fi
+    #fi
 }
 
 

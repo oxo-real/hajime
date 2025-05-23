@@ -118,7 +118,7 @@ apps_packages ()
 	networkmanager
 
 	## password_security
-	pass pass-otp 
+	pass pass-otp
 	## for ykman and yubikey usb communication
 	yubikey-manager libfido2
 	#pass-tomb bitwarden-cli pass-wl-clipboard
@@ -184,9 +184,8 @@ apps_packages ()
 	emacs figlet qrencode zbar jq tinyxxd
 
 	## terminal_file_manager
-	fff lf
-	#yazi (=aur)
-	#vifm lf-git nnn ranger
+	lf yazi
+	#fff vifm lf-git nnn ranger
 
 	## file_tools
 	dust fd ripgrep simple-mtpfs
@@ -212,8 +211,7 @@ apps_packages ()
 
 	## internet_browser
 	firefox-developer-edition qutebrowser w3m
-	#icecat lynx
-	#nyxt  ## seems to inflict a pacman error: libicuuc.so.75
+	#icecat lynx nyxt
 
 	## internet_search
 	#googler ddgr surfraw
@@ -265,6 +263,9 @@ apps_packages ()
 	## pdf_viewers
 	mupdf zathura-pdf-mupdf
 	#calibre okular
+
+	## music player
+	mpd rmpc
 
 	## video_capturing
 	# wf-recorder xdg-desktop-portal-wlr qt6ct wlrobs
