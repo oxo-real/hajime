@@ -42,6 +42,7 @@
 │   │   └── mbp2011a1286.conf
 │   ├── metapackage_deps
 │   ├── network
+│   │   └── etc_hosts
 │   ├── package-list.sh
 │   └── pacman
 │       ├── 3conf_299_pkgs
@@ -52,5 +53,5 @@
 ├── sha3-512sums
 └── temp
 
-10 directories, 42 files
+10 directories, 43 files
 ```
