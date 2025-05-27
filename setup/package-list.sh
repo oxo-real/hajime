@@ -162,11 +162,15 @@ apps_packages ()
 	pipewire-pulse
 	## sound open firmware
 	sof-firmware
-	# alsa-utils pipewire-jack
+	## alsa-utils provides aplay & arecord
+	alsa-utils
+	# pipewire-jack
 	#pulseaudio pulseaudio-alsa pulsemixer qpwgraph-qt5
 
 	## image_viewers
-	sxiv feh imv
+	imv
+	## sxiv and feh need X display
+	#sxiv feh
 	#fim ueberzug geekie
 
 	## bluetooth

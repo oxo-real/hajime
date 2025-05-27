@@ -540,7 +540,7 @@ rewrite_symlinks ()
     ## z-shell config root like user
     rc=/root/.config
     sudo mkdir -p "$rc"
-    sudo ln --symbolic --force "$XDG_CONFIG_HOME"/.config/zsh "$rc"/zsh
+    sudo ln --symbolic --force "$XDG_CONFIG_HOME"/zsh "$rc"/zsh
 
     ## zsh default shell for root
     sudo chsh -s /usr/bin/zsh root
