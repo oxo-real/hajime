@@ -224,7 +224,9 @@ code ()
 
 		case $src in
 
-		    $XDG_CONFIG_HOME)
+		    ## switch this branch off tempo
+		    X )
+		    #$XDG_CONFIG_HOME )
 			local dst=$(printf "$code_mount/.config")
 			# code from dotbu:
 			# rsync files in fpcl_file
@@ -278,7 +280,7 @@ code ()
 			rm -rf $all_files_list
 			;;
 
-		    *)
+		    * )
 			rsync -aAXv \
 			    --info=ALL \
 			    $options \
