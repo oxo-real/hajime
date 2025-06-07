@@ -477,6 +477,30 @@ dotfbu_restore ()
     hcgct="$HOME"/c/git/code/tool
 
     ## username in sha3-512sums file
+    #TODO head: no such file or directory
+    ## why this s3s stuff here?
+    ## made new function
+    # s3s_home=$(head -n 1 "$hcgct"/sha3-512sums \
+    # 		   | awk '{print $2}' \
+    # 		   | awk -F '/' '{print "/"$2"/"$3}' \
+    # 	    )
+
+    # if [[ "$s3s_home" != "$HOME" ]]; then
+    # 	## different username in sha3-512sums file
+
+    # 	## remove sha3sums
+    # 	rm -rf "$hcgct"/sha3-512sums
+    # 	## recalculate sha3sums
+    # 	sh "$hcgct"/calc-sum "$hcgct"
+
+    # fi
+
+    sh $XDG_DATA_HOME/c/git/code/tool/dotfbu restore $XDG_DATA_HOME/c/git/dotf $XDG_CONFIG_HOME
+}
+
+
+rewrite_sha3_512sums ()
+{
     s3s_home=$(head -n 1 "$hcgct"/sha3-512sums \
 		   | awk '{print $2}' \
 		   | awk -F '/' '{print "/"$2"/"$3}' \
@@ -491,8 +515,6 @@ dotfbu_restore ()
 	sh "$hcgct"/calc-sum "$hcgct"
 
     fi
-
-    sh $XDG_DATA_HOME/c/git/code/tool/dotfbu restore $XDG_DATA_HOME/c/git/dotf $XDG_CONFIG_HOME
 }
 
 
@@ -759,6 +781,7 @@ main ()
     get_offline_code
     get_git_repos
     dotfbu_restore
+    # rewrite_sha3_512sums
     rewrite_symlinks
     recalculate_sums
     #set_doas

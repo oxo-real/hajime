@@ -118,7 +118,7 @@ apps_packages ()
 	networkmanager
 
 	## password_security
-	pass pass-otp
+	pass pass-otp argon2
 	## for ykman and yubikey usb communication
 	yubikey-manager libfido2
 	#pass-tomb bitwarden-cli pass-wl-clipboard
@@ -141,7 +141,8 @@ apps_packages ()
 	dosfstools ntfs-3g
 
 	## fonts
-	adobe-source-code-pro-fonts ttf-0xproto-nerd
+	ttf-sourcecodepro-nerd
+	#adobe-source-code-pro-fonts ttf-0xproto-nerd
 	#otf-unifonts ttf-unifonts terminus-font ttf-inconsolata
 
 	## display
