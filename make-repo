@@ -413,14 +413,16 @@ create_latest_aur_pkg_symlink ()
     pkg_version=${pmn_Qm##* }
 
     ## aur package latest zst (and sig) file to repo
-    #TODO remove sort and tail?
-    latest_pkg_zst=$(find "$repo_aur" -type f -name "${pkg_name}"-"${pkg_version}"*.zst \
-		     | sort --version-sort \
-		     | tail -n 1 \
-		   )
+    ## last quotes to prevent running into shell's wildcard expansion
+    ## sed removes debug packages from symlink pre-selection
+    latest_pkg_zst=$(find "$repo_aur" -type f -name "${pkg_name}-${pkg_version}*.zst" \
+			 | sed '/debug/d' \
+			 | sort --version-sort \
+			 | tail -n 1 \
+		  )
 
-    ## remove old symlink
-    unlink $(realpath "$repo_aur")/pkgs/"$pkg_name"-"$pkg_version"*.zst
+    ## remove old symlink(s)
+    unlink $(realpath "$repo_aur")/pkgs/"$pkg_name"*.zst
 
     ## create symlink in aur/pkgs to latest package file
     target=$(realpath "$latest_pkg_zst")

@@ -258,6 +258,7 @@ apps_packages ()
 	#virtualbox virtualbox-ext-oracle
 	#[7-kvm.sh · main · Stephan Raabe / archinstall · GitLab](https://gitlab.com/stephan-raabe/archinstall/-/blob/main/7-kvm.sh)
 	#virt-manager virt-viewer qemu vde2 ebtables iptables-nft nftables dnsmasq bridge-utils ovmf swtpm
+	#flatpak
 
 	## image_capturing
 	grim slurp
@@ -318,7 +319,7 @@ apps_packages ()
 	#yay -Qqm
 	#yay -Qm (version included)
 
-	#7-zip
+	7zip
 	base16-shell-preview
 	# brave-bin
 	# calcmysky

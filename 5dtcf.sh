@@ -527,10 +527,7 @@ user_agent ()
     [[ -d "$lnua" ]] || mkdir -p "$lnua"
     ua='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.10 Safari/605.1.1'
     lnuac="$lnua"/current
-    # printf '%s\n' "$ua" > "$lnuac"
-    ## DEV printf give permission error, why?
-    ## sed as printf gives an error
-    sed -i "$ua" "$lnuac"
+    echo "$ua" > "$lnuac"
 }
 
 
@@ -575,7 +572,7 @@ recalculate_sums ()
 
     while read sum; do
 
-	sh "$lscgc"/tool/calc-sum --noconfirm $(dirname "$sum")
+	sh "$lscgc"/tool/calc-sum --noconfirm "${sum%/*}"
 
     done <<< $(find "$lscgc" -type f -name 'sha3-512sums')
 }
