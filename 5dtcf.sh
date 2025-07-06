@@ -90,6 +90,7 @@ file_etc_pacman_conf=/etc/pacman.conf
 ## absolute file paths
 hajime_src="$code_dir"/code/hajime
 etc_doas_conf=/etc/doas.conf
+hcgct="$HOME"/c/git/code/tool
 
 
 #--------------------------------
@@ -472,33 +473,6 @@ get_git_repos ()
 }
 
 
-dotfbu_restore ()
-{
-    hcgct="$HOME"/c/git/code/tool
-
-    ## username in sha3-512sums file
-    #TODO head: no such file or directory
-    ## why this s3s stuff here?
-    ## made new function
-    # s3s_home=$(head -n 1 "$hcgct"/sha3-512sums \
-    # 		   | awk '{print $2}' \
-    # 		   | awk -F '/' '{print "/"$2"/"$3}' \
-    # 	    )
-
-    # if [[ "$s3s_home" != "$HOME" ]]; then
-    # 	## different username in sha3-512sums file
-
-    # 	## remove sha3sums
-    # 	rm -rf "$hcgct"/sha3-512sums
-    # 	## recalculate sha3sums
-    # 	sh "$hcgct"/calc-sum "$hcgct"
-
-    # fi
-
-    sh $XDG_DATA_HOME/c/git/code/tool/dotfbu restore $XDG_DATA_HOME/c/git/dotf $XDG_CONFIG_HOME
-}
-
-
 rewrite_sha3_512sums ()
 {
     s3s_home=$(head -n 1 "$hcgct"/sha3-512sums \
@@ -509,25 +483,16 @@ rewrite_sha3_512sums ()
     if [[ "$s3s_home" != "$HOME" ]]; then
 	## different username in sha3-512sums file
 
-	## remove sha3sums
-	rm -rf "$hcgct"/sha3-512sums
-	## recalculate sha3sums
-	sh "$hcgct"/calc-sum "$hcgct"
+	## replace s3s_home with $HOME
+	sed -i "s#${s3s_home}#${HOME}#g" "$hcgct"/sha3-512sums
 
     fi
 }
 
 
-user_agent ()
+dotfbu_restore ()
 {
-    ## create an initial user-agent to prevent error from zshenv
-    ## [The Latest and Most Common User Agents List (Updated Weekly)](https://www.useragents.me/)
-    ## 20250407
-    lnua="$XDG_LOGS_HOME"/network/user_agent
-    [[ -d "$lnua" ]] || mkdir -p "$lnua"
-    ua='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.10 Safari/605.1.1'
-    lnuac="$lnua"/current
-    echo "$ua" > "$lnuac"
+    sh $XDG_DATA_HOME/c/git/code/tool/dotfbu restore $XDG_DATA_HOME/c/git/dotf $XDG_CONFIG_HOME
 }
 
 
@@ -602,6 +567,19 @@ set_permissions ()
 {
     ## set right permissions for gnupg home
     sh $XDG_DATA_HOME/c/git/note/crypto/gpg/gnupg_set_permissions
+}
+
+
+user_agent ()
+{
+    ## create an initial user-agent to prevent error from zshenv
+    ## [The Latest and Most Common User Agents List (Updated Weekly)](https://www.useragents.me/)
+    ## 20250407
+    lnua="$HOME"/.logs/network/user-agent
+    [[ -d "$lnua" ]] || mkdir -p "$lnua"
+    ua='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.10 Safari/605.1.1'
+    lnuac="$lnua"/current
+    echo "$ua" > "$lnuac"
 }
 
 
@@ -777,17 +755,17 @@ main ()
     get_offline_repo
     get_offline_code
     get_git_repos
+    rewrite_sha3_512sums
     dotfbu_restore
-    # rewrite_sha3_512sums
     rewrite_symlinks
     recalculate_sums
     #set_doas
     set_permissions
+    user_agent
     z_shell_config
     groups
     set_sway_hardware
     base16
-    user_agent
     qutebrowser
     #wallpaper
     pacman_conf
