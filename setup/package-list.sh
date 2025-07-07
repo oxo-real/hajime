@@ -273,6 +273,9 @@ apps_packages ()
 	## music player
 	mpd rmpc
 
+	## text-to-speech
+	espeak-ng
+
 	## video_capturing
 	# wf-recorder xdg-desktop-portal-wlr qt6ct wlrobs
 	#obs
