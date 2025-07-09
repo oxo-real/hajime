@@ -36,13 +36,15 @@
 │   ├── 20250620_052321_1750389801_pacmanqq
 │   ├── 20250705_120111_1751709671_pacmanqq
 │   └── 3post-pkgs-w-deps.list
-├── make-recov
-├── make-repo
 ├── misc
 │   ├── 0init-offl-dl3189
 │   ├── 2conf_bashrc
 │   ├── 3post_motd
 │   └── alt_dtp_env
+├── prep
+│   ├── isolatest
+│   ├── make-recov
+│   └── make-repo
 ├── README.md
 ├── repo-tree.md
 ├── setup
@@ -66,5 +68,5 @@
 ├── sha3-512sums
 └── temp
 
-10 directories, 56 files
+11 directories, 57 files
 ```

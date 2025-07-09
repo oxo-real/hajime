@@ -1,0 +1,398 @@
+#! /usr/bin/env sh
+
+###  _           _       _            _
+### (_)___  ___ | | __ _| |_ ___  ___| |_
+### | / __|/ _ \| |/ _` | __/ _ \/ __| __|
+### | \__ \ (_) | | (_| | ||  __/\__ \ |_
+### |_|___/\___/|_|\__,_|\__\___||___/\__|
+###
+###
+###  # # # # # #
+###       #
+###  # # # # # #
+###
+
+: '
+isolatest
+create bootable device with the latest archiso
+copyright (c) 2019 - 2025  |  oxo
+
+GNU GPLv3 GENERAL PUBLIC LICENSE
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+https://www.gnu.org/licenses/gpl-3.0.txt
+
+@oxo@qoto.org
+
+
+# dependencies
+  dd, curl, openssl, reflector
+
+# usage
+  isolatest <target>
+
+# example
+  isolatest /dev/sdX
+
+# '
+
+
+#set -o errexit
+#set -o nounset
+#set -o pipefail
+
+# initial definitions
+
+## script
+script_name='isolatest'
+developer='oxo'
+license='gplv3'
+initial_release='2019'
+
+## hardcoded variables
+# initialization
+
+ping_target='9.9.9.9'
+download_location="$XDG_DATA_HOME/c/download"
+mc_abbr='NL'
+mirror_amount='5'
+mirror_country='Sweden,Netherlands'
+arch_mirrorlist='https://www.archlinux.org/mirrorlist/?country=$mc_abbr&protocol=http&protocol=https&ip_version=4'
+
+tmp_loc="$XDG_CACHE_HOME/temp/isolatest"
+# packages in arch linux live system (isolatest)
+# https://geo.mirror.pkgbuild.com/iso/latest/arch/pkglist.x86_64.txt
+
+## dd options
+target_device="$1"
+dd_bs=4M
+dd_conv=fsync
+dd_oflag=direct
+dd_status=progress
+
+# [USB flash installation medium - ArchWiki](https://wiki.archlinux.org/title/USB_flash_installation_medium)
+# [Arch Linux - Downloads](https://archlinux.org/download/)
+
+#--------------------------------
+
+header()
+{
+    #clear
+    printf "$script_name\n"
+    printf 'copyright (c) %s - %s  |  %s\n' "$initial_release" "$(date +%Y)" "$developer"
+    echo
+}
+
+
+validate_privileges()
+{
+    sudo -v
+}
+
+
+sourcing()
+{
+    # external code sources
+    source_dir="$XDG_DATA_HOME/c/git/code/source/function"
+    source $source_dir/reply_functions
+    source $source_dir/text_appearance
+}
+
+
+check_target_dev()
+{
+    ## not a mountpoint
+    mountpoint -q $target_device
+
+    if [ $? -eq 0 ] ; then
+
+	printf "$target_device is a mountpoint\n"
+	printf "exiting\n"
+	exit
+
+    fi
+
+    ## no valid directory path
+    if [ -d $target_device ] ; then
+
+	printf "$target_device is a valid path\n"
+	printf "exiting\n"
+	exit
+
+    fi
+}
+
+
+internet_connection()
+{
+    ping -q -w 2 -c 1 $ping_target
+    network_avail="$?"
+
+    if [[ "$network_avail" -eq 0 ]]; then
+
+	printf "internet connection detected via $(ip r | grep default | cut -d ' ' -f 3)\n"
+
+    else
+
+	printf "no internet connection\n"
+	printf "exiting\n"
+	exit
+
+    fi
+}
+
+
+configuring_mirrorlist()
+{
+    #header
+    file_etc_pacmand_mirrorlist="/etc/pacman.d/mirrorlist"
+    sudo cp $file_etc_pacmand_mirrorlist /etc/pacman.d/`date "+%Y%m%d%H%M%S"`_mirrorlist_backup
+    echo
+    printf "selecting fastest mirror\n"
+    sudo reflector --verbose --country $mirror_country -l $mirror_amount --protocol https --sort rate --save $file_etc_pacmand_mirrorlist
+
+    # create mirror source address
+    source1=$(grep = /etc/pacman.d/mirrorlist | sed -n 1p | awk -F '= ' '{print $2}' | sed 's/$.*/iso\/latest/')
+
+    # create iso filename
+    file1=$(curl -s $source1/sha256sums.txt | grep -o 'archlinux-.*-x86_64.iso')
+    #[TODO] on error select next mirror of mirrorlist
+
+    # check if file already exists
+    ## TODO add file is not complete iso (partial download)
+    if [[ -f $download_location/$file1 ]]; then
+
+	## derive sha256 ist (preliminary)
+	sha256_ist_pl=$(openssl dgst -sha256 $download_location/$file1 | sed 's/^.*= //')
+
+	if [[ "$sha256_ist_pl" == "$sha256_soll" ]]; then
+
+	    ## previous download attempt completed
+	    echo
+	    printf "$download_location/$file1 already exists\n"
+	    printf "continue and overwrite? (y/N) "
+
+	    reply_single
+
+	    if printf "$reply" | grep -iq "^n"; then
+
+		echo
+		printf 'aborted\n'
+		exit 172
+
+	    fi
+
+	fi
+
+	## else curl continues downloading
+
+    fi
+}
+
+
+download_iso()
+{
+    echo
+    printf "%27s %s\n" "image version:" "$file1"
+    printf "%27s %s\n" "downloading from:" "$source1"
+    printf "%27s %s\n" "copying iso image to:" "$download_location"
+    printf "%27s %s\n" "extracting iso image to:" "$target_device"
+
+    echo
+    printf "downloading ...\n"
+    download_status=1
+
+    #curl -O "$source1/$file1" --continue-at - --output-dir "$download_location"
+    ## curl: (33) HTTP server doesn't seem to support byte ranges. Cannot resume.
+
+    wget "$source1/$file1" --continue --output-document "$download_location/$file1"
+}
+
+
+download_soll() {
+
+    ## get iso checksum from sha256sums.txt
+    sha256_soll=$(curl --silent --show-error $source1/sha256sums.txt | grep $file1 | cut -d ' ' -f 1)
+    #sha1_soll=$(curl -s $source1/sha1sums.txt | grep $file1 | cut -d ' ' -f 1)
+    printf "$sha256_soll" > $download_location/$file1.sha256_soll
+}
+
+
+derive_ist() {
+
+    ## derive sha256 ist
+    sha256_ist=$(openssl dgst -sha256 $download_location/$file1 | sed 's/^.*= //')
+    #sha1_ist=$(openssl dgst -sha1 $file1 | sed 's/^.*= //')
+    printf "$sha256_ist" > $download_location/$file1.sha256_ist
+}
+
+
+sha256_checksum_verification() {
+
+    derive_ist
+    ## derive sha256 soll
+    #if [[ $download_status == 1 ]]; then
+
+    #	## get iso checksum from sha256sums.txt
+    #	sha256_soll=$(curl --silent --show-error $source1/sha256sums.txt | grep $file1 | cut -d ' ' -f 1)
+    #	#sha1_soll=$(curl -s $source1/sha1sums.txt | grep $file1 | cut -d ' ' -f 1)
+    #	printf "$sha256_soll" > $download_location/$file1.sha256_soll
+
+    #else
+
+#	sha256_soll=$(cat $download_location/$file1.sha256_soll)
+
+    #fi
+
+    ## report to human
+    #echo
+    printf "iso image checksum comparison:\n"
+    printf "source soll: $source1/sha256sums.txt\n"
+    echo
+    printf "soll sha256: $sha256_soll\n"
+    printf "ist  sha256: $sha256_ist\n"
+    echo
+
+    ## checksum comparison and set status
+    [ "$sha256_soll" = "$sha256_ist" ] || checksum=0 # no checksum match
+    [ "$sha256_soll" = "$sha256_ist" ] && checksum=1 # checksum match
+
+    if [ $checksum = 0 ]; then
+
+	printf "checksum error!\n"
+	printf "delete unvalidated iso image? (y/N) "
+
+	reply
+	echo
+
+	if printf "$reply" | grep -iq "^y" ; then
+	    echo
+	    rm $download_location/$file1
+	    #srm -Ev $download_location/$file1
+	    printf "unvalidated iso image moved to trash\n"
+	    #printf "unvalidated iso image wiped\n"
+	    printf "exiting\n"
+	    exit
+	else
+	    printf "unvalidated iso image in: $download_location\n"
+	fi
+
+	printf "exiting\n"
+	exit
+
+    elif [ $checksum == 1 ]; then
+
+	printf "checksum soll is equal to checksum ist\n"
+
+    fi
+}
+
+
+reply()
+{
+    # first silently entered character goes directly to $reply
+    stty_0=$(stty -g)
+    stty raw -echo
+    reply=$(head -c 1)
+    stty $stty_0
+}
+
+
+info_and_warning()
+{
+    #header
+    echo
+    ## device info for human
+    lsblk --tree -o name,uuid,fstype,label,size,fsuse%,fsused,path,mountpoint
+    echo
+    printf "WARNING! about to \033[1mirreversible overwrite\033[0m $target_device\n"
+    echo
+    printf "continue? (y/N) "
+
+    reply_single
+    echo
+
+    if printf "$reply" | grep -iq "^y" ; then
+	#clear
+	:
+    else
+	echo
+	printf "aborted by user\n"
+	printf "exiting\n"
+	exit
+    fi
+}
+
+
+write_to_usb()
+{
+    echo
+    printf "extracting $file1 to $target_device\n"
+    echo
+    # sudo dd if=$download_location/$file1 of=$target_device bs=256k status=progress oflag=sync
+    # [USB flash installation medium - ArchWiki](https://wiki.archlinux.org/title/USB_flash_installation_medium#Using_the_ISO_as_is_(BIOS_and_UEFI))
+    #TODO select an unmounted target device via it's name (lsusb or lsblk -o vendor)
+    #TODO check on target device sufficient size
+    sudo dd bs="$dd_bs" if="$download_location"/"$file1" of="$target_device" conv="$dd_conv" oflag="$dd_oflag" status="$dd_status"
+
+    echo
+    if [[ $? -eq 0 ]]; then
+
+	printf "dd process complete\n"
+	printf "$file1 available in $download_location\n"
+
+    else
+
+	printf "dd process encountered errors\n"
+
+    fi
+
+    echo
+}
+
+
+some_info()
+{
+    mkdir -p $tmp_loc
+    sudo mount -r --options silent $target_device $tmp_loc
+
+    printf "release $(lsblk -no label $target_device | head -n 1):\n"
+    printf "$(cat $tmp_loc/arch/pkglist.x86_64.txt | grep firmware)\n"
+    printf "$(cat $tmp_loc/arch/pkglist.x86_64.txt | grep keyring)\n"
+    printf "$(cat $tmp_loc/arch/pkglist.x86_64.txt | grep "systemd")\n"
+    printf "$(cat $tmp_loc/arch/pkglist.x86_64.txt | grep bash)\n"
+    printf "$(cat $tmp_loc/arch/pkglist.x86_64.txt | grep "vim")\n"
+
+    sudo umount $tmp_loc
+    rm -rf $tmp_loc
+    echo
+}
+
+
+main()
+{
+    header
+    sourcing
+    validate_privileges
+    check_target_dev
+    internet_connection
+    configuring_mirrorlist
+    download_soll
+    download_iso
+    sha256_checksum_verification
+    info_and_warning
+    write_to_usb
+    some_info
+}
+
+main
