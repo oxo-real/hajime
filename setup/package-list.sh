@@ -68,7 +68,7 @@ post_packages ()
     post_pkgs=(
 
 	## post_core_additions
-	lsof mlocate neofetch pacman-contrib
+	lsof mlocate fastfetch pacman-contrib
     )
 }
 

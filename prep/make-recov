@@ -74,7 +74,7 @@ source $source_dir/text_appearance
 
 #make_offl_repo="$hajime_dir/make-offl-repo"
 hajime_dir="$XDG_DATA_HOME"/c/git/code/hajime
-make_repo="$hajime_dir"/make-repo
+make_repo="$hajime_dir"/prep/make-repo
 timestamp=$(date +'%Y%m%d_%H%M%S_%s')
 [[ -d "$hajime_dir"/logs ]] || mkdir -p "$hajime_dir"/logs
 pacman_qq="$hajime_dir"/logs/"$timestamp"_pacmanqq

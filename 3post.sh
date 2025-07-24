@@ -461,17 +461,6 @@ configure_pacman ()
 }
 
 
-# pacman_init ()
-# {
-    ## already done in 2conf
-    # sudo pacman-key --config "$pm_alt_conf" --init
-    # sudo pacman-key --config "$pm_alt_conf" --populate archlinux
-
-    # sudo pacman -Syyu --config "$pm_alt_conf"
-    #sudo pacman -Syyu --needed --noconfirm --dbpath "$repo_dir"/ofcl/db --cachedir "repo_dir"/ofcl/pkgs
-# }
-
-
 install_post_pkgs ()
 {
     sudo pacman -Syu \
@@ -527,7 +516,8 @@ wrap_up ()
     fi
 
     echo
-    neofetch --ascii_distro arch_small --gtk3 off --gtk2 off --colors 3 3 3 7 3 4 --separator '     \t'
+    fastfetch --logo small --logo-color-1 blue --logo-color-2 blue
+    # neofetch --ascii_distro arch_small --gtk3 off --gtk2 off --colors 3 3 3 7 3 4 --separator '     \t'
 
     sudo touch hajime/3post.done
 }
@@ -552,7 +542,6 @@ main ()
     get_offline_code
     set_read_write
     configure_pacman
-    # pacman_init
     install_post_pkgs
     set_read_only
     wrap_up
