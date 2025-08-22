@@ -193,8 +193,8 @@ apps_packages ()
 	#fff vifm lf-git nnn ranger
 
 	## file_tools
-	dust fd ripgrep simple-mtpfs
-	#gdisk tmsu trash-cli
+	dust fd ripgrep simple-mtpfs gptfdisk
+	#tmsu trash-cli
 
 	## debugging
 	# strace
