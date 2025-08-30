@@ -1,12 +1,8 @@
 #! /usr/bin/env sh
-#TODO verify if we are chroot jailed:
-# [linux - Detecting a chroot jail from within - Stack Overflow](https://stackoverflow.com/questions/75182/detecting-a-chroot-jail-from-within)
-# ! [ -x /proc/1/root/. ] || [ /proc/1/root/. -ef / ]
 
-# manually entering luks encrypted archlinux system:
-# define system by setting parameters
-# boot archiso
+# forst boot archiso
 # CAUTION root will have escalated privileges
+# NOTICE specific for oxo linux distribution
 
 # to set up an existing installation in a chroot jail (/mnt)
 # for maintenance and/or recovery, run:
@@ -15,17 +11,21 @@
 # % rescue.sh --close
 
 
+#TODO verify if we are chroot jailed:
+# [linux - Detecting a chroot jail from within - Stack Overflow](https://stackoverflow.com/questions/75182/detecting-a-chroot-jail-from-within)
+# ! [ -x /proc/1/root/. ] || [ /proc/1/root/. -ef / ]
+
 # device parameters
 
 ## boot
-dev_boot=/dev/sda
-part_boot=1
-boot_part="$dev_boot""$part_boot"
+# dev_boot=/dev/sda
+# part_boot=1
+# boot_part="$dev_boot""$part_boot"
 
 ## lvm
-dev_lvm=/dev/sda
-part_lvm=2
-lvm_part="$dev_lvm""$part_lvm"
+# dev_lvm=/dev/sda
+# part_lvm=2
+# lvm_part="$dev_lvm""$part_lvm"
 
 
 # cryptoluks parameters
@@ -48,6 +48,27 @@ lvm_root=/mnt
 
 
 args="$@"
+
+
+get_devices ()
+{
+    lsblk -paf
+    echo
+    boot_part=$(lsblk -paf --raw | grep BOOT | awk '{print $1}')
+    lsblk -paf | grep "$boot_part"
+    echo
+    lvm_part=$(lsblk -paf --raw | grep crypto_LUKS | awk '{print $1}')
+    lsblk -paf | grep "$lvm_part"
+
+    printf 'correct? [y/N] '
+    read -r reply
+
+    if [[ ! "$reply" =~ ^[yY]$ ]]; then
+
+	exit 66
+
+    fi
+}
 
 
 # script
@@ -94,6 +115,7 @@ os_close ()
 
 main ()
 {
+    get_devices
     [[ "$args" == '--open' ]] && os_open
     [[ "$args" == '--close' ]] && os_close
 }
